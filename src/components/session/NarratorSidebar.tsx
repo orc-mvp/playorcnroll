@@ -5,6 +5,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
 import {
   Select,
   SelectContent,
@@ -41,12 +44,23 @@ const attributeIcons: Record<string, React.ElementType> = {
 
 const attributeKeys = ['aggression', 'determination', 'seduction', 'cunning', 'faith'] as const;
 
+const difficultyLabels: Record<number, string> = {
+  [-2]: 'veryEasy',
+  [-1]: 'easy',
+  [0]: 'normal',
+  [1]: 'hard',
+  [2]: 'veryHard',
+  [3]: 'nearlyImpossible',
+};
+
 export function NarratorSidebar({ session, participants, currentScene }: NarratorSidebarProps) {
   const { t } = useI18n();
   const { toast } = useToast();
   
   const [selectedAttribute, setSelectedAttribute] = useState<string>('');
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
+  const [difficulty, setDifficulty] = useState<number>(0);
+  const [context, setContext] = useState<string>('');
   const [isRequestingTest, setIsRequestingTest] = useState(false);
 
   const handleRequestTest = async () => {
@@ -70,7 +84,8 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
           attribute: selectedAttribute,
           test_type: selectedPlayers.length > 1 ? 'group' : 'individual',
           created_by: session.narrator_id,
-          difficulty: 0,
+          difficulty: difficulty,
+          context: context.trim() || null,
         })
         .select()
         .single();
@@ -85,13 +100,17 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
         event_data: {
           test_id: test.id,
           attribute: selectedAttribute,
+          difficulty: difficulty,
           players: selectedPlayers,
+          context: context.trim() || null,
         },
       });
 
       toast({ title: 'Teste solicitado!', duration: 2000 });
       setSelectedAttribute('');
       setSelectedPlayers([]);
+      setDifficulty(0);
+      setContext('');
     } catch (error: any) {
       toast({ title: 'Erro ao solicitar teste', variant: 'destructive' });
     } finally {
@@ -126,9 +145,9 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
         <CardContent className="space-y-4">
           {/* Attribute Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medieval text-muted-foreground">
+            <Label className="text-sm font-medieval text-muted-foreground">
               {t.tests.selectAttribute}
-            </label>
+            </Label>
             <Select value={selectedAttribute} onValueChange={setSelectedAttribute}>
               <SelectTrigger className="font-body">
                 <SelectValue placeholder="Escolha o atributo" />
@@ -149,11 +168,44 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
             </Select>
           </div>
 
+          {/* Difficulty Selection */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medieval text-muted-foreground">
+              {t.tests.difficulty}: {t.tests[difficultyLabels[difficulty] as keyof typeof t.tests] || 'Normal'}
+            </Label>
+            <Slider
+              value={[difficulty]}
+              onValueChange={([val]) => setDifficulty(val)}
+              min={-2}
+              max={3}
+              step={1}
+              className="py-2"
+            />
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>-2</span>
+              <span>0</span>
+              <span>+3</span>
+            </div>
+          </div>
+
+          {/* Context */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medieval text-muted-foreground">
+              {t.tests.context}
+            </Label>
+            <Input
+              value={context}
+              onChange={(e) => setContext(e.target.value)}
+              placeholder={t.tests.contextPlaceholder}
+              className="font-body text-sm"
+            />
+          </div>
+
           {/* Player Selection */}
           <div className="space-y-2">
-            <label className="text-sm font-medieval text-muted-foreground">
+            <Label className="text-sm font-medieval text-muted-foreground">
               {t.tests.selectPlayers}
-            </label>
+            </Label>
             <div className="space-y-2">
               {participants.map((p) => {
                 if (!p.character) return null;
