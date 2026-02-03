@@ -10,8 +10,9 @@ import { ScenePanel } from '@/components/session/ScenePanel';
 import { EventFeed } from '@/components/session/EventFeed';
 import { NarratorSidebar } from '@/components/session/NarratorSidebar';
 import { PlayerSidebar } from '@/components/session/PlayerSidebar';
+import { PendingTestNotification } from '@/components/dice/PendingTestNotification';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BookOpen, Scroll, User } from 'lucide-react';
+import { BookOpen, Scroll, User, Dices } from 'lucide-react';
 
 export interface SessionData {
   id: string;
@@ -298,6 +299,10 @@ export default function Session() {
 
   if (!session) return null;
 
+  // Get player's character for pending tests
+  const myParticipant = participants.find((p) => p.user_id === user?.id);
+  const myCharacter = myParticipant?.character;
+
   // Mobile layout with tabs
   if (isMobile) {
     return (
@@ -308,8 +313,19 @@ export default function Session() {
           onEndSession={handleEndSession}
         />
 
+        {/* Pending Test Notification for Players */}
+        {!isNarrator && myCharacter && (
+          <div className="px-4 pt-2">
+            <PendingTestNotification
+              sessionId={session.id}
+              characterId={myCharacter.id}
+              character={myCharacter}
+            />
+          </div>
+        )}
+
         <Tabs defaultValue="scene" className="flex-1 flex flex-col">
-          <TabsList className="grid grid-cols-3 mx-4 mt-2">
+          <TabsList className="grid grid-cols-4 mx-4 mt-2">
             <TabsTrigger value="scene" className="font-medieval text-xs">
               <BookOpen className="w-4 h-4 mr-1" />
               Cena
@@ -318,9 +334,13 @@ export default function Session() {
               <Scroll className="w-4 h-4 mr-1" />
               Eventos
             </TabsTrigger>
+            <TabsTrigger value="dice" className="font-medieval text-xs">
+              <Dices className="w-4 h-4 mr-1" />
+              Dados
+            </TabsTrigger>
             <TabsTrigger value="panel" className="font-medieval text-xs">
               <User className="w-4 h-4 mr-1" />
-              {isNarrator ? 'Controles' : 'Ficha'}
+              {isNarrator ? 'Ctrl' : 'Ficha'}
             </TabsTrigger>
           </TabsList>
 
@@ -335,6 +355,21 @@ export default function Session() {
 
           <TabsContent value="events" className="flex-1 p-4 overflow-auto">
             <EventFeed events={events} />
+          </TabsContent>
+
+          <TabsContent value="dice" className="flex-1 p-4 overflow-auto">
+            {!isNarrator && myCharacter ? (
+              <PendingTestNotification
+                sessionId={session.id}
+                characterId={myCharacter.id}
+                character={myCharacter}
+              />
+            ) : (
+              <div className="text-center text-muted-foreground py-8">
+                <Dices className="w-12 h-12 mx-auto mb-2 opacity-30" />
+                <p className="font-body">Aguardando testes...</p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="panel" className="flex-1 p-4 overflow-auto">
@@ -389,6 +424,17 @@ export default function Session() {
 
         {/* Sidebar */}
         <aside className="w-80 border-l border-border bg-card/30 overflow-auto p-4">
+          {/* Pending Test Notification for Players (Desktop) */}
+          {!isNarrator && myCharacter && (
+            <div className="mb-4">
+              <PendingTestNotification
+                sessionId={session.id}
+                characterId={myCharacter.id}
+                character={myCharacter}
+              />
+            </div>
+          )}
+          
           {isNarrator ? (
             <NarratorSidebar 
               session={session}
