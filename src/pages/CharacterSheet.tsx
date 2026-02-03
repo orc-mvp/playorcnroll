@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,7 +33,9 @@ import {
   AlertTriangle,
   Clock,
   Check,
+  Pencil,
 } from 'lucide-react';
+import { EditCharacterModal } from '@/components/character/EditCharacterModal';
 import type { Json } from '@/integrations/supabase/types';
 
 interface MajorMark {
@@ -50,11 +52,6 @@ interface ExtendedNarrative {
   name: string;
   description: string;
   created_at?: string;
-}
-
-interface MarkProgress {
-  theme: string;
-  points: number;
 }
 
 interface MinorMarkData {
@@ -112,6 +109,9 @@ export default function CharacterSheet() {
   const [minorMarksData, setMinorMarksData] = useState<MinorMarkData[]>([]);
   const [complications, setComplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const isOwner = character && user && character.id && user.id;
 
   useEffect(() => {
     if (!characterId || !user) return;
@@ -160,6 +160,10 @@ export default function CharacterSheet() {
     fetchCharacter();
   }, [characterId, user, navigate, toast, language]);
 
+  const handleCharacterUpdate = (updated: Character) => {
+    setCharacter((prev) => (prev ? { ...prev, ...updated } : prev));
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -193,14 +197,23 @@ export default function CharacterSheet() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <User className="w-5 h-5 text-primary" />
-            <h1 className="font-medieval text-xl text-foreground">{t.character.sheet}</h1>
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
+              <h1 className="font-medieval text-xl text-foreground">{t.character.sheet}</h1>
+            </div>
           </div>
+
+          {isOwner && (
+            <Button variant="outline" size="sm" onClick={() => setShowEditModal(true)}>
+              <Pencil className="w-4 h-4 mr-1" />
+              {t.common.edit}
+            </Button>
+          )}
         </div>
       </header>
 
@@ -606,6 +619,16 @@ export default function CharacterSheet() {
           </div>
         </ScrollArea>
       </main>
+
+      {/* Edit Character Modal */}
+      {character && (
+        <EditCharacterModal
+          open={showEditModal}
+          onOpenChange={setShowEditModal}
+          character={character}
+          onSave={handleCharacterUpdate}
+        />
+      )}
     </div>
   );
 }
