@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import CreateCharacter from "./pages/CreateCharacter";
+import MyCharacters from "./pages/MyCharacters";
+import CharacterSheet from "./pages/CharacterSheet";
 import CreateSession from "./pages/CreateSession";
 import SessionLobby from "./pages/SessionLobby";
 import Session from "./pages/Session";
@@ -31,6 +33,8 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/character/create" element={<CreateCharacter />} />
+              <Route path="/characters" element={<MyCharacters />} />
+              <Route path="/character/:characterId" element={<CharacterSheet />} />
               <Route path="/session/create" element={<CreateSession />} />
               <Route path="/session/:sessionId/lobby" element={<SessionLobby />} />
               <Route path="/session/:sessionId" element={<Session />} />
