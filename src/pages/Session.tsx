@@ -56,6 +56,8 @@ export interface Participant {
     cunning_type: string;
     faith_type: string;
     heroic_moves_stored: number;
+    minor_marks?: string[] | null;
+    major_marks?: unknown[] | null;
   } | null;
   profile?: {
     display_name: string | null;
@@ -152,7 +154,9 @@ export default function Session() {
             seduction_type,
             cunning_type,
             faith_type,
-            heroic_moves_stored
+            heroic_moves_stored,
+            minor_marks,
+            major_marks
           )
         `)
         .eq('session_id', sessionId);
