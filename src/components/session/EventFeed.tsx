@@ -1,6 +1,7 @@
 import { useI18n } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
 import { 
   Scroll, 
   BookOpen, 
@@ -8,11 +9,16 @@ import {
   AlertTriangle, 
   Sparkles,
   UserPlus,
-  MessageSquare
+  MessageSquare,
+  Users,
+  CheckCircle,
+  XCircle,
+  MinusCircle
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import type { SessionEvent } from '@/pages/Session';
+import { cn } from '@/lib/utils';
 
 interface EventFeedProps {
   events: SessionEvent[];
@@ -33,9 +39,43 @@ const eventConfig: Record<string, {
   test_requested: {
     icon: Dices,
     color: 'text-yellow-500',
-    label: (data, lang) => lang === 'pt-BR'
-      ? `Teste de ${data.attribute} solicitado`
-      : `${data.attribute} test requested`,
+    label: (data, lang) => {
+      const isGroup = Array.isArray(data.players) && data.players.length > 1;
+      return lang === 'pt-BR'
+        ? `Teste ${isGroup ? 'em grupo ' : ''}de ${data.attribute} solicitado`
+        : `${isGroup ? 'Group ' : ''}${data.attribute} test requested`;
+    },
+  },
+  dice_rolled: {
+    icon: Dices,
+    color: 'text-green-500',
+    label: (data, lang) => {
+      const resultText = data.result === 'success' 
+        ? (lang === 'pt-BR' ? 'Sucesso' : 'Success')
+        : data.result === 'partial' 
+          ? (lang === 'pt-BR' ? 'Parcial' : 'Partial')
+          : (lang === 'pt-BR' ? 'Falha' : 'Failure');
+      return `${data.attribute}: ${data.dice1}+${data.dice2}=${data.total} → ${resultText}`;
+    },
+  },
+  group_test_completed: {
+    icon: Users,
+    color: 'text-purple-500',
+    label: (data, lang) => {
+      const resultText = data.finalResult === 'success'
+        ? (lang === 'pt-BR' ? 'Sucesso do Grupo' : 'Group Success')
+        : data.finalResult === 'partial'
+          ? (lang === 'pt-BR' ? 'Sucesso Parcial do Grupo' : 'Group Partial')
+          : (lang === 'pt-BR' ? 'Falha do Grupo' : 'Group Failure');
+      return `${data.attribute}: ${resultText}`;
+    },
+  },
+  pull_group: {
+    icon: Users,
+    color: 'text-yellow-500',
+    label: (_, lang) => lang === 'pt-BR'
+      ? 'Jogador puxou o grupo! +1 sucesso'
+      : 'Player pulled the group! +1 success',
   },
   test_completed: {
     icon: Dices,
@@ -108,7 +148,12 @@ export function EventFeed({ events }: EventFeedProps) {
                 return (
                   <div
                     key={event.id}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border/50"
+                    className={cn(
+                      "flex items-start gap-3 p-3 rounded-lg border border-border/50",
+                      event.event_type === 'group_test_completed' 
+                        ? "bg-purple-500/10 border-purple-500/30"
+                        : "bg-muted/30"
+                    )}
                   >
                     <div className={`mt-0.5 ${config.color}`}>
                       <Icon className="w-4 h-4" />
@@ -117,6 +162,48 @@ export function EventFeed({ events }: EventFeedProps) {
                       <p className="font-body text-sm">
                         {config.label(event.event_data, language)}
                       </p>
+                      
+                      {/* Extra info for dice rolls */}
+                      {event.event_type === 'dice_rolled' && (
+                        <div className="flex items-center gap-2 mt-1">
+                          {(event.event_data as any).has_positive_extreme && (
+                            <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30 text-xs">
+                              <Sparkles className="w-3 h-3 mr-1" />
+                              Extremo+
+                            </Badge>
+                          )}
+                          {(event.event_data as any).has_negative_extreme && (
+                            <Badge className="bg-red-500/20 text-red-500 border-red-500/30 text-xs">
+                              <AlertTriangle className="w-3 h-3 mr-1" />
+                              Extremo-
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Extra info for group test results */}
+                      {event.event_type === 'group_test_completed' && (
+                        <div className="flex items-center gap-2 mt-2">
+                          <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
+                            <CheckCircle className="w-3 h-3 mr-1" />
+                            {(event.event_data as any).successes}
+                          </Badge>
+                          <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30 text-xs">
+                            <MinusCircle className="w-3 h-3 mr-1" />
+                            {(event.event_data as any).partials}
+                          </Badge>
+                          <Badge className="bg-red-500/20 text-red-500 border-red-500/30 text-xs">
+                            <XCircle className="w-3 h-3 mr-1" />
+                            {(event.event_data as any).failures}
+                          </Badge>
+                          {(event.event_data as any).pullGroupCount > 0 && (
+                            <Badge className="bg-primary/20 text-primary border-primary/30 text-xs">
+                              +{(event.event_data as any).pullGroupCount} Pull
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+
                       <span className="text-xs text-muted-foreground">
                         {format(new Date(event.created_at), 'HH:mm:ss', { locale: dateLocale })}
                       </span>

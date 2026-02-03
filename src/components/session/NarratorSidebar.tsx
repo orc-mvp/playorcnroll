@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -26,6 +26,7 @@ import {
   Brain,
   Flame
 } from 'lucide-react';
+import { GroupTestPanel } from '@/components/dice/GroupTestPanel';
 import type { SessionData, Participant, Scene } from '@/pages/Session';
 
 interface NarratorSidebarProps {
@@ -62,6 +63,66 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
   const [difficulty, setDifficulty] = useState<number>(0);
   const [context, setContext] = useState<string>('');
   const [isRequestingTest, setIsRequestingTest] = useState(false);
+  const [activeGroupTest, setActiveGroupTest] = useState<{
+    id: string;
+    attribute: string;
+    players: string[];
+  } | null>(null);
+
+  // Check for active group tests
+  useEffect(() => {
+    const fetchActiveGroupTest = async () => {
+      const { data: tests } = await supabase
+        .from('tests')
+        .select('id, attribute, status, test_type')
+        .eq('session_id', session.id)
+        .eq('status', 'pending')
+        .eq('test_type', 'group')
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (tests && tests.length > 0) {
+        // Get the expected players from the event
+        const { data: events } = await supabase
+          .from('session_events')
+          .select('event_data')
+          .eq('session_id', session.id)
+          .eq('event_type', 'test_requested')
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        const testEvent = events?.find(e => 
+          (e.event_data as any)?.test_id === tests[0].id
+        );
+        
+        const players = (testEvent?.event_data as any)?.players || [];
+        
+        setActiveGroupTest({
+          id: tests[0].id,
+          attribute: tests[0].attribute,
+          players,
+        });
+      } else {
+        setActiveGroupTest(null);
+      }
+    };
+
+    fetchActiveGroupTest();
+
+    // Subscribe to test updates
+    const channel = supabase
+      .channel(`narrator-tests-${session.id}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'tests', filter: `session_id=eq.${session.id}` },
+        () => fetchActiveGroupTest()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [session.id]);
 
   const handleRequestTest = async () => {
     if (!selectedAttribute || selectedPlayers.length === 0 || !currentScene) {
@@ -133,6 +194,18 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
         <Crown className="w-5 h-5" />
         <span className="font-medieval">{t.roles.narrator}</span>
       </div>
+
+      {/* Active Group Test Panel */}
+      {activeGroupTest && (
+        <GroupTestPanel
+          testId={activeGroupTest.id}
+          sessionId={session.id}
+          attribute={activeGroupTest.attribute}
+          expectedPlayers={activeGroupTest.players}
+          participants={participants}
+          isNarrator={true}
+        />
+      )}
 
       {/* Request Test Card */}
       <Card className="medieval-card">
