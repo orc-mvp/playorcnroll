@@ -122,30 +122,34 @@ export default function Dashboard() {
           {isNarrator ? (
             <>
               {/* Create Session */}
-              <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                    <Plus className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="font-medieval">{t.session.create}</CardTitle>
-                  <CardDescription className="font-body">
-                    Inicie uma nova aventura com seus jogadores
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/session/create">
+                <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                      <Plus className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="font-medieval">{t.session.create}</CardTitle>
+                    <CardDescription className="font-body">
+                      Inicie uma nova aventura com seus jogadores
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
               {/* My Sessions */}
-              <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                    <BookOpen className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="font-medieval">{t.session.mySessions}</CardTitle>
-                  <CardDescription className="font-body">
-                    Acesse sessões anteriores e em andamento
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/sessions">
+                <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                      <BookOpen className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="font-medieval">{t.session.mySessions}</CardTitle>
+                    <CardDescription className="font-body">
+                      Acesse sessões anteriores e em andamento
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
               {/* Manage Marks */}
               <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group">
@@ -191,17 +195,19 @@ export default function Dashboard() {
               </Card>
 
               {/* Join Session */}
-              <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                    <BookOpen className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="font-medieval">{t.session.join}</CardTitle>
-                  <CardDescription className="font-body">
-                    Entre em uma sessão usando código de convite
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/join">
+                <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                      <BookOpen className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="font-medieval">{t.session.join}</CardTitle>
+                    <CardDescription className="font-body">
+                      Entre em uma sessão usando código de convite
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
             </>
           )}
         </div>
