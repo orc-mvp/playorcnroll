@@ -182,17 +182,19 @@ export default function Dashboard() {
               </Link>
 
               {/* My Characters */}
-              <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                    <Users className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="font-medieval">{t.nav.characters}</CardTitle>
-                  <CardDescription className="font-body">
-                    Gerencie seus personagens existentes
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/characters">
+                <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                      <Users className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="font-medieval">{t.nav.characters}</CardTitle>
+                    <CardDescription className="font-body">
+                      Gerencie seus personagens existentes
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
               {/* Join Session */}
               <Link to="/join">
