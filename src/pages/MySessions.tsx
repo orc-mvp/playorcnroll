@@ -81,7 +81,7 @@ export default function MySessions() {
           setSessions(sessionsWithCounts);
         }
       } else {
-        // Fetch sessions where user is participant
+        // Fetch sessions where user is participant (players don't need invite_code)
         const { data: participantData, error } = await supabase
           .from('session_participants')
           .select(`
@@ -90,7 +90,6 @@ export default function MySessions() {
               id,
               name,
               description,
-              invite_code,
               status,
               created_at,
               updated_at
@@ -241,11 +240,14 @@ export default function MySessions() {
                           </span>
                         </div>
                       )}
-                      <div className="flex items-center gap-1 ml-auto">
-                        <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
-                          {session.invite_code}
-                        </span>
-                      </div>
+                      {/* Only show invite code to narrators - players don't need to see it */}
+                      {isNarrator && (
+                        <div className="flex items-center gap-1 ml-auto">
+                          <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
+                            {session.invite_code}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
