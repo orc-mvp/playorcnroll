@@ -90,7 +90,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   ): Promise<{ error: Error | null }> => {
     const redirectUrl = `${window.location.origin}/`;
 
-    const { data, error } = await supabase.auth.signUp({
+    // Profile is automatically created via database trigger (handle_new_user)
+    // The role and display_name are passed in user metadata
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -104,22 +106,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) {
       return { error };
-    }
-
-    // Create profile after signup
-    if (data.user) {
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          user_id: data.user.id,
-          role,
-          display_name: displayName || null,
-        });
-
-      if (profileError) {
-        console.error('Error creating profile:', profileError);
-        return { error: profileError };
-      }
     }
 
     return { error: null };
