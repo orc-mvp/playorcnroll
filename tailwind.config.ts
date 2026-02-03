@@ -13,6 +13,10 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        medieval: ["Cinzel", "Times New Roman", "serif"],
+        body: ["Crimson Text", "Georgia", "serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -30,6 +34,14 @@ export default {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+        },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -57,6 +69,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // Medieval theme specific
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          light: "hsl(var(--gold-light))",
+          dark: "hsl(var(--gold-dark))",
+        },
+        parchment: {
+          DEFAULT: "hsl(var(--parchment))",
+          dark: "hsl(var(--parchment-dark))",
+        },
+        blood: "hsl(var(--blood))",
+        frost: "hsl(var(--frost))",
+        ember: "hsl(var(--ember))",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -65,25 +90,60 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "fade-in": {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "fade-out": {
+          from: { opacity: "1", transform: "translateY(0)" },
+          to: { opacity: "0", transform: "translateY(10px)" },
+        },
+        "scale-in": {
+          from: { transform: "scale(0.95)", opacity: "0" },
+          to: { transform: "scale(1)", opacity: "1" },
+        },
+        "slide-in-right": {
+          from: { transform: "translateX(100%)" },
+          to: { transform: "translateX(0)" },
+        },
+        "pulse-gold": {
+          "0%, 100%": {
+            boxShadow: "0 0 5px hsl(43 74% 49% / 0.5), 0 0 20px hsl(43 74% 49% / 0.3)",
           },
-          to: {
-            height: "0",
+          "50%": {
+            boxShadow: "0 0 15px hsl(43 74% 49% / 0.8), 0 0 40px hsl(43 74% 49% / 0.5)",
           },
+        },
+        "pulse-blood": {
+          "0%, 100%": {
+            boxShadow: "0 0 5px hsl(0 65% 40% / 0.5), 0 0 20px hsl(0 65% 40% / 0.3)",
+          },
+          "50%": {
+            boxShadow: "0 0 15px hsl(0 65% 40% / 0.8), 0 0 40px hsl(0 65% 40% / 0.5)",
+          },
+        },
+        "dice-roll": {
+          "0%": { transform: "rotateX(0deg) rotateY(0deg) rotateZ(0deg)" },
+          "100%": { transform: "rotateX(720deg) rotateY(720deg) rotateZ(360deg)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.3s ease-out",
+        "fade-out": "fade-out 0.3s ease-out",
+        "scale-in": "scale-in 0.2s ease-out",
+        "slide-in-right": "slide-in-right 0.3s ease-out",
+        "pulse-gold": "pulse-gold 1.5s ease-in-out infinite",
+        "pulse-blood": "pulse-blood 1.5s ease-in-out infinite",
+        "dice-roll": "dice-roll 2s ease-out",
       },
     },
   },
