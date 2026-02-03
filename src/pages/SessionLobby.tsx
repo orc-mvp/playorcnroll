@@ -289,13 +289,14 @@ export default function SessionLobby() {
                 <label className="text-sm font-medieval text-muted-foreground">
                   {t.session.inviteLink}
                 </label>
-                <div className="flex gap-2">
-                  <div className="flex-1 bg-muted rounded-md px-3 py-2 text-sm truncate font-body">
+                <div className="flex gap-2 min-w-0">
+                  <div className="flex-1 min-w-0 bg-muted rounded-md px-3 py-2 text-sm truncate font-body overflow-hidden">
                     {inviteLink}
                   </div>
                   <Button
                     variant="outline"
                     size="icon"
+                    className="shrink-0"
                     onClick={() => copyToClipboard(inviteLink, 'Link')}
                   >
                     <Copy className="w-4 h-4" />
