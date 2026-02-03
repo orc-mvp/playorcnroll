@@ -11,7 +11,6 @@ import {
   LogOut, 
   Crown, 
   Scroll,
-  Settings,
   BookOpen
 } from 'lucide-react';
 
@@ -164,17 +163,19 @@ export default function Dashboard() {
           ) : (
             <>
               {/* Create Character */}
-              <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                    <Plus className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="font-medieval">{t.character.create}</CardTitle>
-                  <CardDescription className="font-body">
-                    Crie um novo herói para suas aventuras
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/character/create">
+                <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                      <Plus className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="font-medieval">{t.character.create}</CardTitle>
+                    <CardDescription className="font-body">
+                      Crie um novo herói para suas aventuras
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
 
               {/* My Characters */}
               <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group">
