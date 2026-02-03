@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import CreateCharacter from "./pages/CreateCharacter";
 import CreateSession from "./pages/CreateSession";
 import SessionLobby from "./pages/SessionLobby";
+import Session from "./pages/Session";
 import JoinSession from "./pages/JoinSession";
 import MySessions from "./pages/MySessions";
 import NotFound from "./pages/NotFound";
@@ -32,7 +33,7 @@ const App = () => (
               <Route path="/character/create" element={<CreateCharacter />} />
               <Route path="/session/create" element={<CreateSession />} />
               <Route path="/session/:sessionId/lobby" element={<SessionLobby />} />
-              <Route path="/session/:sessionId" element={<SessionLobby />} />
+              <Route path="/session/:sessionId" element={<Session />} />
               <Route path="/join" element={<JoinSession />} />
               <Route path="/join/:code" element={<JoinSession />} />
               <Route path="/sessions" element={<MySessions />} />
