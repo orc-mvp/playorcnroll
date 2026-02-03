@@ -101,6 +101,20 @@ const eventConfig: Record<string, {
       ? `${data.character_name} teve um Extremo Negativo!`
       : `${data.character_name} got a Negative Extreme!`,
   },
+  complication_created: {
+    icon: AlertTriangle,
+    color: 'text-red-500',
+    label: (data, lang) => lang === 'pt-BR'
+      ? `Complicação criada para ${data.character_name}`
+      : `Complication created for ${data.character_name}`,
+  },
+  complication_manifested: {
+    icon: Sparkles,
+    color: 'text-green-500',
+    label: (data, lang) => lang === 'pt-BR'
+      ? `Complicação resolvida: ${data.description?.substring(0, 30)}...`
+      : `Complication resolved: ${data.description?.substring(0, 30)}...`,
+  },
   player_joined: {
     icon: UserPlus,
     color: 'text-green-500',

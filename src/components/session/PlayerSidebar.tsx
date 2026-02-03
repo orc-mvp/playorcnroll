@@ -11,6 +11,7 @@ import {
   Sparkles,
   AlertCircle
 } from 'lucide-react';
+import { ComplicationsPlayerPanel } from '@/components/complications/ComplicationsPlayerPanel';
 import type { SessionData, Participant } from '@/pages/Session';
 
 interface PlayerSidebarProps {
@@ -134,6 +135,12 @@ export function PlayerSidebar({ session, participants, userId }: PlayerSidebarPr
         </CardContent>
       </Card>
 
+      {/* Complications Panel */}
+      <ComplicationsPlayerPanel 
+        sessionId={session.id}
+        characterId={character.id}
+      />
+
       {/* Quick Stats */}
       <Card className="medieval-card">
         <CardContent className="pt-4">
@@ -143,15 +150,15 @@ export function PlayerSidebar({ session, participants, userId }: PlayerSidebarPr
                 {t.character.minorMarks}
               </p>
               <p className="font-medieval text-lg text-primary">
-                2
+                {character.minor_marks?.length || 0}
               </p>
             </div>
             <div className="p-2 rounded-lg bg-muted/30">
               <p className="text-xs text-muted-foreground font-body">
-                {t.character.complications}
+                {t.character.majorMarks}
               </p>
               <p className="font-medieval text-lg text-primary">
-                0
+                {(character.major_marks as any[])?.length || 0}
               </p>
             </div>
           </div>

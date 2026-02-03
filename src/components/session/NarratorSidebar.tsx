@@ -27,6 +27,7 @@ import {
   Flame
 } from 'lucide-react';
 import { GroupTestPanel } from '@/components/dice/GroupTestPanel';
+import { ComplicationsNarratorPanel } from '@/components/complications/ComplicationsNarratorPanel';
 import type { SessionData, Participant, Scene } from '@/pages/Session';
 
 interface NarratorSidebarProps {
@@ -362,6 +363,12 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
           )}
         </CardContent>
       </Card>
+
+      {/* Complications Panel */}
+      <ComplicationsNarratorPanel 
+        sessionId={session.id}
+        participants={participants}
+      />
     </div>
   );
 }
