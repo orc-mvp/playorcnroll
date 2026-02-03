@@ -314,6 +314,7 @@ export default function Session() {
         <SessionHeader 
           session={session} 
           isNarrator={isNarrator} 
+          participants={participants}
           onEndSession={handleEndSession}
         />
 
@@ -402,6 +403,7 @@ export default function Session() {
       <SessionHeader 
         session={session} 
         isNarrator={isNarrator} 
+        participants={participants}
         onEndSession={handleEndSession}
       />
 

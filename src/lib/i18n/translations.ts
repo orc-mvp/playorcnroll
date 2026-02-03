@@ -244,13 +244,16 @@ export const translations = {
     endSession: {
       title: 'Encerrar Sessão',
       temporaryMarks: 'Marcas Maiores Temporárias',
-      usedTimes: 'Usou {count} vezes durante sessão',
-      makePermanent: 'Tornar Permanente',
+      usedTimes: 'Usou {count} vez(es) na sessão',
+      makePermanent: 'Permanente',
       expire: 'Expirar',
       unusedMoves: 'Movimentos Heroicos Não Usados',
       stored: 'armazenado(s)',
-      willExpire: 'Expira ao fim da sessão',
-      none: 'nenhuma',
+      willExpire: 'Expiram ao encerrar a sessão',
+      none: 'Nenhuma marca temporária',
+      summary: 'Resumo da Sessão',
+      complicationsKept: 'Complicações Mantidas',
+      progressSaved: 'Progresso Salvo',
     },
 
     // Navigation
@@ -515,13 +518,16 @@ export const translations = {
     endSession: {
       title: 'End Session',
       temporaryMarks: 'Temporary Major Marks',
-      usedTimes: 'Used {count} times during session',
-      makePermanent: 'Make Permanent',
+      usedTimes: 'Used {count} time(s) in session',
+      makePermanent: 'Permanent',
       expire: 'Expire',
       unusedMoves: 'Unused Heroic Moves',
       stored: 'stored',
-      willExpire: 'Expires at end of session',
-      none: 'none',
+      willExpire: 'Expire when session ends',
+      none: 'No temporary marks',
+      summary: 'Session Summary',
+      complicationsKept: 'Complications Kept',
+      progressSaved: 'Progress Saved',
     },
 
     // Navigation
