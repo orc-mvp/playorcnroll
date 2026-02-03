@@ -103,16 +103,17 @@ export default function JoinSession() {
     setIsJoining(true);
 
     try {
-      // Find session by invite code
-      const { data: sessionData, error: sessionError } = await supabase
-        .from('sessions')
-        .select('id, status')
-        .eq('invite_code', codeToUse)
-        .single();
+      // Find session by invite code using secure edge function
+      const { data: validateData, error: validateError } = await supabase.functions.invoke(
+        'validate-invite-code',
+        { body: { invite_code: codeToUse } }
+      );
 
-      if (sessionError || !sessionData) {
+      if (validateError || !validateData?.session) {
         throw new Error('Sessão não encontrada com este código');
       }
+
+      const sessionData = validateData.session;
 
       // Check if already a participant
       const { data: existingParticipant } = await supabase
