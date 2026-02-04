@@ -12,11 +12,13 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CreateComplicationModal } from './CreateComplicationModal';
+import { EditComplicationModal } from './EditComplicationModal';
 import { ManifestComplicationModal } from './ManifestComplicationModal';
 import { cn } from '@/lib/utils';
 import {
   AlertTriangle,
   Plus,
+  Pencil,
   User,
   Eye,
   EyeOff,
@@ -72,6 +74,10 @@ export function ComplicationsManagerModal({
     characterName: string;
   } | null>(null);
   const [manifestModalOpen, setManifestModalOpen] = useState<{
+    complication: Complication;
+    characterName: string;
+  } | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState<{
     complication: Complication;
     characterName: string;
   } | null>(null);
@@ -293,20 +299,35 @@ export function ComplicationsManagerModal({
                                       {comp.description}
                                     </p>
                                   </div>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    className="shrink-0"
-                                    onClick={() =>
-                                      setManifestModalOpen({
-                                        complication: comp,
-                                        characterName: char.name,
-                                      })
-                                    }
-                                  >
-                                    <Sparkles className="w-4 h-4 mr-1" />
-                                    {t.complications.manifest}
-                                  </Button>
+                                  <div className="flex gap-2 shrink-0">
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-8 w-8 p-0"
+                                      onClick={() =>
+                                        setEditModalOpen({
+                                          complication: comp,
+                                          characterName: char.name,
+                                        })
+                                      }
+                                      title="Editar"
+                                    >
+                                      <Pencil className="w-4 h-4" />
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() =>
+                                        setManifestModalOpen({
+                                          complication: comp,
+                                          characterName: char.name,
+                                        })
+                                      }
+                                    >
+                                      <Sparkles className="w-4 h-4 mr-1" />
+                                      {t.complications.manifest}
+                                    </Button>
+                                  </div>
                                 </div>
                               </div>
                             );
@@ -342,6 +363,16 @@ export function ComplicationsManagerModal({
           characterName={manifestModalOpen.characterName}
           onClose={() => setManifestModalOpen(null)}
           onManifested={fetchComplications}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {editModalOpen && (
+        <EditComplicationModal
+          complication={editModalOpen.complication}
+          characterName={editModalOpen.characterName}
+          onClose={() => setEditModalOpen(null)}
+          onUpdated={fetchComplications}
         />
       )}
     </>
