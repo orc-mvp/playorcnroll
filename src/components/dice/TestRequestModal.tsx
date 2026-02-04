@@ -299,11 +299,12 @@ export function TestRequestModal({
             </DialogTitle>
           </DialogHeader>
 
-          {context && (
-            <p className="text-sm text-muted-foreground font-body italic">
-              "{context}"
-            </p>
-          )}
+          <div className="flex-1 overflow-y-auto space-y-4">
+            {context && (
+              <p className="text-sm text-muted-foreground font-body italic">
+                "{context}"
+              </p>
+            )}
 
           {/* Group Test Status */}
           {isGroupTest && (
@@ -404,6 +405,7 @@ export function TestRequestModal({
               </Button>
             </div>
           )}
+          </div>
         </DialogContent>
       </Dialog>
 

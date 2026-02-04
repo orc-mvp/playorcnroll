@@ -195,8 +195,8 @@ export function EndSessionModal({
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[400px] pr-4">
-          <div className="space-y-6">
+        <ScrollArea className="flex-1 pr-4">
+          <div className="space-y-6 pb-2">
             {/* Temporary Major Marks Section */}
             <div className="space-y-3">
               <h3 className="font-medieval text-sm flex items-center gap-2">

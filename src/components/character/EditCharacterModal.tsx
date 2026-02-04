@@ -183,8 +183,8 @@ export function EditCharacterModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+        <Tabs defaultValue="basic" className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <TabsList className="grid w-full grid-cols-2 shrink-0">
             <TabsTrigger value="basic" className="font-medieval">
               <User className="w-4 h-4 mr-1" />
               {language === 'pt-BR' ? 'Básico' : 'Basic'}
@@ -195,7 +195,7 @@ export function EditCharacterModal({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basic" className="space-y-4 mt-4">
+          <TabsContent value="basic" className="space-y-4 mt-4 overflow-y-auto flex-1">
             <div className="space-y-2">
               <Label htmlFor="edit-name" className="font-medieval">
                 {t.character.name} *
@@ -225,7 +225,7 @@ export function EditCharacterModal({
             </div>
           </TabsContent>
 
-          <TabsContent value="attributes" className="space-y-4 mt-4">
+          <TabsContent value="attributes" className="space-y-4 mt-4 overflow-y-auto flex-1">
             <div className="text-center mb-4">
               <p className="text-sm text-muted-foreground font-body">
                 {t.character.distributeHint}

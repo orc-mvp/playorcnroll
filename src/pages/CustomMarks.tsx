@@ -415,7 +415,7 @@ export default function CustomMarks() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 overflow-y-auto flex-1">
             {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="mark-name" className="font-medieval">
