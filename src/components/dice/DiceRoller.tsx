@@ -53,35 +53,37 @@ export function DiceRoller({
     const newDice1 = Math.floor(Math.random() * 6) + 1;
     const newDice2 = Math.floor(Math.random() * 6) + 1;
 
-    // Calculate after animation
+    // Calculate after animation - use generated values directly
     setTimeout(() => {
       setDice1(newDice1);
       setDice2(newDice2);
       setIsRolling(false);
+      
+      // Calculate result immediately with the generated values
+      const attrModifier = getAttributeModifier(attributeType);
+      const total = newDice1 + newDice2 + attrModifier - difficulty;
+      const extremes = checkExtremes(newDice1, newDice2, attributeType);
+      const result = calculateResult(total);
+
+      const resultData = {
+        dice1: newDice1,
+        dice2: newDice2,
+        total,
+        result,
+        hasPositiveExtreme: extremes.positive,
+        hasNegativeExtreme: extremes.negative,
+      };
+
+      setRollResult(resultData);
+      setHasRolled(true);
+      onRollComplete(resultData);
     }, 2500);
-  }, [isRolling, disabled]);
+  }, [isRolling, disabled, attributeType, difficulty, onRollComplete]);
 
-  const handleRollComplete = useCallback(() => {
-    if (hasRolled) return;
-    
-    const attrModifier = getAttributeModifier(attributeType);
-    const total = dice1 + dice2 + attrModifier - difficulty;
-    const extremes = checkExtremes(dice1, dice2, attributeType);
-    const result = calculateResult(total);
-
-    const resultData = {
-      dice1,
-      dice2,
-      total,
-      result,
-      hasPositiveExtreme: extremes.positive,
-      hasNegativeExtreme: extremes.negative,
-    };
-
-    setRollResult(resultData);
-    setHasRolled(true);
-    onRollComplete(resultData);
-  }, [dice1, dice2, attributeType, difficulty, hasRolled, onRollComplete]);
+  // Animation callback no longer needed for logic - only for visual sync
+  const handleAnimationComplete = useCallback(() => {
+    // Animation completed - visual only, logic handled in rollDice timeout
+  }, []);
 
   const getResultIcon = (result: TestResult) => {
     switch (result) {
@@ -127,7 +129,7 @@ export function DiceRoller({
             dice1={dice1} 
             dice2={dice2} 
             isRolling={isRolling}
-            onRollComplete={handleRollComplete}
+            onRollComplete={handleAnimationComplete}
           />
         </div>
 
