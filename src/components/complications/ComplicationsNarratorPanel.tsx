@@ -4,21 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { CreateComplicationModal } from './CreateComplicationModal';
-import { ManifestComplicationModal } from './ManifestComplicationModal';
+import { ComplicationsManagerModal } from './ComplicationsManagerModal';
 import { 
   AlertTriangle, 
-  Plus, 
   User, 
   Eye, 
   EyeOff,
-  Sparkles,
   Skull,
   Users,
   Footprints,
   Handshake,
-  Coins
+  Coins,
+  Settings2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -52,14 +49,7 @@ const typeIcons: Record<string, React.ElementType> = {
 export function ComplicationsNarratorPanel({ sessionId, participants }: ComplicationsNarratorPanelProps) {
   const { t } = useI18n();
   const [complications, setComplications] = useState<Complication[]>([]);
-  const [createModalOpen, setCreateModalOpen] = useState<{
-    characterId: string;
-    characterName: string;
-  } | null>(null);
-  const [manifestModalOpen, setManifestModalOpen] = useState<{
-    complication: Complication;
-    characterName: string;
-  } | null>(null);
+  const [managerOpen, setManagerOpen] = useState(false);
 
   const fetchComplications = async () => {
     const { data } = await supabase
@@ -106,158 +96,114 @@ export function ComplicationsNarratorPanel({ sessionId, participants }: Complica
       name: p.character!.name,
     }));
 
+  const totalComplications = complications.length;
+  const charactersAtLimit = characters.filter(c => getComplicationsByCharacter(c.id).length >= 3);
+
   return (
-    <Card className="medieval-card">
-      <CardHeader className="pb-3">
-        <CardTitle className="font-medieval text-base flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-red-500" />
-          {t.complications.title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="max-h-80">
-          <div className="space-y-4">
+    <>
+      <Card className="medieval-card">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="font-medieval text-base flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+              {t.complications.title}
+            </CardTitle>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setManagerOpen(true)}
+            >
+              <Settings2 className="w-4 h-4 mr-1" />
+              Gerenciar
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Summary Stats */}
+          <div className="flex items-center gap-4 mb-4 p-3 rounded-lg bg-muted/30">
+            <div className="text-center">
+              <p className="text-2xl font-medieval text-red-500">{totalComplications}</p>
+              <p className="text-xs text-muted-foreground">Ativas</p>
+            </div>
+            {charactersAtLimit.length > 0 && (
+              <div className="flex items-center gap-2 p-2 rounded bg-red-500/20 text-red-500">
+                <Skull className="w-4 h-4" />
+                <span className="text-xs font-body">
+                  {charactersAtLimit.length} no limite!
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Character Summary List */}
+          <div className="space-y-2">
             {characters.map(char => {
               const charComplications = getComplicationsByCharacter(char.id);
               const count = charComplications.length;
               const isAtLimit = count >= 3;
               
+              if (count === 0) return null;
+              
               return (
                 <div 
                   key={char.id}
                   className={cn(
-                    "p-3 rounded-lg border",
+                    "flex items-center gap-2 p-2 rounded-lg border",
                     isAtLimit 
                       ? "bg-red-500/10 border-red-500/50" 
                       : "bg-muted/30 border-border"
                   )}
                 >
-                  {/* Character Header */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-primary" />
-                      <span className="font-medieval text-sm">{char.name}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge 
-                        variant="outline" 
-                        className={cn(
-                          "text-xs",
-                          isAtLimit 
-                            ? "bg-red-500/20 text-red-500 border-red-500/50"
-                            : count > 0 
-                              ? "bg-yellow-500/20 text-yellow-500 border-yellow-500/50"
-                              : ""
-                        )}
-                      >
-                        {count}/3
-                      </Badge>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        className="h-7 w-7 p-0"
-                        onClick={() => setCreateModalOpen({ 
-                          characterId: char.id, 
-                          characterName: char.name 
-                        })}
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
+                  <User className="w-4 h-4 text-primary shrink-0" />
+                  <span className="font-medieval text-sm flex-1 truncate">{char.name}</span>
+                  <div className="flex items-center gap-1">
+                    {charComplications.slice(0, 3).map(comp => {
+                      const TypeIcon = typeIcons[comp.type] || AlertTriangle;
+                      return (
+                        <div 
+                          key={comp.id}
+                          className="w-6 h-6 rounded bg-background/50 flex items-center justify-center"
+                          title={`${t.complications[comp.type as keyof typeof t.complications] || comp.type}${!comp.is_visible ? ' (oculta)' : ''}`}
+                        >
+                          <TypeIcon className={cn(
+                            "w-3 h-3",
+                            comp.is_visible ? "text-red-500" : "text-muted-foreground"
+                          )} />
+                        </div>
+                      );
+                    })}
                   </div>
-
-                  {/* Warning at limit */}
-                  {isAtLimit && (
-                    <div className="flex items-center gap-2 p-2 mb-2 rounded bg-red-500/20 text-red-500 text-xs">
-                      <Skull className="w-4 h-4" />
-                      <span className="font-body">
-                        {t.complications.negativeMarkWarning}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* Complications List */}
-                  {charComplications.length > 0 ? (
-                    <div className="space-y-2">
-                      {charComplications.map(comp => {
-                        const TypeIcon = typeIcons[comp.type] || AlertTriangle;
-                        return (
-                          <div 
-                            key={comp.id}
-                            className="flex items-start gap-2 p-2 rounded bg-background/50"
-                          >
-                            <TypeIcon className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-body line-clamp-2">
-                                {comp.description}
-                              </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline" className="text-xs">
-                                  {t.complications[comp.type as keyof typeof t.complications] || comp.type}
-                                </Badge>
-                                {comp.is_visible ? (
-                                  <Eye className="w-3 h-3 text-muted-foreground" />
-                                ) : (
-                                  <EyeOff className="w-3 h-3 text-muted-foreground" />
-                                )}
-                              </div>
-                            </div>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-7 text-xs"
-                              onClick={() => setManifestModalOpen({
-                                complication: comp,
-                                characterName: char.name,
-                              })}
-                            >
-                              <Sparkles className="w-3 h-3 mr-1" />
-                              {t.complications.manifest}
-                            </Button>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-xs text-muted-foreground text-center py-2">
-                      Nenhuma complicação ativa
-                    </p>
-                  )}
+                  <Badge 
+                    variant="outline" 
+                    className={cn(
+                      "text-xs shrink-0",
+                      isAtLimit 
+                        ? "bg-red-500/20 text-red-500 border-red-500/50"
+                        : "bg-yellow-500/20 text-yellow-500 border-yellow-500/50"
+                    )}
+                  >
+                    {count}/3
+                  </Badge>
                 </div>
               );
             })}
 
-            {characters.length === 0 && (
+            {characters.every(c => getComplicationsByCharacter(c.id).length === 0) && (
               <p className="text-sm text-muted-foreground text-center py-4">
-                Nenhum jogador conectado
+                Nenhuma complicação ativa
               </p>
             )}
           </div>
-        </ScrollArea>
-      </CardContent>
+        </CardContent>
+      </Card>
 
-      {/* Create Modal */}
-      {createModalOpen && (
-        <CreateComplicationModal
-          sessionId={sessionId}
-          characterId={createModalOpen.characterId}
-          characterName={createModalOpen.characterName}
-          onClose={() => setCreateModalOpen(null)}
-          onCreated={fetchComplications}
-        />
-      )}
-
-      {/* Manifest Modal */}
-      {manifestModalOpen && (
-        <ManifestComplicationModal
-          complicationId={manifestModalOpen.complication.id}
-          sessionId={sessionId}
-          description={manifestModalOpen.complication.description}
-          characterName={manifestModalOpen.characterName}
-          onClose={() => setManifestModalOpen(null)}
-          onManifested={fetchComplications}
-        />
-      )}
-    </Card>
+      {/* Manager Modal */}
+      <ComplicationsManagerModal
+        open={managerOpen}
+        onOpenChange={setManagerOpen}
+        sessionId={sessionId}
+        participants={participants}
+      />
+    </>
   );
 }
