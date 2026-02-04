@@ -1,208 +1,179 @@
 
-# Plano: Melhorias no Modal de Teste e Feed de Eventos
+# Plano Atualizado: Corrigir Modal de Rolagem (Todos os Cenários)
 
-## Resumo das Mudanças
+## Resumo do Problema
 
-Este plano aborda quatro problemas identificados:
-1. O modal de rolagem fecha antes de mostrar o resultado ao jogador
-2. Os resultados dos testes não aparecem no feed de eventos
-3. O evento "Teste solicitado" não mostra quais jogadores devem rolar
-4. Nenhum evento mostra em qual cena foi realizado
+O modal de rolagem fecha sozinho em **três cenários**:
+
+1. **Race condition no useEffect** - Updates em `rolledTestIds` disparam re-fetch que interfere com o modal
+2. **Extremo Positivo** - `handleHeroicMoveComplete()` e `handlePullGroup()` chamam `onClose()` automaticamente
+3. **Toasts interferindo** - Toasts com z-index alto podem causar problemas de foco (menos provável, mas possível)
 
 ---
 
 ## Alterações Planejadas
 
-### 1. Corrigir Modal de Rolagem (TestRequestModal)
+### 1. PendingTestNotification.tsx - Proteção com Refs
 
-**Problema**: O modal pode estar fechando antes do jogador ver o resultado completo.
+Adicionar refs para evitar que atualizações de estado fechem o modal enquanto ele está aberto:
 
-**Solução**: 
-- Garantir que o modal permaneça aberto após a rolagem mostrando claramente os valores
-- Adicionar uma exibição mais proeminente do resultado (valores dos dados, total, sucesso/falha)
-- O botão "Fechar" só fecha quando o jogador decidir
+- Criar `isModalOpenRef` para bloquear fetches enquanto modal aberto
+- Criar `rolledTestIdsRef` para tracking sem re-renders
+- Remover `rolledTestIds` das dependências do useEffect
+- Proteger subscribers de realtime contra updates quando modal aberto
 
-**Arquivo**: `src/components/dice/TestRequestModal.tsx`
+### 2. TestRequestModal.tsx - Remover Fechamento Automático
 
----
+Remover `onClose()` de:
 
-### 2. Incluir scene_id nos Eventos de Rolagem
+| Função | Linha | Ação |
+|--------|-------|------|
+| `handleHeroicMoveComplete` | 312 | Remover `onClose()` |
+| `handlePullGroup` | 300 | Remover `onClose()` |
 
-**Problema**: Quando um jogador rola dados, o evento `dice_rolled` não inclui o `scene_id`, impossibilitando mostrar em qual cena a rolagem ocorreu.
+Após usar Movimento Heroico ou Puxar Grupo, o jogador ainda poderá ver o resultado e fechar manualmente.
 
-**Solução**:
-- Passar o `sceneId` como prop para o `TestRequestModal`
-- Incluir `scene_id` ao inserir o evento `dice_rolled`
-- Fazer o mesmo para eventos `pull_group`
+### 3. Session.tsx e SessionLobby.tsx - Corrigir Erro 406
 
-**Arquivos**: 
-- `src/components/dice/TestRequestModal.tsx`
-- `src/components/dice/PendingTestNotification.tsx`
-- `src/pages/Session.tsx`
+Trocar `.single()` por `.maybeSingle()` nas queries de profiles para evitar erros quando perfil não existe.
 
 ---
 
-### 3. Mostrar Jogadores no Evento "Teste Solicitado"
+## Fluxos Corrigidos
 
-**Problema**: O evento `test_requested` contém apenas IDs de personagens no campo `players`, mas o feed não exibe os nomes.
+### Rolagem Normal (sem Extremo):
+```
+Jogador rola dados → Resultado aparece → Modal permanece aberto
+    ↓
+Jogador clica "Fechar" → Modal fecha
+```
 
-**Solução**:
-- Modificar `NarratorSidebar.tsx` para incluir `player_names` no `event_data` ao criar o teste
-- Atualizar o `EventFeed.tsx` para exibir os nomes dos jogadores no evento
+### Extremo Positivo (Individual):
+```
+Jogador rola dados → Extremo Positivo!
+    ↓
+Toast: "Movimento Heroico ganho!"
+    ↓
+Botão "Usar Movimento Heroico Agora" aparece
+    ↓
+Se clicar no botão → HeroicMoveModal abre
+    ↓
+Jogador escolhe opção → HeroicMoveModal fecha
+    ↓
+TestRequestModal reaparece (resultado visível) ← CORRIGIDO
+    ↓
+Jogador clica "Fechar" manualmente
+```
 
-**Arquivos**:
-- `src/components/session/NarratorSidebar.tsx`
-- `src/components/session/EventFeed.tsx`
+### Extremo Positivo (Teste em Grupo):
+```
+Jogador rola dados → Extremo Positivo!
+    ↓
+Opções aparecem: "Puxar Grupo" ou "Manter para Si"
+    ↓
+Se "Puxar Grupo" → Evento criado + Toast
+    ↓
+Modal permanece aberto (resultado visível) ← CORRIGIDO
+    ↓
+Jogador clica "Fechar" manualmente
+```
+
+### Extremo Negativo:
+```
+Jogador rola dados → Extremo Negativo!
+    ↓
+Toast: "O Narrador pode criar uma Complicação"
+    ↓
+Modal permanece aberto (resultado visível) ← JÁ FUNCIONA (sem onClose)
+    ↓
+Jogador clica "Fechar" manualmente
+```
 
 ---
 
-### 4. Exibir Nome da Cena em Todos os Eventos
+## Arquivos a Modificar
 
-**Problema**: O feed não mostra em qual cena cada evento ocorreu.
-
-**Solução**:
-- Incluir `scene_name` no `event_data` de todos os eventos
-- Atualizar o EventFeed para exibir a cena como badge ou texto secundário
-- Eventos que já incluem `scene_id` precisam também ter o nome
-
-**Arquivos**:
-- `src/components/session/NarratorSidebar.tsx` (scene_created, test_requested)
-- `src/components/dice/TestRequestModal.tsx` (dice_rolled, pull_group)
-- `src/components/session/EventFeed.tsx` (exibição)
+| Arquivo | Alteração |
+|---------|-----------|
+| `src/components/dice/PendingTestNotification.tsx` | Adicionar refs, remover dependência do useEffect, proteger contra re-renders |
+| `src/components/dice/TestRequestModal.tsx` | Remover `onClose()` de `handleHeroicMoveComplete` (linha 312) e `handlePullGroup` (linha 300) |
+| `src/pages/Session.tsx` | Trocar `.single()` por `.maybeSingle()` |
+| `src/pages/SessionLobby.tsx` | Trocar `.single()` por `.maybeSingle()` |
 
 ---
 
 ## Detalhes Técnicos
 
-### TestRequestModal.tsx - Mudanças de Props
+### PendingTestNotification.tsx - Código Principal
 
 ```typescript
-interface TestRequestModalProps {
-  testId: string;
-  sessionId: string;
-  sceneId: string;      // NOVO
-  sceneName: string;    // NOVO
-  attribute: string;
-  attributeType: AttributeType;
-  difficulty: number;
-  context?: string;
-  characterId: string;
-  isGroupTest: boolean;
-  onClose: () => void;
-}
+// Adicionar imports
+import { useState, useEffect, useRef } from 'react';
+
+// Adicionar refs no início do componente
+const isModalOpenRef = useRef(false);
+const rolledTestIdsRef = useRef<Set<string>>(new Set());
+
+// Modificar useEffect (remover rolledTestIds das dependências)
+useEffect(() => {
+  if (isModalOpenRef.current) return; // Bloquear se modal aberto
+  
+  const fetchPendingTests = async () => {
+    // ... código existente ...
+    
+    // Merge com IDs locais
+    rolledTestIdsRef.current.forEach(id => rolledIds.add(id));
+    rolledTestIdsRef.current = rolledIds;
+    setRolledTestIds(rolledIds);
+  };
+  
+  // Proteger subscriber
+  .on('postgres_changes', { ... }, (payload) => {
+    if (isModalOpenRef.current) return; // Ignorar se modal aberto
+    // ...
+  })
+}, [sessionId]); // ← SEM rolledTestIds
+
+// Função para abrir teste
+const handleOpenTest = (test: PendingTest) => {
+  isModalOpenRef.current = true;
+  setActiveTest(test);
+};
+
+// Função para fechar
+const handleCloseModal = () => {
+  if (activeTest) {
+    rolledTestIdsRef.current.add(activeTest.id);
+    setRolledTestIds(new Set(rolledTestIdsRef.current));
+    setPendingTests(prev => prev.filter(t => t.id !== activeTest.id));
+  }
+  isModalOpenRef.current = false;
+  setActiveTest(null);
+};
 ```
 
-### Evento dice_rolled - Estrutura Atualizada
+### TestRequestModal.tsx - Remoção de onClose()
 
 ```typescript
-await supabase.from('session_events').insert({
-  session_id: sessionId,
-  scene_id: sceneId,    // NOVO
-  event_type: 'dice_rolled',
-  event_data: {
-    character_id: characterId,
-    character_name: characterName,
-    attribute,
-    attribute_type: attributeType,
-    difficulty,
-    dice1: result.dice1,
-    dice2: result.dice2,
-    total: result.total,
-    result: result.result,
-    has_positive_extreme: result.hasPositiveExtreme,
-    has_negative_extreme: result.hasNegativeExtreme,
-    is_group_test: isGroupTest,
-    scene_name: sceneName,  // NOVO
-  },
-});
+// Linha 300 - handlePullGroup
+toast({ title: t.tests.pullGroup + ' ativado! +1 sucesso coletivo' });
+setShowPullGroupOption(false);
+// REMOVER: onClose();
+
+// Linha 310-313 - handleHeroicMoveComplete
+const handleHeroicMoveComplete = () => {
+  setShowHeroicModal(false);
+  // REMOVER: onClose();
+};
 ```
-
-### Evento test_requested - Estrutura Atualizada
-
-```typescript
-await supabase.from('session_events').insert({
-  session_id: session.id,
-  scene_id: currentScene.id,
-  event_type: 'test_requested',
-  event_data: {
-    test_id: test.id,
-    attribute: selectedAttribute,
-    difficulty: difficulty,
-    players: selectedPlayers,
-    player_names: playerNames,  // NOVO - array de nomes
-    context: context.trim() || null,
-    scene_name: currentScene.name,  // NOVO
-  },
-});
-```
-
-### EventFeed.tsx - Formato de Exibição
-
-Para cada evento, adicionar badge com nome da cena:
-```tsx
-{/* Scene badge */}
-{(event.event_data as any).scene_name && (
-  <Badge variant="outline" className="text-xs">
-    <BookOpen className="w-3 h-3 mr-1" />
-    {(event.event_data as any).scene_name}
-  </Badge>
-)}
-```
-
-Para `test_requested`:
-```typescript
-test_requested: {
-  label: (data, lang) => {
-    const isGroup = Array.isArray(data.players) && data.players.length > 1;
-    const attrName = getAttributeName(data.attribute, lang, t);
-    const playerNames = data.player_names?.join(', ') || '';
-    return lang === 'pt-BR'
-      ? `Teste ${isGroup ? 'em grupo ' : ''}de ${attrName} para ${playerNames}`
-      : `${isGroup ? 'Group ' : ''}${attrName} test for ${playerNames}`;
-  },
-},
-```
-
----
-
-## Fluxo de Dados
-
-```text
-Narrador solicita teste
-    ↓
-NarratorSidebar cria evento test_requested
-    - Inclui: player_names, scene_name
-    ↓
-Jogador vê notificação de teste pendente
-    ↓
-Jogador clica → TestRequestModal abre
-    - Recebe: sceneId, sceneName via props
-    ↓
-Jogador rola dados → Modal permanece aberto
-    ↓
-Evento dice_rolled criado
-    - Inclui: scene_id, scene_name, character_name
-    ↓
-Feed exibe todos os detalhes com cena
-```
-
----
-
-## Componentes Afetados
-
-| Arquivo | Alteração |
-|---------|-----------|
-| `TestRequestModal.tsx` | Adicionar props sceneId/sceneName, incluir no evento |
-| `PendingTestNotification.tsx` | Passar sceneId/sceneName para o modal |
-| `NarratorSidebar.tsx` | Incluir player_names e scene_name nos eventos |
-| `EventFeed.tsx` | Exibir nomes dos jogadores e badge de cena |
-| `Session.tsx` | Passar currentScene para PendingTestNotification |
 
 ---
 
 ## Resultado Esperado
 
-1. **Modal de Rolagem**: Permanece aberto mostrando claramente os valores (ex: "4 + 3 = 7 → Sucesso")
-2. **Feed - Teste Solicitado**: "Teste de Agressão para João, Maria" + badge "Cena 2"
-3. **Feed - Rolagem**: "João (Agressão): 4+3=7 → Sucesso" + badge "Cena 2"
-4. **Todas as informações visíveis** até o jogador fechar manualmente
+1. O modal **nunca fecha sozinho** após rolagem, independente do resultado
+2. Extremos Positivos permitem usar Movimento Heroico e depois ver o resultado
+3. "Puxar Grupo" funciona e mantém o modal aberto
+4. Extremos Negativos mostram toast mas mantêm modal aberto
+5. O botão "Fechar" é a **única forma** de fechar o modal
+6. Erro 406 de profiles eliminado
