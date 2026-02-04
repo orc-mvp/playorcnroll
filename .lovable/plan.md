@@ -1,170 +1,208 @@
 
+# Plano: Melhorias no Modal de Teste e Feed de Eventos
 
-# Heróis Marcados Digital - Plano de Implementação
+## Resumo das Mudanças
 
-## Visão Geral do Projeto
-Aplicação web completa para jogar o RPG narrativo "Heróis Marcados", com interface visual medieval rústica, dados 3D animados, e sincronização em tempo real entre Narrador e Jogadores.
-
----
-
-## Fase 1: Fundação e Autenticação
-
-### 1.1 Design System Medieval
-- Paleta de cores sóbrios de preto e branco com detalhes em cinza e dourado
-- Tipografia gótica/medieval para títulos, legível para textos
-- Texturas sutis de papel/couro nos backgrounds
-- Ícones temáticos (espadas, escudos, pergaminhos, chamas, gelo)
-
-### 1.2 Configuração do Backend (Lovable Cloud)
-- Banco de dados com tabelas para usuários, personagens, sessões, cenas
-- Sistema de autenticação com email/senha
-- Configuração de Realtime para sincronização instantânea
-
-### 1.3 Sistema de Autenticação
-- Página de login/cadastro com visual medieval
-- Seleção de papel ao criar conta: Narrador ou Jogador
-- Sistema de tradução (PT-BR / EN) persistente por usuário
+Este plano aborda quatro problemas identificados:
+1. O modal de rolagem fecha antes de mostrar o resultado ao jogador
+2. Os resultados dos testes não aparecem no feed de eventos
+3. O evento "Teste solicitado" não mostra quais jogadores devem rolar
+4. Nenhum evento mostra em qual cena foi realizado
 
 ---
 
-## Fase 2: Gestão de Personagens
+## Alterações Planejadas
 
-### 2.1 Criação de Personagem (Wizard em 3 Passos)
-- **Passo 1**: Nome e conceito do personagem
-- **Passo 2**: Distribuição de atributos com interface drag-and-drop visual (2 Fortes, 1 Neutro, 2 Fracos)
-- **Passo 3**: Seleção de 2 Marcas Menores com filtros e visualização de detalhes
+### 1. Corrigir Modal de Rolagem (TestRequestModal)
 
-### 2.2 Ficha do Personagem
-- Visualização completa com indicadores visuais por tipo de atributo
-- Seções para Marcas (Menores, Maiores, Épicas)
-- Área de progresso de novas Marcas
-- Lista de Complicações Penduradas ativas
-- Narrativas Estendidas (NPCs aliados, reputações, recursos)
-- Contador de Movimentos Heroicos armazenados
+**Problema**: O modal pode estar fechando antes do jogador ver o resultado completo.
 
-### 2.3 Biblioteca de Marcas Menores
-- Lista pré-definida do sistema original
-- Interface para Narradores adicionarem Marcas customizadas por campanha
-- Cada Marca com: nome, atributo associado, descrição, efeito mecânico
+**Solução**: 
+- Garantir que o modal permaneça aberto após a rolagem mostrando claramente os valores
+- Adicionar uma exibição mais proeminente do resultado (valores dos dados, total, sucesso/falha)
+- O botão "Fechar" só fecha quando o jogador decidir
+
+**Arquivo**: `src/components/dice/TestRequestModal.tsx`
 
 ---
 
-## Fase 3: Sistema de Sessões
+### 2. Incluir scene_id nos Eventos de Rolagem
 
-### 3.1 Criação e Gerenciamento de Sessões (Narrador)
-- Criar nova sessão com nome e descrição
-- Gerar código de convite E link compartilhável
-- Lista de sessões anteriores do Narrador
+**Problema**: Quando um jogador rola dados, o evento `dice_rolled` não inclui o `scene_id`, impossibilitando mostrar em qual cena a rolagem ocorreu.
 
-### 3.2 Lobby Pré-Sessão
-- Narrador vê jogadores conectados com avatares e nomes
-- Visualização resumida das fichas de cada personagem
-- Botão "Iniciar Sessão" exclusivo para Narrador
-- Jogadores veem "Aguardando início..." até Narrador começar
+**Solução**:
+- Passar o `sceneId` como prop para o `TestRequestModal`
+- Incluir `scene_id` ao inserir o evento `dice_rolled`
+- Fazer o mesmo para eventos `pull_group`
 
-### 3.3 Interface Durante Sessão
-- **Painel Central**: Nome da cena, descrição, feed de eventos em tempo real
-- **Painel Lateral Narrador**: Controles de cena, botão solicitar teste, complicações
-- **Painel Lateral Jogador**: Ficha resumida, movimentos armazenados, complicações ativas
-- Layout responsivo que adapta para mobile (abas ao invés de painéis)
+**Arquivos**: 
+- `src/components/dice/TestRequestModal.tsx`
+- `src/components/dice/PendingTestNotification.tsx`
+- `src/pages/Session.tsx`
 
 ---
 
-## Fase 4: Sistema de Testes e Dados
+### 3. Mostrar Jogadores no Evento "Teste Solicitado"
 
-### 4.1 Animação de Dados 3D
-- Dois dados 3D realistas usando React Three Fiber
-- Animação de rolagem física (2-3 segundos)
-- Números claramente visíveis ao parar
-- Efeitos visuais de extremos (borda dourada pulsante para positivo, vermelha para negativo)
+**Problema**: O evento `test_requested` contém apenas IDs de personagens no campo `players`, mas o feed não exibe os nomes.
 
-### 4.2 Fluxo de Solicitação de Teste (Narrador)
-- Modal para configurar: tipo (individual/grupo), jogadores, atributo, dificuldade
-- Escala de dificuldade visual: Muito Fácil (-2) até Quase Impossível (+3)
-- Campo opcional de contexto narrativo
+**Solução**:
+- Modificar `NarratorSidebar.tsx` para incluir `player_names` no `event_data` ao criar o teste
+- Atualizar o `EventFeed.tsx` para exibir os nomes dos jogadores no evento
 
-### 4.3 Fluxo de Rolagem (Jogador)
-- Notificação visual quando teste é solicitado
-- Botão "Rolar Dados" que dispara animação 3D
-- Cálculo automático de extremos baseado na tabela do sistema
-- Exibição do resultado: dados, modificadores, total, sucesso/parcial/falha
-- Detecção e destaque de Extremos (positivo ou negativo)
-
-### 4.4 Sistema de Extremos
-- Tabela programada para cada tipo de atributo (Fraco/Neutro/Forte)
-- Verificação automática do par de dados antes de somar
-- Feedback visual imediato quando extremo ativa
+**Arquivos**:
+- `src/components/session/NarratorSidebar.tsx`
+- `src/components/session/EventFeed.tsx`
 
 ---
 
-## Fase 5: Testes em Grupo
+### 4. Exibir Nome da Cena em Todos os Eventos
 
-### 5.1 Rolagem Simultânea
-- Sistema aguarda todos os jogadores selecionados rolarem
-- Indicador de status: quem já rolou (resultado oculto), quem está aguardando
-- Resultados revelados apenas quando todos completam
+**Problema**: O feed não mostra em qual cena cada evento ocorreu.
 
-### 5.2 Cálculo Coletivo
-- Contagem automática de sucessos totais, parciais e falhas
-- Determinação do resultado do grupo pela maioria
-- Opção "Puxar o Grupo" para quem teve Extremo Positivo
+**Solução**:
+- Incluir `scene_name` no `event_data` de todos os eventos
+- Atualizar o EventFeed para exibir a cena como badge ou texto secundário
+- Eventos que já incluem `scene_id` precisam também ter o nome
 
----
-
-## Fase 6: Movimentos Heroicos
-
-### 6.1 Modal de Escolha (4 Opções)
-- **A - Marca Maior Temporária**: Criar marca que dura até fim da sessão
-- **B - Acumular para Marca Menor**: +1 ponto em tema (3 = nova Marca Menor)
-- **C - Narrativa Estendida**: Criar NPC aliado, reputação, ou recurso
-- **D - Puxar o Grupo**: (só em testes de grupo) +1 sucesso coletivo
-
-### 6.2 Fluxos Específicos
-- Criação de Marca Maior Temporária com aprovação do Narrador
-- Sistema de progresso visual (●●○) para acumulação de pontos
-- Notificação quando jogador atinge 3/3 para nova Marca Menor
-- Registro de Narrativas Estendidas na ficha
+**Arquivos**:
+- `src/components/session/NarratorSidebar.tsx` (scene_created, test_requested)
+- `src/components/dice/TestRequestModal.tsx` (dice_rolled, pull_group)
+- `src/components/session/EventFeed.tsx` (exibição)
 
 ---
 
-## Fase 7: Sistema de Complicações
+## Detalhes Técnicos
 
-### 7.1 Gestão pelo Narrador
-- Criação de Complicação ao ocorrer Extremo Negativo
-- Tipos: Reputacional, Rastreamento, Traição, Dívida, Maldição Menor
-- Opção: visível ou oculta para o jogador
+### TestRequestModal.tsx - Mudanças de Props
 
-### 7.2 Painel de Complicações
-- Lista organizada por jogador com contador (X/3)
-- Botão "Manifestar" para resolver complicação narrativamente
-- Alerta vermelho quando jogador atinge 3 complicações
+```typescript
+interface TestRequestModalProps {
+  testId: string;
+  sessionId: string;
+  sceneId: string;      // NOVO
+  sceneName: string;    // NOVO
+  attribute: string;
+  attributeType: AttributeType;
+  difficulty: number;
+  context?: string;
+  characterId: string;
+  isGroupTest: boolean;
+  onClose: () => void;
+}
+```
 
-### 7.3 Marca Negativa
-- Sistema automático quando jogador excede limite de complicações
-- Condensação de complicações em Marca Negativa permanente
+### Evento dice_rolled - Estrutura Atualizada
+
+```typescript
+await supabase.from('session_events').insert({
+  session_id: sessionId,
+  scene_id: sceneId,    // NOVO
+  event_type: 'dice_rolled',
+  event_data: {
+    character_id: characterId,
+    character_name: characterName,
+    attribute,
+    attribute_type: attributeType,
+    difficulty,
+    dice1: result.dice1,
+    dice2: result.dice2,
+    total: result.total,
+    result: result.result,
+    has_positive_extreme: result.hasPositiveExtreme,
+    has_negative_extreme: result.hasNegativeExtreme,
+    is_group_test: isGroupTest,
+    scene_name: sceneName,  // NOVO
+  },
+});
+```
+
+### Evento test_requested - Estrutura Atualizada
+
+```typescript
+await supabase.from('session_events').insert({
+  session_id: session.id,
+  scene_id: currentScene.id,
+  event_type: 'test_requested',
+  event_data: {
+    test_id: test.id,
+    attribute: selectedAttribute,
+    difficulty: difficulty,
+    players: selectedPlayers,
+    player_names: playerNames,  // NOVO - array de nomes
+    context: context.trim() || null,
+    scene_name: currentScene.name,  // NOVO
+  },
+});
+```
+
+### EventFeed.tsx - Formato de Exibição
+
+Para cada evento, adicionar badge com nome da cena:
+```tsx
+{/* Scene badge */}
+{(event.event_data as any).scene_name && (
+  <Badge variant="outline" className="text-xs">
+    <BookOpen className="w-3 h-3 mr-1" />
+    {(event.event_data as any).scene_name}
+  </Badge>
+)}
+```
+
+Para `test_requested`:
+```typescript
+test_requested: {
+  label: (data, lang) => {
+    const isGroup = Array.isArray(data.players) && data.players.length > 1;
+    const attrName = getAttributeName(data.attribute, lang, t);
+    const playerNames = data.player_names?.join(', ') || '';
+    return lang === 'pt-BR'
+      ? `Teste ${isGroup ? 'em grupo ' : ''}de ${attrName} para ${playerNames}`
+      : `${isGroup ? 'Group ' : ''}${attrName} test for ${playerNames}`;
+  },
+},
+```
 
 ---
 
-## Fase 8: Gestão de Cenas e Encerramento
+## Fluxo de Dados
 
-### 8.1 Controle de Cenas (Narrador)
-- Criar nova cena com nome e descrição
-- Histórico de cenas anteriores na sessão
-- Feed de eventos atualizado em tempo real
-
-### 8.2 Encerramento de Sessão
-- Resumo de Marcas Maiores Temporárias com opção de tornar permanentes
-- Alerta sobre Movimentos Heroicos não usados (expiram)
-- Salvamento automático de todo progresso
-- Complicações Penduradas mantidas para próxima sessão
+```text
+Narrador solicita teste
+    ↓
+NarratorSidebar cria evento test_requested
+    - Inclui: player_names, scene_name
+    ↓
+Jogador vê notificação de teste pendente
+    ↓
+Jogador clica → TestRequestModal abre
+    - Recebe: sceneId, sceneName via props
+    ↓
+Jogador rola dados → Modal permanece aberto
+    ↓
+Evento dice_rolled criado
+    - Inclui: scene_id, scene_name, character_name
+    ↓
+Feed exibe todos os detalhes com cena
+```
 
 ---
 
-## Recursos Técnicos Essenciais
+## Componentes Afetados
 
-- **Tempo Real**: Sincronização instantânea entre Narrador e Jogadores via Supabase Realtime
-- **Responsividade**: Interface adaptável para desktop, tablet e mobile
-- **Internacionalização**: PT-BR e EN com troca a qualquer momento
-- **Persistência**: Todo progresso salvo automaticamente no banco de dados
-- **Notificações**: Alertas visuais e sonoros para eventos importantes
+| Arquivo | Alteração |
+|---------|-----------|
+| `TestRequestModal.tsx` | Adicionar props sceneId/sceneName, incluir no evento |
+| `PendingTestNotification.tsx` | Passar sceneId/sceneName para o modal |
+| `NarratorSidebar.tsx` | Incluir player_names e scene_name nos eventos |
+| `EventFeed.tsx` | Exibir nomes dos jogadores e badge de cena |
+| `Session.tsx` | Passar currentScene para PendingTestNotification |
 
+---
+
+## Resultado Esperado
+
+1. **Modal de Rolagem**: Permanece aberto mostrando claramente os valores (ex: "4 + 3 = 7 → Sucesso")
+2. **Feed - Teste Solicitado**: "Teste de Agressão para João, Maria" + badge "Cena 2"
+3. **Feed - Rolagem**: "João (Agressão): 4+3=7 → Sucesso" + badge "Cena 2"
+4. **Todas as informações visíveis** até o jogador fechar manualmente
