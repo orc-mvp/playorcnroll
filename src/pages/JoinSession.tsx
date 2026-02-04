@@ -289,154 +289,174 @@ export default function JoinSession() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 max-w-lg space-y-6">
-        {/* Join New Session Card */}
-        <Card className="medieval-card">
-          <CardHeader className="text-center">
-            <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <Users className="w-8 h-8 text-primary" />
-            </div>
-            <CardTitle className="font-medieval text-2xl">
-              Entrar na Aventura
-            </CardTitle>
-            <CardDescription className="font-body">
-              Digite o código de convite e escolha seu personagem
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
-            <form onSubmit={handleJoin} className="space-y-6">
-              {/* Invite Code */}
-              <div className="space-y-2">
-                <Label htmlFor="code" className="font-medieval">
-                  {t.session.inviteCode}
-                </Label>
-                <Input
-                  id="code"
-                  value={inviteCode}
-                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                  placeholder="Ex: ABC123"
-                  className="font-mono text-xl text-center tracking-widest uppercase"
-                  maxLength={6}
-                  disabled={isJoining}
-                />
-              </div>
-
-              {/* Character Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="character" className="font-medieval">
-                  Personagem
-                </Label>
-                {loadingCharacters ? (
-                  <div className="flex items-center justify-center py-4">
-                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+      <main className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Previously Joined Sessions - First on mobile, second on desktop */}
+          <div className="order-1 lg:order-2">
+            {loadingSessions ? (
+              <Card className="medieval-card">
+                <CardContent className="flex items-center justify-center py-12">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                </CardContent>
+              </Card>
+            ) : joinedSessions.length > 0 ? (
+              <Card className="medieval-card h-full">
+                <CardHeader>
+                  <div className="w-12 h-12 mx-auto lg:mx-0 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                    <History className="w-6 h-6 text-primary" />
                   </div>
-                ) : characters.length === 0 ? (
-                  <div className="text-center py-4">
-                    <p className="text-muted-foreground font-body text-sm mb-3">
-                      Você ainda não tem personagens
-                    </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => navigate('/character/create')}
+                  <CardTitle className="font-medieval text-xl text-center lg:text-left">
+                    Minhas Aventuras
+                  </CardTitle>
+                  <CardDescription className="font-body text-center lg:text-left">
+                    Sessões que você já participou
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="space-y-3">
+                  {joinedSessions.map((session) => (
+                    <button
+                      key={session.id}
+                      onClick={() => handleRejoinSession(session)}
+                      className="w-full p-4 rounded-lg border border-border bg-card/50 hover:bg-primary/5 hover:border-primary/50 transition-all text-left"
                     >
-                      Criar Personagem
-                    </Button>
-                  </div>
-                ) : (
-                  <Select
-                    value={selectedCharacterId}
-                    onValueChange={setSelectedCharacterId}
-                    disabled={isJoining}
-                  >
-                    <SelectTrigger className="font-body">
-                      <SelectValue placeholder="Selecione um personagem" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {characters.map((char) => (
-                        <SelectItem key={char.id} value={char.id}>
-                          <span className="font-medieval">{char.name}</span>
-                          {char.concept && (
-                            <span className="text-muted-foreground ml-2 text-sm">
-                              - {char.concept}
-                            </span>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medieval text-foreground truncate">
+                            {session.name}
+                          </h4>
+                          {session.description && (
+                            <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                              {session.description}
+                            </p>
                           )}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full font-medieval text-lg h-12"
-                disabled={isJoining || !inviteCode.trim() || !selectedCharacterId || characters.length === 0}
-              >
-                {isJoining ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    Entrando...
-                  </>
-                ) : (
-                  t.session.join
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* Previously Joined Sessions */}
-        {!loadingSessions && joinedSessions.length > 0 && (
-          <Card className="medieval-card">
-            <CardHeader>
-              <CardTitle className="font-medieval text-lg flex items-center gap-2">
-                <History className="w-5 h-5 text-primary" />
-                Minhas Aventuras
-              </CardTitle>
-              <CardDescription className="font-body">
-                Sessões que você já participou
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className="space-y-3">
-              {joinedSessions.map((session) => (
-                <button
-                  key={session.id}
-                  onClick={() => handleRejoinSession(session)}
-                  className="w-full p-4 rounded-lg border border-border bg-card/50 hover:bg-primary/5 hover:border-primary/50 transition-all text-left"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medieval text-foreground truncate">
-                        {session.name}
-                      </h4>
-                      {session.description && (
-                        <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
-                          {session.description}
-                        </p>
-                      )}
-                      <p className="text-xs text-primary mt-2 font-body">
-                        Como: {session.characterName}
-                      </p>
-                    </div>
-                    <div className="shrink-0">
-                      {getStatusBadge(session.status)}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-
-        {loadingSessions && (
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+                          <p className="text-xs text-primary mt-2 font-body">
+                            Como: {session.characterName}
+                          </p>
+                        </div>
+                        <div className="shrink-0">
+                          {getStatusBadge(session.status)}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="medieval-card h-full">
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                  <History className="w-12 h-12 text-muted-foreground/30 mb-4" />
+                  <p className="font-medieval text-lg text-muted-foreground">
+                    Nenhuma aventura ainda
+                  </p>
+                  <p className="text-sm text-muted-foreground font-body mt-1">
+                    Entre em uma sessão para começar
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
-        )}
+
+          {/* Join New Session Card - Second on mobile, first on desktop */}
+          <div className="order-2 lg:order-1">
+            <Card className="medieval-card h-full">
+              <CardHeader className="text-center lg:text-left">
+                <div className="w-12 h-12 mx-auto lg:mx-0 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+                  <Users className="w-6 h-6 text-primary" />
+                </div>
+                <CardTitle className="font-medieval text-xl">
+                  Entrar na Aventura
+                </CardTitle>
+                <CardDescription className="font-body">
+                  Digite o código de convite e escolha seu personagem
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <form onSubmit={handleJoin} className="space-y-6">
+                  {/* Invite Code */}
+                  <div className="space-y-2">
+                    <Label htmlFor="code" className="font-medieval">
+                      {t.session.inviteCode}
+                    </Label>
+                    <Input
+                      id="code"
+                      value={inviteCode}
+                      onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                      placeholder="Ex: ABC123"
+                      className="font-mono text-xl text-center tracking-widest uppercase"
+                      maxLength={6}
+                      disabled={isJoining}
+                    />
+                  </div>
+
+                  {/* Character Selection */}
+                  <div className="space-y-2">
+                    <Label htmlFor="character" className="font-medieval">
+                      Personagem
+                    </Label>
+                    {loadingCharacters ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                      </div>
+                    ) : characters.length === 0 ? (
+                      <div className="text-center py-4">
+                        <p className="text-muted-foreground font-body text-sm mb-3">
+                          Você ainda não tem personagens
+                        </p>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => navigate('/character/create')}
+                        >
+                          Criar Personagem
+                        </Button>
+                      </div>
+                    ) : (
+                      <Select
+                        value={selectedCharacterId}
+                        onValueChange={setSelectedCharacterId}
+                        disabled={isJoining}
+                      >
+                        <SelectTrigger className="font-body">
+                          <SelectValue placeholder="Selecione um personagem" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {characters.map((char) => (
+                            <SelectItem key={char.id} value={char.id}>
+                              <span className="font-medieval">{char.name}</span>
+                              {char.concept && (
+                                <span className="text-muted-foreground ml-2 text-sm">
+                                  - {char.concept}
+                                </span>
+                              )}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+
+                  {/* Submit Button */}
+                  <Button
+                    type="submit"
+                    className="w-full font-medieval text-lg h-12"
+                    disabled={isJoining || !inviteCode.trim() || !selectedCharacterId || characters.length === 0}
+                  >
+                    {isJoining ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                        Entrando...
+                      </>
+                    ) : (
+                      t.session.join
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </main>
     </div>
   );
