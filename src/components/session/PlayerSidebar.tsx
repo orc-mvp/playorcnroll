@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   User, 
   Sword,
@@ -9,9 +11,15 @@ import {
   Brain,
   Flame,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Scroll,
+  Crown,
+  Star,
+  AlertTriangle,
+  Eye
 } from 'lucide-react';
 import { ComplicationsPlayerPanel } from '@/components/complications/ComplicationsPlayerPanel';
+import { MarksModal } from '@/components/character/MarksModal';
 import type { SessionData, Participant } from '@/pages/Session';
 
 interface PlayerSidebarProps {
@@ -38,6 +46,7 @@ const typeColors: Record<string, string> = {
 
 export function PlayerSidebar({ session, participants, userId }: PlayerSidebarProps) {
   const { t } = useI18n();
+  const [showMarksModal, setShowMarksModal] = useState(false);
 
   // Find current player's participant data
   const myParticipant = participants.find((p) => p.user_id === userId);
@@ -58,6 +67,12 @@ export function PlayerSidebar({ session, participants, userId }: PlayerSidebarPr
     const key = `${attr}_type` as keyof typeof character;
     return (character[key] as string) || 'neutral';
   };
+
+  // Parse marks from character data
+  const minorMarkIds = character.minor_marks || [];
+  const majorMarks = (character.major_marks as any[]) || [];
+  const epicMarks = ((character as any).epic_marks as any[]) || [];
+  const negativeMarks = ((character as any).negative_marks as any[]) || [];
 
   return (
     <div className="space-y-4">
@@ -135,35 +150,88 @@ export function PlayerSidebar({ session, participants, userId }: PlayerSidebarPr
         </CardContent>
       </Card>
 
+      {/* Marks Summary Card */}
+      <Card className="medieval-card">
+        <CardHeader className="pb-2">
+          <CardTitle className="font-medieval text-base flex items-center gap-2">
+            <Scroll className="w-4 h-4 text-primary" />
+            Marcas
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-2 text-center">
+            <div className="p-2 rounded-lg bg-muted/30">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Scroll className="w-3 h-3 text-primary" />
+                <p className="text-xs text-muted-foreground font-body">
+                  {t.character.minorMarks}
+                </p>
+              </div>
+              <p className="font-medieval text-lg text-primary">
+                {minorMarkIds.length}
+              </p>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/30">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Crown className="w-3 h-3 text-amber-500" />
+                <p className="text-xs text-muted-foreground font-body">
+                  {t.character.majorMarks}
+                </p>
+              </div>
+              <p className="font-medieval text-lg text-amber-500">
+                {majorMarks.length}
+              </p>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/30">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Star className="w-3 h-3 text-yellow-400" />
+                <p className="text-xs text-muted-foreground font-body">
+                  {t.character.epicMarks}
+                </p>
+              </div>
+              <p className="font-medieval text-lg text-yellow-400">
+                {epicMarks.length}
+              </p>
+            </div>
+            <div className="p-2 rounded-lg bg-muted/30">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <AlertTriangle className="w-3 h-3 text-red-500" />
+                <p className="text-xs text-muted-foreground font-body">
+                  Negativas
+                </p>
+              </div>
+              <p className="font-medieval text-lg text-red-500">
+                {negativeMarks.length}
+              </p>
+            </div>
+          </div>
+          
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => setShowMarksModal(true)}
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            Ver Todas as Marcas
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Complications Panel */}
       <ComplicationsPlayerPanel 
         sessionId={session.id}
         characterId={character.id}
       />
 
-      {/* Quick Stats */}
-      <Card className="medieval-card">
-        <CardContent className="pt-4">
-          <div className="grid grid-cols-2 gap-2 text-center">
-            <div className="p-2 rounded-lg bg-muted/30">
-              <p className="text-xs text-muted-foreground font-body">
-                {t.character.minorMarks}
-              </p>
-              <p className="font-medieval text-lg text-primary">
-                {character.minor_marks?.length || 0}
-              </p>
-            </div>
-            <div className="p-2 rounded-lg bg-muted/30">
-              <p className="text-xs text-muted-foreground font-body">
-                {t.character.majorMarks}
-              </p>
-              <p className="font-medieval text-lg text-primary">
-                {(character.major_marks as any[])?.length || 0}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Marks Modal */}
+      <MarksModal
+        open={showMarksModal}
+        onOpenChange={setShowMarksModal}
+        minorMarkIds={minorMarkIds}
+        majorMarks={majorMarks}
+        epicMarks={epicMarks}
+        negativeMarks={negativeMarks}
+      />
     </div>
   );
 }
