@@ -58,6 +58,8 @@ export interface Participant {
     heroic_moves_stored: number;
     minor_marks?: string[] | null;
     major_marks?: unknown[] | null;
+    epic_marks?: unknown[] | null;
+    negative_marks?: unknown[] | null;
   } | null;
   profile?: {
     display_name: string | null;
@@ -156,7 +158,9 @@ export default function Session() {
             faith_type,
             heroic_moves_stored,
             minor_marks,
-            major_marks
+            major_marks,
+            epic_marks,
+            negative_marks
           )
         `)
         .eq('session_id', sessionId);
