@@ -63,7 +63,9 @@ const eventConfig: Record<string, {
         : data.result === 'partial' 
           ? (lang === 'pt-BR' ? 'Parcial' : 'Partial')
           : (lang === 'pt-BR' ? 'Falha' : 'Failure');
-      return `${data.attribute}: ${data.dice1}+${data.dice2}=${data.total} → ${resultText}`;
+      const charName = data.character_name || 'Jogador';
+      const groupTag = data.is_group_test ? (lang === 'pt-BR' ? ' [Grupo]' : ' [Group]') : '';
+      return `${charName}: ${data.dice1}+${data.dice2}=${data.dice1 + data.dice2} → ${resultText}${groupTag}`;
     },
   },
   group_test_completed: {
