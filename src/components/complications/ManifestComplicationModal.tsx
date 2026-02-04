@@ -86,7 +86,7 @@ export function ManifestComplicationModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1 overflow-y-auto">
           {/* Current Complication */}
           <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
             <p className="font-body text-sm">{description}</p>

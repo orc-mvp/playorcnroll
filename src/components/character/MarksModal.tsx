@@ -189,7 +189,7 @@ export function MarksModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-medieval flex items-center gap-2">
             <Scroll className="w-5 h-5 text-primary" />
@@ -198,7 +198,7 @@ export function MarksModal({
         </DialogHeader>
 
         {/* Attribute Filter */}
-        <div className="flex gap-1 flex-wrap pb-2 border-b border-border">
+        <div className="flex gap-1 flex-wrap pb-2 border-b border-border shrink-0">
           <Button
             variant={filterAttribute === null ? 'default' : 'outline'}
             size="sm"
@@ -226,8 +226,8 @@ export function MarksModal({
           })}
         </div>
 
-        <Tabs defaultValue="minor" className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid grid-cols-4">
+        <Tabs defaultValue="minor" className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <TabsList className="grid grid-cols-4 shrink-0">
             <TabsTrigger value="minor" className="text-xs gap-1">
               <Scroll className="w-3 h-3" />
               <span className="hidden sm:inline">{t.marks.minor}</span>

@@ -284,7 +284,7 @@ export function HeroicMoveModal({ characterId, sessionId, isGroupTest, onClose }
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-medieval flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-yellow-500" />
@@ -293,7 +293,7 @@ export function HeroicMoveModal({ characterId, sessionId, isGroupTest, onClose }
         </DialogHeader>
 
         {!selectedOption ? (
-          <div className="grid gap-3">
+          <div className="grid gap-3 overflow-y-auto flex-1">
             <p className="text-sm text-muted-foreground font-body">
               {t.heroicMoves.choose}
             </p>
@@ -319,7 +319,7 @@ export function HeroicMoveModal({ characterId, sessionId, isGroupTest, onClose }
             ))}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 overflow-y-auto flex-1">
             <Button 
               variant="ghost" 
               size="sm" 

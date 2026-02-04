@@ -111,7 +111,7 @@ export function CreateComplicationModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto flex-1">
           {/* Type Selection */}
           <div className="space-y-2">
             <Label className="font-medieval">{t.complications.type}</Label>

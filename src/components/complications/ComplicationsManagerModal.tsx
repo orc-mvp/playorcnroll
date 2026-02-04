@@ -145,7 +145,7 @@ export function ComplicationsManagerModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col">
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-medieval flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-red-500" />
@@ -159,14 +159,14 @@ export function ComplicationsManagerModal({
               <p className="font-body">Nenhum jogador conectado</p>
             </div>
           ) : (
-            <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
               {/* Character Tabs */}
               <Tabs
                 value={selectedCharacter || characters[0]?.id}
                 onValueChange={setSelectedCharacter}
-                className="flex-1 flex flex-col min-h-0"
+                className="flex-1 flex flex-col min-h-0 overflow-hidden"
               >
-                <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 h-auto p-1">
+                <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1 h-auto p-1 shrink-0">
                   {characters.map((char) => {
                     const count = getComplicationsByCharacter(char.id).length;
                     const atLimit = count >= 3;
