@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils';
 
 interface EventFeedProps {
   events: SessionEvent[];
+  isNarrator?: boolean;
 }
 
 const eventConfig: Record<string, { 
@@ -129,9 +130,23 @@ const eventConfig: Record<string, {
   },
 };
 
-export function EventFeed({ events }: EventFeedProps) {
+export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
   const { t, language } = useI18n();
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
+
+  // Filter out hidden complication events for players
+  const filteredEvents = events.filter(event => {
+    // If narrator, show all events
+    if (isNarrator) return true;
+    
+    // Filter out complication_created events where is_visible is false
+    if (event.event_type === 'complication_created') {
+      const eventData = event.event_data as any;
+      return eventData.is_visible !== false;
+    }
+    
+    return true;
+  });
 
   return (
     <Card className="medieval-card h-full flex flex-col">
@@ -144,14 +159,14 @@ export function EventFeed({ events }: EventFeedProps) {
 
       <CardContent className="flex-1 overflow-hidden p-0">
         <ScrollArea className="h-full px-6 pb-6">
-          {events.length === 0 ? (
+          {filteredEvents.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground font-body">
               <Scroll className="w-10 h-10 mx-auto mb-2 opacity-30" />
               <p>Nenhum evento ainda</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {events.map((event) => {
+              {filteredEvents.map((event) => {
                 const config = eventConfig[event.event_type] || {
                   icon: MessageSquare,
                   color: 'text-muted-foreground',

@@ -363,7 +363,7 @@ export default function Session() {
           </TabsContent>
 
           <TabsContent value="events" className="flex-1 p-4 overflow-auto">
-            <EventFeed events={events} />
+            <EventFeed events={events} isNarrator={isNarrator} />
           </TabsContent>
 
           <TabsContent value="dice" className="flex-1 p-4 overflow-auto">
@@ -427,7 +427,7 @@ export default function Session() {
 
             {/* Event Feed */}
             <div className="overflow-auto">
-              <EventFeed events={events} />
+              <EventFeed events={events} isNarrator={isNarrator} />
             </div>
           </div>
         </main>
