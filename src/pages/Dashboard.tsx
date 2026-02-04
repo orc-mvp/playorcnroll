@@ -47,13 +47,13 @@ export default function Dashboard() {
   const isNarrator = profile.role === 'narrator';
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Sword className="w-6 h-6 text-primary" />
-            <h1 className="font-medieval text-xl md:text-2xl text-foreground">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Sword className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+            <h1 className="font-medieval text-lg sm:text-xl md:text-2xl text-foreground truncate">
               Heróis Marcados
             </h1>
           </div>
@@ -80,12 +80,12 @@ export default function Dashboard() {
             </div>
 
             {/* User Info */}
-            <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground">
-              {isNarrator ? <Crown className="w-4 h-4 text-primary" /> : <Users className="w-4 h-4 text-primary" />}
-              <span className="font-body">
+            <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+              {isNarrator ? <Crown className="w-4 h-4 text-primary shrink-0" /> : <Users className="w-4 h-4 text-primary shrink-0" />}
+              <span className="font-body truncate max-w-[150px]">
                 {profile.display_name || user.email}
               </span>
-              <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary font-medieval">
+              <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary font-medieval shrink-0">
                 {isNarrator ? t.roles.narrator : t.roles.player}
               </span>
             </div>

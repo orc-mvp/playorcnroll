@@ -217,20 +217,21 @@ export default function SessionLobby() {
   const inviteLink = `${window.location.origin}/join/${session.invite_code}`;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
             <Button
               variant="ghost"
               size="icon"
+              className="shrink-0"
               onClick={() => navigate('/dashboard')}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <div>
-              <h1 className="font-medieval text-xl md:text-2xl text-foreground">
+            <div className="min-w-0 flex-1">
+              <h1 className="font-medieval text-lg sm:text-xl md:text-2xl text-foreground truncate">
                 {session.name}
               </h1>
               <span className="text-sm text-muted-foreground font-body">
@@ -240,9 +241,9 @@ export default function SessionLobby() {
           </div>
 
           {isNarrator && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               <Crown className="w-4 h-4 text-primary" />
-              <span className="text-sm text-primary font-medieval">
+              <span className="text-sm text-primary font-medieval hidden sm:inline">
                 {t.roles.narrator}
               </span>
             </div>
@@ -251,32 +252,33 @@ export default function SessionLobby() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 max-w-4xl">
+      <main className="container mx-auto px-4 py-8 max-w-4xl overflow-hidden">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Invite Section */}
-          <Card className="medieval-card">
+          <Card className="medieval-card overflow-hidden">
             <CardHeader>
               <CardTitle className="font-medieval flex items-center gap-2">
-                <LinkIcon className="w-5 h-5 text-primary" />
-                Convide Jogadores
+                <LinkIcon className="w-5 h-5 text-primary shrink-0" />
+                <span className="truncate">Convide Jogadores</span>
               </CardTitle>
               <CardDescription className="font-body">
                 Compartilhe o código ou link com seus jogadores
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 overflow-hidden">
               {/* Invite Code */}
               <div className="space-y-2">
                 <label className="text-sm font-medieval text-muted-foreground">
                   {t.session.inviteCode}
                 </label>
                 <div className="flex gap-2">
-                  <div className="flex-1 bg-muted rounded-md px-4 py-3 font-mono text-2xl text-center tracking-widest">
+                  <div className="flex-1 min-w-0 bg-muted rounded-md px-4 py-3 font-mono text-xl sm:text-2xl text-center tracking-widest overflow-hidden">
                     {session.invite_code}
                   </div>
                   <Button
                     variant="outline"
                     size="icon"
+                    className="shrink-0"
                     onClick={() => copyToClipboard(session.invite_code, 'Código')}
                   >
                     <Copy className="w-4 h-4" />
@@ -285,12 +287,12 @@ export default function SessionLobby() {
               </div>
 
               {/* Invite Link */}
-              <div className="space-y-2">
+              <div className="space-y-2 overflow-hidden">
                 <label className="text-sm font-medieval text-muted-foreground">
                   {t.session.inviteLink}
                 </label>
                 <div className="flex gap-2 min-w-0">
-                  <div className="flex-1 min-w-0 bg-muted rounded-md px-3 py-2 text-sm truncate font-body overflow-hidden">
+                  <div className="flex-1 min-w-0 bg-muted rounded-md px-3 py-2 text-sm font-body overflow-hidden text-ellipsis whitespace-nowrap">
                     {inviteLink}
                   </div>
                   <Button
