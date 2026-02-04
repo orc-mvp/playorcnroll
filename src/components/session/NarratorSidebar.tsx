@@ -50,7 +50,8 @@ const attributeIcons: Record<string, React.ElementType> = {
 const attributeKeys = ['aggression', 'determination', 'seduction', 'cunning', 'faith'] as const;
 
 const difficultyLabels: Record<number, string> = {
-  [-2]: 'veryEasy',
+  [-3]: 'veryEasy',
+  [-2]: 'easy',
   [-1]: 'easy',
   [0]: 'normal',
   [1]: 'hard',
@@ -256,15 +257,15 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
             <Slider
               value={[difficulty]}
               onValueChange={([val]) => setDifficulty(val)}
-              min={-2}
+              min={-3}
               max={3}
               step={1}
               className="py-2"
             />
-            <div className="flex text-xs text-muted-foreground">
-              <span className="w-0">-2</span>
-              <span className="flex-1 text-center" style={{ marginLeft: '40%', transform: 'translateX(-50%)' }}>0</span>
-              <span className="ml-auto">+3</span>
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>-3</span>
+              <span>0</span>
+              <span>+3</span>
             </div>
           </div>
 
