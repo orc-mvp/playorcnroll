@@ -1,7 +1,9 @@
+import { useState, useMemo } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
   Scroll, 
   BookOpen, 
@@ -13,7 +15,9 @@ import {
   Users,
   CheckCircle,
   XCircle,
-  MinusCircle
+  MinusCircle,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
@@ -24,6 +28,9 @@ interface EventFeedProps {
   events: SessionEvent[];
   isNarrator?: boolean;
 }
+
+const ITEMS_PER_PAGE = 10;
+const MAX_EVENTS = 100;
 
 const eventConfig: Record<string, { 
   icon: React.ElementType; 
@@ -133,40 +140,66 @@ const eventConfig: Record<string, {
 export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
   const { t, language } = useI18n();
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
+  const [currentPage, setCurrentPage] = useState(0);
 
-  // Filter out hidden complication events for players
-  const filteredEvents = events.filter(event => {
-    // If narrator, show all events
-    if (isNarrator) return true;
-    
-    // Filter out complication_created events where is_visible is false
-    if (event.event_type === 'complication_created') {
-      const eventData = event.event_data as any;
-      return eventData.is_visible !== false;
+  // Filter out hidden complication events for players and limit to MAX_EVENTS
+  const filteredEvents = useMemo(() => {
+    const filtered = events.filter(event => {
+      if (isNarrator) return true;
+      if (event.event_type === 'complication_created') {
+        const eventData = event.event_data as any;
+        return eventData.is_visible !== false;
+      }
+      return true;
+    });
+    // Limit to the last MAX_EVENTS
+    return filtered.slice(0, MAX_EVENTS);
+  }, [events, isNarrator]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+  const startIndex = currentPage * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
     }
-    
-    return true;
-  });
+  };
+
+  const goToPrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
 
   return (
     <Card className="medieval-card h-full flex flex-col">
       <CardHeader className="pb-3 flex-shrink-0">
-        <CardTitle className="font-medieval flex items-center gap-2">
-          <Scroll className="w-5 h-5 text-primary" />
-          {t.scene.events}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-medieval flex items-center gap-2">
+            <Scroll className="w-5 h-5 text-primary" />
+            {t.scene.events}
+          </CardTitle>
+          {filteredEvents.length > 0 && (
+            <span className="text-xs text-muted-foreground font-body">
+              {filteredEvents.length} {language === 'pt-BR' ? 'eventos' : 'events'}
+            </span>
+          )}
+        </div>
       </CardHeader>
 
-      <CardContent className="flex-1 overflow-hidden p-0">
-        <ScrollArea className="h-full px-6 pb-6">
+      <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
+        <ScrollArea className="flex-1 px-6">
           {filteredEvents.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground font-body">
               <Scroll className="w-10 h-10 mx-auto mb-2 opacity-30" />
               <p>Nenhum evento ainda</p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {filteredEvents.map((event) => {
+            <div className="space-y-3 pb-2">
+              {paginatedEvents.map((event) => {
                 const config = eventConfig[event.event_type] || {
                   icon: MessageSquare,
                   color: 'text-muted-foreground',
@@ -243,6 +276,35 @@ export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
             </div>
           )}
         </ScrollArea>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-3 border-t border-border shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goToPrevPage}
+              disabled={currentPage === 0}
+              className="h-8"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              {language === 'pt-BR' ? 'Anterior' : 'Previous'}
+            </Button>
+            <span className="text-xs text-muted-foreground font-body">
+              {currentPage + 1} / {totalPages}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goToNextPage}
+              disabled={currentPage >= totalPages - 1}
+              className="h-8"
+            >
+              {language === 'pt-BR' ? 'Próximo' : 'Next'}
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
