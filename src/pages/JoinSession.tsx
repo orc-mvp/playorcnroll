@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { 
   Select,
   SelectContent,
@@ -15,12 +17,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ArrowLeft, Users, Loader2 } from 'lucide-react';
+import { ArrowLeft, Users, Loader2, History, Play, Clock, CheckCircle } from 'lucide-react';
 
 interface Character {
   id: string;
   name: string;
   concept: string | null;
+}
+
+interface JoinedSession {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  characterName: string;
+  joinedAt: string;
 }
 
 export default function JoinSession() {
@@ -36,6 +47,8 @@ export default function JoinSession() {
   const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
   const [isJoining, setIsJoining] = useState(false);
   const [loadingCharacters, setLoadingCharacters] = useState(true);
+  const [joinedSessions, setJoinedSessions] = useState<JoinedSession[]>([]);
+  const [loadingSessions, setLoadingSessions] = useState(true);
 
   // Redirect if not authenticated or is a narrator
   useEffect(() => {
@@ -66,6 +79,52 @@ export default function JoinSession() {
     };
 
     fetchCharacters();
+  }, [user]);
+
+  // Fetch sessions the user has joined
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchJoinedSessions = async () => {
+      setLoadingSessions(true);
+      
+      const { data: participations, error } = await supabase
+        .from('session_participants')
+        .select(`
+          id,
+          joined_at,
+          character_id,
+          characters:character_id (name),
+          sessions:session_id (
+            id,
+            name,
+            description,
+            status
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('joined_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching joined sessions:', error);
+      } else if (participations) {
+        const sessions: JoinedSession[] = participations
+          .filter(p => p.sessions && (p.sessions as any).status !== 'completed')
+          .map(p => ({
+            id: (p.sessions as any).id,
+            name: (p.sessions as any).name,
+            description: (p.sessions as any).description,
+            status: (p.sessions as any).status,
+            characterName: (p.characters as any)?.name || 'Sem personagem',
+            joinedAt: p.joined_at,
+          }));
+        setJoinedSessions(sessions);
+      }
+      
+      setLoadingSessions(false);
+    };
+
+    fetchJoinedSessions();
   }, [user]);
 
   // Auto-join if code is in URL
@@ -167,6 +226,39 @@ export default function JoinSession() {
     }
   };
 
+  const handleRejoinSession = (session: JoinedSession) => {
+    if (session.status === 'active') {
+      navigate(`/session/${session.id}`);
+    } else {
+      navigate(`/session/${session.id}/lobby`);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return (
+          <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
+            <Play className="w-3 h-3 mr-1" />
+            Ativa
+          </Badge>
+        );
+      case 'lobby':
+        return (
+          <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
+            <Clock className="w-3 h-3 mr-1" />
+            Aguardando
+          </Badge>
+        );
+      default:
+        return (
+          <Badge variant="outline">
+            {status}
+          </Badge>
+        );
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -197,7 +289,8 @@ export default function JoinSession() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 max-w-md">
+      <main className="container mx-auto px-4 py-8 max-w-lg space-y-6">
+        {/* Join New Session Card */}
         <Card className="medieval-card">
           <CardHeader className="text-center">
             <div className="w-16 h-16 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -294,6 +387,56 @@ export default function JoinSession() {
             </form>
           </CardContent>
         </Card>
+
+        {/* Previously Joined Sessions */}
+        {!loadingSessions && joinedSessions.length > 0 && (
+          <Card className="medieval-card">
+            <CardHeader>
+              <CardTitle className="font-medieval text-lg flex items-center gap-2">
+                <History className="w-5 h-5 text-primary" />
+                Minhas Aventuras
+              </CardTitle>
+              <CardDescription className="font-body">
+                Sessões que você já participou
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent className="space-y-3">
+              {joinedSessions.map((session) => (
+                <button
+                  key={session.id}
+                  onClick={() => handleRejoinSession(session)}
+                  className="w-full p-4 rounded-lg border border-border bg-card/50 hover:bg-primary/5 hover:border-primary/50 transition-all text-left"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medieval text-foreground truncate">
+                        {session.name}
+                      </h4>
+                      {session.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-1 mt-1">
+                          {session.description}
+                        </p>
+                      )}
+                      <p className="text-xs text-primary mt-2 font-body">
+                        Como: {session.characterName}
+                      </p>
+                    </div>
+                    <div className="shrink-0">
+                      {getStatusBadge(session.status)}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {loadingSessions && (
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        )}
       </main>
     </div>
   );
