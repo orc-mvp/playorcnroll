@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
@@ -35,8 +35,15 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
   const [activeTest, setActiveTest] = useState<PendingTest | null>(null);
   const [rolledTestIds, setRolledTestIds] = useState<Set<string>>(new Set());
 
+  // Refs para controlar estado do modal de forma estável (sem re-renders)
+  const isModalOpenRef = useRef(false);
+  const rolledTestIdsRef = useRef<Set<string>>(new Set());
+
   // Fetch pending tests
   useEffect(() => {
+    // Não executar fetch se o modal estiver aberto
+    if (isModalOpenRef.current) return;
+
     const fetchPendingTests = async () => {
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) return;
@@ -57,6 +64,10 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
         .eq('user_id', user.user.id);
 
       const rolledIds = new Set((rolls || []).map(r => r.test_id));
+      
+      // Merge com IDs marcados localmente
+      rolledTestIdsRef.current.forEach(id => rolledIds.add(id));
+      rolledTestIdsRef.current = rolledIds;
       setRolledTestIds(rolledIds);
 
       // Filter tests that haven't been rolled yet
@@ -73,8 +84,11 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'tests', filter: `session_id=eq.${sessionId}` },
         (payload) => {
+          // Ignorar se modal estiver aberto
+          if (isModalOpenRef.current) return;
+          
           const newTest = payload.new as PendingTest;
-          if (!rolledTestIds.has(newTest.id)) {
+          if (!rolledTestIdsRef.current.has(newTest.id)) {
             setPendingTests(prev => [...prev, newTest]);
           }
         }
@@ -94,24 +108,32 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [sessionId, rolledTestIds]);
+  }, [sessionId]); // REMOVIDO rolledTestIds das dependências
 
   const getAttributeType = (attribute: string): AttributeType => {
     const key = `${attribute}_type` as keyof typeof character;
     return (character[key] as AttributeType) || 'neutral';
   };
 
-  // Called when test is rolled - mark as rolled but keep modal open
-  const handleTestRolled = (testId: string) => {
-    setPendingTests(prev => prev.filter(t => t.id !== testId));
-    setRolledTestIds(prev => new Set([...prev, testId]));
+  // Função para abrir o modal de teste
+  const handleOpenTest = (test: PendingTest) => {
+    isModalOpenRef.current = true;
+    setActiveTest(test);
   };
 
   // Called when user manually closes the modal
   const handleCloseModal = () => {
     if (activeTest) {
-      handleTestRolled(activeTest.id);
+      // Marcar como rolado
+      const newRolled = new Set(rolledTestIdsRef.current);
+      newRolled.add(activeTest.id);
+      rolledTestIdsRef.current = newRolled;
+      setRolledTestIds(newRolled);
+      
+      // Remover da lista de pendentes
+      setPendingTests(prev => prev.filter(t => t.id !== activeTest.id));
     }
+    isModalOpenRef.current = false;
     setActiveTest(null);
   };
 
@@ -134,7 +156,7 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
                 key={test.id}
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => setActiveTest(test)}
+                onClick={() => handleOpenTest(test)}
               >
                 <Dices className="w-4 h-4 mr-2" />
                 <span className="font-medieval">

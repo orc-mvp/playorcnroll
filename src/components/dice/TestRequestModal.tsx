@@ -297,7 +297,7 @@ export function TestRequestModal({
 
       toast({ title: t.tests.pullGroup + ' ativado! +1 sucesso coletivo' });
       setShowPullGroupOption(false);
-      onClose();
+      // Removido: onClose() - modal permanece aberto para jogador ver resultado
     } catch (error) {
       console.error('Error using pull group:', error);
     }
@@ -309,7 +309,7 @@ export function TestRequestModal({
 
   const handleHeroicMoveComplete = () => {
     setShowHeroicModal(false);
-    onClose();
+    // Removido: onClose() - modal permanece aberto para jogador ver resultado
   };
 
   const groupProgress = groupRollStatus.length > 0 

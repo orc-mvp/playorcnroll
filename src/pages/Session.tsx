@@ -172,7 +172,7 @@ export default function Session() {
               .from('profiles')
               .select('display_name')
               .eq('user_id', p.user_id)
-              .single();
+              .maybeSingle();
 
             return {
               ...p,
