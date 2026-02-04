@@ -150,6 +150,15 @@ export function TestRequestModal({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('User not found');
 
+      // Get character name
+      const { data: characterData } = await supabase
+        .from('characters')
+        .select('name')
+        .eq('id', characterId)
+        .single();
+
+      const characterName = characterData?.name || 'Jogador';
+
       // Get attribute modifier
       const attrMod = attributeType === 'strong' ? 2 : attributeType === 'neutral' ? 1 : 0;
 
@@ -169,24 +178,23 @@ export function TestRequestModal({
         rolled_at: new Date().toISOString(),
       });
 
-      // For group tests, hide individual results in feed
-      if (!isGroupTest) {
-        // Create event for feed (individual test only)
-        await supabase.from('session_events').insert({
-          session_id: sessionId,
-          event_type: 'dice_rolled',
-          event_data: {
-            character_id: characterId,
-            attribute,
-            dice1: result.dice1,
-            dice2: result.dice2,
-            total: result.total,
-            result: result.result,
-            has_positive_extreme: result.hasPositiveExtreme,
-            has_negative_extreme: result.hasNegativeExtreme,
-          },
-        });
-      }
+      // Create event for feed (both individual and group tests)
+      await supabase.from('session_events').insert({
+        session_id: sessionId,
+        event_type: 'dice_rolled',
+        event_data: {
+          character_id: characterId,
+          character_name: characterName,
+          attribute,
+          dice1: result.dice1,
+          dice2: result.dice2,
+          total: result.total,
+          result: result.result,
+          has_positive_extreme: result.hasPositiveExtreme,
+          has_negative_extreme: result.hasNegativeExtreme,
+          is_group_test: isGroupTest,
+        },
+      });
 
       // If positive extreme, increment heroic moves and show option to use
       if (result.hasPositiveExtreme) {
