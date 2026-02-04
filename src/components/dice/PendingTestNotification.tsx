@@ -99,9 +99,17 @@ export function PendingTestNotification({ sessionId, characterId, character }: P
     return (character[key] as AttributeType) || 'neutral';
   };
 
-  const handleTestComplete = (testId: string) => {
+  // Called when test is rolled - mark as rolled but keep modal open
+  const handleTestRolled = (testId: string) => {
     setPendingTests(prev => prev.filter(t => t.id !== testId));
     setRolledTestIds(prev => new Set([...prev, testId]));
+  };
+
+  // Called when user manually closes the modal
+  const handleCloseModal = () => {
+    if (activeTest) {
+      handleTestRolled(activeTest.id);
+    }
     setActiveTest(null);
   };
 
@@ -151,7 +159,7 @@ export function PendingTestNotification({ sessionId, characterId, character }: P
           context={activeTest.context || undefined}
           characterId={characterId}
           isGroupTest={activeTest.test_type === 'group'}
-          onClose={() => handleTestComplete(activeTest.id)}
+          onClose={handleCloseModal}
         />
       )}
     </>

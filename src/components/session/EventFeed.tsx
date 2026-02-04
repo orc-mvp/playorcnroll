@@ -61,14 +61,15 @@ const getEventConfig = (t: any) => ({
     icon: Dices,
     color: 'text-green-500',
     label: (data: Record<string, any>, lang: string) => {
+      const attrName = getAttributeName(data.attribute, lang, t);
       const resultText = data.result === 'success' 
         ? (lang === 'pt-BR' ? 'Sucesso' : 'Success')
         : data.result === 'partial' 
           ? (lang === 'pt-BR' ? 'Parcial' : 'Partial')
           : (lang === 'pt-BR' ? 'Falha' : 'Failure');
-      const charName = data.character_name || 'Jogador';
+      const charName = data.character_name || (lang === 'pt-BR' ? 'Jogador' : 'Player');
       const groupTag = data.is_group_test ? (lang === 'pt-BR' ? ' [Grupo]' : ' [Group]') : '';
-      return `${charName}: ${data.dice1}+${data.dice2}=${data.dice1 + data.dice2} → ${resultText}${groupTag}`;
+      return `${charName} (${attrName}): ${data.dice1}+${data.dice2}=${data.total} → ${resultText}${groupTag}`;
     },
   },
   group_test_completed: {
