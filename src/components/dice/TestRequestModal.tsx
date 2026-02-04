@@ -318,8 +318,8 @@ export function TestRequestModal({
 
   return (
     <>
-      <Dialog open={!showHeroicModal} onOpenChange={(open) => !open && !showHeroicModal && onClose()}>
-        <DialogContent className="max-w-md">
+      <Dialog open={!showHeroicModal} onOpenChange={() => {}}>
+        <DialogContent className="max-w-md" onPointerDownOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle className="font-medieval flex items-center gap-2">
               <Dices className="w-5 h-5 text-primary" />
