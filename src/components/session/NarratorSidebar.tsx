@@ -24,10 +24,13 @@ import {
   Shield,
   Heart,
   Brain,
-  Flame
+  Flame,
+  Scroll,
+  Eye
 } from 'lucide-react';
 import { GroupTestPanel } from '@/components/dice/GroupTestPanel';
 import { ComplicationsNarratorPanel } from '@/components/complications/ComplicationsNarratorPanel';
+import { MarksModal } from '@/components/character/MarksModal';
 import type { SessionData, Participant, Scene } from '@/pages/Session';
 
 interface NarratorSidebarProps {
@@ -69,6 +72,9 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
     attribute: string;
     players: string[];
   } | null>(null);
+  
+  // State for viewing player marks
+  const [viewingMarksFor, setViewingMarksFor] = useState<Participant | null>(null);
 
   // Check for active group tests
   useEffect(() => {
@@ -343,22 +349,41 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
             </p>
           ) : (
             <div className="space-y-2">
-              {participants.map((p) => (
-                <div
-                  key={p.id}
-                  className="flex items-center gap-2 p-2 rounded-lg bg-muted/50"
-                >
-                  <User className="w-4 h-4 text-primary" />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medieval text-sm truncate">
-                      {p.character?.name || 'Sem personagem'}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {p.profile?.display_name || 'Jogador'}
-                    </p>
+              {participants.map((p) => {
+                const minorMarksCount = p.character?.minor_marks?.length || 0;
+                const majorMarksCount = (p.character?.major_marks as any[])?.length || 0;
+                const epicMarksCount = ((p.character as any)?.epic_marks as any[])?.length || 0;
+                const totalMarks = minorMarksCount + majorMarksCount + epicMarksCount;
+                
+                return (
+                  <div
+                    key={p.id}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-muted/50"
+                  >
+                    <User className="w-4 h-4 text-primary shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medieval text-sm truncate">
+                        {p.character?.name || 'Sem personagem'}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {p.profile?.display_name || 'Jogador'}
+                      </p>
+                    </div>
+                    {p.character && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 gap-1 shrink-0"
+                        onClick={() => setViewingMarksFor(p)}
+                        title="Ver marcas do jogador"
+                      >
+                        <Scroll className="w-3 h-3" />
+                        <span className="text-xs">{totalMarks}</span>
+                      </Button>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
@@ -369,6 +394,18 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
         sessionId={session.id}
         participants={participants}
       />
+
+      {/* Marks Modal for viewing player marks */}
+      {viewingMarksFor?.character && (
+        <MarksModal
+          open={!!viewingMarksFor}
+          onOpenChange={(open) => !open && setViewingMarksFor(null)}
+          minorMarkIds={viewingMarksFor.character.minor_marks || []}
+          majorMarks={(viewingMarksFor.character.major_marks as any[]) || []}
+          epicMarks={((viewingMarksFor.character as any).epic_marks as any[]) || []}
+          negativeMarks={((viewingMarksFor.character as any).negative_marks as any[]) || []}
+        />
+      )}
     </div>
   );
 }
