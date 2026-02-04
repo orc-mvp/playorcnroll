@@ -46,6 +46,15 @@ const typeIcons: Record<string, React.ElementType> = {
   minor_curse: Skull,
 };
 
+// Map snake_case DB values to camelCase translation keys
+const typeTranslationKeys: Record<string, string> = {
+  reputational: 'reputational',
+  tracking: 'tracking',
+  betrayal: 'betrayal',
+  debt: 'debt',
+  minor_curse: 'minorCurse',
+};
+
 export function ComplicationsNarratorPanel({ sessionId, participants }: ComplicationsNarratorPanelProps) {
   const { t } = useI18n();
   const [complications, setComplications] = useState<Complication[]>([]);
@@ -163,7 +172,7 @@ export function ComplicationsNarratorPanel({ sessionId, participants }: Complica
                         <div 
                           key={comp.id}
                           className="w-6 h-6 rounded bg-background/50 flex items-center justify-center"
-                          title={`${t.complications[comp.type as keyof typeof t.complications] || comp.type}${!comp.is_visible ? ' (oculta)' : ''}`}
+                          title={`${t.complications[typeTranslationKeys[comp.type] as keyof typeof t.complications] || comp.type}${!comp.is_visible ? ' (oculta)' : ''}`}
                         >
                           <TypeIcon className={cn(
                             "w-3 h-3",

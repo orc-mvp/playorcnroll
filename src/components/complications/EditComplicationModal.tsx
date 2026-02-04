@@ -46,11 +46,11 @@ interface EditComplicationModalProps {
 }
 
 const complicationTypes = [
-  { value: 'reputational', icon: Users },
-  { value: 'tracking', icon: Footprints },
-  { value: 'betrayal', icon: Handshake },
-  { value: 'debt', icon: Coins },
-  { value: 'minor_curse', icon: Skull },
+  { value: 'reputational', icon: Users, labelKey: 'reputational' },
+  { value: 'tracking', icon: Footprints, labelKey: 'tracking' },
+  { value: 'betrayal', icon: Handshake, labelKey: 'betrayal' },
+  { value: 'debt', icon: Coins, labelKey: 'debt' },
+  { value: 'minor_curse', icon: Skull, labelKey: 'minorCurse' },
 ] as const;
 
 export function EditComplicationModal({
@@ -128,7 +128,7 @@ export function EditComplicationModal({
                       <div className="flex items-center gap-2">
                         <Icon className="w-4 h-4" />
                         <span>
-                          {t.complications[ct.value as keyof typeof t.complications]}
+                          {t.complications[ct.labelKey as keyof typeof t.complications]}
                         </span>
                       </div>
                     </SelectItem>

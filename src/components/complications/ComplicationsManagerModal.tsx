@@ -59,6 +59,15 @@ const typeIcons: Record<string, React.ElementType> = {
   minor_curse: Skull,
 };
 
+// Map snake_case DB values to camelCase translation keys
+const typeTranslationKeys: Record<string, string> = {
+  reputational: 'reputational',
+  tracking: 'tracking',
+  betrayal: 'betrayal',
+  debt: 'debt',
+  minor_curse: 'minorCurse',
+};
+
 export function ComplicationsManagerModal({
   open,
   onOpenChange,
@@ -274,7 +283,7 @@ export function ComplicationsManagerModal({
                                     <div className="flex items-center gap-2 mb-2">
                                       <Badge variant="outline" className="text-xs">
                                         {t.complications[
-                                          comp.type as keyof typeof t.complications
+                                          typeTranslationKeys[comp.type] as keyof typeof t.complications
                                         ] || comp.type}
                                       </Badge>
                                       {comp.is_visible ? (
