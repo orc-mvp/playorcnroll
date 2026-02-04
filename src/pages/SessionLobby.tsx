@@ -371,7 +371,7 @@ export default function SessionLobby() {
         )}
 
         {/* Start Session Button (Narrator only) */}
-        {isNarrator && (
+        {isNarrator && session.status !== 'ended' && (
           <div className="mt-8 flex justify-center">
             <Button
               size="lg"
@@ -394,13 +394,53 @@ export default function SessionLobby() {
           </div>
         )}
 
+        {/* Restart Ended Session Button (Narrator only) */}
+        {isNarrator && session.status === 'ended' && (
+          <div className="mt-8 flex flex-col items-center gap-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 border border-border">
+              <span className="text-sm text-muted-foreground font-body">
+                Esta sessão foi encerrada
+              </span>
+            </div>
+            <Button
+              size="lg"
+              className="font-medieval text-lg px-8 h-14"
+              onClick={handleStartSession}
+              disabled={isStarting}
+            >
+              {isStarting ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  Reiniciando...
+                </>
+              ) : (
+                <>
+                  <Play className="w-5 h-5 mr-2" />
+                  Reiniciar Sessão
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+
         {/* Waiting Message (Player) */}
-        {!isNarrator && (
+        {!isNarrator && session.status !== 'ended' && (
           <div className="mt-8 text-center">
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-muted">
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
               <span className="font-body text-muted-foreground">
                 {t.session.waitingForNarrator}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Ended Session Message (Player) */}
+        {!isNarrator && session.status === 'ended' && (
+          <div className="mt-8 text-center">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-muted/50 border border-border">
+              <span className="font-body text-muted-foreground">
+                Esta sessão foi encerrada pelo Narrador
               </span>
             </div>
           </div>
