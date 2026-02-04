@@ -3,7 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { 
   Sword, 
   Users, 
@@ -217,25 +218,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Activity */}
-        <Card className="medieval-card">
-          <CardHeader>
-            <CardTitle className="font-medieval flex items-center gap-2">
-              <Scroll className="w-5 h-5 text-primary" />
-              Atividade Recente
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-muted-foreground font-body">
-              <p>Nenhuma atividade recente</p>
-              <p className="text-sm mt-2">
-                {isNarrator 
-                  ? 'Crie uma sessão para começar!'
-                  : 'Crie um personagem ou entre em uma sessão!'
-                }
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <RecentActivity userId={user.id} isNarrator={isNarrator} />
       </main>
     </div>
   );
