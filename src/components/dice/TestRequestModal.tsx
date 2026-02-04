@@ -20,6 +20,8 @@ import { cn } from '@/lib/utils';
 interface TestRequestModalProps {
   testId: string;
   sessionId: string;
+  sceneId: string;
+  sceneName: string;
   attribute: string;
   attributeType: AttributeType;
   difficulty: number;
@@ -38,6 +40,8 @@ interface GroupRollStatus {
 export function TestRequestModal({
   testId,
   sessionId,
+  sceneId,
+  sceneName,
   attribute,
   attributeType,
   difficulty,
@@ -181,6 +185,7 @@ export function TestRequestModal({
       // Create event for feed (both individual and group tests)
       await supabase.from('session_events').insert({
         session_id: sessionId,
+        scene_id: sceneId,
         event_type: 'dice_rolled',
         event_data: {
           character_id: characterId,
@@ -195,6 +200,7 @@ export function TestRequestModal({
           has_positive_extreme: result.hasPositiveExtreme,
           has_negative_extreme: result.hasNegativeExtreme,
           is_group_test: isGroupTest,
+          scene_name: sceneName,
         },
       });
 
@@ -270,11 +276,23 @@ export function TestRequestModal({
           .eq('id', characterId);
       }
 
+      // Get character name for event
+      const { data: charData } = await supabase
+        .from('characters')
+        .select('name')
+        .eq('id', characterId)
+        .single();
+
       // Create event
       await supabase.from('session_events').insert({
         session_id: sessionId,
+        scene_id: sceneId,
         event_type: 'pull_group',
-        event_data: { character_id: characterId },
+        event_data: { 
+          character_id: characterId,
+          character_name: charData?.name || 'Jogador',
+          scene_name: sceneName,
+        },
       });
 
       toast({ title: t.tests.pullGroup + ' ativado! +1 sucesso coletivo' });

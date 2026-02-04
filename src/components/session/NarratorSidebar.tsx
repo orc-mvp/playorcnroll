@@ -161,6 +161,12 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
 
       if (error) throw error;
 
+      // Get character names for the event
+      const playerNames = selectedPlayers.map((charId) => {
+        const participant = participants.find(p => p.character?.id === charId);
+        return participant?.character?.name || 'Jogador';
+      });
+
       // Add event
       await supabase.from('session_events').insert({
         session_id: session.id,
@@ -171,7 +177,9 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
           attribute: selectedAttribute,
           difficulty: difficulty,
           players: selectedPlayers,
+          player_names: playerNames,
           context: context.trim() || null,
+          scene_name: currentScene.name,
         },
       });
 

@@ -323,11 +323,13 @@ export default function Session() {
         />
 
         {/* Pending Test Notification for Players */}
-        {!isNarrator && myCharacter && (
+        {!isNarrator && myCharacter && currentScene && (
           <div className="px-4 pt-2">
             <PendingTestNotification
               sessionId={session.id}
               characterId={myCharacter.id}
+              sceneId={currentScene.id}
+              sceneName={currentScene.name}
               character={myCharacter}
             />
           </div>
@@ -367,10 +369,12 @@ export default function Session() {
           </TabsContent>
 
           <TabsContent value="dice" className="flex-1 p-4 overflow-auto">
-            {!isNarrator && myCharacter ? (
+            {!isNarrator && myCharacter && currentScene ? (
               <PendingTestNotification
                 sessionId={session.id}
                 characterId={myCharacter.id}
+                sceneId={currentScene.id}
+                sceneName={currentScene.name}
                 character={myCharacter}
               />
             ) : (
@@ -435,11 +439,13 @@ export default function Session() {
         {/* Sidebar */}
         <aside className="w-80 border-l border-border bg-card/30 overflow-auto p-4">
           {/* Pending Test Notification for Players (Desktop) */}
-          {!isNarrator && myCharacter && (
+          {!isNarrator && myCharacter && currentScene && (
             <div className="mb-4">
               <PendingTestNotification
                 sessionId={session.id}
                 characterId={myCharacter.id}
+                sceneId={currentScene.id}
+                sceneName={currentScene.name}
                 character={myCharacter}
               />
             </div>
