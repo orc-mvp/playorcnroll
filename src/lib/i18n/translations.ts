@@ -218,7 +218,7 @@ export const translations = {
 
     // Complications
     complications: {
-      title: 'Complicações Penduradas',
+      title: 'Complicações',
       create: 'Criar Complicação',
       manifest: 'Manifestar',
       type: 'Tipo',
