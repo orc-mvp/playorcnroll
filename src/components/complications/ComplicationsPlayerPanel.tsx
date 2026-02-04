@@ -39,6 +39,15 @@ const typeIcons: Record<string, React.ElementType> = {
   minor_curse: Skull,
 };
 
+// Map snake_case DB values to camelCase translation keys
+const typeTranslationKeys: Record<string, string> = {
+  reputational: 'reputational',
+  tracking: 'tracking',
+  betrayal: 'betrayal',
+  debt: 'debt',
+  minor_curse: 'minorCurse',
+};
+
 export function ComplicationsPlayerPanel({ sessionId, characterId }: ComplicationsPlayerPanelProps) {
   const { t } = useI18n();
   const [complications, setComplications] = useState<Complication[]>([]);
@@ -140,7 +149,7 @@ export function ComplicationsPlayerPanel({ sessionId, characterId }: Complicatio
                       {comp.description}
                     </p>
                     <Badge variant="outline" className="text-xs mt-1">
-                      {t.complications[comp.type as keyof typeof t.complications] || comp.type}
+                      {t.complications[typeTranslationKeys[comp.type] as keyof typeof t.complications] || comp.type}
                     </Badge>
                   </div>
                 </div>
