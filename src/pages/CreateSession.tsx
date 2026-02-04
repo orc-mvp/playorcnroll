@@ -98,18 +98,19 @@ export default function CreateSession() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center gap-4">
+        <div className="container mx-auto px-4 py-4 flex items-center gap-2 sm:gap-4">
           <Button
             variant="ghost"
             size="icon"
+            className="shrink-0"
             onClick={() => navigate('/dashboard')}
           >
             <ArrowLeft className="w-5 h-5" />
           </Button>
-          <h1 className="font-medieval text-xl md:text-2xl text-foreground">
+          <h1 className="font-medieval text-lg sm:text-xl md:text-2xl text-foreground truncate">
             {t.session.create}
           </h1>
         </div>

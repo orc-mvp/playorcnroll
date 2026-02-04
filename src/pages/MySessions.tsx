@@ -135,28 +135,30 @@ export default function MySessions() {
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <Button
               variant="ghost"
               size="icon"
+              className="shrink-0"
               onClick={() => navigate('/dashboard')}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="font-medieval text-xl md:text-2xl text-foreground">
+            <h1 className="font-medieval text-lg sm:text-xl md:text-2xl text-foreground truncate">
               {t.session.mySessions}
             </h1>
           </div>
 
           {isNarrator && (
-            <Button asChild>
+            <Button asChild className="shrink-0">
               <Link to="/session/create">
                 <Plus className="w-4 h-4 mr-2" />
-                {t.session.create}
+                <span className="hidden sm:inline">{t.session.create}</span>
+                <span className="sm:hidden">Nova</span>
               </Link>
             </Button>
           )}

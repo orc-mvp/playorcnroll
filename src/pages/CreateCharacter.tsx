@@ -126,21 +126,21 @@ export default function CreateCharacter() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={handleBack}>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Button variant="ghost" size="icon" className="shrink-0" onClick={handleBack}>
               <ArrowLeft className="w-5 h-5" />
             </Button>
-            <Sword className="w-6 h-6 text-primary" />
-            <h1 className="font-medieval text-xl md:text-2xl text-foreground">
+            <Sword className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+            <h1 className="font-medieval text-lg sm:text-xl md:text-2xl text-foreground truncate">
               {t.character.create}
             </h1>
           </div>
 
-          <div className="text-sm text-muted-foreground font-body">
+          <div className="text-sm text-muted-foreground font-body shrink-0">
             {t.character.step} {step} {t.character.of} {totalSteps}
           </div>
         </div>
