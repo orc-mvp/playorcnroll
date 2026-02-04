@@ -103,11 +103,19 @@ export function DiceRoller({
 
   return (
     <Card className={cn(
-      "medieval-card overflow-hidden transition-all duration-500",
-      rollResult?.hasPositiveExtreme && "ring-2 ring-yellow-500 animate-pulse",
-      rollResult?.hasNegativeExtreme && "ring-2 ring-red-500 animate-pulse"
+      "medieval-card overflow-hidden transition-all duration-500 relative",
+      rollResult?.hasPositiveExtreme && "ring-4 ring-yellow-400 shadow-[0_0_30px_rgba(234,179,8,0.6)]",
+      rollResult?.hasNegativeExtreme && "ring-4 ring-red-500 shadow-[0_0_30px_rgba(239,68,68,0.6)]"
     )}>
-      <CardContent className="p-4 space-y-4">
+      {/* Extreme Glow Overlay */}
+      {rollResult?.hasPositiveExtreme && (
+        <div className="absolute inset-0 bg-gradient-to-b from-yellow-500/20 to-transparent pointer-events-none animate-pulse" />
+      )}
+      {rollResult?.hasNegativeExtreme && (
+        <div className="absolute inset-0 bg-gradient-to-b from-red-500/20 to-transparent pointer-events-none animate-pulse" />
+      )}
+      
+      <CardContent className="p-4 space-y-4 relative z-10">
         {/* Attribute Info */}
         <div className="flex items-center justify-between">
           <div>
@@ -145,6 +153,42 @@ export function DiceRoller({
           </Button>
         ) : rollResult && (
           <div className="space-y-3">
+            {/* Extreme Banner - Positive */}
+            {rollResult.hasPositiveExtreme && (
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-yellow-600 via-yellow-400 to-yellow-600 p-[2px]">
+                <div className="bg-background/95 rounded-[10px] p-4 flex items-center justify-center gap-3">
+                  <Sparkles className="w-8 h-8 text-yellow-400 animate-bounce" />
+                  <div className="text-center">
+                    <p className="font-medieval text-xl text-yellow-400 font-bold">
+                      {t.tests.extremePositive}
+                    </p>
+                    <p className="text-xs text-yellow-500/80 font-body">
+                      Movimento Heroico ganho!
+                    </p>
+                  </div>
+                  <Sparkles className="w-8 h-8 text-yellow-400 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                </div>
+              </div>
+            )}
+
+            {/* Extreme Banner - Negative */}
+            {rollResult.hasNegativeExtreme && (
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-red-700 via-red-500 to-red-700 p-[2px]">
+                <div className="bg-background/95 rounded-[10px] p-4 flex items-center justify-center gap-3">
+                  <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+                  <div className="text-center">
+                    <p className="font-medieval text-xl text-red-500 font-bold">
+                      {t.tests.extremeNegative}
+                    </p>
+                    <p className="text-xs text-red-400/80 font-body">
+                      O Narrador pode criar uma Complicação
+                    </p>
+                  </div>
+                  <AlertTriangle className="w-8 h-8 text-red-500 animate-pulse" />
+                </div>
+              </div>
+            )}
+
             {/* Dice Values */}
             <div className="flex items-center justify-center gap-4 text-2xl font-medieval">
               <span className="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-lg">
@@ -163,29 +207,16 @@ export function DiceRoller({
               {dice1 + dice2} + {getAttributeModifier(attributeType)} (attr) - {difficulty} (dif) = {rollResult.total}
             </div>
 
-            {/* Result */}
+            {/* Result Badge */}
             <div className={cn(
-              "flex items-center justify-center gap-2 text-xl font-medieval",
-              getResultColor(rollResult.result)
+              "flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medieval text-xl",
+              rollResult.result === 'success' && "bg-green-500/20 text-green-500 border border-green-500/30",
+              rollResult.result === 'partial' && "bg-yellow-500/20 text-yellow-500 border border-yellow-500/30",
+              rollResult.result === 'failure' && "bg-red-500/20 text-red-500 border border-red-500/30"
             )}>
               {getResultIcon(rollResult.result)}
               <span>{t.tests[rollResult.result]}</span>
             </div>
-
-            {/* Extreme Notifications */}
-            {rollResult.hasPositiveExtreme && (
-              <div className="flex items-center justify-center gap-2 p-3 bg-yellow-500/20 rounded-lg border border-yellow-500/30">
-                <Sparkles className="w-5 h-5 text-yellow-500" />
-                <span className="font-medieval text-yellow-500">{t.tests.extremePositive}</span>
-              </div>
-            )}
-
-            {rollResult.hasNegativeExtreme && (
-              <div className="flex items-center justify-center gap-2 p-3 bg-red-500/20 rounded-lg border border-red-500/30">
-                <AlertTriangle className="w-5 h-5 text-red-500" />
-                <span className="font-medieval text-red-500">{t.tests.extremeNegative}</span>
-              </div>
-            )}
           </div>
         )}
       </CardContent>
