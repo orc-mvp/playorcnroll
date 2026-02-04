@@ -186,6 +186,8 @@ export function TestRequestModal({
           character_id: characterId,
           character_name: characterName,
           attribute,
+          attribute_type: attributeType,
+          difficulty,
           dice1: result.dice1,
           dice2: result.dice2,
           total: result.total,
