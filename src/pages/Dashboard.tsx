@@ -152,17 +152,19 @@ export default function Dashboard() {
               </Link>
 
               {/* Manage Marks */}
-              <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group">
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                    <Scroll className="w-6 h-6 text-primary" />
-                  </div>
-                  <CardTitle className="font-medieval">{t.marks.createCustom}</CardTitle>
-                  <CardDescription className="font-body">
-                    Crie marcas personalizadas para suas campanhas
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <Link to="/marks">
+                <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                  <CardHeader>
+                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                      <Scroll className="w-6 h-6 text-primary" />
+                    </div>
+                    <CardTitle className="font-medieval">{t.marks.createCustom}</CardTitle>
+                    <CardDescription className="font-body">
+                      Crie marcas personalizadas para suas campanhas
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
             </>
           ) : (
             <>
