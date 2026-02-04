@@ -18,6 +18,8 @@ interface PendingTest {
 interface PendingTestNotificationProps {
   sessionId: string;
   characterId: string;
+  sceneId: string;
+  sceneName: string;
   character: {
     aggression_type: string;
     determination_type: string;
@@ -27,7 +29,7 @@ interface PendingTestNotificationProps {
   };
 }
 
-export function PendingTestNotification({ sessionId, characterId, character }: PendingTestNotificationProps) {
+export function PendingTestNotification({ sessionId, characterId, sceneId, sceneName, character }: PendingTestNotificationProps) {
   const { t } = useI18n();
   const [pendingTests, setPendingTests] = useState<PendingTest[]>([]);
   const [activeTest, setActiveTest] = useState<PendingTest | null>(null);
@@ -153,6 +155,8 @@ export function PendingTestNotification({ sessionId, characterId, character }: P
         <TestRequestModal
           testId={activeTest.id}
           sessionId={sessionId}
+          sceneId={sceneId}
+          sceneName={sceneName}
           attribute={activeTest.attribute}
           attributeType={getAttributeType(activeTest.attribute)}
           difficulty={activeTest.difficulty}

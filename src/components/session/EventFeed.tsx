@@ -52,9 +52,10 @@ const getEventConfig = (t: any) => ({
     label: (data: Record<string, any>, lang: string) => {
       const isGroup = Array.isArray(data.players) && data.players.length > 1;
       const attrName = getAttributeName(data.attribute, lang, t);
+      const playerNames = data.player_names?.join(', ') || '';
       return lang === 'pt-BR'
-        ? `Teste ${isGroup ? 'em grupo ' : ''}de ${attrName} solicitado`
-        : `${isGroup ? 'Group ' : ''}${attrName} test requested`;
+        ? `Teste ${isGroup ? 'em grupo ' : ''}de ${attrName}${playerNames ? ` para ${playerNames}` : ''}`
+        : `${isGroup ? 'Group ' : ''}${attrName} test${playerNames ? ` for ${playerNames}` : ''}`;
     },
   },
   dice_rolled: {
@@ -88,9 +89,12 @@ const getEventConfig = (t: any) => ({
   pull_group: {
     icon: Users,
     color: 'text-yellow-500',
-    label: (_: Record<string, any>, lang: string) => lang === 'pt-BR'
-      ? 'Jogador puxou o grupo! +1 sucesso'
-      : 'Player pulled the group! +1 success',
+    label: (data: Record<string, any>, lang: string) => {
+      const charName = data.character_name || (lang === 'pt-BR' ? 'Jogador' : 'Player');
+      return lang === 'pt-BR'
+        ? `${charName} puxou o grupo! +1 sucesso`
+        : `${charName} pulled the group! +1 success`;
+    },
   },
   test_completed: {
     icon: Dices,
@@ -274,6 +278,14 @@ export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
                             </Badge>
                           )}
                         </div>
+                      )}
+
+                      {/* Scene badge */}
+                      {(event.event_data as any).scene_name && (
+                        <Badge variant="outline" className="text-xs mr-1">
+                          <BookOpen className="w-3 h-3 mr-1" />
+                          {(event.event_data as any).scene_name}
+                        </Badge>
                       )}
 
                       <span className="text-xs text-muted-foreground">
