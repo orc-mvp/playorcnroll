@@ -17,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ArrowLeft, Users, Loader2, History, Play, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Users, Loader2, History, Play, Clock, CheckCircle, XCircle } from 'lucide-react';
 
 interface Character {
   id: string;
@@ -109,7 +109,7 @@ export default function JoinSession() {
         console.error('Error fetching joined sessions:', error);
       } else if (participations) {
         const sessions: JoinedSession[] = participations
-          .filter(p => p.sessions && (p.sessions as any).status !== 'completed')
+          .filter(p => p.sessions && !['completed'].includes((p.sessions as any).status))
           .map(p => ({
             id: (p.sessions as any).id,
             name: (p.sessions as any).name,
@@ -248,6 +248,13 @@ export default function JoinSession() {
           <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
             <Clock className="w-3 h-3 mr-1" />
             Aguardando
+          </Badge>
+        );
+      case 'ended':
+        return (
+          <Badge className="bg-muted text-muted-foreground border-muted-foreground/30">
+            <XCircle className="w-3 h-3 mr-1" />
+            Encerrada
           </Badge>
         );
       default:

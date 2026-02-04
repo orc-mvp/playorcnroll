@@ -30,10 +30,11 @@ interface Session {
   participant_count?: number;
 }
 
-const statusConfig: Record<string, { label: string; labelEn: string; icon: React.ElementType; variant: 'default' | 'secondary' | 'outline' }> = {
+const statusConfig: Record<string, { label: string; labelEn: string; icon: React.ElementType; variant: 'default' | 'secondary' | 'outline'; className?: string }> = {
   lobby: { label: 'Aguardando', labelEn: 'Waiting', icon: Pause, variant: 'secondary' },
   active: { label: 'Em Andamento', labelEn: 'Active', icon: Play, variant: 'default' },
   completed: { label: 'Encerrada', labelEn: 'Completed', icon: CheckCircle, variant: 'outline' },
+  ended: { label: 'Encerrada', labelEn: 'Ended', icon: CheckCircle, variant: 'outline', className: 'bg-muted/50' },
 };
 
 export default function MySessions() {
@@ -117,6 +118,9 @@ export default function MySessions() {
   const handleSessionClick = (session: Session) => {
     if (session.status === 'active') {
       navigate(`/session/${session.id}`);
+    } else if (session.status === 'ended') {
+      // For ended sessions, narrator goes to lobby to restart
+      navigate(`/session/${session.id}/lobby`);
     } else {
       navigate(`/session/${session.id}/lobby`);
     }
@@ -218,7 +222,7 @@ export default function MySessions() {
                           </CardDescription>
                         )}
                       </div>
-                      <Badge variant={status.variant} className="shrink-0">
+                      <Badge variant={status.variant} className={`shrink-0 ${status.className || ''}`}>
                         <StatusIcon className="w-3 h-3 mr-1" />
                         {language === 'pt-BR' ? status.label : status.labelEn}
                       </Badge>
