@@ -32,32 +32,35 @@ interface EventFeedProps {
 const ITEMS_PER_PAGE = 10;
 const MAX_EVENTS = 100;
 
-const eventConfig: Record<string, { 
-  icon: React.ElementType; 
-  color: string; 
-  label: (data: Record<string, any>, lang: string) => string 
-}> = {
+// Helper to get translated attribute name
+const getAttributeName = (attr: string, lang: string, t: any): string => {
+  const attrKey = attr as keyof typeof t.attributes;
+  return t.attributes[attrKey] || attr;
+};
+
+const getEventConfig = (t: any) => ({
   scene_created: {
     icon: BookOpen,
     color: 'text-blue-500',
-    label: (data, lang) => lang === 'pt-BR' 
+    label: (data: Record<string, any>, lang: string) => lang === 'pt-BR' 
       ? `Nova cena: ${data.scene_name}` 
       : `New scene: ${data.scene_name}`,
   },
   test_requested: {
     icon: Dices,
     color: 'text-yellow-500',
-    label: (data, lang) => {
+    label: (data: Record<string, any>, lang: string) => {
       const isGroup = Array.isArray(data.players) && data.players.length > 1;
+      const attrName = getAttributeName(data.attribute, lang, t);
       return lang === 'pt-BR'
-        ? `Teste ${isGroup ? 'em grupo ' : ''}de ${data.attribute} solicitado`
-        : `${isGroup ? 'Group ' : ''}${data.attribute} test requested`;
+        ? `Teste ${isGroup ? 'em grupo ' : ''}de ${attrName} solicitado`
+        : `${isGroup ? 'Group ' : ''}${attrName} test requested`;
     },
   },
   dice_rolled: {
     icon: Dices,
     color: 'text-green-500',
-    label: (data, lang) => {
+    label: (data: Record<string, any>, lang: string) => {
       const resultText = data.result === 'success' 
         ? (lang === 'pt-BR' ? 'Sucesso' : 'Success')
         : data.result === 'partial' 
@@ -71,26 +74,27 @@ const eventConfig: Record<string, {
   group_test_completed: {
     icon: Users,
     color: 'text-purple-500',
-    label: (data, lang) => {
+    label: (data: Record<string, any>, lang: string) => {
+      const attrName = getAttributeName(data.attribute, lang, t);
       const resultText = data.finalResult === 'success'
         ? (lang === 'pt-BR' ? 'Sucesso do Grupo' : 'Group Success')
         : data.finalResult === 'partial'
           ? (lang === 'pt-BR' ? 'Sucesso Parcial do Grupo' : 'Group Partial')
           : (lang === 'pt-BR' ? 'Falha do Grupo' : 'Group Failure');
-      return `${data.attribute}: ${resultText}`;
+      return `${attrName}: ${resultText}`;
     },
   },
   pull_group: {
     icon: Users,
     color: 'text-yellow-500',
-    label: (_, lang) => lang === 'pt-BR'
+    label: (_: Record<string, any>, lang: string) => lang === 'pt-BR'
       ? 'Jogador puxou o grupo! +1 sucesso'
       : 'Player pulled the group! +1 success',
   },
   test_completed: {
     icon: Dices,
     color: 'text-green-500',
-    label: (data, lang) => {
+    label: (data: Record<string, any>, lang: string) => {
       const result = data.result === 'success' ? (lang === 'pt-BR' ? 'Sucesso' : 'Success')
         : data.result === 'partial' ? (lang === 'pt-BR' ? 'Sucesso Parcial' : 'Partial Success')
         : (lang === 'pt-BR' ? 'Falha' : 'Failure');
@@ -100,49 +104,52 @@ const eventConfig: Record<string, {
   extreme_positive: {
     icon: Sparkles,
     color: 'text-yellow-400',
-    label: (data, lang) => lang === 'pt-BR'
+    label: (data: Record<string, any>, lang: string) => lang === 'pt-BR'
       ? `${data.character_name} teve um Extremo Positivo!`
       : `${data.character_name} got a Positive Extreme!`,
   },
   extreme_negative: {
     icon: AlertTriangle,
     color: 'text-red-500',
-    label: (data, lang) => lang === 'pt-BR'
+    label: (data: Record<string, any>, lang: string) => lang === 'pt-BR'
       ? `${data.character_name} teve um Extremo Negativo!`
       : `${data.character_name} got a Negative Extreme!`,
   },
   complication_created: {
     icon: AlertTriangle,
     color: 'text-red-500',
-    label: (data, lang) => lang === 'pt-BR'
+    label: (data: Record<string, any>, lang: string) => lang === 'pt-BR'
       ? `Complicação criada para ${data.character_name}`
       : `Complication created for ${data.character_name}`,
   },
   complication_manifested: {
     icon: Sparkles,
     color: 'text-green-500',
-    label: (data, lang) => lang === 'pt-BR'
+    label: (data: Record<string, any>, lang: string) => lang === 'pt-BR'
       ? `Complicação resolvida: ${data.description?.substring(0, 30)}...`
       : `Complication resolved: ${data.description?.substring(0, 30)}...`,
   },
   player_joined: {
     icon: UserPlus,
     color: 'text-green-500',
-    label: (data, lang) => lang === 'pt-BR'
+    label: (data: Record<string, any>, lang: string) => lang === 'pt-BR'
       ? `${data.player_name} entrou na sessão`
       : `${data.player_name} joined the session`,
   },
   narrator_message: {
     icon: MessageSquare,
     color: 'text-primary',
-    label: (data) => data.message,
+    label: (data: Record<string, any>) => data.message,
   },
-};
+});
 
 export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
   const { t, language } = useI18n();
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
   const [currentPage, setCurrentPage] = useState(0);
+  
+  // Get event config with translations
+  const eventConfig = useMemo(() => getEventConfig(t), [t]);
 
   // Filter out hidden complication events for players and limit to MAX_EVENTS
   const filteredEvents = useMemo(() => {
@@ -197,12 +204,12 @@ export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
           {filteredEvents.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground font-body">
               <Scroll className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p>Nenhum evento ainda</p>
+              <p>{language === 'pt-BR' ? 'Nenhum evento ainda' : 'No events yet'}</p>
             </div>
           ) : (
             <div className="space-y-3 pb-2">
               {paginatedEvents.map((event) => {
-                const config = eventConfig[event.event_type] || {
+                const config = eventConfig[event.event_type as keyof typeof eventConfig] || {
                   icon: MessageSquare,
                   color: 'text-muted-foreground',
                   label: () => event.event_type,
