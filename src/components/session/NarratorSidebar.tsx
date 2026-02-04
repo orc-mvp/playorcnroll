@@ -261,10 +261,10 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
               step={1}
               className="py-2"
             />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>-2</span>
-              <span>0</span>
-              <span>+3</span>
+            <div className="flex text-xs text-muted-foreground">
+              <span className="w-0">-2</span>
+              <span className="flex-1 text-center" style={{ marginLeft: '40%', transform: 'translateX(-50%)' }}>0</span>
+              <span className="ml-auto">+3</span>
             </div>
           </div>
 
