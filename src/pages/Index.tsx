@@ -59,7 +59,7 @@ export default function Index() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-16 bg-muted">
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-16 bg-parchment">
         {/* Logo */}
         <div className="mb-6">
           <img
@@ -220,7 +220,7 @@ export default function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-border bg-muted">
+      <footer className="py-8 px-4 border-t border-border bg-parchment">
         <div className="container mx-auto text-center">
           <img
             src={logoLarge}
