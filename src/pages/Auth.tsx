@@ -125,7 +125,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-muted">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-parchment">
       {/* Language Toggle */}
       <div className="absolute top-4 right-4 flex gap-2">
         <Button
