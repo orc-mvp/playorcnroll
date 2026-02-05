@@ -1,24 +1,18 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
+import { CharacterOptionsModal } from '@/components/dashboard/CharacterOptionsModal';
 import { 
   Users, 
   Plus, 
   LogOut, 
   Crown, 
   Scroll,
-  BookOpen,
-  Eye
+  BookOpen
 } from 'lucide-react';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 
@@ -26,6 +20,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, profile, loading, signOut } = useAuth();
   const { t, language, setLanguage } = useI18n();
+  const [showCharacterModal, setShowCharacterModal] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -157,32 +152,21 @@ export default function Dashboard() {
                 </Card>
               </Link>
 
-              {/* Characters Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
-                    <CardHeader className="p-4 md:p-6">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                        <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                      </div>
-                      <CardTitle className="font-medieval text-base md:text-lg">{t.nav.characters}</CardTitle>
-                      <CardDescription className="font-body text-xs md:text-sm">
-                        Criar ou visualizar personagens
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-48">
-                  <DropdownMenuItem onClick={() => navigate('/character/create')} className="cursor-pointer">
-                    <Plus className="w-4 h-4 mr-2" />
-                    {t.character.create}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/characters')} className="cursor-pointer">
-                    <Eye className="w-4 h-4 mr-2" />
-                    {t.nav.characters}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Characters */}
+              <Card 
+                className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full"
+                onClick={() => setShowCharacterModal(true)}
+              >
+                <CardHeader className="p-4 md:p-6">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                    <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                  </div>
+                  <CardTitle className="font-medieval text-base md:text-lg">{t.nav.characters}</CardTitle>
+                  <CardDescription className="font-body text-xs md:text-sm">
+                    Criar ou visualizar personagens
+                  </CardDescription>
+                </CardHeader>
+              </Card>
 
               {/* Manage Marks */}
               <Link to="/marks">
@@ -252,6 +236,12 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <RecentActivity userId={user.id} isNarrator={isNarrator} />
       </main>
+
+      {/* Character Options Modal */}
+      <CharacterOptionsModal 
+        open={showCharacterModal} 
+        onOpenChange={setShowCharacterModal} 
+      />
     </div>
   );
 }
