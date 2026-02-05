@@ -8,13 +8,17 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import VampireTestRequestModal, { TestConfig } from '@/components/session/vampire/VampireTestRequestModal';
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { VampireEventFeed } from '@/components/session/vampire/VampireEventFeed';
 import { VampirePendingTest } from '@/components/session/vampire/VampirePendingTest';
 import { VampireTrackers } from '@/components/session/vampire/VampireTrackers';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
   Moon, 
   Users, 
@@ -28,8 +32,11 @@ import {
   Sparkles,
   ChevronLeft,
   Link,
+  Plus,
+  History,
+  ChevronDown,
+  Play,
 } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SessionData {
   id: string;
@@ -470,9 +477,11 @@ export default function VampireSession() {
 
           <TabsContent value="scene" className="flex-1 p-4 overflow-auto">
             <VampireScenePanel 
+              sessionId={sessionId!}
               currentScene={currentScene}
               scenes={scenes}
               isNarrator={isNarrator}
+              onSceneChange={setCurrentScene}
             />
           </TabsContent>
 
@@ -572,9 +581,11 @@ export default function VampireSession() {
               {/* Scene Panel */}
               <div className="overflow-auto min-h-0">
                 <VampireScenePanel 
+                  sessionId={sessionId!}
                   currentScene={currentScene}
                   scenes={scenes}
                   isNarrator={isNarrator}
+                  onSceneChange={setCurrentScene}
                 />
               </div>
 
@@ -617,27 +628,119 @@ export default function VampireSession() {
 
 // Vampire Scene Panel Component
 function VampireScenePanel({ 
+  sessionId,
   currentScene, 
   scenes, 
-  isNarrator 
+  isNarrator,
+  onSceneChange,
 }: { 
+  sessionId: string;
   currentScene: Scene | null; 
   scenes: Scene[];
   isNarrator: boolean;
+  onSceneChange: (scene: Scene) => void;
 }) {
-  const { language } = useI18n();
+  const { t, language } = useI18n();
+  const { toast } = useToast();
+  
+  const [showHistory, setShowHistory] = useState(false);
+  const [showNewScene, setShowNewScene] = useState(false);
+  const [newSceneName, setNewSceneName] = useState('');
+  const [newSceneDesc, setNewSceneDesc] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
+
+  const previousScenes = scenes.filter(s => s.id !== currentScene?.id);
+
+  const handleCreateScene = async () => {
+    if (!newSceneName.trim()) return;
+    setIsCreating(true);
+
+    try {
+      // Deactivate current scene
+      if (currentScene) {
+        await supabase.from('scenes').update({ is_active: false }).eq('id', currentScene.id);
+      }
+
+      // Create new scene
+      const { data: scene, error } = await supabase
+        .from('scenes')
+        .insert({
+          session_id: sessionId,
+          name: newSceneName.trim(),
+          description: newSceneDesc.trim() || null,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Update session
+      await supabase.from('sessions').update({ current_scene_id: scene.id }).eq('id', sessionId);
+
+      // Add event
+      await supabase.from('session_events').insert({
+        session_id: sessionId,
+        scene_id: scene.id,
+        event_type: 'scene_started',
+        event_data: { scene_name: scene.name, scene_description: scene.description },
+      });
+
+      toast({ title: language === 'pt-BR' ? 'Cena criada!' : 'Scene created!' });
+      setNewSceneName('');
+      setNewSceneDesc('');
+      setShowNewScene(false);
+      onSceneChange(scene);
+    } catch (error) {
+      toast({ title: language === 'pt-BR' ? 'Erro ao criar cena' : 'Error creating scene', variant: 'destructive' });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const handleActivateScene = async (scene: Scene) => {
+    try {
+      await supabase.from('scenes').update({ is_active: false }).eq('session_id', sessionId);
+      await supabase.from('scenes').update({ is_active: true }).eq('id', scene.id);
+      await supabase.from('sessions').update({ current_scene_id: scene.id }).eq('id', sessionId);
+      await supabase.from('session_events').insert({
+        session_id: sessionId,
+        scene_id: scene.id,
+        event_type: 'scene_changed',
+        event_data: { scene_name: scene.name },
+      });
+      onSceneChange(scene);
+    } catch (error) {
+      toast({ title: language === 'pt-BR' ? 'Erro ao trocar cena' : 'Error changing scene', variant: 'destructive' });
+    }
+  };
 
   return (
     <Card className="medieval-card border-destructive/20 h-full">
       <CardHeader className="pb-3">
-        <CardTitle className="font-medieval flex items-center gap-2 text-destructive">
-          <BookOpen className="w-5 h-5" />
-          {language === 'pt-BR' ? 'Cena Atual' : 'Current Scene'}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-medieval flex items-center gap-2 text-destructive">
+            <BookOpen className="w-5 h-5" />
+            {language === 'pt-BR' ? 'Cena Atual' : 'Current Scene'}
+          </CardTitle>
+          
+          {isNarrator && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="border-destructive/30 hover:bg-destructive/10"
+              onClick={() => setShowNewScene(true)}
+            >
+              <Plus className="w-3 h-3 mr-1" />
+              {language === 'pt-BR' ? 'Nova Cena' : 'New Scene'}
+            </Button>
+          )}
+        </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-3">
+        {/* Current Scene Display */}
         {currentScene ? (
-          <div className="space-y-3">
+          <div className="space-y-2">
             <h3 className="font-medieval text-lg">{currentScene.name}</h3>
             {currentScene.description && (
               <p className="text-muted-foreground font-body text-sm">
@@ -646,9 +749,74 @@ function VampireScenePanel({
             )}
           </div>
         ) : (
-          <p className="text-muted-foreground text-center py-8 font-body">
+          <p className="text-muted-foreground text-center py-4 font-body">
             {language === 'pt-BR' ? 'Nenhuma cena ativa' : 'No active scene'}
           </p>
+        )}
+
+        {/* New Scene Form */}
+        {showNewScene && isNarrator && (
+          <div className="space-y-2 pt-3 border-t border-border">
+            <Input
+              placeholder={language === 'pt-BR' ? 'Nome da cena' : 'Scene name'}
+              value={newSceneName}
+              onChange={(e) => setNewSceneName(e.target.value)}
+              className="text-sm"
+            />
+            <Textarea
+              placeholder={language === 'pt-BR' ? 'Descrição (opcional)' : 'Description (optional)'}
+              value={newSceneDesc}
+              onChange={(e) => setNewSceneDesc(e.target.value)}
+              rows={2}
+              className="text-sm"
+            />
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={handleCreateScene}
+                disabled={!newSceneName.trim() || isCreating}
+                className="flex-1 bg-destructive hover:bg-destructive/90"
+              >
+                {t.common.create}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowNewScene(false)}
+              >
+                {t.common.cancel}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Previous Scenes Collapsible */}
+        {previousScenes.length > 0 && isNarrator && (
+          <Collapsible open={showHistory} onOpenChange={setShowHistory}>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="w-full justify-between text-muted-foreground">
+                <span className="flex items-center gap-2">
+                  <History className="w-4 h-4" />
+                  {language === 'pt-BR' ? 'Cenas Anteriores' : 'Previous Scenes'} ({previousScenes.length})
+                </span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="space-y-1 pt-2">
+                {previousScenes.map((scene) => (
+                  <button
+                    key={scene.id}
+                    onClick={() => handleActivateScene(scene)}
+                    className="w-full flex items-center gap-2 p-2 rounded text-left hover:bg-muted/50 text-sm"
+                  >
+                    <Play className="w-3 h-3 text-muted-foreground" />
+                    <span className="truncate flex-1">{scene.name}</span>
+                  </button>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         )}
       </CardContent>
     </Card>
