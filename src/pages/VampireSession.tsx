@@ -717,7 +717,7 @@ function VampireBloodTracker({ character }: { character: Participant['character'
   );
 }
 
-// VampireNarratorPanel is now VampireNarratorSidebar - imported from separate file
+// VampireNarratorPanel was replaced by VampireNarratorSidebar component
 
 // Vampire Player Panel Component
 function VampirePlayerPanel({ character }: { character: Participant['character'] }) {
