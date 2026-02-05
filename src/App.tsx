@@ -17,6 +17,7 @@ import SessionLobby from "./pages/SessionLobby";
 import Session from "./pages/Session";
 import JoinSession from "./pages/JoinSession";
 import MySessions from "./pages/MySessions";
+import VampireSession from "./pages/VampireSession";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/marks" element={<CustomMarks />} />
               <Route path="/session/:sessionId/lobby" element={<SessionLobby />} />
               <Route path="/session/:sessionId" element={<Session />} />
+              <Route path="/session/vampire/:sessionId" element={<VampireSession />} />
               <Route path="/join" element={<JoinSession />} />
               <Route path="/join/:code" element={<JoinSession />} />
               <Route path="/sessions" element={<MySessions />} />
