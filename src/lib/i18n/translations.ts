@@ -397,6 +397,81 @@ export const translations = {
       ravnos: 'Ravnos',
       caitiff: 'Caitiff',
     },
+
+    // Vampire Tests System
+    vampiroTests: {
+      // Narrator Modal
+      requestTest: 'Pedir Teste',
+      configureTest: 'Configurar Teste',
+      testType: 'Tipo de Teste',
+      attributeAbility: 'Atributo + Habilidade',
+      willpowerOnly: 'Força de Vontade',
+      humanityOnly: 'Humanidade',
+      virtueOnly: 'Virtude',
+      selectAttribute: 'Selecionar Atributo',
+      selectAbility: 'Selecionar Habilidade',
+      selectVirtue: 'Selecionar Virtude',
+      difficulty: 'Dificuldade',
+      difficultyDefault: 'Padrão: 6',
+      context: 'Contexto',
+      contextPlaceholder: 'Descreva a situação do teste',
+      
+      // Switches
+      privateTest: 'Teste Fechado',
+      privateTestDesc: 'Apenas jogador e narrador veem o resultado',
+      openTest: 'Teste Aberto',
+      applyHealthPenalty: 'Aplicar Penalidade de Vitalidade',
+      healthPenaltyDesc: 'Reduz dados baseado no dano atual',
+      specializedTest: 'Teste com Especialização',
+      specializedTestDesc: 'Cada 10 gera um dado extra',
+      
+      // Player selection
+      selectPlayers: 'Selecionar Jogadores',
+      allPlayers: 'Todos os Jogadores',
+      
+      // Rolling
+      dicePool: 'Pool de Dados',
+      baseDice: 'Dados Base',
+      extraDice: 'Dados Extras',
+      rollDice: 'Rolar Dados',
+      rolling: 'Rolando...',
+      reroll: 'Rolar Novamente',
+      
+      // Results
+      result: 'Resultado',
+      successes: 'Sucessos',
+      ones: '1s',
+      tens: '10s',
+      finalResult: 'Resultado Final',
+      successCount: '{count} Sucesso(s)',
+      
+      // Result states
+      botch: 'Falha Crítica!',
+      botchDesc: 'Nenhum sucesso e pelo menos um 1',
+      failure: 'Falha',
+      failureDesc: 'Nenhum sucesso obtido',
+      partialSuccess: 'Sucesso Parcial',
+      success: 'Sucesso',
+      exceptional: 'Sucesso Excepcional!',
+      exceptionalDesc: '5 ou mais sucessos',
+      
+      // Health penalties
+      healthPenalty: 'Penalidade de Vitalidade',
+      noPenalty: 'Sem penalidade',
+      penaltyApplied: '-{count} dados',
+      
+      // Specialization
+      specialization: 'Especialização',
+      hasSpecialization: 'Possui especialização',
+      explosiveTens: '10s explosivos',
+      
+      // Event feed
+      testedWith: 'testou',
+      difficultyLabel: 'Dificuldade',
+      poolLabel: 'Pool',
+      privateResult: 'Resultado Privado',
+      onlyNarratorSees: 'Apenas narrador e jogador veem',
+    },
   },
 
   en: {
@@ -794,6 +869,81 @@ export const translations = {
       giovanni: 'Giovanni',
       ravnos: 'Ravnos',
       caitiff: 'Caitiff',
+    },
+
+    // Vampire Tests System
+    vampiroTests: {
+      // Narrator Modal
+      requestTest: 'Request Test',
+      configureTest: 'Configure Test',
+      testType: 'Test Type',
+      attributeAbility: 'Attribute + Ability',
+      willpowerOnly: 'Willpower Only',
+      humanityOnly: 'Humanity Only',
+      virtueOnly: 'Virtue Only',
+      selectAttribute: 'Select Attribute',
+      selectAbility: 'Select Ability',
+      selectVirtue: 'Select Virtue',
+      difficulty: 'Difficulty',
+      difficultyDefault: 'Default: 6',
+      context: 'Context',
+      contextPlaceholder: 'Describe the test situation',
+      
+      // Switches
+      privateTest: 'Private Test',
+      privateTestDesc: 'Only player and narrator see the result',
+      openTest: 'Open Test',
+      applyHealthPenalty: 'Apply Health Penalty',
+      healthPenaltyDesc: 'Reduces dice based on current damage',
+      specializedTest: 'Specialized Test',
+      specializedTestDesc: 'Each 10 generates an extra die',
+      
+      // Player selection
+      selectPlayers: 'Select Players',
+      allPlayers: 'All Players',
+      
+      // Rolling
+      dicePool: 'Dice Pool',
+      baseDice: 'Base Dice',
+      extraDice: 'Extra Dice',
+      rollDice: 'Roll Dice',
+      rolling: 'Rolling...',
+      reroll: 'Roll Again',
+      
+      // Results
+      result: 'Result',
+      successes: 'Successes',
+      ones: '1s',
+      tens: '10s',
+      finalResult: 'Final Result',
+      successCount: '{count} Success(es)',
+      
+      // Result states
+      botch: 'Botch!',
+      botchDesc: 'No successes and at least one 1',
+      failure: 'Failure',
+      failureDesc: 'No successes obtained',
+      partialSuccess: 'Partial Success',
+      success: 'Success',
+      exceptional: 'Exceptional Success!',
+      exceptionalDesc: '5 or more successes',
+      
+      // Health penalties
+      healthPenalty: 'Health Penalty',
+      noPenalty: 'No penalty',
+      penaltyApplied: '-{count} dice',
+      
+      // Specialization
+      specialization: 'Specialization',
+      hasSpecialization: 'Has specialization',
+      explosiveTens: 'Explosive 10s',
+      
+      // Event feed
+      testedWith: 'tested',
+      difficultyLabel: 'Difficulty',
+      poolLabel: 'Pool',
+      privateResult: 'Private Result',
+      onlyNarratorSees: 'Only narrator and player can see',
     },
   },
 } as const;
