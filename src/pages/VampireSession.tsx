@@ -27,7 +27,9 @@ import {
   Heart,
   Sparkles,
   ChevronLeft,
+  Link,
 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SessionData {
   id: string;
@@ -388,6 +390,38 @@ export default function VampireSession() {
             )}
 
             {/* Actions */}
+            {isNarrator && (
+              <div className="flex items-center gap-2">
+                {/* Invite Code Badge */}
+                <Badge variant="outline" className="font-mono text-xs border-destructive/30">
+                  {session.invite_code}
+                </Badge>
+                
+                {/* Copy Link Button */}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => {
+                          const url = `${window.location.origin}/join/${session.invite_code}`;
+                          navigator.clipboard.writeText(url);
+                          toast({ title: language === 'pt-BR' ? 'Link copiado!' : 'Link copied!' });
+                        }}
+                      >
+                        <Link className="w-4 h-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{language === 'pt-BR' ? 'Copiar link de convite' : 'Copy invite link'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+            )}
+
             {isNarrator ? (
               <Button 
                 variant="destructive" 
