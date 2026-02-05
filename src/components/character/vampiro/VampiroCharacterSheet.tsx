@@ -260,7 +260,7 @@ export default function VampiroCharacterSheet({ character }: VampiroCharacterShe
             {data.generation && (
               <div className="space-y-1">
                 <span className="text-xs text-muted-foreground/60 block">{t.vampiro.generation}</span>
-                <span className="font-body text-foreground">{data.generation}{language === 'pt-BR' ? 'ª' : 'th'}</span>
+                <span className="font-body text-foreground">{data.generation}</span>
               </div>
             )}
             {data.sire && (
@@ -489,29 +489,36 @@ export default function VampiroCharacterSheet({ character }: VampiroCharacterShe
         </CardContent>
       </Card>
 
-      {/* Blood Pool placeholder */}
+      {/* Salvaterios Section */}
       <Card className="medieval-card border-destructive/20">
         <CardHeader className="pb-3">
           <CardTitle className="font-medieval flex items-center gap-2 text-destructive">
             <Flame className="w-5 h-5" />
-            {t.vampiro.vitality}
+            {t.vampiro.salvaterios}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            {/* Blood Pool - 50 points in rows of 10 */}
             <div>
               <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.bloodPool}</h4>
-              <div className="flex flex-wrap gap-1">
-                {Array.from({ length: 20 }, (_, i) => (
-                  <div
-                    key={i}
-                    className="w-4 h-4 rounded-sm border border-destructive/40 bg-destructive/10"
-                  />
+              <div className="space-y-1">
+                {Array.from({ length: 5 }, (_, rowIndex) => (
+                  <div key={rowIndex} className="flex gap-1">
+                    {Array.from({ length: 10 }, (_, colIndex) => (
+                      <div
+                        key={colIndex}
+                        className="w-4 h-4 rounded-sm border border-destructive/40 bg-destructive/10"
+                      />
+                    ))}
+                  </div>
                 ))}
               </div>
             </div>
+
+            {/* Vitality / Health Levels */}
             <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.healthLevels}</h4>
+              <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.vitality}</h4>
               <div className="space-y-1 text-sm font-body">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 rounded border border-muted-foreground/40" />
@@ -542,6 +549,22 @@ export default function VampiroCharacterSheet({ character }: VampiroCharacterShe
                   <span>{t.vampiro.incapacitated}</span>
                 </div>
               </div>
+            </div>
+
+            {/* Willpower (Current) */}
+            <div>
+              <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.willpowerCurrent}</h4>
+              <div className="flex gap-1">
+                {Array.from({ length: willpower }, (_, i) => (
+                  <div
+                    key={i}
+                    className="w-4 h-4 rounded border border-muted-foreground/40 bg-transparent"
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {language === 'pt-BR' ? `Máximo: ${willpower}` : `Max: ${willpower}`}
+              </p>
             </div>
           </div>
         </CardContent>

@@ -365,10 +365,12 @@ export const translations = {
       humanity: 'Humanidade',
       path: 'Trilha',
       willpower: 'Força de Vontade',
+      willpowerCurrent: 'Força de Vontade (Atual)',
       
-      // Vitality
-      vitality: 'Vitalidade',
+      // Salvaterios section
+      salvaterios: 'Salvatérios',
       bloodPool: 'Pontos de Sangue',
+      vitality: 'Vitalidade',
       healthLevels: 'Níveis de Vitalidade',
       bruised: 'Escoriado',
       hurt: 'Machucado',
@@ -761,10 +763,12 @@ export const translations = {
       humanity: 'Humanity',
       path: 'Path',
       willpower: 'Willpower',
+      willpowerCurrent: 'Willpower (Current)',
       
-      // Vitality
-      vitality: 'Vitality',
+      // Salvaterios section
+      salvaterios: 'Salvaterios',
       bloodPool: 'Blood Pool',
+      vitality: 'Vitality',
       healthLevels: 'Health Levels',
       bruised: 'Bruised',
       hurt: 'Hurt',
