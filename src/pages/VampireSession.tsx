@@ -11,6 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import VampireTestRequestModal, { TestConfig } from '@/components/session/vampire/VampireTestRequestModal';
+import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
+import { VampireEventFeed } from '@/components/session/vampire/VampireEventFeed';
+import { VampirePendingTest } from '@/components/session/vampire/VampirePendingTest';
 import { 
   Moon, 
   Users, 
@@ -22,12 +25,7 @@ import {
   Droplets,
   Heart,
   Sparkles,
-  Settings,
   ChevronLeft,
-  Lock,
-  Star,
-  XCircle,
-  CheckCircle2
 } from 'lucide-react';
 
 interface SessionData {
@@ -289,6 +287,25 @@ export default function VampireSession() {
   // Get player's character
   const myParticipant = participants.find((p) => p.user_id === user?.id);
   const myCharacter = myParticipant?.character;
+  const myVampiroData = myCharacter?.vampiro_data;
+
+  // Find pending test for this player
+  const pendingTestEvent = events.find((e) => {
+    if (e.event_type !== 'vampire_test_requested') return false;
+    const config = e.event_data as unknown as TestConfig;
+    if (!myCharacter) return false;
+    return config.targetCharacterIds?.includes(myCharacter.id);
+  });
+
+  // Check if player already rolled for this test
+  const hasRolledForPendingTest = pendingTestEvent
+    ? events.some(
+        (e) =>
+          e.event_type === 'vampire_test_result' &&
+          (e.event_data as Record<string, unknown>).test_event_id === pendingTestEvent.id &&
+          (e.event_data as Record<string, unknown>).character_id === myCharacter?.id
+      )
+    : false;
 
   // Test request modal state
   const [testModalOpen, setTestModalOpen] = useState(false);
@@ -427,13 +444,34 @@ export default function VampireSession() {
 
           <TabsContent value="character" className="flex-1 p-4 overflow-auto">
              {isNarrator ? (
-              <VampireNarratorPanel 
+              <VampireNarratorSidebar 
+                sessionId={sessionId!}
                 participants={participants}
+                scenes={scenes}
                 currentScene={currentScene}
                 onRequestTest={() => setTestModalOpen(true)}
+                onSceneChange={setCurrentScene}
               />
             ) : (
-              <VampirePlayerPanel character={myCharacter} />
+              <div className="space-y-4">
+                {/* Pending Test */}
+                {pendingTestEvent && !hasRolledForPendingTest && myCharacter && myVampiroData && (
+                  <VampirePendingTest
+                    sessionId={sessionId!}
+                    sceneId={currentScene?.id || null}
+                    characterId={myCharacter.id}
+                    characterName={myCharacter.name}
+                    vampiroData={myVampiroData}
+                    testEvent={{
+                      id: pendingTestEvent.id,
+                      event_data: pendingTestEvent.event_data as unknown as TestConfig,
+                      created_at: pendingTestEvent.created_at,
+                    }}
+                    onTestComplete={() => {}}
+                  />
+                )}
+                <VampirePlayerPanel character={myCharacter} />
+              </div>
             )}
           </TabsContent>
         </Tabs>
@@ -444,13 +482,34 @@ export default function VampireSession() {
           <aside className="w-80 border-r border-destructive/20 bg-gradient-to-b from-destructive/5 to-background overflow-auto">
             <ScrollArea className="h-full p-4">
               {isNarrator ? (
-                <VampireNarratorPanel 
+                <VampireNarratorSidebar 
+                  sessionId={sessionId!}
                   participants={participants}
+                  scenes={scenes}
                   currentScene={currentScene}
                   onRequestTest={() => setTestModalOpen(true)}
+                  onSceneChange={setCurrentScene}
                 />
               ) : (
-                <VampirePlayerPanel character={myCharacter} />
+                <div className="space-y-4">
+                  {/* Pending Test */}
+                  {pendingTestEvent && !hasRolledForPendingTest && myCharacter && myVampiroData && (
+                    <VampirePendingTest
+                      sessionId={sessionId!}
+                      sceneId={currentScene?.id || null}
+                      characterId={myCharacter.id}
+                      characterName={myCharacter.name}
+                      vampiroData={myVampiroData}
+                      testEvent={{
+                        id: pendingTestEvent.id,
+                        event_data: pendingTestEvent.event_data as unknown as TestConfig,
+                        created_at: pendingTestEvent.created_at,
+                      }}
+                      onTestComplete={() => {}}
+                    />
+                  )}
+                  <VampirePlayerPanel character={myCharacter} />
+                </div>
               )}
             </ScrollArea>
           </aside>
@@ -534,47 +593,7 @@ function VampireScenePanel({
   );
 }
 
-// Vampire Event Feed Component
-function VampireEventFeed({ events }: { events: SessionEvent[] }) {
-  const { language } = useI18n();
-
-  return (
-    <Card className="medieval-card border-destructive/20 h-full">
-      <CardHeader className="pb-3">
-        <CardTitle className="font-medieval flex items-center gap-2">
-          <Scroll className="w-5 h-5 text-destructive" />
-          {language === 'pt-BR' ? 'Crônica' : 'Chronicle'}
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px]">
-          {events.length > 0 ? (
-            <div className="space-y-3">
-              {events.map((event) => (
-                <div 
-                  key={event.id} 
-                  className="p-3 rounded-lg bg-muted/30 border border-border/50"
-                >
-                  <p className="text-sm font-body">
-                    {JSON.stringify(event.event_data)}
-                  </p>
-                  <span className="text-xs text-muted-foreground">
-                    {new Date(event.created_at).toLocaleTimeString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-8 font-body">
-              {language === 'pt-BR' ? 'Nenhum evento ainda' : 'No events yet'}
-            </p>
-          )}
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  );
-}
-
+// Moved to VampireEventFeed component
 // Vampire Blood Tracker Component
 function VampireBloodTracker({ character }: { character: Participant['character'] }) {
   const { t, language } = useI18n();
@@ -698,70 +717,7 @@ function VampireBloodTracker({ character }: { character: Participant['character'
   );
 }
 
-// Vampire Narrator Panel Component
-function VampireNarratorPanel({ 
-  participants,
-  currentScene,
-  onRequestTest
-}: { 
-  participants: Participant[];
-  currentScene: Scene | null;
-  onRequestTest: () => void;
-}) {
-  const { t, language } = useI18n();
-
-  return (
-    <div className="space-y-4">
-      <Card className="medieval-card border-destructive/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2">
-            <Settings className="w-4 h-4 text-destructive" />
-            {language === 'pt-BR' ? 'Painel do Narrador' : 'Narrator Panel'}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Request Test Button */}
-            <Button 
-              onClick={onRequestTest}
-              className="w-full bg-destructive hover:bg-destructive/90"
-            >
-              <Dices className="w-4 h-4 mr-2" />
-              {t.vampiroTests.requestTest}
-            </Button>
-
-            {/* Participants */}
-            <div>
-              <h4 className="text-xs font-medieval text-muted-foreground mb-2">
-                {language === 'pt-BR' ? 'Coterie' : 'Coterie'}
-              </h4>
-              <div className="space-y-2">
-                {participants.map((p) => (
-                  <div 
-                    key={p.id} 
-                    className="flex items-center gap-2 p-2 rounded bg-muted/30"
-                  >
-                    <Moon className="w-4 h-4 text-destructive" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-body truncate">
-                        {p.character?.name || p.profile?.display_name || 'Desconhecido'}
-                      </p>
-                      {p.character?.vampiro_data?.clan && (
-                        <p className="text-xs text-muted-foreground capitalize">
-                          {p.character.vampiro_data.clan}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+// VampireNarratorPanel is now VampireNarratorSidebar - imported from separate file
 
 // Vampire Player Panel Component
 function VampirePlayerPanel({ character }: { character: Participant['character'] }) {
