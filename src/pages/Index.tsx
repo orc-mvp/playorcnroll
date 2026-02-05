@@ -70,9 +70,6 @@ export default function Index() {
         </div>
 
         {/* Tagline */}
-        <h1 className="text-3xl md:text-4xl font-medieval text-on-light text-center mb-2">
-          Orc & Roll
-        </h1>
         <p className="text-xl md:text-2xl text-on-light-alt font-body mb-12 text-center">
           {language === 'pt-BR' 
             ? 'Teatro da Mente Online'
@@ -88,21 +85,8 @@ export default function Index() {
             return (
               <div
                 key={system.id}
-                className={`relative flex flex-col items-center gap-4 p-6 rounded-xl border-2 transition-all ${
-                  system.available
-                    ? 'border-primary bg-card hover:border-primary/80 hover:bg-card/80'
-                    : 'border-border bg-card/50 opacity-75'
-                }`}
+                className="relative flex flex-col items-center gap-4 p-6 rounded-xl border-2 border-primary bg-card hover:border-primary/80 transition-all"
               >
-                {!system.available && (
-                  <Badge 
-                    variant="secondary" 
-                    className="absolute top-3 right-3 text-xs"
-                  >
-                    {language === 'pt-BR' ? 'Em breve' : 'Coming soon'}
-                  </Badge>
-                )}
-
                 <div
                   className={`p-4 rounded-full ${
                     system.color === 'primary'
@@ -114,7 +98,7 @@ export default function Index() {
                 </div>
 
                 <div className="text-center">
-                  <h3 className="font-medieval text-xl font-semibold mb-1">
+                  <h3 className="font-medieval text-xl font-semibold mb-1 text-foreground">
                     {system.name}
                   </h3>
                   <p className="text-xs text-muted-foreground font-body">
@@ -134,17 +118,11 @@ export default function Index() {
                   ))}
                 </div>
 
-                {system.available ? (
-                  <Link to="/auth" className="w-full">
-                    <Button className="w-full font-medieval">
-                      {language === 'pt-BR' ? 'Jogar' : 'Play'}
-                    </Button>
-                  </Link>
-                ) : (
-                  <Button disabled className="w-full font-medieval" variant="secondary">
-                    {language === 'pt-BR' ? 'Aguardar' : 'Wait'}
+                <Link to="/auth" className="w-full">
+                  <Button className="w-full font-medieval">
+                    {language === 'pt-BR' ? 'Jogar' : 'Play'}
                   </Button>
-                )}
+                </Link>
               </div>
             );
           })}
@@ -227,7 +205,6 @@ export default function Index() {
             alt="Orc and Roll"
             className="w-12 h-12 mx-auto mb-4 object-contain"
           />
-          <p className="font-medieval text-on-light mb-2">Orc & Roll</p>
           <p className="text-sm text-on-light-alt font-body">
             {language === 'pt-BR' 
               ? 'Teatro da Mente Online'
