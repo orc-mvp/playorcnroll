@@ -118,7 +118,7 @@ export default function Index() {
                   ))}
                 </div>
 
-                <Link to="/signup" className="w-full">
+                <Link to="/login" className="w-full">
                   <Button className="w-full font-medieval">
                     {language === 'pt-BR' ? 'Jogar' : 'Play'}
                   </Button>
