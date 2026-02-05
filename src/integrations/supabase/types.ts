@@ -35,6 +35,7 @@ export type Database = {
           seduction_type: string
           updated_at: string
           user_id: string
+          vampiro_data: Json | null
         }
         Insert: {
           aggression_type?: string
@@ -56,6 +57,7 @@ export type Database = {
           seduction_type?: string
           updated_at?: string
           user_id: string
+          vampiro_data?: Json | null
         }
         Update: {
           aggression_type?: string
@@ -77,6 +79,7 @@ export type Database = {
           seduction_type?: string
           updated_at?: string
           user_id?: string
+          vampiro_data?: Json | null
         }
         Relationships: []
       }

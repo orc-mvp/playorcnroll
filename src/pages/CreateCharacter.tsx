@@ -158,28 +158,62 @@ export default function CreateCharacter() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !validateStep(3) || !gameSystem) return;
+    if (!user || !gameSystem) return;
 
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.from('characters').insert({
-        user_id: user.id,
-        name: formData.name.trim(),
-        concept: formData.concept.trim() || null,
-        aggression_type: formData.attributes.aggression,
-        determination_type: formData.attributes.determination,
-        seduction_type: formData.attributes.seduction,
-        cunning_type: formData.attributes.cunning,
-        faith_type: formData.attributes.faith,
-        minor_marks: formData.selectedMarks,
-        game_system: gameSystem,
-      });
+      if (gameSystem === 'herois_marcados') {
+        if (!validateStep(3)) return;
+        
+        const { error } = await supabase.from('characters').insert({
+          user_id: user.id,
+          name: formData.name.trim(),
+          concept: formData.concept.trim() || null,
+          aggression_type: formData.attributes.aggression,
+          determination_type: formData.attributes.determination,
+          seduction_type: formData.attributes.seduction,
+          cunning_type: formData.attributes.cunning,
+          faith_type: formData.attributes.faith,
+          minor_marks: formData.selectedMarks,
+          game_system: gameSystem,
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+      } else if (gameSystem === 'vampiro_v3') {
+        const { error } = await supabase.from('characters').insert({
+          user_id: user.id,
+          name: vampiroFormData.name.trim(),
+          concept: vampiroFormData.concept.trim() || null,
+          game_system: gameSystem,
+          vampiro_data: {
+            player: vampiroFormData.player,
+            chronicle: vampiroFormData.chronicle,
+            nature: vampiroFormData.nature,
+            demeanor: vampiroFormData.demeanor,
+            clan: vampiroFormData.clan,
+            generation: vampiroFormData.generation,
+            sire: vampiroFormData.sire,
+            attributes: vampiroFormData.attributes,
+            abilities: vampiroFormData.abilities,
+            specializations: vampiroFormData.specializations,
+            virtues: vampiroFormData.virtues,
+            moralityType: vampiroFormData.moralityType,
+            pathName: vampiroFormData.pathName,
+            humanity: vampiroFormData.humanity,
+            willpower: vampiroFormData.willpower,
+            disciplines: vampiroFormData.disciplines,
+            backgrounds: vampiroFormData.backgrounds,
+          },
+        });
+
+        if (error) throw error;
+      }
 
       toast({
         title: t.character.create,
-        description: `${formData.name} foi criado com sucesso!`,
+        description: language === 'pt-BR' 
+          ? `${gameSystem === 'vampiro_v3' ? vampiroFormData.name : formData.name} foi criado com sucesso!`
+          : `${gameSystem === 'vampiro_v3' ? vampiroFormData.name : formData.name} was created successfully!`,
       });
 
       navigate('/dashboard');
@@ -338,18 +372,10 @@ export default function CreateCharacter() {
 
           {step === totalSteps - 1 && gameSystem === 'vampiro_v3' && (
             <Button 
-              onClick={() => {
-                // TODO: Implement Vampiro character creation
-                toast({
-                  title: language === 'pt-BR' ? 'Em desenvolvimento' : 'In development',
-                  description: language === 'pt-BR' 
-                    ? 'A criação de personagens para Vampiro será finalizada em breve!'
-                    : 'Vampire character creation will be finished soon!',
-                });
-              }}
-              disabled={true}
+              onClick={handleSubmit}
+              disabled={!vampiroFormData.name.trim() || !vampiroFormData.clan || isSubmitting}
             >
-              {t.common.finish}
+              {isSubmitting ? t.common.loading : t.common.finish}
             </Button>
           )}
 
