@@ -20,6 +20,8 @@ import {
   Droplets,
   Sparkles,
   Heart,
+  AlertTriangle,
+  Skull,
 } from 'lucide-react';
 
 interface VampiroCharacterData {
@@ -329,11 +331,28 @@ export function VampireNarratorSidebar({
                 const healthDamage = p.session_health_damage || [];
                 const damagedLevels = healthDamage.filter(Boolean).length;
                 
+                // Critical state detection
+                const isBloodCritical = bloodPool === 0;
+                const isWillpowerCritical = currentWillpower === 0;
+                const hasCriticalState = isBloodCritical || isWillpowerCritical;
+                
                 return (
                   <div
                     key={p.id}
-                    className="p-2 rounded-lg bg-muted/30 space-y-2"
+                    className={`p-2 rounded-lg space-y-2 ${
+                      hasCriticalState 
+                        ? 'bg-destructive/20 border border-destructive/40 animate-pulse' 
+                        : 'bg-muted/30'
+                    }`}
                   >
+                    {/* Critical State Badge */}
+                    {hasCriticalState && (
+                      <Badge variant="destructive" className="text-xs">
+                        <AlertTriangle className="w-3 h-3 mr-1" />
+                        CRÍTICO
+                      </Badge>
+                    )}
+
                     {/* Character Name & Clan */}
                     <div className="flex items-center gap-2">
                       <Moon className="w-4 h-4 text-destructive shrink-0" />
@@ -352,16 +371,34 @@ export function VampireNarratorSidebar({
                     {p.character && (
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         {/* Blood Pool */}
-                        <div className="flex flex-col items-center p-1.5 rounded bg-destructive/10 border border-destructive/20">
-                          <Droplets className="w-3 h-3 text-destructive mb-0.5" />
+                        <div className={`flex flex-col items-center p-1.5 rounded border ${
+                          isBloodCritical 
+                            ? 'bg-destructive/30 border-destructive' 
+                            : 'bg-destructive/10 border-destructive/20'
+                        }`}>
+                          {isBloodCritical ? (
+                            <Skull className="w-3 h-3 text-destructive mb-0.5 animate-pulse" />
+                          ) : (
+                            <Droplets className="w-3 h-3 text-destructive mb-0.5" />
+                          )}
                           <span className="font-medium text-destructive">{bloodPool}</span>
                           <span className="text-muted-foreground text-[10px]">Sangue</span>
                         </div>
                         
                         {/* Willpower */}
-                        <div className="flex flex-col items-center p-1.5 rounded bg-muted/50 border border-border">
-                          <Sparkles className="w-3 h-3 text-foreground mb-0.5" />
-                          <span className="font-medium">{currentWillpower}/{maxWillpower}</span>
+                        <div className={`flex flex-col items-center p-1.5 rounded border ${
+                          isWillpowerCritical 
+                            ? 'bg-amber-500/30 border-amber-500' 
+                            : 'bg-muted/50 border-border'
+                        }`}>
+                          {isWillpowerCritical ? (
+                            <AlertTriangle className="w-3 h-3 text-amber-500 mb-0.5 animate-pulse" />
+                          ) : (
+                            <Sparkles className="w-3 h-3 text-foreground mb-0.5" />
+                          )}
+                          <span className={`font-medium ${isWillpowerCritical ? 'text-amber-500' : ''}`}>
+                            {currentWillpower}/{maxWillpower}
+                          </span>
                           <span className="text-muted-foreground text-[10px]">Vontade</span>
                         </div>
                         

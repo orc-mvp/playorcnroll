@@ -12,6 +12,8 @@ import {
   AlertCircle,
   Lock,
   Moon,
+  Skull,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface SessionEvent {
@@ -92,6 +94,31 @@ export function VampireEventFeed({ events, currentUserId }: VampireEventFeedProp
 
       case 'vampire_test_result':
         return renderTestResult(event_data, t, currentUserId);
+
+      case 'critical_state': {
+        const criticalType = event_data.type as string;
+        const charName = event_data.character_name as string;
+        const isBlood = criticalType === 'blood_depleted';
+
+        return (
+          <div className={`rounded-lg p-3 animate-pulse ${
+            isBlood 
+              ? 'bg-destructive/20 border border-destructive/40' 
+              : 'bg-amber-500/20 border border-amber-500/40'
+          }`}>
+            <div className="flex items-center gap-2">
+              {isBlood ? (
+                <Skull className="w-5 h-5 text-destructive" />
+              ) : (
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+              )}
+              <span className={`font-medieval ${isBlood ? 'text-destructive' : 'text-amber-500'}`}>
+                {charName} - {isBlood ? 'Sangue Esgotado!' : 'Vontade Exaurida!'}
+              </span>
+            </div>
+          </div>
+        );
+      }
 
       default:
         return (

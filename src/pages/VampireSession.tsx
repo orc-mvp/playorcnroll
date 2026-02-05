@@ -450,6 +450,8 @@ export default function VampireSession() {
             {myParticipant && myCharacter && (
               <VampireTrackers
                 participantId={myParticipant.id}
+                sessionId={sessionId!}
+                sceneId={currentScene?.id || null}
                 character={myCharacter}
                 initialBloodPool={myParticipant.session_blood_pool || 0}
                 initialWillpower={myParticipant.session_willpower_current || 0}
@@ -555,6 +557,8 @@ export default function VampireSession() {
               {myParticipant && myCharacter && (
                 <VampireTrackers
                   participantId={myParticipant.id}
+                  sessionId={sessionId!}
+                  sceneId={currentScene?.id || null}
                   character={myCharacter}
                   initialBloodPool={myParticipant.session_blood_pool || 0}
                   initialWillpower={myParticipant.session_willpower_current || 0}

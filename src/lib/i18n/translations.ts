@@ -396,6 +396,14 @@ export const translations = {
       giovanni: 'Giovanni',
       ravnos: 'Ravnos',
       caitiff: 'Caitiff',
+
+      // Critical States
+      bloodDepleted: 'Sangue Esgotado!',
+      willpowerDepleted: 'Vontade Exaurida!',
+      hungerFrenzy: 'Frenesi de Fome!',
+      willpowerExhausted: 'Vontade Exaurida!',
+      vulnerableToCommands: 'Vulnerável a comandos!',
+      criticalState: 'Estado Crítico',
     },
 
     // Vampire Tests System
@@ -869,6 +877,14 @@ export const translations = {
       giovanni: 'Giovanni',
       ravnos: 'Ravnos',
       caitiff: 'Caitiff',
+
+      // Critical States
+      bloodDepleted: 'Blood Depleted!',
+      willpowerDepleted: 'Willpower Exhausted!',
+      hungerFrenzy: 'Hunger Frenzy!',
+      willpowerExhausted: 'Willpower Exhausted!',
+      vulnerableToCommands: 'Vulnerable to commands!',
+      criticalState: 'Critical State',
     },
 
     // Vampire Tests System

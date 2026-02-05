@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { toast as sonnerToast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Droplets, Sparkles, Heart, AlertTriangle } from 'lucide-react';
+import { Droplets, Sparkles, Heart, AlertTriangle, Skull } from 'lucide-react';
 
 interface VampiroCharacterData {
   player?: string;
@@ -22,6 +23,8 @@ interface VampiroCharacterData {
 
 interface VampireTrackersProps {
   participantId: string;
+  sessionId: string;
+  sceneId: string | null;
   character: {
     id: string;
     name: string;
@@ -44,6 +47,8 @@ const HEALTH_LEVELS = [
 
 export function VampireTrackers({
   participantId,
+  sessionId,
+  sceneId,
   character,
   initialBloodPool = 0,
   initialWillpower = 0,
@@ -59,6 +64,63 @@ export function VampireTrackers({
   const [currentWillpower, setCurrentWillpower] = useState(initialWillpower);
   const [healthDamage, setHealthDamage] = useState<boolean[]>(initialHealthDamage);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Track previous values for critical state detection
+  const prevBloodPool = useRef(initialBloodPool);
+  const prevWillpower = useRef(initialWillpower);
+  const hasInitialized = useRef(false);
+
+  // Emit critical state event to session feed
+  const emitCriticalEvent = useCallback(
+    async (type: 'blood_depleted' | 'willpower_depleted') => {
+      if (!character) return;
+
+      await supabase.from('session_events').insert({
+        session_id: sessionId,
+        scene_id: sceneId,
+        event_type: 'critical_state',
+        event_data: {
+          type,
+          character_id: character.id,
+          character_name: character.name,
+        },
+      });
+    },
+    [sessionId, sceneId, character]
+  );
+
+  // Detect blood pool critical state
+  useEffect(() => {
+    if (!hasInitialized.current) {
+      hasInitialized.current = true;
+      prevBloodPool.current = bloodPool;
+      prevWillpower.current = currentWillpower;
+      return;
+    }
+
+    if (prevBloodPool.current > 0 && bloodPool === 0) {
+      emitCriticalEvent('blood_depleted');
+      sonnerToast.error(t.vampiro?.bloodDepleted || 'Sangue Esgotado!', {
+        description: t.vampiro?.hungerFrenzy || 'Frenesi de Fome!',
+        duration: 5000,
+      });
+    }
+    prevBloodPool.current = bloodPool;
+  }, [bloodPool, emitCriticalEvent, t]);
+
+  // Detect willpower critical state
+  useEffect(() => {
+    if (!hasInitialized.current) return;
+
+    if (prevWillpower.current > 0 && currentWillpower === 0) {
+      emitCriticalEvent('willpower_depleted');
+      sonnerToast.error(t.vampiro?.willpowerDepleted || 'Vontade Exaurida!', {
+        description: t.vampiro?.vulnerableToCommands || 'Vulnerável a comandos!',
+        duration: 5000,
+      });
+    }
+    prevWillpower.current = currentWillpower;
+  }, [currentWillpower, emitCriticalEvent, t]);
 
   // Debounced save to database
   const saveTrackers = useCallback(
@@ -131,7 +193,7 @@ export function VampireTrackers({
   return (
     <div className="space-y-4">
       {/* Blood Pool */}
-      <Card className="medieval-card border-destructive/20">
+      <Card className={`medieval-card ${bloodPool === 0 ? 'border-destructive' : 'border-destructive/20'}`}>
         <CardHeader className="pb-2">
           <CardTitle className="font-medieval text-sm flex items-center gap-2 text-destructive">
             <Droplets className="w-4 h-4" />
@@ -143,7 +205,17 @@ export function VampireTrackers({
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-2">
+          {/* Critical State Banner */}
+          {bloodPool === 0 && (
+            <div className="bg-destructive/20 border border-destructive rounded-lg p-2 animate-pulse flex items-center gap-2">
+              <Skull className="w-4 h-4 text-destructive" />
+              <span className="text-sm font-medieval text-destructive">
+                {t.vampiro?.hungerFrenzy || 'Frenesi de Fome!'}
+              </span>
+            </div>
+          )}
+
           <div className="space-y-1">
             {Array.from({ length: 5 }, (_, rowIndex) => (
               <div key={rowIndex} className="flex gap-1 justify-center">
@@ -166,21 +238,31 @@ export function VampireTrackers({
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground text-center mt-2">
+          <p className="text-xs text-muted-foreground text-center">
             {bloodPool}/50
           </p>
         </CardContent>
       </Card>
 
       {/* Willpower */}
-      <Card className="medieval-card border-destructive/20">
+      <Card className={`medieval-card ${currentWillpower === 0 ? 'border-amber-500' : 'border-destructive/20'}`}>
         <CardHeader className="pb-2">
           <CardTitle className="font-medieval text-sm flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-destructive" />
             {t.vampiro.willpowerCurrent}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-2">
+          {/* Critical State Banner */}
+          {currentWillpower === 0 && (
+            <div className="bg-amber-500/20 border border-amber-500 rounded-lg p-2 animate-pulse flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-medieval text-amber-500">
+                {t.vampiro?.willpowerExhausted || 'Vontade Exaurida!'}
+              </span>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-1 justify-center">
             {Array.from({ length: maxWillpower }, (_, i) => {
               const isFilled = i < currentWillpower;
@@ -198,7 +280,7 @@ export function VampireTrackers({
               );
             })}
           </div>
-          <p className="text-xs text-muted-foreground text-center mt-2">
+          <p className="text-xs text-muted-foreground text-center">
             {currentWillpower}/{maxWillpower}
           </p>
         </CardContent>
