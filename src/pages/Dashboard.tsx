@@ -4,6 +4,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { 
   Users, 
@@ -11,7 +17,8 @@ import {
   LogOut, 
   Crown, 
   Scroll,
-  BookOpen
+  BookOpen,
+  Eye
 } from 'lucide-react';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 
@@ -150,20 +157,32 @@ export default function Dashboard() {
                 </Card>
               </Link>
 
-              {/* Create Character */}
-              <Link to="/character/create">
-                <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
-                  <CardHeader className="p-4 md:p-6">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                      <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                    </div>
-                    <CardTitle className="font-medieval text-base md:text-lg">{t.character.create}</CardTitle>
-                    <CardDescription className="font-body text-xs md:text-sm">
-                      Crie personagens para jogar
-                    </CardDescription>
-                  </CardHeader>
-                </Card>
-              </Link>
+              {/* Characters Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                    <CardHeader className="p-4 md:p-6">
+                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                        <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                      </div>
+                      <CardTitle className="font-medieval text-base md:text-lg">{t.nav.characters}</CardTitle>
+                      <CardDescription className="font-body text-xs md:text-sm">
+                        Criar ou visualizar personagens
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate('/character/create')} className="cursor-pointer">
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t.character.create}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/characters')} className="cursor-pointer">
+                    <Eye className="w-4 h-4 mr-2" />
+                    {t.nav.characters}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
 
               {/* Manage Marks */}
               <Link to="/marks">
