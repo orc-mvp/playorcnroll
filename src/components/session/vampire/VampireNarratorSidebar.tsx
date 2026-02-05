@@ -41,6 +41,9 @@ interface Participant {
   id: string;
   user_id: string;
   character_id: string | null;
+  session_blood_pool?: number;
+  session_willpower_current?: number;
+  session_health_damage?: boolean[];
   character?: {
     id: string;
     name: string;
@@ -317,41 +320,66 @@ export function VampireNarratorSidebar({
               Nenhum jogador conectado
             </p>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {participants.map((p) => {
                 const vampData = p.character?.vampiro_data;
+                const maxWillpower = vampData?.willpower || 1;
+                const bloodPool = p.session_blood_pool || 0;
+                const currentWillpower = p.session_willpower_current || 0;
+                const healthDamage = p.session_health_damage || [];
+                const damagedLevels = healthDamage.filter(Boolean).length;
+                
                 return (
                   <div
                     key={p.id}
-                    className="flex items-center gap-2 p-2 rounded-lg bg-muted/30"
+                    className="p-2 rounded-lg bg-muted/30 space-y-2"
                   >
-                    <Moon className="w-4 h-4 text-destructive shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medieval text-sm truncate">
-                        {p.character?.name || 'Sem personagem'}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        {vampData?.clan && (
-                          <span className="capitalize">{vampData.clan}</span>
-                        )}
-                        {vampData?.generation && (
-                          <>
-                            <span>•</span>
-                            <span>{vampData.generation}ª Geração</span>
-                          </>
-                        )}
+                    {/* Character Name & Clan */}
+                    <div className="flex items-center gap-2">
+                      <Moon className="w-4 h-4 text-destructive shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medieval text-sm truncate">
+                          {p.character?.name || 'Sem personagem'}
+                        </p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {vampData?.clan || ''}
+                          {vampData?.generation && ` • ${vampData.generation}ª Geração`}
+                        </p>
                       </div>
                     </div>
-                    {/* Quick Stats */}
-                    {vampData && (
-                      <div className="flex items-center gap-2 shrink-0">
-                        <div className="flex items-center gap-0.5" title="Humanidade">
-                          <Heart className="w-3 h-3 text-destructive" />
-                          <span className="text-xs">{vampData.humanity || '?'}</span>
+                    
+                    {/* Trackers Row */}
+                    {p.character && (
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        {/* Blood Pool */}
+                        <div className="flex flex-col items-center p-1.5 rounded bg-destructive/10 border border-destructive/20">
+                          <Droplets className="w-3 h-3 text-destructive mb-0.5" />
+                          <span className="font-medium text-destructive">{bloodPool}</span>
+                          <span className="text-muted-foreground text-[10px]">Sangue</span>
                         </div>
-                        <div className="flex items-center gap-0.5" title="Força de Vontade">
-                          <Sparkles className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-xs">{vampData.willpower || '?'}</span>
+                        
+                        {/* Willpower */}
+                        <div className="flex flex-col items-center p-1.5 rounded bg-muted/50 border border-border">
+                          <Sparkles className="w-3 h-3 text-foreground mb-0.5" />
+                          <span className="font-medium">{currentWillpower}/{maxWillpower}</span>
+                          <span className="text-muted-foreground text-[10px]">Vontade</span>
+                        </div>
+                        
+                        {/* Health */}
+                        <div className={`flex flex-col items-center p-1.5 rounded border ${
+                          damagedLevels >= 5 
+                            ? 'bg-destructive/20 border-destructive/40' 
+                            : damagedLevels >= 3 
+                              ? 'bg-orange-500/10 border-orange-500/30' 
+                              : 'bg-muted/50 border-border'
+                        }`}>
+                          <Heart className={`w-3 h-3 mb-0.5 ${
+                            damagedLevels >= 5 ? 'text-destructive' : damagedLevels >= 3 ? 'text-orange-500' : 'text-foreground'
+                          }`} />
+                          <span className={`font-medium ${
+                            damagedLevels >= 5 ? 'text-destructive' : damagedLevels >= 3 ? 'text-orange-500' : ''
+                          }`}>{7 - damagedLevels}/7</span>
+                          <span className="text-muted-foreground text-[10px]">Vitalidade</span>
                         </div>
                       </div>
                     )}
