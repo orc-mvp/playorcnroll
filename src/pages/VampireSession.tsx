@@ -14,6 +14,7 @@ import VampireTestRequestModal, { TestConfig } from '@/components/session/vampir
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { VampireEventFeed } from '@/components/session/vampire/VampireEventFeed';
 import { VampirePendingTest } from '@/components/session/vampire/VampirePendingTest';
+import { VampireTrackers } from '@/components/session/vampire/VampireTrackers';
 import { 
   Moon, 
   Users, 
@@ -76,6 +77,9 @@ interface Participant {
   id: string;
   user_id: string;
   character_id: string | null;
+  session_blood_pool?: number;
+  session_willpower_current?: number;
+  session_health_damage?: boolean[];
   character?: {
     id: string;
     name: string;
@@ -176,6 +180,9 @@ export default function VampireSession() {
           id,
           user_id,
           character_id,
+          session_blood_pool,
+          session_willpower_current,
+          session_health_damage,
           characters:character_id (
             id,
             name,
@@ -197,6 +204,7 @@ export default function VampireSession() {
 
             return {
               ...p,
+              session_health_damage: (p.session_health_damage as boolean[] | null) || [false, false, false, false, false, false, false],
               character: p.characters as Participant['character'],
               profile,
             };
@@ -439,7 +447,15 @@ export default function VampireSession() {
           </TabsContent>
 
           <TabsContent value="blood" className="flex-1 p-4 overflow-auto">
-            <VampireBloodTracker character={myCharacter} />
+            {myParticipant && myCharacter && (
+              <VampireTrackers
+                participantId={myParticipant.id}
+                character={myCharacter}
+                initialBloodPool={myParticipant.session_blood_pool || 0}
+                initialWillpower={myParticipant.session_willpower_current || 0}
+                initialHealthDamage={myParticipant.session_health_damage || [false, false, false, false, false, false, false]}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="character" className="flex-1 p-4 overflow-auto">
@@ -536,7 +552,15 @@ export default function VampireSession() {
           {/* Right Sidebar - Blood/Willpower Tracker */}
           <aside className="w-72 border-l border-destructive/20 bg-gradient-to-b from-destructive/5 to-background overflow-auto">
             <ScrollArea className="h-full p-4">
-              <VampireBloodTracker character={myCharacter} />
+              {myParticipant && myCharacter && (
+                <VampireTrackers
+                  participantId={myParticipant.id}
+                  character={myCharacter}
+                  initialBloodPool={myParticipant.session_blood_pool || 0}
+                  initialWillpower={myParticipant.session_willpower_current || 0}
+                  initialHealthDamage={myParticipant.session_health_damage || [false, false, false, false, false, false, false]}
+                />
+              )}
             </ScrollArea>
           </aside>
         </div>
@@ -593,129 +617,7 @@ function VampireScenePanel({
   );
 }
 
-// Moved to VampireEventFeed component
-// Vampire Blood Tracker Component
-function VampireBloodTracker({ character }: { character: Participant['character'] }) {
-  const { t, language } = useI18n();
-  const [bloodPool, setBloodPool] = useState(0);
-  const [currentWillpower, setCurrentWillpower] = useState(0);
-
-  const vampiroData = character?.vampiro_data;
-  const maxWillpower = vampiroData?.willpower || 1;
-
-  const toggleBloodPoint = (index: number) => {
-    if (index < bloodPool) {
-      setBloodPool(index);
-    } else {
-      setBloodPool(index + 1);
-    }
-  };
-
-  const toggleWillpowerPoint = (index: number) => {
-    if (index < currentWillpower) {
-      setCurrentWillpower(index);
-    } else {
-      setCurrentWillpower(index + 1);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Blood Pool */}
-      <Card className="medieval-card border-destructive/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2 text-destructive">
-            <Droplets className="w-4 h-4" />
-            {t.vampiro.bloodPool}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-1">
-            {Array.from({ length: 5 }, (_, rowIndex) => (
-              <div key={rowIndex} className="flex gap-1 justify-center">
-                {Array.from({ length: 10 }, (_, colIndex) => {
-                  const index = rowIndex * 10 + colIndex;
-                  const isFilled = index < bloodPool;
-                  return (
-                    <button
-                      key={colIndex}
-                      type="button"
-                      onClick={() => toggleBloodPoint(index)}
-                      className={`w-3 h-3 rounded-sm border transition-colors cursor-pointer hover:border-destructive ${
-                        isFilled
-                          ? 'bg-destructive border-destructive'
-                          : 'border-destructive/40 bg-destructive/10'
-                      }`}
-                    />
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground text-center mt-2">
-            {bloodPool}/50
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Willpower */}
-      <Card className="medieval-card border-destructive/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-destructive" />
-            {t.vampiro.willpowerCurrent}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-1 justify-center">
-            {Array.from({ length: maxWillpower }, (_, i) => {
-              const isFilled = i < currentWillpower;
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => toggleWillpowerPoint(i)}
-                  className={`w-4 h-4 rounded border-2 transition-colors cursor-pointer hover:border-foreground ${
-                    isFilled
-                      ? 'bg-foreground border-foreground'
-                      : 'border-muted-foreground/40 bg-transparent'
-                  }`}
-                />
-              );
-            })}
-          </div>
-          <p className="text-xs text-muted-foreground text-center mt-2">
-            {currentWillpower}/{maxWillpower}
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Quick Disciplines */}
-      {vampiroData?.disciplines && Object.keys(vampiroData.disciplines).length > 0 && (
-        <Card className="medieval-card border-destructive/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-medieval text-sm flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-destructive" />
-              {t.vampiro.disciplines}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              {Object.entries(vampiroData.disciplines).map(([key, value]) => (
-                value > 0 && (
-                  <div key={key} className="flex items-center justify-between text-sm">
-                    <span className="font-body capitalize">{key}</span>
-                    <span className="text-muted-foreground">{value}</span>
-                  </div>
-                )
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-}
+// VampireBloodTracker was replaced by VampireTrackers component
 
 // VampireNarratorPanel was replaced by VampireNarratorSidebar component
 

@@ -282,21 +282,30 @@ export type Database = {
           character_id: string | null
           id: string
           joined_at: string
+          session_blood_pool: number | null
+          session_health_damage: Json | null
           session_id: string
+          session_willpower_current: number | null
           user_id: string
         }
         Insert: {
           character_id?: string | null
           id?: string
           joined_at?: string
+          session_blood_pool?: number | null
+          session_health_damage?: Json | null
           session_id: string
+          session_willpower_current?: number | null
           user_id: string
         }
         Update: {
           character_id?: string | null
           id?: string
           joined_at?: string
+          session_blood_pool?: number | null
+          session_health_damage?: Json | null
           session_id?: string
+          session_willpower_current?: number | null
           user_id?: string
         }
         Relationships: [
