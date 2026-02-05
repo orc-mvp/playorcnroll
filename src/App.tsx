@@ -31,7 +31,9 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
+              <Route path="/auth" element={<Auth defaultMode="login" />} />
+              <Route path="/login" element={<Auth defaultMode="login" />} />
+              <Route path="/signup" element={<Auth defaultMode="signup" />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/character/create" element={<CreateCharacter />} />
               <Route path="/characters" element={<MyCharacters />} />
