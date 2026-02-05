@@ -82,6 +82,10 @@ export default {
         blood: "hsl(var(--blood))",
         frost: "hsl(var(--frost))",
         ember: "hsl(var(--ember))",
+        "on-light": {
+          DEFAULT: "hsl(var(--text-on-light))",
+          alt: "hsl(var(--text-on-light-alt))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
