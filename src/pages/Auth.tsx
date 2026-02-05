@@ -153,7 +153,7 @@ export default function Auth() {
           alt="Orc and Roll"
           className="w-32 h-32 mx-auto mb-4 object-contain"
         />
-        <p className="text-muted-foreground font-body text-lg">
+        <p className="text-foreground font-body text-lg">
           {language === 'pt-BR' ? 'Teatro da Mente Online' : 'Online Theater of the Mind'}
         </p>
       </div>
