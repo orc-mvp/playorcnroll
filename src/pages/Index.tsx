@@ -50,7 +50,7 @@ export default function Index() {
           </div>
 
           {/* Login Button */}
-          <Link to="/auth">
+          <Link to="/login">
             <Button variant="outline" className="font-medieval">
               {t.auth.login}
             </Button>
@@ -118,7 +118,7 @@ export default function Index() {
                   ))}
                 </div>
 
-                <Link to="/auth" className="w-full">
+                <Link to="/signup" className="w-full">
                   <Button className="w-full font-medieval">
                     {language === 'pt-BR' ? 'Jogar' : 'Play'}
                   </Button>
@@ -130,7 +130,7 @@ export default function Index() {
 
         {/* CTA */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <Link to="/auth">
+          <Link to="/signup">
             <Button size="lg" className="font-medieval text-lg px-8 py-6">
               {t.auth.signup}
             </Button>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
@@ -17,14 +17,23 @@ const passwordSchema = z.string().min(6);
 type AuthMode = 'login' | 'signup';
 type Role = 'narrator' | 'player';
 
-export default function Auth() {
+interface AuthProps {
+  defaultMode?: AuthMode;
+}
+
+export default function Auth({ defaultMode = 'login' }: AuthProps) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { signIn, signUp, user, loading } = useAuth();
   const { t, language, setLanguage } = useI18n();
   const { toast } = useToast();
 
-  const [mode, setMode] = useState<AuthMode>('login');
+  // Check URL param for mode override
+  const urlMode = searchParams.get('mode') as AuthMode | null;
+  const initialMode = urlMode || defaultMode;
+
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [role, setRole] = useState<Role | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,6 +41,14 @@ export default function Auth() {
   const [displayName, setDisplayName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Update mode when URL changes
+  useEffect(() => {
+    const newMode = searchParams.get('mode') as AuthMode | null;
+    if (newMode && (newMode === 'login' || newMode === 'signup')) {
+      setMode(newMode);
+    }
+  }, [searchParams]);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -109,9 +126,12 @@ export default function Auth() {
   };
 
   const toggleMode = () => {
-    setMode(mode === 'login' ? 'signup' : 'login');
+    const newMode = mode === 'login' ? 'signup' : 'login';
+    setMode(newMode);
     setErrors({});
     setRole(null);
+    // Update URL without full navigation
+    navigate(`/auth?mode=${newMode}`, { replace: true });
   };
 
   if (loading) {
