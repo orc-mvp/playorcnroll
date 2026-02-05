@@ -125,7 +125,7 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-background">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-muted">
       {/* Language Toggle */}
       <div className="absolute top-4 right-4 flex gap-2">
         <Button
@@ -148,13 +148,11 @@ export default function Auth() {
 
       {/* Logo */}
       <div className="mb-8 text-center">
-        <div className="w-36 h-36 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center p-4 shadow-lg">
-          <img
-            src={logoLarge}
-            alt="Orc and Roll"
-            className="w-full h-full object-contain"
-          />
-        </div>
+        <img
+          src={logoLarge}
+          alt="Orc and Roll"
+          className="w-32 h-32 mx-auto mb-4 object-contain"
+        />
         <p className="text-muted-foreground font-body text-lg">
           {language === 'pt-BR' ? 'Teatro da Mente Online' : 'Online Theater of the Mind'}
         </p>
