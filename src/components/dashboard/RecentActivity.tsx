@@ -50,13 +50,23 @@ export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
           // Fetch narrator's sessions
           const { data: sessions } = await supabase
             .from('sessions')
-            .select('id, name, status, created_at, updated_at')
+            .select('id, name, status, game_system, created_at, updated_at')
             .eq('narrator_id', userId)
             .order('updated_at', { ascending: false })
             .limit(10);
 
           if (sessions) {
             sessions.forEach(session => {
+              // Determine correct route based on game system
+              const getSessionLink = (s: typeof session) => {
+                if (s.status === 'active') {
+                  return s.game_system === 'vampiro_v3' 
+                    ? `/session/vampire/${s.id}` 
+                    : `/session/${s.id}`;
+                }
+                return `/session/${s.id}/lobby`;
+              };
+
               // Session created
               allActivities.push({
                 id: `session-created-${session.id}`,
@@ -64,7 +74,7 @@ export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
                 title: language === 'pt-BR' ? 'Sessão criada' : 'Session created',
                 description: session.name,
                 timestamp: session.created_at,
-                link: session.status === 'active' ? `/session/${session.id}` : `/session/${session.id}/lobby`,
+                link: getSessionLink(session),
                 metadata: { status: session.status }
               });
 
@@ -76,7 +86,7 @@ export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
                   title: language === 'pt-BR' ? 'Sessão iniciada' : 'Session started',
                   description: session.name,
                   timestamp: session.updated_at,
-                  link: `/session/${session.id}`,
+                  link: getSessionLink(session),
                   metadata: { status: session.status }
                 });
               }
@@ -166,7 +176,7 @@ export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
             .select(`
               id,
               joined_at,
-              sessions(id, name, status)
+              sessions(id, name, status, game_system)
             `)
             .eq('user_id', userId)
             .order('joined_at', { ascending: false })
@@ -176,13 +186,19 @@ export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
             participations.forEach(p => {
               const session = p.sessions as any;
               if (session) {
+                const link = session.status === 'active' 
+                  ? (session.game_system === 'vampiro_v3' 
+                    ? `/session/vampire/${session.id}` 
+                    : `/session/${session.id}`)
+                  : `/session/${session.id}/lobby`;
+                
                 allActivities.push({
                   id: `joined-${p.id}`,
                   type: 'session_joined',
                   title: language === 'pt-BR' ? 'Entrou na sessão' : 'Joined session',
                   description: session.name,
                   timestamp: p.joined_at,
-                  link: session.status === 'active' ? `/session/${session.id}` : `/session/${session.id}/lobby`,
+                  link,
                   metadata: { status: session.status }
                 });
               }

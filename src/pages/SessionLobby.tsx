@@ -24,6 +24,7 @@ interface Session {
   invite_code: string;
   narrator_id: string;
   status: string;
+  game_system: string;
 }
 
 interface Participant {
@@ -147,9 +148,12 @@ export default function SessionLobby() {
           const newSession = payload.new as Session;
           setSession(newSession);
           
-          // Redirect to active session if started
+          // Redirect to active session if started (with correct route for game system)
           if (newSession.status === 'active') {
-            navigate(`/session/${sessionId}`);
+            const route = newSession.game_system === 'vampiro_v3' 
+              ? `/session/vampire/${sessionId}` 
+              : `/session/${sessionId}`;
+            navigate(route);
           }
         }
       )
@@ -188,7 +192,11 @@ export default function SessionLobby() {
 
       if (error) throw error;
 
-      navigate(`/session/${session.id}`);
+      // Navigate to correct route based on game system
+      const route = session.game_system === 'vampiro_v3' 
+        ? `/session/vampire/${session.id}` 
+        : `/session/${session.id}`;
+      navigate(route);
     } catch (error: any) {
       toast({
         title: 'Erro ao iniciar sessão',

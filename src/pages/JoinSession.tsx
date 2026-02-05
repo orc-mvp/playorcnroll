@@ -30,6 +30,7 @@ interface JoinedSession {
   name: string;
   description: string | null;
   status: string;
+  game_system: string;
   characterName: string;
   joinedAt: string;
 }
@@ -99,7 +100,8 @@ export default function JoinSession() {
             id,
             name,
             description,
-            status
+            status,
+            game_system
           )
         `)
         .eq('user_id', user.id)
@@ -115,6 +117,7 @@ export default function JoinSession() {
             name: (p.sessions as any).name,
             description: (p.sessions as any).description,
             status: (p.sessions as any).status,
+            game_system: (p.sessions as any).game_system || 'herois_marcados',
             characterName: (p.characters as any)?.name || 'Sem personagem',
             joinedAt: p.joined_at,
           }));
@@ -183,9 +186,12 @@ export default function JoinSession() {
         .single();
 
       if (existingParticipant) {
-        // Already joined, just navigate
+        // Already joined, just navigate (with correct route for game system)
         if (sessionData.status === 'active') {
-          navigate(`/session/${sessionData.id}`);
+          const route = sessionData.game_system === 'vampiro_v3' 
+            ? `/session/vampire/${sessionData.id}` 
+            : `/session/${sessionData.id}`;
+          navigate(route);
         } else {
           navigate(`/session/${sessionData.id}/lobby`);
         }
@@ -208,9 +214,12 @@ export default function JoinSession() {
         description: 'Aguardando o Narrador iniciar...',
       });
 
-      // Navigate to lobby or active session
+      // Navigate to lobby or active session (with correct route for game system)
       if (sessionData.status === 'active') {
-        navigate(`/session/${sessionData.id}`);
+        const route = sessionData.game_system === 'vampiro_v3' 
+          ? `/session/vampire/${sessionData.id}` 
+          : `/session/${sessionData.id}`;
+        navigate(route);
       } else {
         navigate(`/session/${sessionData.id}/lobby`);
       }
@@ -228,7 +237,10 @@ export default function JoinSession() {
 
   const handleRejoinSession = (session: JoinedSession) => {
     if (session.status === 'active') {
-      navigate(`/session/${session.id}`);
+      const route = session.game_system === 'vampiro_v3' 
+        ? `/session/vampire/${session.id}` 
+        : `/session/${session.id}`;
+      navigate(route);
     } else {
       navigate(`/session/${session.id}/lobby`);
     }
