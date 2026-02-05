@@ -14,6 +14,7 @@ import StepMinorMarks from '@/components/character/StepMinorMarks';
 import StepVampiroBasicInfo, { VampiroFormData } from '@/components/character/vampiro/StepVampiroBasicInfo';
 import StepVampiroAttributes from '@/components/character/vampiro/StepVampiroAttributes';
 import StepVampiroVirtues from '@/components/character/vampiro/StepVampiroVirtues';
+import StepVampiroDisciplines from '@/components/character/vampiro/StepVampiroDisciplines';
 import GameSystemSelector from '@/components/GameSystemSelector';
 import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
 
@@ -82,6 +83,10 @@ const initialVampiroFormData: VampiroFormData = {
   pathName: '',
   humanity: 2,
   willpower: 1,
+  
+  // Step 4 - Disciplines & Backgrounds
+  disciplines: {},
+  backgrounds: {},
 };
 
 export default function CreateCharacter() {
@@ -277,26 +282,12 @@ export default function CreateCharacter() {
           />
         )}
 
-        {/* Vampiro Step 4: Coming Soon */}
+        {/* Vampiro Step 4: Disciplines & Backgrounds */}
         {step === 4 && gameSystem === 'vampiro_v3' && (
-          <div className="max-w-2xl mx-auto">
-            <Card className="medieval-card">
-              <CardHeader className="text-center">
-                <div className="w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-                  <Construction className="w-8 h-8 text-destructive" />
-                </div>
-                <CardTitle className="font-medieval text-2xl">
-                  {language === 'pt-BR' ? 'Em Desenvolvimento' : 'In Development'}
-                </CardTitle>
-                <CardDescription className="font-body">
-                  {language === 'pt-BR' 
-                    ? 'Esta etapa ainda está sendo desenvolvida. Aguarde!'
-                    : 'This step is still being developed. Stay tuned!'
-                  }
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
+          <StepVampiroDisciplines
+            formData={vampiroFormData}
+            updateFormData={updateVampiroFormData}
+          />
         )}
 
         {/* Heróis Marcados Steps */}

@@ -41,6 +41,10 @@ export interface VampiroFormData {
   pathName: string;
   humanity: number;
   willpower: number;
+  
+  // Step 4 - Disciplines & Backgrounds
+  disciplines: Record<string, number>;
+  backgrounds: Record<string, number>;
 }
 
 interface StepVampiroBasicInfoProps {
