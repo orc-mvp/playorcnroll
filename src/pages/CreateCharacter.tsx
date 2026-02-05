@@ -11,6 +11,7 @@ import { ArrowLeft, Sword, Construction } from 'lucide-react';
 import StepBasicInfo from '@/components/character/StepBasicInfo';
 import StepAttributes from '@/components/character/StepAttributes';
 import StepMinorMarks from '@/components/character/StepMinorMarks';
+import StepVampiroBasicInfo, { VampiroFormData } from '@/components/character/vampiro/StepVampiroBasicInfo';
 import GameSystemSelector from '@/components/GameSystemSelector';
 import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
 
@@ -42,6 +43,18 @@ const initialFormData: CharacterFormData = {
   selectedMarks: [],
 };
 
+const initialVampiroFormData: VampiroFormData = {
+  name: '',
+  player: '',
+  chronicle: '',
+  nature: '',
+  demeanor: '',
+  clan: '',
+  generation: '',
+  sire: '',
+  concept: '',
+};
+
 export default function CreateCharacter() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -51,29 +64,47 @@ export default function CreateCharacter() {
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(null);
   const [step, setStep] = useState(0); // Start at step 0 (system selection)
   const [formData, setFormData] = useState<CharacterFormData>(initialFormData);
+  const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalSteps = 4; // 0: System, 1: Info, 2: Attributes, 3: Marks
+  const totalSteps = 4; // 0: System, 1: Info, 2: Attributes, 3: Marks/Disciplines
   const progress = ((step + 1) / totalSteps) * 100;
 
   const validateStep = (currentStep: number): boolean => {
-    switch (currentStep) {
-      case 0:
-        return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
-      case 1:
-        return formData.name.trim().length >= 2;
-      case 2: {
-        const types = Object.values(formData.attributes);
-        const strongCount = types.filter(t => t === 'strong').length;
-        const neutralCount = types.filter(t => t === 'neutral').length;
-        const weakCount = types.filter(t => t === 'weak').length;
-        return strongCount === 2 && neutralCount === 1 && weakCount === 2;
+    if (gameSystem === 'herois_marcados') {
+      switch (currentStep) {
+        case 0:
+          return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
+        case 1:
+          return formData.name.trim().length >= 2;
+        case 2: {
+          const types = Object.values(formData.attributes);
+          const strongCount = types.filter(t => t === 'strong').length;
+          const neutralCount = types.filter(t => t === 'neutral').length;
+          const weakCount = types.filter(t => t === 'weak').length;
+          return strongCount === 2 && neutralCount === 1 && weakCount === 2;
+        }
+        case 3:
+          return formData.selectedMarks.length === 2;
+        default:
+          return false;
       }
-      case 3:
-        return formData.selectedMarks.length === 2;
-      default:
-        return false;
+    } else if (gameSystem === 'vampiro_v3') {
+      switch (currentStep) {
+        case 0:
+          return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
+        case 1:
+          return vampiroFormData.name.trim().length >= 2 && vampiroFormData.clan.length > 0;
+        case 2:
+          // Step 2 validation for Vampiro - will be implemented later
+          return true;
+        case 3:
+          return true;
+        default:
+          return false;
+      }
     }
+    return currentStep === 0 && gameSystem !== null;
   };
 
   const handleNext = () => {
@@ -132,6 +163,10 @@ export default function CreateCharacter() {
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
+  const updateVampiroFormData = (updates: Partial<VampiroFormData>) => {
+    setVampiroFormData(prev => ({ ...prev, ...updates }));
+  };
+
   const selectedSystem = gameSystem ? getGameSystem(gameSystem) : null;
 
   return (
@@ -187,8 +222,16 @@ export default function CreateCharacter() {
           </div>
         )}
 
-        {/* Vampiro: Coming Soon */}
-        {step > 0 && gameSystem === 'vampiro_v3' && (
+        {/* Vampiro Step 1: Basic Info */}
+        {step === 1 && gameSystem === 'vampiro_v3' && (
+          <StepVampiroBasicInfo
+            formData={vampiroFormData}
+            updateFormData={updateVampiroFormData}
+          />
+        )}
+
+        {/* Vampiro Steps 2-3: Coming Soon */}
+        {step > 1 && gameSystem === 'vampiro_v3' && (
           <div className="max-w-2xl mx-auto">
             <Card className="medieval-card">
               <CardHeader className="text-center">
@@ -200,8 +243,8 @@ export default function CreateCharacter() {
                 </CardTitle>
                 <CardDescription className="font-body">
                   {language === 'pt-BR' 
-                    ? 'A criação de personagens para Vampiro 3ª Edição ainda está sendo desenvolvida. Aguarde!'
-                    : 'Character creation for Vampire 3rd Edition is still being developed. Stay tuned!'
+                    ? 'Esta etapa ainda está sendo desenvolvida. Aguarde!'
+                    : 'This step is still being developed. Stay tuned!'
                   }
                 </CardDescription>
               </CardHeader>
@@ -246,14 +289,29 @@ export default function CreateCharacter() {
             </Button>
           )}
 
-          {step > 0 && gameSystem === 'vampiro_v3' && (
+          {step > 0 && step < totalSteps - 1 && gameSystem === 'vampiro_v3' && (
+            <Button 
+              onClick={handleNext}
+              disabled={!validateStep(step)}
+            >
+              {t.common.next}
+            </Button>
+          )}
+
+          {step === totalSteps - 1 && gameSystem === 'vampiro_v3' && (
             <Button 
               onClick={() => {
-                setStep(0);
-                setGameSystem(null);
+                // TODO: Implement Vampiro character creation
+                toast({
+                  title: language === 'pt-BR' ? 'Em desenvolvimento' : 'In development',
+                  description: language === 'pt-BR' 
+                    ? 'A criação de personagens para Vampiro será finalizada em breve!'
+                    : 'Vampire character creation will be finished soon!',
+                });
               }}
+              disabled={true}
             >
-              {language === 'pt-BR' ? 'Escolher outro sistema' : 'Choose another system'}
+              {t.common.finish}
             </Button>
           )}
 
