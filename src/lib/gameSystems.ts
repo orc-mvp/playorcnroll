@@ -19,8 +19,8 @@ export const GAME_SYSTEMS: GameSystem[] = [
     name: 'Heróis Marcados',
     shortName: 'PBTA',
     description: {
-      'pt-BR': 'Um RPG narrativo de fantasia medieval épica',
-      'en': 'A narrative epic medieval fantasy RPG'
+      'pt-BR': 'Um RPG narrativista de fantasia medieval épica.',
+      'en': 'A narrativist epic medieval fantasy RPG.'
     },
     color: 'primary',
     available: true,
@@ -31,11 +31,11 @@ export const GAME_SYSTEMS: GameSystem[] = [
     name: 'Vampiro 3ª Edição',
     shortName: 'V3',
     description: {
-      'pt-BR': 'Horror pessoal no Mundo das Trevas',
-      'en': 'Personal horror in the World of Darkness'
+      'pt-BR': 'Horror pessoal no Mundo das Trevas.',
+      'en': 'Personal horror in the World of Darkness.'
     },
     color: 'red',
-    available: false,
+    available: true,
     features: ['Pool de d10', 'Fome', 'Humanidade', 'Disciplinas']
   }
 ];
