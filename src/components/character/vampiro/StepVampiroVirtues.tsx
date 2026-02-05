@@ -12,38 +12,53 @@ interface StepVampiroVirtuesProps {
   updateFormData: (updates: Partial<VampiroFormData>) => void;
 }
 
+const defaultVirtues = {
+  virtueType1: 'conscience' as const,
+  virtueValue1: 1,
+  virtueType2: 'selfControl' as const,
+  virtueValue2: 1,
+  courage: 1,
+};
+
 export default function StepVampiroVirtues({ formData, updateFormData }: StepVampiroVirtuesProps) {
   const { language } = useI18n();
+  
+  // Defensive defaults for virtues
+  const virtues = formData.virtues || defaultVirtues;
+  const humanity = formData.humanity ?? 2;
+  const willpower = formData.willpower ?? 1;
+  const moralityType = formData.moralityType ?? 'humanity';
+  const pathName = formData.pathName ?? '';
 
   // Auto-calculate humanity when virtues change
   useEffect(() => {
-    const newHumanity = formData.virtues.virtueValue1 + formData.virtues.virtueValue2;
-    if (formData.humanity !== newHumanity) {
+    const newHumanity = virtues.virtueValue1 + virtues.virtueValue2;
+    if (humanity !== newHumanity) {
       updateFormData({ humanity: newHumanity });
     }
-  }, [formData.virtues.virtueValue1, formData.virtues.virtueValue2]);
+  }, [virtues.virtueValue1, virtues.virtueValue2]);
 
   // Auto-calculate willpower when courage changes
   useEffect(() => {
-    if (formData.willpower !== formData.virtues.courage) {
-      updateFormData({ willpower: formData.virtues.courage });
+    if (willpower !== virtues.courage) {
+      updateFormData({ willpower: virtues.courage });
     }
-  }, [formData.virtues.courage]);
+  }, [virtues.courage]);
 
   const updateVirtue = (key: keyof VampiroFormData['virtues'], value: string | number) => {
     updateFormData({
       virtues: {
-        ...formData.virtues,
+        ...virtues,
         [key]: value,
       },
     });
   };
 
-  const virtue1Label = formData.virtues.virtueType1 === 'conscience'
+  const virtue1Label = virtues.virtueType1 === 'conscience'
     ? (language === 'pt-BR' ? 'Consciência' : 'Conscience')
     : (language === 'pt-BR' ? 'Convicção' : 'Conviction');
 
-  const virtue2Label = formData.virtues.virtueType2 === 'selfControl'
+  const virtue2Label = virtues.virtueType2 === 'selfControl'
     ? (language === 'pt-BR' ? 'Autocontrole' : 'Self-Control')
     : (language === 'pt-BR' ? 'Instinto' : 'Instinct');
 
@@ -65,7 +80,7 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
           {/* Virtue 1: Conscience / Conviction */}
           <div className="space-y-3">
             <RadioGroup
-              value={formData.virtues.virtueType1}
+              value={virtues.virtueType1}
               onValueChange={(value) => updateVirtue('virtueType1', value as 'conscience' | 'conviction')}
               className="flex gap-4"
             >
@@ -85,7 +100,7 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
             <div className="flex items-center justify-between">
               <span className="font-body text-sm text-muted-foreground">{virtue1Label}</span>
               <DotRating
-                value={formData.virtues.virtueValue1}
+                value={virtues.virtueValue1}
                 onChange={(value) => updateVirtue('virtueValue1', value)}
                 maxValue={5}
                 minValue={1}
@@ -96,7 +111,7 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
           {/* Virtue 2: Self-Control / Instinct */}
           <div className="space-y-3">
             <RadioGroup
-              value={formData.virtues.virtueType2}
+              value={virtues.virtueType2}
               onValueChange={(value) => updateVirtue('virtueType2', value as 'selfControl' | 'instinct')}
               className="flex gap-4"
             >
@@ -116,7 +131,7 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
             <div className="flex items-center justify-between">
               <span className="font-body text-sm text-muted-foreground">{virtue2Label}</span>
               <DotRating
-                value={formData.virtues.virtueValue2}
+                value={virtues.virtueValue2}
                 onChange={(value) => updateVirtue('virtueValue2', value)}
                 maxValue={5}
                 minValue={1}
@@ -130,7 +145,7 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
               {language === 'pt-BR' ? 'Coragem' : 'Courage'}
             </span>
             <DotRating
-              value={formData.virtues.courage}
+              value={virtues.courage}
               onChange={(value) => updateVirtue('courage', value)}
               maxValue={5}
               minValue={1}
@@ -148,7 +163,7 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
         </CardHeader>
         <CardContent className="space-y-4">
           <RadioGroup
-            value={formData.moralityType}
+            value={moralityType}
             onValueChange={(value) => updateFormData({ moralityType: value as 'humanity' | 'path' })}
             className="flex gap-4"
           >
@@ -166,14 +181,14 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
             </div>
           </RadioGroup>
 
-          {formData.moralityType === 'path' && (
+          {moralityType === 'path' && (
             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label htmlFor="pathName" className="font-medieval text-sm">
                 {language === 'pt-BR' ? 'Nome da Trilha' : 'Path Name'}
               </Label>
               <Input
                 id="pathName"
-                value={formData.pathName}
+                value={pathName}
                 onChange={(e) => updateFormData({ pathName: e.target.value })}
                 placeholder={language === 'pt-BR' ? 'Ex: Trilha do Poder...' : 'Ex: Path of Power...'}
                 className="font-body bg-input border-border"
@@ -183,15 +198,15 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
 
           <div className="flex items-center justify-between pt-2">
             <span className="font-body text-sm">
-              {formData.moralityType === 'humanity'
+              {moralityType === 'humanity'
                 ? (language === 'pt-BR' ? 'Humanidade' : 'Humanity')
-                : (formData.pathName || (language === 'pt-BR' ? 'Trilha' : 'Path'))}
+                : (pathName || (language === 'pt-BR' ? 'Trilha' : 'Path'))}
               <span className="text-muted-foreground ml-2 text-xs">
-                ({language === 'pt-BR' ? 'auto' : 'auto'}: {formData.virtues.virtueValue1 + formData.virtues.virtueValue2})
+                ({language === 'pt-BR' ? 'auto' : 'auto'}: {virtues.virtueValue1 + virtues.virtueValue2})
               </span>
             </span>
             <DotRating
-              value={formData.humanity}
+              value={humanity}
               onChange={(value) => updateFormData({ humanity: value })}
               maxValue={10}
               minValue={1}
@@ -212,11 +227,11 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
             <span className="font-body text-sm">
               {language === 'pt-BR' ? 'Força de Vontade' : 'Willpower'}
               <span className="text-muted-foreground ml-2 text-xs">
-                ({language === 'pt-BR' ? 'auto' : 'auto'}: {formData.virtues.courage})
+                ({language === 'pt-BR' ? 'auto' : 'auto'}: {virtues.courage})
               </span>
             </span>
             <DotRating
-              value={formData.willpower}
+              value={willpower}
               onChange={(value) => updateFormData({ willpower: value })}
               maxValue={10}
               minValue={1}
