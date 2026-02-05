@@ -28,6 +28,19 @@ export interface VampiroFormData {
     knowledges: Record<string, number>;
   };
   specializations: Record<string, string>;
+  
+  // Step 3 - Virtues, Humanity/Path, Willpower
+  virtues: {
+    virtueType1: 'conscience' | 'conviction';
+    virtueValue1: number;
+    virtueType2: 'selfControl' | 'instinct';
+    virtueValue2: number;
+    courage: number;
+  };
+  moralityType: 'humanity' | 'path';
+  pathName: string;
+  humanity: number;
+  willpower: number;
 }
 
 interface StepVampiroBasicInfoProps {

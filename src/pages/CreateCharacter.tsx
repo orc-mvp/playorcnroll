@@ -13,6 +13,7 @@ import StepAttributes from '@/components/character/StepAttributes';
 import StepMinorMarks from '@/components/character/StepMinorMarks';
 import StepVampiroBasicInfo, { VampiroFormData } from '@/components/character/vampiro/StepVampiroBasicInfo';
 import StepVampiroAttributes from '@/components/character/vampiro/StepVampiroAttributes';
+import StepVampiroVirtues from '@/components/character/vampiro/StepVampiroVirtues';
 import GameSystemSelector from '@/components/GameSystemSelector';
 import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
 
@@ -68,6 +69,19 @@ const initialVampiroFormData: VampiroFormData = {
     knowledges: {},
   },
   specializations: {},
+  
+  // Step 3 - Virtues, Humanity/Path, Willpower
+  virtues: {
+    virtueType1: 'conscience',
+    virtueValue1: 1,
+    virtueType2: 'selfControl',
+    virtueValue2: 1,
+    courage: 1,
+  },
+  moralityType: 'humanity',
+  pathName: '',
+  humanity: 2,
+  willpower: 1,
 };
 
 export default function CreateCharacter() {
@@ -82,7 +96,7 @@ export default function CreateCharacter() {
   const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalSteps = 4; // 0: System, 1: Info, 2: Attributes, 3: Marks/Disciplines
+  const totalSteps = 5; // 0: System, 1: Info, 2: Attributes, 3: Virtues, 4: Disciplines
   const progress = ((step + 1) / totalSteps) * 100;
 
   const validateStep = (currentStep: number): boolean => {
@@ -111,9 +125,11 @@ export default function CreateCharacter() {
         case 1:
           return vampiroFormData.name.trim().length >= 2 && vampiroFormData.clan.length > 0;
         case 2:
-          // Step 2 validation for Vampiro - will be implemented later
           return true;
         case 3:
+          // Virtues step - always valid since virtues have minValue
+          return true;
+        case 4:
           return true;
         default:
           return false;
@@ -253,8 +269,16 @@ export default function CreateCharacter() {
           />
         )}
 
-        {/* Vampiro Step 3: Coming Soon */}
+        {/* Vampiro Step 3: Virtues */}
         {step === 3 && gameSystem === 'vampiro_v3' && (
+          <StepVampiroVirtues
+            formData={vampiroFormData}
+            updateFormData={updateVampiroFormData}
+          />
+        )}
+
+        {/* Vampiro Step 4: Coming Soon */}
+        {step === 4 && gameSystem === 'vampiro_v3' && (
           <div className="max-w-2xl mx-auto">
             <Card className="medieval-card">
               <CardHeader className="text-center">
