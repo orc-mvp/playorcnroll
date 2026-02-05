@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Sword, BookOpen, Crown, Users } from 'lucide-react';
+import { Crown, Users } from 'lucide-react';
+import logoLarge from '@/assets/logo-orcnroll-large.webp';
 
 const emailSchema = z.string().email();
 const passwordSchema = z.string().min(6);
@@ -145,17 +146,15 @@ export default function Auth() {
         </Button>
       </div>
 
-      {/* Logo/Title */}
+      {/* Logo */}
       <div className="mb-8 text-center">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <Sword className="w-10 h-10 text-primary" />
-          <h1 className="text-4xl md:text-5xl font-medieval text-foreground text-shadow-medieval">
-            Heróis Marcados
-          </h1>
-          <Sword className="w-10 h-10 text-primary transform scale-x-[-1]" />
-        </div>
+        <img
+          src={logoLarge}
+          alt="Orc and Roll"
+          className="w-32 h-32 mx-auto mb-4 object-contain"
+        />
         <p className="text-muted-foreground font-body text-lg">
-          {mode === 'login' ? t.auth.loginSubtitle : t.auth.signupSubtitle}
+          {language === 'pt-BR' ? 'Teatro da Mente Online' : 'Online Theater of the Mind'}
         </p>
       </div>
 

@@ -24,6 +24,7 @@ export type Database = {
           epic_marks: Json | null
           extended_narratives: Json | null
           faith_type: string
+          game_system: string
           heroic_moves_stored: number
           id: string
           major_marks: Json | null
@@ -44,6 +45,7 @@ export type Database = {
           epic_marks?: Json | null
           extended_narratives?: Json | null
           faith_type?: string
+          game_system?: string
           heroic_moves_stored?: number
           id?: string
           major_marks?: Json | null
@@ -64,6 +66,7 @@ export type Database = {
           epic_marks?: Json | null
           extended_narratives?: Json | null
           faith_type?: string
+          game_system?: string
           heroic_moves_stored?: number
           id?: string
           major_marks?: Json | null
@@ -315,6 +318,7 @@ export type Database = {
           created_at: string
           current_scene_id: string | null
           description: string | null
+          game_system: string
           id: string
           invite_code: string
           name: string
@@ -326,6 +330,7 @@ export type Database = {
           created_at?: string
           current_scene_id?: string | null
           description?: string | null
+          game_system?: string
           id?: string
           invite_code: string
           name: string
@@ -337,6 +342,7 @@ export type Database = {
           created_at?: string
           current_scene_id?: string | null
           description?: string | null
+          game_system?: string
           id?: string
           invite_code?: string
           name?: string
