@@ -82,10 +82,7 @@ export default function Dashboard() {
             </div>
 
             {/* User Info */}
-            <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground min-w-0">
-              <span className="font-body truncate max-w-[150px]">
-                {profile.display_name || user.email}
-              </span>
+            <div className="hidden md:flex items-center gap-2 text-sm min-w-0">
               <span className="flex items-center gap-1 text-xs px-2 py-1 rounded bg-card border border-border text-foreground font-medieval shrink-0">
                 {isNarrator ? <Crown className="w-3 h-3 text-primary" /> : <Users className="w-3 h-3 text-primary" />}
                 {isNarrator ? t.roles.narrator : t.roles.player}
