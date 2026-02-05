@@ -36,6 +36,7 @@ import {
   Pencil,
 } from 'lucide-react';
 import { EditCharacterModal } from '@/components/character/EditCharacterModal';
+import { EditVampiroCharacterModal } from '@/components/character/vampiro/EditVampiroCharacterModal';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import type { Json } from '@/integrations/supabase/types';
 
@@ -113,7 +114,7 @@ export default function CharacterSheet() {
   const [complications, setComplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
-
+  const [showVampiroEditModal, setShowVampiroEditModal] = useState(false);
   const isOwner = character && user && character.id && user.id;
 
   useEffect(() => {
@@ -212,7 +213,12 @@ export default function CharacterSheet() {
           </div>
 
           {isOwner && (
-            <Button variant="outline" size="sm" className="shrink-0" onClick={() => setShowEditModal(true)}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="shrink-0" 
+              onClick={() => character.game_system === 'vampiro_v3' ? setShowVampiroEditModal(true) : setShowEditModal(true)}
+            >
               <Pencil className="w-4 h-4 mr-1" />
               <span className="hidden sm:inline">{t.common.edit}</span>
             </Button>
@@ -635,13 +641,35 @@ export default function CharacterSheet() {
         </ScrollArea>
       </main>
 
-      {/* Edit Character Modal */}
-      {character && (
+      {/* Edit Character Modal - Heróis Marcados */}
+      {character && character.game_system !== 'vampiro_v3' && (
         <EditCharacterModal
           open={showEditModal}
           onOpenChange={setShowEditModal}
           character={character}
           onSave={handleCharacterUpdate}
+        />
+      )}
+
+      {/* Edit Character Modal - Vampiro */}
+      {character && character.game_system === 'vampiro_v3' && (
+        <EditVampiroCharacterModal
+          open={showVampiroEditModal}
+          onOpenChange={setShowVampiroEditModal}
+          character={{
+            id: character.id,
+            name: character.name,
+            concept: character.concept,
+            vampiro_data: character.vampiro_data as any,
+          }}
+          onSave={(updated) => {
+            setCharacter(prev => prev ? { 
+              ...prev, 
+              name: updated.name, 
+              concept: updated.concept,
+              vampiro_data: updated.vampiro_data as any 
+            } : prev);
+          }}
         />
       )}
     </div>

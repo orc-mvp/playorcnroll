@@ -223,10 +223,11 @@ export default function VampiroCharacterSheet({ character }: VampiroCharacterShe
 
   return (
     <div className="space-y-6 pb-8">
-      {/* Character Header */}
+      {/* Character Header - Complete */}
       <Card className="medieval-card bg-gradient-to-br from-red-950/20 to-background">
         <CardContent className="pt-6">
-          <div className="flex items-start gap-4">
+          {/* Top row: Avatar + Name/Clan + Player/Chronicle */}
+          <div className="flex items-start gap-4 mb-4">
             <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center flex-shrink-0 border-2 border-red-500/30">
               <Moon className="w-10 h-10 text-red-500" />
             </div>
@@ -242,33 +243,51 @@ export default function VampiroCharacterSheet({ character }: VampiroCharacterShe
               {character.concept && (
                 <p className="text-muted-foreground font-body mt-1">{character.concept}</p>
               )}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 mt-3 text-sm text-muted-foreground">
-                {data.nature && (
-                  <div>
-                    <span className="text-xs text-muted-foreground/60">Natureza:</span>{' '}
-                    <span className="font-body">{data.nature}</span>
+              {/* Player & Chronicle */}
+              <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                {data.player && (
+                  <div className="flex items-center gap-1">
+                    <User className="w-3 h-3" />
+                    <span className="font-body">{data.player}</span>
                   </div>
                 )}
-                {data.demeanor && (
-                  <div>
-                    <span className="text-xs text-muted-foreground/60">Comportamento:</span>{' '}
-                    <span className="font-body">{data.demeanor}</span>
-                  </div>
-                )}
-                {data.generation && (
-                  <div>
-                    <span className="text-xs text-muted-foreground/60">Geração:</span>{' '}
-                    <span className="font-body">{data.generation}ª</span>
-                  </div>
-                )}
-                {data.sire && (
-                  <div>
-                    <span className="text-xs text-muted-foreground/60">Senhor:</span>{' '}
-                    <span className="font-body">{data.sire}</span>
+                {data.chronicle && (
+                  <div className="flex items-center gap-1">
+                    <span className="text-muted-foreground/60 text-xs">Crônica:</span>
+                    <span className="font-body">{data.chronicle}</span>
                   </div>
                 )}
               </div>
             </div>
+          </div>
+          
+          {/* Second row: Nature, Demeanor, Generation, Sire */}
+          <Separator className="my-4" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            {data.nature && (
+              <div className="space-y-1">
+                <span className="text-xs text-muted-foreground/60 block">Natureza</span>
+                <span className="font-body text-foreground">{data.nature}</span>
+              </div>
+            )}
+            {data.demeanor && (
+              <div className="space-y-1">
+                <span className="text-xs text-muted-foreground/60 block">Comportamento</span>
+                <span className="font-body text-foreground">{data.demeanor}</span>
+              </div>
+            )}
+            {data.generation && (
+              <div className="space-y-1">
+                <span className="text-xs text-muted-foreground/60 block">Geração</span>
+                <span className="font-body text-foreground">{data.generation}ª</span>
+              </div>
+            )}
+            {data.sire && (
+              <div className="space-y-1">
+                <span className="text-xs text-muted-foreground/60 block">Senhor</span>
+                <span className="font-body text-foreground">{data.sire}</span>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
