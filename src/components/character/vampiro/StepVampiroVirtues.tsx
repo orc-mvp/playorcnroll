@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import DotRating from './DotRating';
 import { VampiroFormData } from './StepVampiroBasicInfo';
 
@@ -76,72 +77,62 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
               : 'Define the virtues that guide your vampire'}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           {/* Virtue 1: Conscience / Conviction */}
-          <div className="space-y-3">
-            <RadioGroup
+          <div className="flex items-center justify-between gap-4">
+            <Select
               value={virtues.virtueType1}
               onValueChange={(value) => updateVirtue('virtueType1', value as 'conscience' | 'conviction')}
-              className="flex gap-4"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="conscience" id="conscience" />
-                <Label htmlFor="conscience" className="font-medieval text-sm cursor-pointer">
+              <SelectTrigger className="w-40 font-body bg-input border-border">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="conscience">
                   {language === 'pt-BR' ? 'Consciência' : 'Conscience'}
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="conviction" id="conviction" />
-                <Label htmlFor="conviction" className="font-medieval text-sm cursor-pointer">
+                </SelectItem>
+                <SelectItem value="conviction">
                   {language === 'pt-BR' ? 'Convicção' : 'Conviction'}
-                </Label>
-              </div>
-            </RadioGroup>
-            <div className="flex items-center justify-between">
-              <span className="font-body text-sm text-muted-foreground">{virtue1Label}</span>
-              <DotRating
-                value={virtues.virtueValue1}
-                onChange={(value) => updateVirtue('virtueValue1', value)}
-                maxValue={5}
-                minValue={1}
-              />
-            </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <DotRating
+              value={virtues.virtueValue1}
+              onChange={(value) => updateVirtue('virtueValue1', value)}
+              maxValue={5}
+              minValue={1}
+            />
           </div>
 
           {/* Virtue 2: Self-Control / Instinct */}
-          <div className="space-y-3">
-            <RadioGroup
+          <div className="flex items-center justify-between gap-4">
+            <Select
               value={virtues.virtueType2}
               onValueChange={(value) => updateVirtue('virtueType2', value as 'selfControl' | 'instinct')}
-              className="flex gap-4"
             >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="selfControl" id="selfControl" />
-                <Label htmlFor="selfControl" className="font-medieval text-sm cursor-pointer">
+              <SelectTrigger className="w-40 font-body bg-input border-border">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="selfControl">
                   {language === 'pt-BR' ? 'Autocontrole' : 'Self-Control'}
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="instinct" id="instinct" />
-                <Label htmlFor="instinct" className="font-medieval text-sm cursor-pointer">
+                </SelectItem>
+                <SelectItem value="instinct">
                   {language === 'pt-BR' ? 'Instinto' : 'Instinct'}
-                </Label>
-              </div>
-            </RadioGroup>
-            <div className="flex items-center justify-between">
-              <span className="font-body text-sm text-muted-foreground">{virtue2Label}</span>
-              <DotRating
-                value={virtues.virtueValue2}
-                onChange={(value) => updateVirtue('virtueValue2', value)}
-                maxValue={5}
-                minValue={1}
-              />
-            </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <DotRating
+              value={virtues.virtueValue2}
+              onChange={(value) => updateVirtue('virtueValue2', value)}
+              maxValue={5}
+              minValue={1}
+            />
           </div>
 
           {/* Courage */}
-          <div className="flex items-center justify-between pt-2 border-t border-border">
-            <span className="font-medieval text-sm">
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-body text-sm w-40">
               {language === 'pt-BR' ? 'Coragem' : 'Courage'}
             </span>
             <DotRating
