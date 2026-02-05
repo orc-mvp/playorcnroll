@@ -61,11 +61,11 @@ export default function Index() {
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-16">
         {/* Logo */}
-        <div className="mb-6">
+        <div className="mb-6 bg-white rounded-3xl p-6 shadow-xl">
           <img
             src={logoLarge}
             alt="Orc and Roll"
-            className="w-48 h-48 md:w-64 md:h-64 object-contain"
+            className="w-40 h-40 md:w-56 md:h-56 object-contain"
           />
         </div>
 
@@ -222,11 +222,13 @@ export default function Index() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-border">
         <div className="container mx-auto text-center">
-          <img
-            src={logoLarge}
-            alt="Orc and Roll"
-            className="w-12 h-12 mx-auto mb-4 object-contain"
-          />
+          <div className="w-16 h-16 mx-auto mb-4 bg-white rounded-xl flex items-center justify-center p-2 shadow-md">
+            <img
+              src={logoLarge}
+              alt="Orc and Roll"
+              className="w-full h-full object-contain"
+            />
+          </div>
           <p className="font-medieval text-foreground mb-2">Orc & Roll</p>
           <p className="text-sm text-muted-foreground font-body">
             {language === 'pt-BR' 
