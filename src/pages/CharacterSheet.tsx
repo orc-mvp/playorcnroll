@@ -36,6 +36,7 @@ import {
   Pencil,
 } from 'lucide-react';
 import { EditCharacterModal } from '@/components/character/EditCharacterModal';
+import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import type { Json } from '@/integrations/supabase/types';
 
 interface MajorMark {
@@ -78,6 +79,8 @@ interface Character {
   negative_marks: Json | null;
   extended_narratives: Json | null;
   mark_progress: Json | null;
+  game_system: string;
+  vampiro_data: Json | null;
   created_at: string;
   updated_at: string;
 }
@@ -219,6 +222,17 @@ export default function CharacterSheet() {
 
       <main className="container mx-auto px-4 py-6 max-w-4xl">
         <ScrollArea className="h-[calc(100vh-120px)]">
+          {/* Render Vampiro Sheet */}
+          {character.game_system === 'vampiro_v3' ? (
+            <VampiroCharacterSheet 
+              character={{
+                id: character.id,
+                name: character.name,
+                concept: character.concept,
+                vampiro_data: character.vampiro_data as any,
+              }} 
+            />
+          ) : (
           <div className="space-y-6 pb-8">
             {/* Character Header */}
             <Card className="medieval-card">
@@ -617,6 +631,7 @@ export default function CharacterSheet() {
               </CardContent>
             </Card>
           </div>
+          )}
         </ScrollArea>
       </main>
 
