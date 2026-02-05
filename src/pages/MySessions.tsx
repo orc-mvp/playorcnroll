@@ -120,7 +120,11 @@ export default function MySessions() {
 
   const handleSessionClick = (session: Session) => {
     if (session.status === 'active') {
-      navigate(`/session/${session.id}`);
+      // Navigate to correct route based on game system
+      const route = session.game_system === 'vampiro_v3' 
+        ? `/session/vampire/${session.id}` 
+        : `/session/${session.id}`;
+      navigate(route);
     } else if (session.status === 'ended') {
       // For ended sessions, narrator goes to lobby to restart
       navigate(`/session/${session.id}/lobby`);
