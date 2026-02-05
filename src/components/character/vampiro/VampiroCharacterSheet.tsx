@@ -5,6 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
   User,
   Moon,
   Heart,
@@ -13,6 +19,7 @@ import {
   Sparkles,
   Users,
   Flame,
+  Star,
 } from 'lucide-react';
 
 interface VampiroData {
@@ -85,12 +92,32 @@ function AttributeRow({ name, value }: { name: string; value: number }) {
 }
 
 function AbilityRow({ name, value, specialization }: { name: string; value: number; specialization?: string }) {
+  const { t } = useI18n();
+  const [showTooltip, setShowTooltip] = useState(false);
+
   return (
     <div className="flex items-center justify-between py-0.5">
       <div className="flex items-center gap-1">
         <span className="text-sm font-body">{name}</span>
         {specialization && (
-          <span className="text-xs text-muted-foreground italic">({specialization})</span>
+          <TooltipProvider delayDuration={0}>
+            <Tooltip open={showTooltip} onOpenChange={setShowTooltip}>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => setShowTooltip(!showTooltip)}
+                  className="text-primary hover:text-primary/80 transition-colors"
+                  aria-label={t.vampiroTests.specialization}
+                >
+                  <Star className="w-3 h-3 fill-current" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                <p className="font-medium">{t.vampiroTests.specialization}</p>
+                <p className="text-muted-foreground">{specialization}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         )}
       </div>
       <DotDisplay value={value} />

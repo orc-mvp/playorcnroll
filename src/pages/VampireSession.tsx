@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import VampireTestRequestModal, { TestConfig } from '@/components/session/vampire/VampireTestRequestModal';
 import { 
   Moon, 
   Users, 
@@ -22,7 +23,11 @@ import {
   Heart,
   Sparkles,
   Settings,
-  ChevronLeft
+  ChevronLeft,
+  Lock,
+  Star,
+  XCircle,
+  CheckCircle2
 } from 'lucide-react';
 
 interface SessionData {
@@ -285,6 +290,26 @@ export default function VampireSession() {
   const myParticipant = participants.find((p) => p.user_id === user?.id);
   const myCharacter = myParticipant?.character;
 
+  // Test request modal state
+  const [testModalOpen, setTestModalOpen] = useState(false);
+
+  const handleRequestTest = async (config: TestConfig) => {
+    if (!sessionId) return;
+    
+    // Create test request event
+    await supabase.from('session_events').insert([{
+      session_id: sessionId,
+      scene_id: currentScene?.id || null,
+      event_type: 'vampire_test_requested',
+      event_data: JSON.parse(JSON.stringify(config)),
+    }]);
+
+    toast({
+      title: t.vampiroTests.requestTest,
+      description: `${config.testType} - ${t.vampiroTests.difficulty}: ${config.difficulty}`,
+    });
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -401,10 +426,11 @@ export default function VampireSession() {
           </TabsContent>
 
           <TabsContent value="character" className="flex-1 p-4 overflow-auto">
-            {isNarrator ? (
+             {isNarrator ? (
               <VampireNarratorPanel 
                 participants={participants}
                 currentScene={currentScene}
+                onRequestTest={() => setTestModalOpen(true)}
               />
             ) : (
               <VampirePlayerPanel character={myCharacter} />
@@ -421,6 +447,7 @@ export default function VampireSession() {
                 <VampireNarratorPanel 
                   participants={participants}
                   currentScene={currentScene}
+                  onRequestTest={() => setTestModalOpen(true)}
                 />
               ) : (
                 <VampirePlayerPanel character={myCharacter} />
@@ -455,6 +482,14 @@ export default function VampireSession() {
           </aside>
         </div>
       )}
+
+      {/* Test Request Modal */}
+      <VampireTestRequestModal
+        open={testModalOpen}
+        onOpenChange={setTestModalOpen}
+        participants={participants}
+        onRequestTest={handleRequestTest}
+      />
     </div>
   );
 }
@@ -666,12 +701,14 @@ function VampireBloodTracker({ character }: { character: Participant['character'
 // Vampire Narrator Panel Component
 function VampireNarratorPanel({ 
   participants,
-  currentScene
+  currentScene,
+  onRequestTest
 }: { 
   participants: Participant[];
   currentScene: Scene | null;
+  onRequestTest: () => void;
 }) {
-  const { language } = useI18n();
+  const { t, language } = useI18n();
 
   return (
     <div className="space-y-4">
@@ -684,6 +721,15 @@ function VampireNarratorPanel({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            {/* Request Test Button */}
+            <Button 
+              onClick={onRequestTest}
+              className="w-full bg-destructive hover:bg-destructive/90"
+            >
+              <Dices className="w-4 h-4 mr-2" />
+              {t.vampiroTests.requestTest}
+            </Button>
+
             {/* Participants */}
             <div>
               <h4 className="text-xs font-medieval text-muted-foreground mb-2">
