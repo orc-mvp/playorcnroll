@@ -1,4 +1,5 @@
 // Vampiro Character Sheet with i18n support
+import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -145,10 +146,26 @@ const BACKGROUND_DISPLAY: Record<string, { pt: string; en: string }> = {
   status: { pt: 'Status', en: 'Status' },
 };
 
+// Health level definitions
+const HEALTH_LEVELS = [
+  { key: 'bruised', penalty: '' },
+  { key: 'hurt', penalty: '-1' },
+  { key: 'injured', penalty: '-1' },
+  { key: 'wounded', penalty: '-2' },
+  { key: 'mauled', penalty: '-2' },
+  { key: 'crippled', penalty: '-5' },
+  { key: 'incapacitated', penalty: '' },
+] as const;
+
 export default function VampiroCharacterSheet({ character }: VampiroCharacterSheetProps) {
   const { t, language } = useI18n();
   const data = character.vampiro_data || {};
   const lang = language === 'pt-BR' ? 'pt' : 'en';
+  
+  // Interactive state for trackers
+  const [bloodPool, setBloodPool] = useState(0);
+  const [currentWillpower, setCurrentWillpower] = useState(0);
+  const [healthDamage, setHealthDamage] = useState<boolean[]>(Array(7).fill(false));
   
   const attributes = data.attributes || {
     physical: { strength: 1, dexterity: 1, stamina: 1 },
@@ -172,6 +189,31 @@ export default function VampiroCharacterSheet({ character }: VampiroCharacterShe
   const willpower = data.willpower || 1;
   const moralityType = data.moralityType || 'humanity';
   const pathName = data.pathName || '';
+
+  // Toggle blood pool point
+  const toggleBloodPoint = (index: number) => {
+    if (index < bloodPool) {
+      setBloodPool(index);
+    } else {
+      setBloodPool(index + 1);
+    }
+  };
+
+  // Toggle willpower point
+  const toggleWillpowerPoint = (index: number) => {
+    if (index < currentWillpower) {
+      setCurrentWillpower(index);
+    } else {
+      setCurrentWillpower(index + 1);
+    }
+  };
+
+  // Toggle health level damage
+  const toggleHealthDamage = (index: number) => {
+    const newDamage = [...healthDamage];
+    newDamage[index] = !newDamage[index];
+    setHealthDamage(newDamage);
+  };
 
   // Get clan name from translations
   const getClanName = (clan: string) => {
@@ -498,73 +540,90 @@ export default function VampiroCharacterSheet({ character }: VampiroCharacterShe
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Blood Pool - 50 points in rows of 10 */}
             <div>
               <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.bloodPool}</h4>
               <div className="space-y-1">
                 {Array.from({ length: 5 }, (_, rowIndex) => (
                   <div key={rowIndex} className="flex gap-1">
-                    {Array.from({ length: 10 }, (_, colIndex) => (
-                      <div
-                        key={colIndex}
-                        className="w-4 h-4 rounded-sm border border-destructive/40 bg-destructive/10"
-                      />
-                    ))}
+                    {Array.from({ length: 10 }, (_, colIndex) => {
+                      const index = rowIndex * 10 + colIndex;
+                      const isFilled = index < bloodPool;
+                      return (
+                        <button
+                          key={colIndex}
+                          type="button"
+                          onClick={() => toggleBloodPoint(index)}
+                          className={`w-4 h-4 rounded-sm border transition-colors cursor-pointer hover:border-destructive ${
+                            isFilled
+                              ? 'bg-destructive border-destructive'
+                              : 'border-destructive/40 bg-destructive/10'
+                          }`}
+                          aria-label={`Blood point ${index + 1}`}
+                        />
+                      );
+                    })}
                   </div>
                 ))}
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {bloodPool}/50
+              </p>
+            </div>
+
+            {/* Willpower (Current) */}
+            <div>
+              <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.willpowerCurrent}</h4>
+              <div className="flex flex-wrap gap-1">
+                {Array.from({ length: willpower }, (_, i) => {
+                  const isFilled = i < currentWillpower;
+                  return (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => toggleWillpowerPoint(i)}
+                      className={`w-5 h-5 rounded border-2 transition-colors cursor-pointer hover:border-foreground ${
+                        isFilled
+                          ? 'bg-foreground border-foreground'
+                          : 'border-muted-foreground/40 bg-transparent'
+                      }`}
+                      aria-label={`Willpower point ${i + 1}`}
+                    />
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {currentWillpower}/{willpower}
+              </p>
             </div>
 
             {/* Vitality / Health Levels */}
             <div>
               <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.vitality}</h4>
               <div className="space-y-1 text-sm font-body">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded border border-muted-foreground/40" />
-                  <span>{t.vampiro.bruised}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded border border-muted-foreground/40" />
-                  <span>{t.vampiro.hurt} (-1)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded border border-muted-foreground/40" />
-                  <span>{t.vampiro.injured} (-1)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded border border-muted-foreground/40" />
-                  <span>{t.vampiro.wounded} (-2)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded border border-muted-foreground/40" />
-                  <span>{t.vampiro.mauled} (-2)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded border border-muted-foreground/40" />
-                  <span>{t.vampiro.crippled} (-5)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded border border-muted-foreground/40" />
-                  <span>{t.vampiro.incapacitated}</span>
-                </div>
+                {HEALTH_LEVELS.map((level, index) => {
+                  const isDamaged = healthDamage[index];
+                  const levelName = t.vampiro[level.key as keyof typeof t.vampiro];
+                  return (
+                    <div key={level.key} className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleHealthDamage(index)}
+                        className={`w-4 h-4 rounded border transition-colors cursor-pointer hover:border-foreground ${
+                          isDamaged
+                            ? 'bg-foreground border-foreground'
+                            : 'border-muted-foreground/40 bg-transparent'
+                        }`}
+                        aria-label={`${levelName} health level`}
+                      />
+                      <span className={isDamaged ? 'line-through text-muted-foreground' : ''}>
+                        {levelName}{level.penalty ? ` (${level.penalty})` : ''}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-
-            {/* Willpower (Current) */}
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.willpowerCurrent}</h4>
-              <div className="flex gap-1">
-                {Array.from({ length: willpower }, (_, i) => (
-                  <div
-                    key={i}
-                    className="w-4 h-4 rounded border border-muted-foreground/40 bg-transparent"
-                  />
-                ))}
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                {language === 'pt-BR' ? `Máximo: ${willpower}` : `Max: ${willpower}`}
-              </p>
             </div>
           </div>
         </CardContent>
