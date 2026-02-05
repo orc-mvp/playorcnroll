@@ -1,336 +1,251 @@
 
-# Plano Atualizado: Sistema de Testes para Vampiro com i18n Completo
 
-## Confirmacao de Integracao i18n
+# Plano: Notificacoes Visuais para Sangue e Forca de Vontade Zerados
 
-Sim! O plano considera a implementacao completa de i18n. O projeto ja possui uma estrutura robusta de internacionalizacao que sera utilizada:
+## Resumo
 
-### Estrutura Existente
-- **Hook `useI18n()`**: Fornece `language` e `setLanguage`
-- **Hook `useTranslation()`**: Retorna objeto `t` com todas as traducoes
-- **Secao `vampiro`**: Ja contem todas as traducoes de atributos, habilidades, virtudes, niveis de vitalidade, etc.
-
-### Novas Traducoes a Adicionar
-
-Sera criada uma nova secao `vampiroTests` dentro do objeto `translations` em ambos os idiomas:
+Implementar alertas visuais automaticos quando um jogador fica sem sangue (blood pool = 0) ou sem forca de vontade (willpower = 0), notificando tanto o jogador quanto o Narrador para criar momentos dramaticos e garantir que estados criticos nao passem despercebidos.
 
 ---
 
-## Traducoes Completas para o Sistema de Testes
+## Experiencia do Usuario
 
-### Portugues (pt-BR)
+### Para o Jogador:
+- Quando o sangue chegar a 0, aparece um banner animado vermelho/pulsante no topo do tracker com icone de alerta
+- Quando a forca de vontade chegar a 0, aparece um banner similar indicando estado critico
+- Toast notification aparece ao atingir cada estado critico
 
-```typescript
-// Adicionar em translations['pt-BR']
-vampiroTests: {
-  // Modal do Narrador
-  requestTest: 'Pedir Teste',
-  configureTest: 'Configurar Teste',
-  testType: 'Tipo de Teste',
-  attributeAbility: 'Atributo + Habilidade',
-  willpowerOnly: 'Forca de Vontade',
-  humanityOnly: 'Humanidade',
-  virtueOnly: 'Virtude',
-  selectAttribute: 'Selecionar Atributo',
-  selectAbility: 'Selecionar Habilidade',
-  selectVirtue: 'Selecionar Virtude',
-  difficulty: 'Dificuldade',
-  difficultyDefault: 'Padrao: 6',
-  context: 'Contexto',
-  contextPlaceholder: 'Descreva a situacao do teste',
-  
-  // Switches
-  privateTest: 'Teste Fechado',
-  privateTestDesc: 'Apenas jogador e narrador veem o resultado',
-  openTest: 'Teste Aberto',
-  applyHealthPenalty: 'Aplicar Penalidade de Vitalidade',
-  healthPenaltyDesc: 'Reduz dados baseado no dano atual',
-  specializedTest: 'Teste com Especializacao',
-  specializedTestDesc: 'Cada 10 gera um dado extra',
-  
-  // Selecao de jogadores
-  selectPlayers: 'Selecionar Jogadores',
-  allPlayers: 'Todos os Jogadores',
-  
-  // Rolagem
-  dicePool: 'Pool de Dados',
-  baseDice: 'Dados Base',
-  extraDice: 'Dados Extras',
-  rollDice: 'Rolar Dados',
-  rolling: 'Rolando...',
-  reroll: 'Rolar Novamente',
-  
-  // Resultados
-  result: 'Resultado',
-  successes: 'Sucessos',
-  ones: '1s',
-  tens: '10s',
-  finalResult: 'Resultado Final',
-  successCount: '{count} Sucesso(s)',
-  
-  // Estados de resultado
-  botch: 'Falha Critica!',
-  botchDesc: 'Nenhum sucesso e pelo menos um 1',
-  failure: 'Falha',
-  failureDesc: 'Nenhum sucesso obtido',
-  partialSuccess: 'Sucesso Parcial',
-  success: 'Sucesso',
-  exceptional: 'Sucesso Excepcional!',
-  exceptionalDesc: '5 ou mais sucessos',
-  
-  // Penalidades de vitalidade
-  healthPenalty: 'Penalidade de Vitalidade',
-  noPenalty: 'Sem penalidade',
-  penaltyApplied: '-{count} dados',
-  
-  // Especializacao
-  specialization: 'Especializacao',
-  hasSpecialization: 'Possui especializacao',
-  explosiveTens: '10s explosivos',
-  
-  // Feed de eventos
-  testedWith: 'testou',
-  difficultyLabel: 'Dificuldade',
-  poolLabel: 'Pool',
-  privateResult: 'Resultado Privado',
-  onlyNarratorSees: 'Apenas narrador e jogador veem',
-},
-```
+### Para o Narrador:
+- Os trackers no painel da Coterie mudam de cor e exibem icone de alerta quando um jogador atinge estado critico
+- Badge "CRITICO" aparece ao lado do nome do personagem afetado
+- Evento automatico e adicionado ao feed quando um jogador fica sem sangue ou vontade
 
-### Ingles (en)
+---
 
-```typescript
-// Adicionar em translations['en']
-vampiroTests: {
-  // Narrator Modal
-  requestTest: 'Request Test',
-  configureTest: 'Configure Test',
-  testType: 'Test Type',
-  attributeAbility: 'Attribute + Ability',
-  willpowerOnly: 'Willpower Only',
-  humanityOnly: 'Humanity Only',
-  virtueOnly: 'Virtue Only',
-  selectAttribute: 'Select Attribute',
-  selectAbility: 'Select Ability',
-  selectVirtue: 'Select Virtue',
-  difficulty: 'Difficulty',
-  difficultyDefault: 'Default: 6',
-  context: 'Context',
-  contextPlaceholder: 'Describe the test situation',
-  
-  // Switches
-  privateTest: 'Private Test',
-  privateTestDesc: 'Only player and narrator see the result',
-  openTest: 'Open Test',
-  applyHealthPenalty: 'Apply Health Penalty',
-  healthPenaltyDesc: 'Reduces dice based on current damage',
-  specializedTest: 'Specialized Test',
-  specializedTestDesc: 'Each 10 generates an extra die',
-  
-  // Player selection
-  selectPlayers: 'Select Players',
-  allPlayers: 'All Players',
-  
-  // Rolling
-  dicePool: 'Dice Pool',
-  baseDice: 'Base Dice',
-  extraDice: 'Extra Dice',
-  rollDice: 'Roll Dice',
-  rolling: 'Rolling...',
-  reroll: 'Roll Again',
-  
-  // Results
-  result: 'Result',
-  successes: 'Successes',
-  ones: '1s',
-  tens: '10s',
-  finalResult: 'Final Result',
-  successCount: '{count} Success(es)',
-  
-  // Result states
-  botch: 'Botch!',
-  botchDesc: 'No successes and at least one 1',
-  failure: 'Failure',
-  failureDesc: 'No successes obtained',
-  partialSuccess: 'Partial Success',
-  success: 'Success',
-  exceptional: 'Exceptional Success!',
-  exceptionalDesc: '5 or more successes',
-  
-  // Health penalties
-  healthPenalty: 'Health Penalty',
-  noPenalty: 'No penalty',
-  penaltyApplied: '-{count} dice',
-  
-  // Specialization
-  specialization: 'Specialization',
-  hasSpecialization: 'Has specialization',
-  explosiveTens: 'Explosive 10s',
-  
-  // Event feed
-  testedWith: 'tested',
-  difficultyLabel: 'Difficulty',
-  poolLabel: 'Pool',
-  privateResult: 'Private Result',
-  onlyNarratorSees: 'Only narrator and player can see',
-},
+## Arquitetura da Solucao
+
+```text
++-------------------------+       +---------------------------+
+|   VampireTrackers.tsx   |       | VampireNarratorSidebar.tsx|
+|   (Componente Player)   |       |   (Painel Narrador)       |
++-------------------------+       +---------------------------+
+           |                                   |
+           v                                   v
+    [Detecta estado     ]            [Visualiza estados    ]
+    [critico localmente ]            [criticos da coterie  ]
+           |                                   |
+           v                                   |
+    [Toast + Banner    ]                       |
+    [visual animado    ]                       |
+           |                                   |
+           +--------> session_events <---------+
+                    (tipo: critical_state)
 ```
 
 ---
 
-## Uso das Traducoes Existentes
+## Detalhes Tecnicos
 
-O sistema reutilizara traducoes ja existentes na secao `vampiro`:
+### 1. VampireTrackers.tsx - Alertas para o Jogador
 
-| Contexto | Traducoes Existentes |
-|----------|---------------------|
-| Dropdown de Atributos | `t.vampiro.strength`, `t.vampiro.dexterity`, etc. |
-| Dropdown de Habilidades | `t.vampiro.alertness`, `t.vampiro.brawl`, etc. |
-| Dropdown de Virtudes | `t.vampiro.conscience`, `t.vampiro.courage`, etc. |
-| Niveis de Vitalidade | `t.vampiro.bruised`, `t.vampiro.hurt`, etc. |
-| Labels Gerais | `t.vampiro.willpower`, `t.vampiro.humanity` |
+**Novas dependencias:**
+- Adicionar `AlertTriangle` e `Skull` do lucide-react
+- Usar sonner toast para notificacoes mais visiveis
 
----
+**Logica de deteccao:**
+```typescript
+const [prevBloodPool, setPrevBloodPool] = useState(initialBloodPool);
+const [prevWillpower, setPrevWillpower] = useState(initialWillpower);
 
-## Exemplo de Uso nos Componentes
+// Detectar transicao para estado critico
+useEffect(() => {
+  if (prevBloodPool > 0 && bloodPool === 0) {
+    // Acabou de ficar sem sangue
+    emitCriticalEvent('blood_depleted');
+    sonnerToast.error('Sangue Esgotado!', {
+      description: 'Voce esta em Frenesi de Fome!',
+      icon: <Skull />,
+      duration: 5000,
+    });
+  }
+  setPrevBloodPool(bloodPool);
+}, [bloodPool]);
 
-### VampireTestRequestModal.tsx
+useEffect(() => {
+  if (prevWillpower > 0 && currentWillpower === 0) {
+    // Acabou de ficar sem vontade
+    emitCriticalEvent('willpower_depleted');
+    sonnerToast.error('Vontade Esgotada!', {
+      description: 'Voce esta vulneravel a comandos!',
+      icon: <AlertTriangle />,
+      duration: 5000,
+    });
+  }
+  setPrevWillpower(currentWillpower);
+}, [currentWillpower]);
+```
 
-```tsx
-import { useTranslation } from '@/lib/i18n';
+**Banner visual animado:**
+```typescript
+// Dentro do Card de Blood Pool
+{bloodPool === 0 && (
+  <div className="bg-destructive/20 border border-destructive rounded-lg p-2 
+                  animate-pulse flex items-center gap-2">
+    <Skull className="w-4 h-4 text-destructive" />
+    <span className="text-sm font-medieval text-destructive">
+      Frenesi de Fome!
+    </span>
+  </div>
+)}
 
-export function VampireTestRequestModal() {
-  const t = useTranslation();
+// Dentro do Card de Willpower
+{currentWillpower === 0 && (
+  <div className="bg-amber-500/20 border border-amber-500 rounded-lg p-2 
+                  animate-pulse flex items-center gap-2">
+    <AlertTriangle className="w-4 h-4 text-amber-500" />
+    <span className="text-sm font-medieval text-amber-500">
+      Vontade Exaurida!
+    </span>
+  </div>
+)}
+```
+
+**Emitir evento para o feed:**
+```typescript
+const emitCriticalEvent = async (type: 'blood_depleted' | 'willpower_depleted') => {
+  await supabase.from('session_events').insert({
+    session_id: sessionId,
+    scene_id: sceneId,
+    event_type: 'critical_state',
+    event_data: {
+      type,
+      character_id: character.id,
+      character_name: character.name,
+    },
+  });
+};
+```
+
+### 2. VampireNarratorSidebar.tsx - Indicadores Visuais
+
+**Logica de estado critico:**
+```typescript
+const isBloodCritical = bloodPool === 0;
+const isWillpowerCritical = currentWillpower === 0;
+const hasCriticalState = isBloodCritical || isWillpowerCritical;
+```
+
+**Visual do card do jogador:**
+```typescript
+<div className={`p-2 rounded-lg space-y-2 ${
+  hasCriticalState 
+    ? 'bg-destructive/20 border border-destructive/40 animate-pulse' 
+    : 'bg-muted/30'
+}`}>
+  {/* Badge de estado critico */}
+  {hasCriticalState && (
+    <Badge variant="destructive" className="text-xs animate-bounce">
+      <AlertTriangle className="w-3 h-3 mr-1" />
+      CRITICO
+    </Badge>
+  )}
+  
+  {/* Tracker de sangue com cor dinamica */}
+  <div className={`... ${
+    isBloodCritical ? 'bg-destructive/30 border-destructive' : '...'
+  }`}>
+    {isBloodCritical && <Skull className="w-3 h-3 text-destructive animate-pulse" />}
+  </div>
+</div>
+```
+
+### 3. VampireEventFeed.tsx - Exibir Eventos Criticos
+
+**Adicionar renderizacao para evento `critical_state`:**
+```typescript
+case 'critical_state': {
+  const { type, character_name } = event.event_data;
+  const isBood = type === 'blood_depleted';
   
   return (
-    <Dialog>
-      <DialogHeader>
-        <DialogTitle>{t.vampiroTests.configureTest}</DialogTitle>
-      </DialogHeader>
-      
-      <Select>
-        <SelectTrigger>
-          <SelectValue placeholder={t.vampiroTests.selectAttribute} />
-        </SelectTrigger>
-        <SelectContent>
-          {/* Reutiliza traducoes existentes de vampiro */}
-          <SelectItem value="strength">{t.vampiro.strength}</SelectItem>
-          <SelectItem value="dexterity">{t.vampiro.dexterity}</SelectItem>
-          {/* ... */}
-        </SelectContent>
-      </Select>
-      
+    <div className="bg-destructive/20 border border-destructive/40 rounded-lg p-3 animate-pulse">
       <div className="flex items-center gap-2">
-        <Switch id="private" />
-        <Label htmlFor="private">
-          {t.vampiroTests.privateTest}
-          <span className="text-muted-foreground text-xs">
-            {t.vampiroTests.privateTestDesc}
-          </span>
-        </Label>
+        {isBlood ? (
+          <Skull className="w-5 h-5 text-destructive" />
+        ) : (
+          <AlertTriangle className="w-5 h-5 text-amber-500" />
+        )}
+        <span className="font-medieval text-destructive">
+          {character_name} - {isBlood ? 'Sangue Esgotado!' : 'Vontade Exaurida!'}
+        </span>
       </div>
-    </Dialog>
-  );
-}
-```
-
-### VampireTestResult.tsx (Feed)
-
-```tsx
-function VampireTestResult({ event }: { event: TestEvent }) {
-  const t = useTranslation();
-  
-  const attributeLabel = t.vampiro[event.attribute as keyof typeof t.vampiro];
-  const abilityLabel = t.vampiro[event.ability as keyof typeof t.vampiro];
-  
-  return (
-    <div>
-      <p>
-        {event.character_name} {t.vampiroTests.testedWith}{' '}
-        {attributeLabel} + {abilityLabel}
-      </p>
-      <p>{t.vampiroTests.difficultyLabel}: {event.difficulty}</p>
-      <p>{t.vampiroTests.successes}: {event.successes}</p>
-      {event.isBotch && <Badge variant="destructive">{t.vampiroTests.botch}</Badge>}
     </div>
   );
 }
 ```
 
----
+### 4. VampireTrackers - Props Adicionais
 
-## Arquivos a Modificar para i18n
-
-| Arquivo | Alteracoes |
-|---------|------------|
-| `src/lib/i18n/translations.ts` | Adicionar secao `vampiroTests` em pt-BR e en |
-| `src/components/session/vampire/VampireTestRequestModal.tsx` | Usar `useTranslation()` para todos os textos |
-| `src/components/session/vampire/VampireDiceRoller.tsx` | Usar `useTranslation()` para todos os textos |
-| `src/components/session/vampire/VampireTestResult.tsx` | Usar `useTranslation()` para todos os textos |
-| `src/pages/VampireSession.tsx` | Usar `useTranslation()` nos componentes de feed |
-| `src/components/character/vampiro/VampiroCharacterSheet.tsx` | Adicionar tooltip de especializacao com i18n |
-
----
-
-## Mapeamento de Chaves para Lookup Dinamico
-
-Para permitir lookup dinamico de atributos e habilidades pelo nome da chave:
-
+Adicionar props para sessionId e sceneId para poder emitir eventos:
 ```typescript
-// src/lib/vampiro/diceUtils.ts
-
-export function getAttributeLabel(
-  t: TranslationsType, 
-  attributeKey: string
-): string {
-  const key = attributeKey as keyof typeof t.vampiro;
-  return t.vampiro[key] || attributeKey;
+interface VampireTrackersProps {
+  participantId: string;
+  sessionId: string;     // Nova prop
+  sceneId: string | null; // Nova prop
+  character: {...} | null;
+  // ... resto das props
 }
+```
 
-export function getAbilityLabel(
-  t: TranslationsType, 
-  abilityKey: string
-): string {
-  const key = abilityKey as keyof typeof t.vampiro;
-  return t.vampiro[key] || abilityKey;
-}
+### 5. VampireSession.tsx - Passar Props
 
-// Uso:
-const label = getAttributeLabel(t, 'dexterity'); 
-// pt-BR: "Destreza" | en: "Dexterity"
+Atualizar a chamada do VampireTrackers para incluir sessionId e sceneId:
+```typescript
+<VampireTrackers
+  participantId={myParticipant.id}
+  sessionId={sessionId!}
+  sceneId={currentScene?.id || null}
+  character={myCharacter}
+  // ... outras props
+/>
 ```
 
 ---
 
-## Sequencia de Implementacao Atualizada
+## Arquivos a Modificar
 
-### Fase 1: Traducoes (Primeiro!)
-1. Adicionar secao `vampiroTests` em `translations.ts` para pt-BR
-2. Adicionar secao `vampiroTests` em `translations.ts` para en
-3. Adicionar chave `specialization` na secao `vampiro` existente
-
-### Fase 2: Utilitarios
-1. Criar `src/lib/vampiro/diceUtils.ts` com funcoes de calculo
-2. Criar funcoes helper para lookup dinamico de labels
-
-### Fase 3: Componentes (todos com i18n desde o inicio)
-1. `VampireTestRequestModal.tsx` - usando `useTranslation()`
-2. `VampireDiceRoller.tsx` - usando `useTranslation()`
-3. `VampireTestResult.tsx` - usando `useTranslation()`
-
-### Fase 4: Integracao
-1. Atualizar `VampireSession.tsx` com i18n
-2. Atualizar `VampiroCharacterSheet.tsx` com tooltip de especializacao
+| Arquivo | Alteracao |
+|---------|-----------|
+| `src/components/session/vampire/VampireTrackers.tsx` | Adicionar logica de deteccao, banners animados, emissao de eventos |
+| `src/components/session/vampire/VampireNarratorSidebar.tsx` | Adicionar indicadores visuais para estados criticos |
+| `src/components/session/vampire/VampireEventFeed.tsx` | Renderizar eventos do tipo `critical_state` |
+| `src/pages/VampireSession.tsx` | Passar sessionId e sceneId para VampireTrackers |
+| `src/lib/i18n/translations.ts` | Adicionar traducoes para mensagens de estado critico |
 
 ---
 
-## Checklist de i18n
+## Traducoes a Adicionar
 
-- [ ] Nenhum texto hardcoded nos componentes
-- [ ] Todos os labels de UI vem de `t.vampiroTests.*`
-- [ ] Atributos/habilidades usam lookup dinamico de `t.vampiro.*`
-- [ ] Mensagens de erro/sucesso traduzidas
-- [ ] Tooltips traduzidos
-- [ ] Placeholders traduzidos
-- [ ] Estados de resultado (Botch, Exceptional) traduzidos
-- [ ] Descricoes dos switches traduzidas
+```typescript
+vampiro: {
+  // ... existentes
+  bloodDepleted: 'Sangue Esgotado',
+  willpowerDepleted: 'Vontade Exaurida',
+  hungerFrenzy: 'Frenesi de Fome!',
+  vulnerableToCommands: 'Vulneravel a comandos!',
+  criticalState: 'Estado Critico',
+}
+```
+
+---
+
+## Resultado Esperado
+
+1. Jogador clica para gastar ultimo ponto de sangue
+2. Tracker fica vermelho com animacao pulsante
+3. Banner "Frenesi de Fome!" aparece no card
+4. Toast notification aparece por 5 segundos
+5. Evento e adicionado ao feed da sessao
+6. Narrador ve o card do jogador pulsar vermelho com badge "CRITICO"
+7. Feed mostra "Personagem X - Sangue Esgotado!"
+
