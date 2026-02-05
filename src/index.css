@@ -73,6 +73,10 @@
     --parchment-dark: 35 20% 15%;
     --blood: 0 65% 40%;
     --frost: 200 40% 70%;
+    
+    /* Text colors for light backgrounds */
+    --text-on-light: 147 100% 20%; /* #00642c */
+    --text-on-light-alt: 30 6% 11%; /* #211f1c */
     --ember: 25 85% 50%;
   }
 

@@ -70,10 +70,10 @@ export default function Index() {
         </div>
 
         {/* Tagline */}
-        <h1 className="text-3xl md:text-4xl font-medieval text-foreground text-center mb-2">
+        <h1 className="text-3xl md:text-4xl font-medieval text-on-light text-center mb-2">
           Orc & Roll
         </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground font-body mb-12 text-center">
+        <p className="text-xl md:text-2xl text-on-light-alt font-body mb-12 text-center">
           {language === 'pt-BR' 
             ? 'Teatro da Mente Online'
             : 'Online Theater of the Mind'
@@ -227,8 +227,8 @@ export default function Index() {
             alt="Orc and Roll"
             className="w-12 h-12 mx-auto mb-4 object-contain"
           />
-          <p className="font-medieval text-foreground mb-2">Orc & Roll</p>
-          <p className="text-sm text-muted-foreground font-body">
+          <p className="font-medieval text-on-light mb-2">Orc & Roll</p>
+          <p className="text-sm text-on-light-alt font-body">
             {language === 'pt-BR' 
               ? 'Teatro da Mente Online'
               : 'Online Theater of the Mind'
