@@ -1,106 +1,117 @@
 
-
-# Plano: Etapa 4 de 5 - Virtudes, Humanidade/Trilha e Força de Vontade
+# Plano: Organizar Antecedentes por Livros de Origem
 
 ## Objetivo
-Criar a quarta etapa de criação de personagem Vampiro contendo Virtudes, Humanidade/Trilha e Força de Vontade. Também ajustar o total de etapas de 4 para 5.
+Reorganizar a lista de antecedentes na etapa 5 de criação de personagem Vampiro, agrupando-os por livro de origem com títulos visuais para cada seção.
 
-## Regras do Sistema
-
-### Virtudes (1-5 pontos cada, mínimo 1)
-1. **Consciência** OU **Convicção** - escolha exclusiva
-2. **Autocontrole** OU **Instinto** - escolha exclusiva  
-3. **Coragem** - sempre presente
-
-### Humanidade/Trilha
-- Escolha entre **Humanidade** ou **Trilha**
-- Se Trilha: campo de texto para especificar qual trilha
-- Valor inicial = (Consciência/Convicção) + (Autocontrole/Instinto)
-- Range: 2-10 pontos (já que cada virtude começa com mínimo 1)
-
-### Força de Vontade
-- Valor inicial = Coragem
-- Range: 1-10 pontos
-
-## Layout da Etapa
+## Estrutura de Dados Proposta
 
 ```text
-┌─────────────────────────────────────────────────┐
-│              VIRTUDES                           │
-├─────────────────────────────────────────────────┤
-│ ○ Consciência / ○ Convicção    ●●●○○           │
-│ ○ Autocontrole / ○ Instinto    ●●○○○           │
-│ Coragem                         ●●●●○           │
-├─────────────────────────────────────────────────┤
-│         HUMANIDADE / TRILHA                     │
-├─────────────────────────────────────────────────┤
-│ ○ Humanidade  ○ Trilha                          │
-│ [Se Trilha: Campo de texto___________]          │
-│                                                 │
-│ Humanidade/Trilha:  ●●●●●○○○○○ (auto: 5)       │
-├─────────────────────────────────────────────────┤
-│         FORÇA DE VONTADE                        │
-├─────────────────────────────────────────────────┤
-│ Força de Vontade:   ●●●●○○○○○○ (auto: 4)       │
-└─────────────────────────────────────────────────┘
+BACKGROUNDS_BY_BOOK = [
+  {
+    book: "Vampiro: A Máscara (Revised / 3ª edição)",
+    backgrounds: [
+      { key: 'allies', labelPt: 'Aliados', labelEn: 'Allies' },
+      { key: 'contacts', labelPt: 'Contatos', labelEn: 'Contacts' },
+      { key: 'fame', labelPt: 'Fama', labelEn: 'Fame' },
+      { key: 'generation', labelPt: 'Geração', labelEn: 'Generation' },
+      { key: 'herd', labelPt: 'Rebanho', labelEn: 'Herd' },
+      { key: 'influence', labelPt: 'Influência', labelEn: 'Influence' },
+      { key: 'mentor', labelPt: 'Mentor', labelEn: 'Mentor' },
+      { key: 'resources', labelPt: 'Recursos', labelEn: 'Resources' },
+      { key: 'retainers', labelPt: 'Lacaios', labelEn: 'Retainers' },
+      { key: 'status', labelPt: 'Status', labelEn: 'Status' },
+      { key: 'elysium', labelPt: 'Elysium', labelEn: 'Elysium' },
+      { key: 'age', labelPt: 'Idade', labelEn: 'Age' },
+      { key: 'elder_status', labelPt: 'Status de Ancião', labelEn: 'Elder Status' },
+      { key: 'elder_generation', labelPt: 'Geração de Ancião', labelEn: 'Elder Generation' },
+      { key: 'military_force', labelPt: 'Força Militar', labelEn: 'Military Force' },
+    ]
+  },
+  {
+    book: "Vampire Storytellers Handbook (Revised)",
+    backgrounds: [
+      { key: 'age_vsh', labelPt: 'Idade', labelEn: 'Age' },
+      { key: 'arcane', labelPt: 'Arcano', labelEn: 'Arcane' },
+      { key: 'military_force_vsh', labelPt: 'Força Militar', labelEn: 'Military Force' },
+    ]
+  },
+  // ... demais livros
+]
 ```
 
-## Estrutura de Dados
+## Layout Visual
 
 ```text
-VampiroFormData (campos adicionais):
-├── virtues
-│   ├── virtueType1: 'conscience' | 'conviction'
-│   ├── virtueValue1: number (1-5, mínimo 1)
-│   ├── virtueType2: 'selfControl' | 'instinct'
-│   ├── virtueValue2: number (1-5, mínimo 1)
-│   └── courage: number (1-5, mínimo 1)
-├── moralityType: 'humanity' | 'path'
-├── pathName: string
-├── humanity: number (2-10)
-└── willpower: number (1-10)
+┌─────────────────────────────────────────────────────┐
+│                   ANTECEDENTES                      │
+├─────────────────────────────────────────────────────┤
+│ ▸ Vampiro: A Máscara (Revised / 3ª edição)         │
+│   Aliados                        ●●○○○              │
+│   Contatos                       ●○○○○              │
+│   Fama                           ○○○○○              │
+│   ...                                               │
+├─────────────────────────────────────────────────────┤
+│ ▸ Vampire Storytellers Handbook (Revised)          │
+│   Idade                          ○○○○○              │
+│   Arcano                         ○○○○○              │
+│   Força Militar                  ○○○○○              │
+├─────────────────────────────────────────────────────┤
+│ ▸ Guide to the Sabbat                              │
+│   Identidade Alternativa         ○○○○○              │
+│   Filiação à Mão Negra           ○○○○○              │
+│   ...                                               │
+└─────────────────────────────────────────────────────┘
 ```
 
----
+## Arquivo a Modificar
 
-## Arquivos a Criar
+### `src/components/character/vampiro/StepVampiroDisciplines.tsx`
 
-### `src/components/character/vampiro/StepVampiroVirtues.tsx`
-- Card de Virtudes com RadioGroup para escolhas exclusivas
-- DotRating com `maxValue={5}` e `minValue={1}` para virtudes
-- Card de Humanidade/Trilha com toggle e campo condicional
-- DotRating com `maxValue={10}` e `minValue={1}` para Humanidade e Força de Vontade
-- Cálculo automático reativo quando virtudes mudam
+**Alterações:**
 
-## Arquivos a Modificar
+1. **Substituir** a constante `BACKGROUNDS` por `BACKGROUNDS_BY_BOOK` contendo todos os 11 livros:
+   - Vampiro: A Máscara (Revised / 3ª edição) - 15 antecedentes
+   - Vampire Storytellers Handbook (Revised) - 3 antecedentes
+   - Dirty Secrets of the Black Hand - 1 antecedente
+   - Guide to the Sabbat - 4 antecedentes
+   - The Players Guide to the Sabbat - 3 antecedentes
+   - Ghouls: Fatal Addiction - 1 antecedente
+   - Clanbook: Nosferatu (Revised) - 1 antecedente
+   - Time of Thin Blood - 1 antecedente
+   - Inquisition - 2 antecedentes
+   - Blood Magic: Secrets of Thaumaturgy - 1 antecedente
+   - The Hunters Hunted - 1 antecedente
+   - Clanbook: Giovanni (Revised) - 1 antecedente
 
-### 1. `src/components/character/vampiro/StepVampiroBasicInfo.tsx`
-Expandir `VampiroFormData` com:
-- `virtues` object
-- `moralityType`, `pathName`
-- `humanity`, `willpower`
+2. **Adicionar** componente `Collapsible` para cada livro (ou usar acordeão simples)
 
-### 2. `src/pages/CreateCharacter.tsx`
-- `totalSteps`: 4 → 5
-- Valores iniciais das virtudes (todos = 1)
-- `humanity` inicial = 2 (1+1)
-- `willpower` inicial = 1
-- Renderizar `StepVampiroVirtues` no step 3
-- Mover placeholder para step 4
+3. **Renderizar** os antecedentes agrupados por livro com:
+   - Título do livro em destaque (usando `Separator` ou estilo diferenciado)
+   - Lista de antecedentes do livro abaixo do título
+   - `DotRating` para cada antecedente
 
-## Valores Iniciais
+4. **Usar keys únicas** para antecedentes que aparecem em múltiplos livros (ex: `age_vsh` vs `age`)
 
-```typescript
-virtues: {
-  virtueType1: 'conscience',
-  virtueValue1: 1,
-  virtueType2: 'selfControl',
-  virtueValue2: 1,
-  courage: 1,
-},
-moralityType: 'humanity',
-pathName: '',
-humanity: 2,  // virtueValue1 + virtueValue2
-willpower: 1, // courage
-```
+## Lista Completa de Antecedentes por Livro
 
+| Livro | Antecedentes |
+|-------|--------------|
+| Vampiro: A Máscara (Revised) | Aliados, Contatos, Fama, Geração, Rebanho, Influência, Mentor, Recursos, Lacaios, Status, Elysium, Idade, Status de Ancião, Geração de Ancião, Força Militar |
+| Vampire Storytellers Handbook | Idade, Arcano, Força Militar |
+| Dirty Secrets of the Black Hand | Idade |
+| Guide to the Sabbat | Identidade Alternativa, Filiação à Mão Negra, Rituais, Status no Sabbat |
+| The Players Guide to the Sabbat | Identidade Alternativa, Filiação à Mão Negra, Reconhecimento de Bando |
+| Ghouls: Fatal Addiction | Domitor |
+| Clanbook: Nosferatu (Revised) | Rede de Informações |
+| Time of Thin Blood | Insight |
+| Inquisition | Turba, Relíquia |
+| Blood Magic: Secrets of Thaumaturgy | Biblioteca Oculta |
+| The Hunters Hunted | Reputação |
+| Clanbook: Giovanni (Revised) | Escravos Espirituais |
+
+## Considerações Técnicas
+
+- **Scroll**: O card de antecedentes pode ficar grande. Considerar usar `ScrollArea` com altura máxima ou manter colapsável
+- **Estado colapsado**: Por padrão, mostrar apenas o livro base expandido para não sobrecarregar a tela
+- **Keys duplicadas**: Usar prefixo do livro para antecedentes repetidos (ex: `vsh_age`, `dsbh_age`)
