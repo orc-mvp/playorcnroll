@@ -12,6 +12,7 @@ import StepBasicInfo from '@/components/character/StepBasicInfo';
 import StepAttributes from '@/components/character/StepAttributes';
 import StepMinorMarks from '@/components/character/StepMinorMarks';
 import StepVampiroBasicInfo, { VampiroFormData } from '@/components/character/vampiro/StepVampiroBasicInfo';
+import StepVampiroAttributes from '@/components/character/vampiro/StepVampiroAttributes';
 import GameSystemSelector from '@/components/GameSystemSelector';
 import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
 
@@ -44,6 +45,7 @@ const initialFormData: CharacterFormData = {
 };
 
 const initialVampiroFormData: VampiroFormData = {
+  // Step 1 - Basic Info
   name: '',
   player: '',
   chronicle: '',
@@ -53,6 +55,19 @@ const initialVampiroFormData: VampiroFormData = {
   generation: '',
   sire: '',
   concept: '',
+  
+  // Step 2 - Attributes & Abilities
+  attributes: {
+    physical: { strength: 1, dexterity: 1, stamina: 1 },
+    social: { charisma: 1, manipulation: 1, appearance: 1 },
+    mental: { perception: 1, intelligence: 1, wits: 1 },
+  },
+  abilities: {
+    talents: {},
+    skills: {},
+    knowledges: {},
+  },
+  specializations: {},
 };
 
 export default function CreateCharacter() {
@@ -230,8 +245,16 @@ export default function CreateCharacter() {
           />
         )}
 
-        {/* Vampiro Steps 2-3: Coming Soon */}
-        {step > 1 && gameSystem === 'vampiro_v3' && (
+        {/* Vampiro Step 2: Attributes & Abilities */}
+        {step === 2 && gameSystem === 'vampiro_v3' && (
+          <StepVampiroAttributes
+            formData={vampiroFormData}
+            updateFormData={updateVampiroFormData}
+          />
+        )}
+
+        {/* Vampiro Step 3: Coming Soon */}
+        {step === 3 && gameSystem === 'vampiro_v3' && (
           <div className="max-w-2xl mx-auto">
             <Card className="medieval-card">
               <CardHeader className="text-center">

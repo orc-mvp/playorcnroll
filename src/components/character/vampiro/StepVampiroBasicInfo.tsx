@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export interface VampiroFormData {
+  // Step 1 - Basic Info
   name: string;
   player: string;
   chronicle: string;
@@ -14,6 +15,19 @@ export interface VampiroFormData {
   generation: string;
   sire: string;
   concept: string;
+  
+  // Step 2 - Attributes & Abilities
+  attributes: {
+    physical: { strength: number; dexterity: number; stamina: number };
+    social: { charisma: number; manipulation: number; appearance: number };
+    mental: { perception: number; intelligence: number; wits: number };
+  };
+  abilities: {
+    talents: Record<string, number>;
+    skills: Record<string, number>;
+    knowledges: Record<string, number>;
+  };
+  specializations: Record<string, string>;
 }
 
 interface StepVampiroBasicInfoProps {
