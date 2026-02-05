@@ -3,7 +3,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
-import { Sword, Shield, Scroll, Flame, Snowflake, Crown, Users, Dices } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Sword, Moon, Users, Dices, Zap, Shield } from 'lucide-react';
+import { GAME_SYSTEMS } from '@/lib/gameSystems';
+import logoLarge from '@/assets/logo-orcnroll-large.webp';
 
 export default function Index() {
   const navigate = useNavigate();
@@ -16,217 +19,199 @@ export default function Index() {
     }
   }, [user, loading, navigate]);
 
+  const systemIcons = {
+    herois_marcados: <Sword className="w-10 h-10" />,
+    vampiro_v3: <Moon className="w-10 h-10" />,
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Language Toggle */}
-      <div className="absolute top-4 right-4 flex gap-2 z-10">
-        <Button
-          variant={language === 'pt-BR' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setLanguage('pt-BR')}
-          className="font-body"
-        >
-          PT
-        </Button>
-        <Button
-          variant={language === 'en' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setLanguage('en')}
-          className="font-body"
-        >
-          EN
-        </Button>
-      </div>
+      {/* Header */}
+      <header className="absolute top-0 left-0 right-0 z-10 p-4">
+        <div className="container mx-auto flex items-center justify-between">
+          {/* Language Toggle */}
+          <div className="flex gap-2">
+            <Button
+              variant={language === 'pt-BR' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setLanguage('pt-BR')}
+              className="font-body"
+            >
+              PT
+            </Button>
+            <Button
+              variant={language === 'en' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setLanguage('en')}
+              className="font-body"
+            >
+              EN
+            </Button>
+          </div>
+
+          {/* Login Button */}
+          <Link to="/auth">
+            <Button variant="outline" className="font-medieval">
+              {t.auth.login}
+            </Button>
+          </Link>
+        </div>
+      </header>
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 overflow-hidden">
-        {/* Decorative Background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 left-10 opacity-10">
-            <Shield className="w-32 h-32 text-primary" />
-          </div>
-          <div className="absolute bottom-20 right-10 opacity-10">
-            <Sword className="w-32 h-32 text-primary transform rotate-45" />
-          </div>
-          <div className="absolute top-40 right-20 opacity-5">
-            <Scroll className="w-24 h-24 text-foreground" />
-          </div>
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-16">
+        {/* Logo */}
+        <div className="mb-6">
+          <img
+            src={logoLarge}
+            alt="Orc and Roll"
+            className="w-48 h-48 md:w-64 md:h-64 object-contain"
+          />
         </div>
 
-        {/* Main Content */}
-        <div className="text-center z-10 max-w-4xl mx-auto">
-          {/* Title */}
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <Sword className="w-12 h-12 md:w-16 md:h-16 text-primary animate-pulse-gold" />
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-medieval text-foreground text-shadow-medieval">
-              Heróis Marcados
-            </h1>
-            <Sword className="w-12 h-12 md:w-16 md:h-16 text-primary transform scale-x-[-1] animate-pulse-gold" />
-          </div>
+        {/* Tagline */}
+        <h1 className="text-3xl md:text-4xl font-medieval text-foreground text-center mb-2">
+          Orc & Roll
+        </h1>
+        <p className="text-xl md:text-2xl text-muted-foreground font-body mb-12 text-center">
+          {language === 'pt-BR' 
+            ? 'Teatro da Mente Online'
+            : 'Online Theater of the Mind'
+          }
+        </p>
 
-          {/* Subtitle */}
-          <p className="text-xl md:text-2xl text-muted-foreground font-body mb-4">
-            {language === 'pt-BR' 
-              ? 'Um RPG narrativo de fantasia medieval'
-              : 'A narrative fantasy medieval RPG'
-            }
-          </p>
+        {/* Game Systems Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl w-full mb-12">
+          {GAME_SYSTEMS.map((system) => {
+            const description = system.description[language as 'pt-BR' | 'en'] || system.description['pt-BR'];
+            
+            return (
+              <div
+                key={system.id}
+                className={`relative flex flex-col items-center gap-4 p-6 rounded-xl border-2 transition-all ${
+                  system.available
+                    ? 'border-primary bg-card hover:border-primary/80 hover:bg-card/80'
+                    : 'border-border bg-card/50 opacity-75'
+                }`}
+              >
+                {!system.available && (
+                  <Badge 
+                    variant="secondary" 
+                    className="absolute top-3 right-3 text-xs"
+                  >
+                    {language === 'pt-BR' ? 'Em breve' : 'Coming soon'}
+                  </Badge>
+                )}
 
-          <p className="text-lg text-muted-foreground/80 font-body mb-12 max-w-2xl mx-auto">
-            {language === 'pt-BR'
-              ? 'Onde heróis são definidos por suas marcas, e cada escolha molda o destino.'
-              : 'Where heroes are defined by their marks, and every choice shapes destiny.'
-            }
-          </p>
+                <div
+                  className={`p-4 rounded-full ${
+                    system.color === 'primary'
+                      ? 'bg-primary/20 text-primary'
+                      : 'bg-destructive/20 text-destructive'
+                  }`}
+                >
+                  {systemIcons[system.id]}
+                </div>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-            <Link to="/auth">
-              <Button size="lg" className="btn-medieval text-lg px-8 py-6">
-                <Crown className="w-5 h-5 mr-2" />
-                {t.auth.signup}
-              </Button>
-            </Link>
-            <Link to="/auth">
-              <Button size="lg" variant="outline" className="btn-medieval text-lg px-8 py-6">
-                {t.auth.login}
-              </Button>
-            </Link>
-          </div>
+                <div className="text-center">
+                  <h3 className="font-medieval text-xl font-semibold mb-1">
+                    {system.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground font-body">
+                    {system.shortName}
+                  </p>
+                </div>
 
-          {/* Feature Icons */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
-            <div className="flex flex-col items-center gap-2 p-4">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                <Dices className="w-7 h-7 text-primary" />
+                <p className="text-sm text-muted-foreground font-body text-center">
+                  {description}
+                </p>
+
+                <div className="flex flex-wrap justify-center gap-1">
+                  {system.features.slice(0, 3).map((feature) => (
+                    <Badge key={feature} variant="outline" className="text-xs">
+                      {feature}
+                    </Badge>
+                  ))}
+                </div>
+
+                {system.available ? (
+                  <Link to="/auth" className="w-full">
+                    <Button className="w-full font-medieval">
+                      {language === 'pt-BR' ? 'Jogar' : 'Play'}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button disabled className="w-full font-medieval" variant="secondary">
+                    {language === 'pt-BR' ? 'Aguardar' : 'Wait'}
+                  </Button>
+                )}
               </div>
-              <span className="font-medieval text-sm text-foreground">
-                {language === 'pt-BR' ? 'Dados 3D' : '3D Dice'}
-              </span>
-            </div>
-            <div className="flex flex-col items-center gap-2 p-4">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                <Users className="w-7 h-7 text-primary" />
-              </div>
-              <span className="font-medieval text-sm text-foreground">
-                {language === 'pt-BR' ? 'Tempo Real' : 'Real-time'}
-              </span>
-            </div>
-            <div className="flex flex-col items-center gap-2 p-4">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                <Flame className="w-7 h-7 text-orange-400" />
-              </div>
-              <span className="font-medieval text-sm text-foreground">
-                {language === 'pt-BR' ? 'Extremos' : 'Extremes'}
-              </span>
-            </div>
-            <div className="flex flex-col items-center gap-2 p-4">
-              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                <Scroll className="w-7 h-7 text-primary" />
-              </div>
-              <span className="font-medieval text-sm text-foreground">
-                {language === 'pt-BR' ? 'Marcas' : 'Marks'}
-              </span>
-            </div>
-          </div>
+            );
+          })}
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex items-start justify-center p-1">
-            <div className="w-1.5 h-3 bg-primary rounded-full animate-pulse" />
-          </div>
+        {/* CTA */}
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <Link to="/auth">
+            <Button size="lg" className="font-medieval text-lg px-8 py-6">
+              {t.auth.signup}
+            </Button>
+          </Link>
         </div>
       </section>
 
       {/* Features Section */}
       <section className="py-20 px-4 bg-card/30">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl md:text-4xl font-medieval text-center mb-12 text-foreground text-shadow-medieval">
-            {language === 'pt-BR' ? 'Sistema de Jogo' : 'Game System'}
+          <h2 className="text-3xl md:text-4xl font-medieval text-center mb-12 text-foreground">
+            {language === 'pt-BR' ? 'Recursos da Plataforma' : 'Platform Features'}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Attributes */}
-            <div className="medieval-card p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Shield className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-medieval text-xl">
-                  {language === 'pt-BR' ? '5 Atributos' : '5 Attributes'}
-                </h3>
+            {/* 3D Dice */}
+            <div className="text-center p-6">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Dices className="w-8 h-8 text-primary" />
               </div>
-              <ul className="space-y-2 font-body text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <Flame className="w-4 h-4 text-orange-400" />
-                  {t.attributes.aggression}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-gray-400" />
-                  {t.attributes.determination}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Crown className="w-4 h-4 text-pink-400" />
-                  {t.attributes.seduction}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Scroll className="w-4 h-4 text-purple-400" />
-                  {t.attributes.cunning}
-                </li>
-                <li className="flex items-center gap-2">
-                  <Snowflake className="w-4 h-4 text-blue-400" />
-                  {t.attributes.faith}
-                </li>
-              </ul>
-            </div>
-
-            {/* Dice System */}
-            <div className="medieval-card p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Dices className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-medieval text-xl">
-                  {language === 'pt-BR' ? 'Sistema 2d6' : '2d6 System'}
-                </h3>
-              </div>
-              <p className="font-body text-muted-foreground mb-4">
+              <h3 className="font-medieval text-xl mb-2">
+                {language === 'pt-BR' ? 'Dados 3D' : '3D Dice'}
+              </h3>
+              <p className="text-muted-foreground font-body text-sm">
                 {language === 'pt-BR' 
-                  ? 'Role 2 dados e some modificadores. Resultados especiais ativam Extremos!'
-                  : 'Roll 2 dice and add modifiers. Special results trigger Extremes!'
+                  ? 'Role dados com animações 3D realistas em tempo real'
+                  : 'Roll dice with realistic 3D animations in real-time'
                 }
               </p>
-              <div className="space-y-1 text-sm font-body">
-                <div className="flex justify-between text-destructive">
-                  <span>6-</span>
-                  <span>{t.tests.failure}</span>
-                </div>
-                <div className="flex justify-between text-warning">
-                  <span>7-9</span>
-                  <span>{t.tests.partial}</span>
-                </div>
-                <div className="flex justify-between text-success">
-                  <span>10+</span>
-                  <span>{t.tests.success}</span>
-                </div>
-              </div>
             </div>
 
-            {/* Marks */}
-            <div className="medieval-card p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Scroll className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-medieval text-xl">
-                  {language === 'pt-BR' ? 'Marcas' : 'Marks'}
-                </h3>
+            {/* Real-time */}
+            <div className="text-center p-6">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-8 h-8 text-primary" />
               </div>
-              <p className="font-body text-muted-foreground">
-                {language === 'pt-BR'
-                  ? 'Heróis são definidos por suas Marcas - habilidades especiais que influenciam dados e narrativa. Evolua de Marcas Menores para Épicas!'
-                  : 'Heroes are defined by their Marks - special abilities that influence dice and narrative. Evolve from Minor to Epic Marks!'
+              <h3 className="font-medieval text-xl mb-2">
+                {language === 'pt-BR' ? 'Tempo Real' : 'Real-time'}
+              </h3>
+              <p className="text-muted-foreground font-body text-sm">
+                {language === 'pt-BR' 
+                  ? 'Sincronização instantânea entre narrador e jogadores'
+                  : 'Instant synchronization between narrator and players'
+                }
+              </p>
+            </div>
+
+            {/* Managed Sessions */}
+            <div className="text-center p-6">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="font-medieval text-xl mb-2">
+                {language === 'pt-BR' ? 'Sessões Gerenciadas' : 'Managed Sessions'}
+              </h3>
+              <p className="text-muted-foreground font-body text-sm">
+                {language === 'pt-BR' 
+                  ? 'O narrador controla testes, cenas e progressão'
+                  : 'The narrator controls tests, scenes and progression'
                 }
               </p>
             </div>
@@ -237,14 +222,16 @@ export default function Index() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-border">
         <div className="container mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Sword className="w-5 h-5 text-primary" />
-            <span className="font-medieval text-foreground">Heróis Marcados</span>
-          </div>
+          <img
+            src={logoLarge}
+            alt="Orc and Roll"
+            className="w-12 h-12 mx-auto mb-4 object-contain"
+          />
+          <p className="font-medieval text-foreground mb-2">Orc & Roll</p>
           <p className="text-sm text-muted-foreground font-body">
             {language === 'pt-BR' 
-              ? 'Um RPG narrativo de fantasia medieval'
-              : 'A narrative fantasy medieval RPG'
+              ? 'Teatro da Mente Online'
+              : 'Online Theater of the Mind'
             }
           </p>
         </div>

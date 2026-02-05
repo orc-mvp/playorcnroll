@@ -6,10 +6,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { ArrowLeft, Sword } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, Sword, Construction } from 'lucide-react';
 import StepBasicInfo from '@/components/character/StepBasicInfo';
 import StepAttributes from '@/components/character/StepAttributes';
 import StepMinorMarks from '@/components/character/StepMinorMarks';
+import GameSystemSelector from '@/components/GameSystemSelector';
+import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
 
 export type AttributeType = 'strong' | 'neutral' | 'weak';
 
@@ -42,18 +45,21 @@ const initialFormData: CharacterFormData = {
 export default function CreateCharacter() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { toast } = useToast();
   
-  const [step, setStep] = useState(1);
+  const [gameSystem, setGameSystem] = useState<GameSystemId | null>(null);
+  const [step, setStep] = useState(0); // Start at step 0 (system selection)
   const [formData, setFormData] = useState<CharacterFormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalSteps = 3;
-  const progress = (step / totalSteps) * 100;
+  const totalSteps = 4; // 0: System, 1: Info, 2: Attributes, 3: Marks
+  const progress = ((step + 1) / totalSteps) * 100;
 
   const validateStep = (currentStep: number): boolean => {
     switch (currentStep) {
+      case 0:
+        return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
       case 1:
         return formData.name.trim().length >= 2;
       case 2: {
@@ -77,7 +83,7 @@ export default function CreateCharacter() {
   };
 
   const handleBack = () => {
-    if (step > 1) {
+    if (step > 0) {
       setStep(step - 1);
     } else {
       navigate('/dashboard');
@@ -85,7 +91,7 @@ export default function CreateCharacter() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !validateStep(3)) return;
+    if (!user || !validateStep(3) || !gameSystem) return;
 
     setIsSubmitting(true);
     try {
@@ -99,6 +105,7 @@ export default function CreateCharacter() {
         cunning_type: formData.attributes.cunning,
         faith_type: formData.attributes.faith,
         minor_marks: formData.selectedMarks,
+        game_system: gameSystem,
       });
 
       if (error) throw error;
@@ -125,6 +132,8 @@ export default function CreateCharacter() {
     setFormData(prev => ({ ...prev, ...updates }));
   };
 
+  const selectedSystem = gameSystem ? getGameSystem(gameSystem) : null;
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
@@ -141,7 +150,7 @@ export default function CreateCharacter() {
           </div>
 
           <div className="text-sm text-muted-foreground font-body shrink-0">
-            {t.character.step} {step} {t.character.of} {totalSteps}
+            {t.character.step} {step + 1} {t.character.of} {totalSteps}
           </div>
         </div>
       </header>
@@ -153,21 +162,69 @@ export default function CreateCharacter() {
 
       {/* Step Content */}
       <main className="container mx-auto px-4 py-6">
-        {step === 1 && (
+        {/* Step 0: System Selection */}
+        {step === 0 && (
+          <div className="max-w-2xl mx-auto">
+            <Card className="medieval-card">
+              <CardHeader className="text-center">
+                <CardTitle className="font-medieval text-2xl">
+                  {language === 'pt-BR' ? 'Escolha o Sistema' : 'Choose the System'}
+                </CardTitle>
+                <CardDescription className="font-body">
+                  {language === 'pt-BR' 
+                    ? 'Selecione para qual sistema de jogo você deseja criar seu personagem'
+                    : 'Select which game system you want to create your character for'
+                  }
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <GameSystemSelector
+                  value={gameSystem}
+                  onChange={setGameSystem}
+                />
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Vampiro: Coming Soon */}
+        {step > 0 && gameSystem === 'vampiro_v3' && (
+          <div className="max-w-2xl mx-auto">
+            <Card className="medieval-card">
+              <CardHeader className="text-center">
+                <div className="w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+                  <Construction className="w-8 h-8 text-destructive" />
+                </div>
+                <CardTitle className="font-medieval text-2xl">
+                  {language === 'pt-BR' ? 'Em Desenvolvimento' : 'In Development'}
+                </CardTitle>
+                <CardDescription className="font-body">
+                  {language === 'pt-BR' 
+                    ? 'A criação de personagens para Vampiro 3ª Edição ainda está sendo desenvolvida. Aguarde!'
+                    : 'Character creation for Vampire 3rd Edition is still being developed. Stay tuned!'
+                  }
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        )}
+
+        {/* Heróis Marcados Steps */}
+        {step === 1 && gameSystem === 'herois_marcados' && (
           <StepBasicInfo
             formData={formData}
             updateFormData={updateFormData}
           />
         )}
 
-        {step === 2 && (
+        {step === 2 && gameSystem === 'herois_marcados' && (
           <StepAttributes
             formData={formData}
             updateFormData={updateFormData}
           />
         )}
 
-        {step === 3 && (
+        {step === 3 && gameSystem === 'herois_marcados' && (
           <StepMinorMarks
             formData={formData}
             updateFormData={updateFormData}
@@ -180,14 +237,36 @@ export default function CreateCharacter() {
             {t.common.back}
           </Button>
 
-          {step < totalSteps ? (
+          {step === 0 && (
             <Button 
               onClick={handleNext}
               disabled={!validateStep(step)}
             >
               {t.common.next}
             </Button>
-          ) : (
+          )}
+
+          {step > 0 && gameSystem === 'vampiro_v3' && (
+            <Button 
+              onClick={() => {
+                setStep(0);
+                setGameSystem(null);
+              }}
+            >
+              {language === 'pt-BR' ? 'Escolher outro sistema' : 'Choose another system'}
+            </Button>
+          )}
+
+          {step > 0 && step < totalSteps - 1 && gameSystem === 'herois_marcados' && (
+            <Button 
+              onClick={handleNext}
+              disabled={!validateStep(step)}
+            >
+              {t.common.next}
+            </Button>
+          )}
+
+          {step === totalSteps - 1 && gameSystem === 'herois_marcados' && (
             <Button 
               onClick={handleSubmit}
               disabled={!validateStep(step) || isSubmitting}

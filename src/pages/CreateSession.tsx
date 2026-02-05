@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Wand2 } from 'lucide-react';
+import GameSystemSelector from '@/components/GameSystemSelector';
+import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
 
 function generateInviteCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -23,9 +25,10 @@ function generateInviteCode(): string {
 export default function CreateSession() {
   const navigate = useNavigate();
   const { user, profile, loading: authLoading } = useAuth();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const { toast } = useToast();
 
+  const [gameSystem, setGameSystem] = useState<GameSystemId | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,6 +41,25 @@ export default function CreateSession() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!gameSystem) {
+      toast({
+        title: 'Erro',
+        description: language === 'pt-BR' ? 'Selecione um sistema de jogo' : 'Select a game system',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const system = getGameSystem(gameSystem);
+    if (!system?.available) {
+      toast({
+        title: 'Erro',
+        description: language === 'pt-BR' ? 'Este sistema ainda não está disponível' : 'This system is not available yet',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     if (!name.trim()) {
       toast({
@@ -63,6 +85,7 @@ export default function CreateSession() {
           narrator_id: user.id,
           invite_code: inviteCode,
           status: 'lobby',
+          game_system: gameSystem,
         })
         .select()
         .single();
@@ -133,6 +156,18 @@ export default function CreateSession() {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Game System Selection */}
+              <div className="space-y-2">
+                <Label className="font-medieval">
+                  {language === 'pt-BR' ? 'Sistema de Jogo' : 'Game System'} *
+                </Label>
+                <GameSystemSelector
+                  value={gameSystem}
+                  onChange={setGameSystem}
+                  disabled={isSubmitting}
+                />
+              </div>
+
               {/* Session Name */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="font-medieval">
@@ -167,7 +202,7 @@ export default function CreateSession() {
               <Button
                 type="submit"
                 className="w-full font-medieval text-lg h-12"
-                disabled={isSubmitting || !name.trim()}
+                disabled={isSubmitting || !name.trim() || !gameSystem || !getGameSystem(gameSystem)?.available}
               >
                 {isSubmitting ? t.common.loading : t.session.create}
               </Button>

@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { 
-  Sword, 
   Users, 
   Plus, 
   LogOut, 
@@ -14,6 +13,7 @@ import {
   Scroll,
   BookOpen
 } from 'lucide-react';
+import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -51,13 +51,14 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <Sword className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
-            <h1 className="font-medieval text-lg sm:text-xl md:text-2xl text-foreground truncate">
-              Heróis Marcados
-            </h1>
-          </div>
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-2">
+          <Link to="/dashboard" className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <img
+              src={logoLateral}
+              alt="Orc and Roll"
+              className="h-8 sm:h-10 object-contain"
+            />
+          </Link>
 
           <div className="flex items-center gap-3">
             {/* Language Toggle */}
