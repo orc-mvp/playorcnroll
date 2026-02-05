@@ -115,10 +115,10 @@ export default {
         },
         "pulse-gold": {
           "0%, 100%": {
-            boxShadow: "0 0 5px hsl(43 74% 49% / 0.5), 0 0 20px hsl(43 74% 49% / 0.3)",
+            boxShadow: "0 0 5px hsl(147 100% 20% / 0.5), 0 0 20px hsl(147 100% 20% / 0.3)",
           },
           "50%": {
-            boxShadow: "0 0 15px hsl(43 74% 49% / 0.8), 0 0 40px hsl(43 74% 49% / 0.5)",
+            boxShadow: "0 0 15px hsl(147 100% 20% / 0.8), 0 0 40px hsl(147 100% 20% / 0.5)",
           },
         },
         "pulse-blood": {
