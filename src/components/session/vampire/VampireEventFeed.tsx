@@ -293,6 +293,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
     const oldValue = eventData.old_value as number;
     const newValue = eventData.new_value as number;
     const isNarratorChange = eventData.is_narrator_change as boolean;
+    const isPermanent = eventData.is_permanent as boolean;
 
     const TrackerIcon = getTrackerIcon(trackerType);
     const colorClass = getTrackerColor(trackerType);
@@ -308,6 +309,11 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
             <span className="font-medieval">{charName}</span>
             <span className="text-muted-foreground">•</span>
             <span className={colorClass}>{label}</span>
+            {isPermanent && (
+              <Badge variant="destructive" className="text-[10px] px-1 py-0">
+                {language === 'pt-BR' ? 'PERMANENTE' : 'PERMANENT'}
+              </Badge>
+            )}
           </div>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-sm text-muted-foreground">{oldValue}</span>

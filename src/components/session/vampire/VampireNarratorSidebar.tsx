@@ -77,7 +77,9 @@ interface PendingChange {
   currentValue: number;
   newValue: number;
   participantId: string;
+  characterId?: string;
   characterName: string;
+  isPermanent?: boolean;
 }
 
 interface VampireNarratorSidebarProps {
@@ -211,14 +213,18 @@ export function VampireNarratorSidebar({
     currentValue: number,
     newValue: number,
     participantId: string,
-    characterName: string
+    characterName: string,
+    characterId?: string,
+    isPermanent?: boolean
   ) => {
     setPendingChange({
       type,
       currentValue,
       newValue,
       participantId,
+      characterId,
       characterName,
+      isPermanent,
     });
     setIsConfirmOpen(true);
   };
@@ -228,28 +234,55 @@ export function VampireNarratorSidebar({
     if (!pendingChange) return;
 
     try {
-      const updateData: Record<string, number | boolean[]> = {};
-      
-      switch (pendingChange.type) {
-        case 'blood':
-          updateData.session_blood_pool = pendingChange.newValue;
-          break;
-        case 'willpower':
-          updateData.session_willpower_current = pendingChange.newValue;
-          break;
-        case 'health':
-          const newHealth = Array(7).fill(false);
-          for (let i = 0; i < pendingChange.newValue; i++) {
-            newHealth[i] = true;
-          }
-          updateData.session_health_damage = newHealth;
-          break;
-      }
+      // Handle humanity changes (permanent - update character record)
+      if (pendingChange.type === 'humanity' && pendingChange.characterId) {
+        // Fetch current vampiro_data
+        const { data: charData, error: fetchError } = await supabase
+          .from('characters')
+          .select('vampiro_data')
+          .eq('id', pendingChange.characterId)
+          .single();
 
-      await supabase
-        .from('session_participants')
-        .update(updateData)
-        .eq('id', pendingChange.participantId);
+        if (fetchError) throw fetchError;
+
+        // Update humanity in the object
+        const updatedData = {
+          ...(charData.vampiro_data as VampiroCharacterData),
+          humanity: pendingChange.newValue,
+        };
+
+        // Save back to database
+        const { error: updateError } = await supabase
+          .from('characters')
+          .update({ vampiro_data: updatedData })
+          .eq('id', pendingChange.characterId);
+
+        if (updateError) throw updateError;
+      } else {
+        // Handle session trackers (temporary)
+        const updateData: Record<string, number | boolean[]> = {};
+        
+        switch (pendingChange.type) {
+          case 'blood':
+            updateData.session_blood_pool = pendingChange.newValue;
+            break;
+          case 'willpower':
+            updateData.session_willpower_current = pendingChange.newValue;
+            break;
+          case 'health':
+            const newHealth = Array(7).fill(false);
+            for (let i = 0; i < pendingChange.newValue; i++) {
+              newHealth[i] = true;
+            }
+            updateData.session_health_damage = newHealth;
+            break;
+        }
+
+        await supabase
+          .from('session_participants')
+          .update(updateData)
+          .eq('id', pendingChange.participantId);
+      }
 
       // Emit event to session feed
       await supabase.from('session_events').insert({
@@ -262,6 +295,7 @@ export function VampireNarratorSidebar({
           old_value: pendingChange.currentValue,
           new_value: pendingChange.newValue,
           is_narrator_change: true,
+          is_permanent: pendingChange.isPermanent || false,
         },
       });
 
@@ -328,6 +362,7 @@ export function VampireNarratorSidebar({
               {participants.map((p) => {
                 const vampData = p.character?.vampiro_data;
                 const maxWillpower = vampData?.willpower || 1;
+                const humanity = vampData?.humanity || 7;
                 const bloodPool = p.session_blood_pool || 0;
                 const currentWillpower = p.session_willpower_current || 0;
                 const healthDamage = p.session_health_damage || [];
@@ -460,6 +495,23 @@ export function VampireNarratorSidebar({
                       </div>
                     )}
 
+                    {/* Humanity - Clickable (PERMANENT) */}
+                    {p.character && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newValue = humanity > 0 ? humanity - 1 : 1;
+                          requestTrackerChange('humanity', humanity, newValue, p.id, p.character?.name || '', p.character?.id, true);
+                        }}
+                        className="flex items-center gap-2 p-1.5 rounded border bg-muted/50 border-border cursor-pointer transition-colors hover:bg-muted/70 w-full"
+                      >
+                        <Moon className="w-3 h-3 text-foreground" />
+                        <span className="font-medium text-sm">{humanity}/10</span>
+                        <span className="text-muted-foreground text-[10px] flex-1">Humanidade</span>
+                        <span className="text-[8px] px-1 py-0.5 bg-destructive/20 text-destructive rounded">⚡</span>
+                      </button>
+                    )}
+
                     {/* View Character Sheet Button */}
                     {p.character && (
                       <Button
@@ -567,6 +619,7 @@ export function VampireNarratorSidebar({
           newValue={pendingChange.newValue}
           characterName={pendingChange.characterName}
           isNarrator={true}
+          isPermanent={pendingChange.isPermanent}
           onConfirm={confirmChange}
           onCancel={cancelChange}
         />

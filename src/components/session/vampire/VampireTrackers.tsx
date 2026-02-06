@@ -3,7 +3,8 @@ import { useTranslation } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { toast as sonnerToast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Droplets, Sparkles, Heart, AlertTriangle, Skull } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Droplets, Sparkles, Heart, AlertTriangle, Skull, Moon, Zap } from 'lucide-react';
 import { TrackerChangeConfirmModal, TrackerType } from './TrackerChangeConfirmModal';
 
 interface VampiroCharacterData {
@@ -49,6 +50,7 @@ interface PendingChange {
   type: TrackerType;
   currentValue: number;
   newValue: number;
+  isPermanent?: boolean;
 }
 
 export function VampireTrackers({
@@ -64,10 +66,12 @@ export function VampireTrackers({
 
   const vampiroData = character?.vampiro_data;
   const maxWillpower = vampiroData?.willpower || 1;
+  const initialHumanity = vampiroData?.humanity || 7;
 
   const [bloodPool, setBloodPool] = useState(initialBloodPool);
   const [currentWillpower, setCurrentWillpower] = useState(initialWillpower);
   const [healthDamage, setHealthDamage] = useState<boolean[]>(initialHealthDamage);
+  const [humanity, setHumanity] = useState(initialHumanity);
   const [isSaving, setIsSaving] = useState(false);
 
   // Confirmation modal state
@@ -78,6 +82,13 @@ export function VampireTrackers({
   const prevBloodPool = useRef(initialBloodPool);
   const prevWillpower = useRef(initialWillpower);
   const hasInitialized = useRef(false);
+
+  // Sync humanity from character when it changes
+  useEffect(() => {
+    if (vampiroData?.humanity !== undefined) {
+      setHumanity(vampiroData.humanity);
+    }
+  }, [vampiroData?.humanity]);
 
   // Emit critical state event to session feed
   const emitCriticalEvent = useCallback(
@@ -97,7 +108,6 @@ export function VampireTrackers({
     },
     [sessionId, sceneId, character]
   );
-
   // Detect blood pool critical state
   useEffect(() => {
     if (!hasInitialized.current) {
@@ -191,9 +201,21 @@ export function VampireTrackers({
     setIsConfirmOpen(true);
   };
 
+  // Handle humanity change request (PERMANENT)
+  const requestHumanityChange = (index: number) => {
+    const newValue = index < humanity ? index : index + 1;
+    setPendingChange({
+      type: 'humanity',
+      currentValue: humanity,
+      newValue,
+      isPermanent: true,
+    });
+    setIsConfirmOpen(true);
+  };
+
   // Emit tracker change event to session feed
   const emitTrackerChangeEvent = useCallback(
-    async (type: TrackerType, oldValue: number, newValue: number) => {
+    async (type: TrackerType, oldValue: number, newValue: number, isPermanent = false) => {
       if (!character) return;
 
       await supabase.from('session_events').insert({
@@ -207,12 +229,50 @@ export function VampireTrackers({
           old_value: oldValue,
           new_value: newValue,
           is_narrator_change: false,
+          is_permanent: isPermanent,
         },
       });
     },
     [sessionId, sceneId, character]
   );
 
+  // Save humanity permanently to character record
+  const saveHumanityPermanently = async (newHumanity: number) => {
+    if (!character) return;
+
+    try {
+      // Fetch current vampiro_data
+      const { data: charData, error: fetchError } = await supabase
+        .from('characters')
+        .select('vampiro_data')
+        .eq('id', character.id)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Update humanity in the object
+      const updatedData = {
+        ...(charData.vampiro_data as VampiroCharacterData),
+        humanity: newHumanity,
+      };
+
+      // Save back to database
+      const { error: updateError } = await supabase
+        .from('characters')
+        .update({ vampiro_data: updatedData })
+        .eq('id', character.id);
+
+      if (updateError) throw updateError;
+
+      sonnerToast.success(t.vampiro?.humanityUpdated || 'Humanidade atualizada!', {
+        description: t.vampiro?.permanentChangeApplied || 'Alteração permanente aplicada à ficha.',
+        duration: 4000,
+      });
+    } catch (error) {
+      console.error('Error saving humanity:', error);
+      sonnerToast.error(t.common?.save || 'Erro ao salvar');
+    }
+  };
   // Confirm the pending change
   const confirmChange = async () => {
     if (!pendingChange) return;
@@ -221,7 +281,8 @@ export function VampireTrackers({
     await emitTrackerChangeEvent(
       pendingChange.type,
       pendingChange.currentValue,
-      pendingChange.newValue
+      pendingChange.newValue,
+      pendingChange.isPermanent
     );
 
     switch (pendingChange.type) {
@@ -240,6 +301,10 @@ export function VampireTrackers({
         }
         setHealthDamage(newHealth);
         saveTrackers(bloodPool, currentWillpower, newHealth);
+        break;
+      case 'humanity':
+        setHumanity(pendingChange.newValue);
+        await saveHumanityPermanently(pendingChange.newValue);
         break;
     }
 
@@ -399,6 +464,44 @@ export function VampireTrackers({
         </CardContent>
       </Card>
 
+      {/* 4. HUMANITY (PERMANENT) */}
+      <Card className="medieval-card border-destructive/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="font-medieval text-sm flex items-center gap-2">
+            <Moon className="w-4 h-4 text-foreground" />
+            {t.vampiro?.humanity || 'Humanidade'}
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 ml-auto border-destructive/40 text-destructive">
+              <Zap className="w-3 h-3 mr-0.5" />
+              {t.vampiro?.permanent || 'PERMANENTE'}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex flex-wrap gap-1 justify-center">
+            {Array.from({ length: 10 }, (_, i) => {
+              const isFilled = i < humanity;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => requestHumanityChange(i)}
+                  className={`w-4 h-4 rounded-full border-2 transition-colors cursor-pointer hover:border-foreground ${
+                    isFilled
+                      ? 'bg-foreground border-foreground'
+                      : 'border-muted-foreground/40 bg-transparent'
+                  }`}
+                />
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            {humanity}/10
+          </p>
+          <p className="text-[10px] text-muted-foreground text-center italic">
+            {t.vampiro?.humanityChangeNote || 'Clique para alterar (mudança permanente)'}
+          </p>
+        </CardContent>
+      </Card>
       {/* 4. HEALTH TRACKER (Vitality) */}
       <Card className="medieval-card border-destructive/20">
         <CardHeader className="pb-2">
@@ -447,6 +550,7 @@ export function VampireTrackers({
           currentValue={pendingChange.currentValue}
           newValue={pendingChange.newValue}
           isNarrator={false}
+          isPermanent={pendingChange.isPermanent}
           onConfirm={confirmChange}
           onCancel={cancelChange}
         />
