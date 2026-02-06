@@ -71,24 +71,29 @@ Deno.serve(async (req) => {
     // Find session by exact invite code match using admin client
     const { data: session, error: sessionError } = await supabaseAdmin
       .from("sessions")
-      .select("id, status, name")
+      .select("id, status, name, game_system, description")
       .eq("invite_code", normalizedCode)
       .single();
 
     if (sessionError || !session) {
+      console.log("Session not found for code:", normalizedCode);
       return new Response(
         JSON.stringify({ error: "Session not found" }),
         { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // Return only necessary session info (not invite_code or narrator_id)
+    console.log("Session found:", session.name, "game_system:", session.game_system);
+
+    // Return session info including game_system for character filtering
     return new Response(
       JSON.stringify({
         session: {
           id: session.id,
           status: session.status,
           name: session.name,
+          game_system: session.game_system,
+          description: session.description,
         },
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
