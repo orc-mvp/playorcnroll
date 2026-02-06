@@ -18,6 +18,14 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
   ArrowLeft,
   User,
   Plus,
@@ -27,14 +35,16 @@ import {
   Brain,
   Flame,
   Sparkles,
-  ChevronRight,
+  Moon,
   Trash2,
 } from 'lucide-react';
+import { getGameSystem, GameSystemId } from '@/lib/gameSystems';
 
 interface Character {
   id: string;
   name: string;
   concept: string | null;
+  game_system: string;
   aggression_type: string;
   determination_type: string;
   seduction_type: string;
@@ -45,12 +55,19 @@ interface Character {
   created_at: string;
 }
 
+const ITEMS_PER_PAGE = 9;
+
 const attributeIcons: Record<string, React.ElementType> = {
   aggression: Sword,
   determination: Shield,
   seduction: Heart,
   cunning: Brain,
   faith: Flame,
+};
+
+const systemIcons: Record<string, React.ElementType> = {
+  herois_marcados: Sword,
+  vampiro_v3: Moon,
 };
 
 export default function MyCharacters() {
@@ -63,6 +80,7 @@ export default function MyCharacters() {
   const [loading, setLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<Character | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!user) return;
@@ -125,6 +143,20 @@ export default function MyCharacters() {
     return attrs.filter((attr) => char[`${attr}_type` as keyof Character] === 'strong');
   };
 
+  // Pagination
+  const totalPages = Math.ceil(characters.length / ITEMS_PER_PAGE);
+  const paginatedCharacters = characters.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const getSystemInfo = (systemId: string) => {
+    const system = getGameSystem(systemId as GameSystemId);
+    const Icon = systemIcons[systemId] || Sword;
+    const color = systemId === 'vampiro_v3' ? 'text-red-500' : 'text-primary';
+    return { system, Icon, color };
+  };
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       {/* Header */}
@@ -150,89 +182,138 @@ export default function MyCharacters() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6 max-w-4xl">
+      <main className="container mx-auto px-4 py-6 max-w-6xl">
         {characters.length > 0 ? (
-          <div className="grid gap-4">
-            {characters.map((char) => {
-              const strongAttrs = getStrongAttributes(char);
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {paginatedCharacters.map((char) => {
+                const strongAttrs = getStrongAttributes(char);
+                const { system, Icon: SystemIcon, color } = getSystemInfo(char.game_system);
 
-              return (
-                <Card
-                  key={char.id}
-                  className="medieval-card hover:border-primary/50 transition-colors group"
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-4">
-                      <Link
-                        to={`/character/${char.id}`}
-                        className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 hover:bg-primary/20 transition-colors"
-                      >
-                        <User className="w-7 h-7 text-primary" />
-                      </Link>
-
-                      <Link to={`/character/${char.id}`} className="flex-1 min-w-0">
-                        <h3 className="font-medieval text-lg truncate hover:text-primary transition-colors">
-                          {char.name}
-                        </h3>
-                        {char.concept && (
-                          <p className="text-sm text-muted-foreground font-body truncate">
-                            {char.concept}
-                          </p>
-                        )}
-
-                        <div className="flex items-center gap-3 mt-2">
-                          {/* Strong Attributes */}
+                return (
+                  <Card
+                    key={char.id}
+                    className="medieval-card hover:border-primary/50 transition-colors group"
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex flex-col gap-3">
+                        {/* Header with avatar and system badge */}
+                        <div className="flex items-start justify-between">
+                          <Link
+                            to={`/character/${char.id}`}
+                            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 hover:bg-primary/20 transition-colors"
+                          >
+                            <User className="w-6 h-6 text-primary" />
+                          </Link>
+                          
                           <div className="flex items-center gap-1">
-                            {strongAttrs.map((attr) => {
-                              const Icon = attributeIcons[attr];
-                              return (
-                                <Icon
-                                  key={attr}
-                                  className="w-4 h-4 text-green-500"
-                                  title={t.attributes[attr]}
-                                />
-                              );
-                            })}
+                            <Badge 
+                              variant="outline" 
+                              className={`text-[10px] px-1.5 py-0.5 ${color} border-current/30`}
+                            >
+                              <SystemIcon className="w-3 h-3 mr-1" />
+                              {system?.shortName || 'PBTA'}
+                            </Badge>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setDeleteTarget(char);
+                              }}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
                           </div>
-
-                          {/* Minor Marks Count */}
-                          <Badge variant="outline" className="text-xs">
-                            {char.minor_marks?.length || 0} {t.character.minorMarks}
-                          </Badge>
-
-                          {/* Heroic Moves */}
-                          {char.heroic_moves_stored > 0 && (
-                            <div className="flex items-center gap-1 text-xs text-primary">
-                              <Sparkles className="w-3 h-3" />
-                              <span>{char.heroic_moves_stored}</span>
-                            </div>
-                          )}
                         </div>
-                      </Link>
 
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-muted-foreground hover:text-destructive"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setDeleteTarget(char);
-                          }}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                        <Link to={`/character/${char.id}`}>
-                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                        {/* Character info */}
+                        <Link to={`/character/${char.id}`} className="flex-1 min-w-0">
+                          <h3 className="font-medieval text-base truncate hover:text-primary transition-colors">
+                            {char.name}
+                          </h3>
+                          {char.concept && (
+                            <p className="text-xs text-muted-foreground font-body truncate">
+                              {char.concept}
+                            </p>
+                          )}
                         </Link>
+
+                        {/* Stats row - only for herois_marcados */}
+                        {char.game_system === 'herois_marcados' && (
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {/* Strong Attributes */}
+                            <div className="flex items-center gap-0.5">
+                              {strongAttrs.map((attr) => {
+                                const AttrIcon = attributeIcons[attr];
+                                return (
+                                  <AttrIcon
+                                    key={attr}
+                                    className="w-3.5 h-3.5 text-green-500"
+                                    title={t.attributes[attr]}
+                                  />
+                                );
+                              })}
+                            </div>
+
+                            {/* Minor Marks Count */}
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                              {char.minor_marks?.length || 0} {t.character.minorMarks}
+                            </Badge>
+
+                            {/* Heroic Moves */}
+                            {char.heroic_moves_stored > 0 && (
+                              <div className="flex items-center gap-0.5 text-[10px] text-primary">
+                                <Sparkles className="w-3 h-3" />
+                                <span>{char.heroic_moves_stored}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          onClick={() => setCurrentPage(page)}
+                          isActive={currentPage === page}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </>
         ) : (
           <Card className="medieval-card">
             <CardContent className="py-12 text-center">
