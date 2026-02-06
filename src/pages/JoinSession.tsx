@@ -23,6 +23,15 @@ interface Character {
   id: string;
   name: string;
   concept: string | null;
+  game_system: string;
+}
+
+interface ValidatedSession {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  game_system: string;
 }
 
 interface JoinedSession {
@@ -50,6 +59,8 @@ export default function JoinSession() {
   const [loadingCharacters, setLoadingCharacters] = useState(true);
   const [joinedSessions, setJoinedSessions] = useState<JoinedSession[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
+  const [validatedSession, setValidatedSession] = useState<ValidatedSession | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
 
   // Redirect if not authenticated or is a narrator
   useEffect(() => {
@@ -65,16 +76,13 @@ export default function JoinSession() {
     const fetchCharacters = async () => {
       const { data, error } = await supabase
         .from('characters')
-        .select('id, name, concept')
+        .select('id, name, concept, game_system')
         .eq('user_id', user.id);
 
       if (error) {
         console.error('Error fetching characters:', error);
       } else {
         setCharacters(data || []);
-        if (data && data.length === 1) {
-          setSelectedCharacterId(data[0].id);
-        }
       }
       setLoadingCharacters(false);
     };
@@ -137,15 +145,56 @@ export default function JoinSession() {
     }
   }, [code, user, authLoading, characters, selectedCharacterId]);
 
+  // Validate invite code and get session info
+  const handleValidateCode = async () => {
+    const codeToUse = inviteCode.trim().toUpperCase();
+
+    if (!codeToUse || codeToUse.length < 6) {
+      toast({
+        title: 'Código inválido',
+        description: 'Digite o código de convite completo',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsValidating(true);
+
+    try {
+      const { data: validateData, error: validateError } = await supabase.functions.invoke(
+        'validate-invite-code',
+        { body: { invite_code: codeToUse } }
+      );
+
+      if (validateError || !validateData?.session) {
+        throw new Error('Sessão não encontrada com este código');
+      }
+
+      setValidatedSession(validateData.session);
+      setSelectedCharacterId(''); // Reset selected character
+      
+      toast({
+        title: 'Sessão encontrada!',
+        description: validateData.session.name,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao validar código',
+        description: error.message || 'Verifique o código e tente novamente',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const codeToUse = inviteCode.trim().toUpperCase();
-
-    if (!codeToUse) {
+    if (!validatedSession) {
       toast({
-        title: 'Código inválido',
-        description: 'Digite o código de convite',
+        title: 'Valide o código primeiro',
+        description: 'Clique em "Verificar" para validar o código',
         variant: 'destructive',
       });
       return;
@@ -154,7 +203,7 @@ export default function JoinSession() {
     if (!selectedCharacterId) {
       toast({
         title: 'Selecione um personagem',
-        description: 'Você precisa escolher um personagem para entrar na sessão',
+        description: 'Você precisa escolher um personagem compatível para entrar na sessão',
         variant: 'destructive',
       });
       return;
@@ -165,17 +214,7 @@ export default function JoinSession() {
     setIsJoining(true);
 
     try {
-      // Find session by invite code using secure edge function
-      const { data: validateData, error: validateError } = await supabase.functions.invoke(
-        'validate-invite-code',
-        { body: { invite_code: codeToUse } }
-      );
-
-      if (validateError || !validateData?.session) {
-        throw new Error('Sessão não encontrada com este código');
-      }
-
-      const sessionData = validateData.session;
+      const sessionData = validatedSession;
 
       // Check if already a participant
       const { data: existingParticipant } = await supabase
@@ -425,74 +464,117 @@ export default function JoinSession() {
 
               <CardContent>
                 <form onSubmit={handleJoin} className="space-y-6">
-                  {/* Invite Code */}
+                  {/* Invite Code with Verify Button */}
                   <div className="space-y-2">
                     <Label htmlFor="code" className="font-medieval">
                       {t.session.inviteCode}
                     </Label>
-                    <Input
-                      id="code"
-                      value={inviteCode}
-                      onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                      placeholder="Ex: ABC123"
-                      className="font-mono text-xl text-center tracking-widest uppercase"
-                      maxLength={6}
-                      disabled={isJoining}
-                    />
-                  </div>
-
-                  {/* Character Selection */}
-                  <div className="space-y-2">
-                    <Label htmlFor="character" className="font-medieval">
-                      Personagem
-                    </Label>
-                    {loadingCharacters ? (
-                      <div className="flex items-center justify-center py-4">
-                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                      </div>
-                    ) : characters.length === 0 ? (
-                      <div className="text-center py-4">
-                        <p className="text-muted-foreground font-body text-sm mb-3">
-                          Você ainda não tem personagens
-                        </p>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          onClick={() => navigate('/character/create')}
-                        >
-                          Criar Personagem
-                        </Button>
-                      </div>
-                    ) : (
-                      <Select
-                        value={selectedCharacterId}
-                        onValueChange={setSelectedCharacterId}
-                        disabled={isJoining}
+                    <div className="flex gap-2">
+                      <Input
+                        id="code"
+                        value={inviteCode}
+                        onChange={(e) => {
+                          setInviteCode(e.target.value.toUpperCase());
+                          setValidatedSession(null); // Reset validation when code changes
+                          setSelectedCharacterId('');
+                        }}
+                        placeholder="Ex: ABC123"
+                        className="font-mono text-xl text-center tracking-widest uppercase flex-1"
+                        maxLength={6}
+                        disabled={isJoining || isValidating}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleValidateCode}
+                        disabled={isValidating || inviteCode.length < 6 || !!validatedSession}
                       >
-                        <SelectTrigger className="font-body">
-                          <SelectValue placeholder="Selecione um personagem" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {characters.map((char) => (
-                            <SelectItem key={char.id} value={char.id}>
-                              <span className="font-medieval">{char.name}</span>
-                              {char.concept && (
-                                <span className="text-muted-foreground ml-2 text-sm">
-                                  - {char.concept}
-                                </span>
-                              )}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        {isValidating ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : validatedSession ? (
+                          <CheckCircle className="w-4 h-4 text-primary" />
+                        ) : (
+                          'Verificar'
+                        )}
+                      </Button>
+                    </div>
+                    {validatedSession && (
+                      <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
+                        <p className="text-sm font-medieval text-primary">{validatedSession.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          Sistema: {validatedSession.game_system === 'vampiro_v3' ? 'Vampiro: A Máscara' : 'Heróis Marcados'}
+                        </p>
+                      </div>
                     )}
                   </div>
+
+                  {/* Character Selection - Only shown after session is validated */}
+                  {validatedSession && (
+                    <div className="space-y-2">
+                      <Label htmlFor="character" className="font-medieval">
+                        Personagem ({validatedSession.game_system === 'vampiro_v3' ? 'Vampiro' : 'Heróis Marcados'})
+                      </Label>
+                      {loadingCharacters ? (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                        </div>
+                      ) : (() => {
+                        const compatibleCharacters = characters.filter(
+                          c => c.game_system === validatedSession.game_system
+                        );
+                        
+                        if (compatibleCharacters.length === 0) {
+                          return (
+                            <div className="text-center py-4 bg-muted/30 rounded-lg">
+                              <p className="text-muted-foreground font-body text-sm mb-3">
+                                Você não tem personagens do sistema{' '}
+                                <span className="font-medieval text-foreground">
+                                  {validatedSession.game_system === 'vampiro_v3' ? 'Vampiro' : 'Heróis Marcados'}
+                                </span>
+                              </p>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => navigate('/character/create')}
+                              >
+                                Criar Personagem
+                              </Button>
+                            </div>
+                          );
+                        }
+                        
+                        return (
+                          <Select
+                            value={selectedCharacterId}
+                            onValueChange={setSelectedCharacterId}
+                            disabled={isJoining}
+                          >
+                            <SelectTrigger className="font-body">
+                              <SelectValue placeholder="Selecione um personagem" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {compatibleCharacters.map((char) => (
+                                <SelectItem key={char.id} value={char.id}>
+                                  <span className="font-medieval">{char.name}</span>
+                                  {char.concept && (
+                                    <span className="text-muted-foreground ml-2 text-sm">
+                                      - {char.concept}
+                                    </span>
+                                  )}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        );
+                      })()}
+                    </div>
+                  )}
 
                   {/* Submit Button */}
                   <Button
                     type="submit"
                     className="w-full font-medieval text-lg h-12"
-                    disabled={isJoining || !inviteCode.trim() || !selectedCharacterId || characters.length === 0}
+                    disabled={isJoining || !validatedSession || !selectedCharacterId}
                   >
                     {isJoining ? (
                       <>
