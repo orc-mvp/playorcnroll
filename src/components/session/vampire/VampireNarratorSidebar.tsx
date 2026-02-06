@@ -1,6 +1,45 @@
 import { useState } from 'react';
-import { useTranslation } from '@/lib/i18n';
+import { useI18n } from '@/lib/i18n/context';
 import { supabase } from '@/integrations/supabase/client';
+
+// Discipline labels for i18n
+const DISCIPLINE_LABELS: Record<string, { pt: string; en: string }> = {
+  animalism: { pt: 'Animalismo', en: 'Animalism' },
+  auspex: { pt: 'Auspícios', en: 'Auspex' },
+  celerity: { pt: 'Celeridade', en: 'Celerity' },
+  chimerstry: { pt: 'Quimerismo', en: 'Chimerstry' },
+  dementation: { pt: 'Demência', en: 'Dementation' },
+  dominate: { pt: 'Dominação', en: 'Dominate' },
+  fortitude: { pt: 'Fortitude', en: 'Fortitude' },
+  necromancy: { pt: 'Necromancia', en: 'Necromancy' },
+  obfuscate: { pt: 'Ofuscação', en: 'Obfuscate' },
+  obtenebration: { pt: 'Obtenebração', en: 'Obtenebration' },
+  potence: { pt: 'Potência', en: 'Potence' },
+  presence: { pt: 'Presença', en: 'Presence' },
+  protean: { pt: 'Metamorfose', en: 'Protean' },
+  quietus: { pt: 'Quietus', en: 'Quietus' },
+  serpentis: { pt: 'Serpentis', en: 'Serpentis' },
+  thaumaturgy: { pt: 'Taumaturgia', en: 'Thaumaturgy' },
+  vicissitude: { pt: 'Vicissitude', en: 'Vicissitude' },
+  daimonion: { pt: 'Daimonion', en: 'Daimonion' },
+  melpominee: { pt: 'Melpominee', en: 'Melpominee' },
+  mytherceria: { pt: 'Mytherceria', en: 'Mytherceria' },
+  obeah: { pt: 'Obeah', en: 'Obeah' },
+  sanguinus: { pt: 'Sanguinus', en: 'Sanguinus' },
+  spiritus: { pt: 'Spiritus', en: 'Spiritus' },
+  temporis: { pt: 'Temporis', en: 'Temporis' },
+  thanatosis: { pt: 'Thanatosis', en: 'Thanatosis' },
+  valeren: { pt: 'Valeren', en: 'Valeren' },
+  visceratika: { pt: 'Visceratika', en: 'Visceratika' },
+  flight: { pt: 'Voo', en: 'Flight' },
+  bardo: { pt: 'Bardo', en: 'Bardo' },
+  abombwe: { pt: 'Abombwe', en: 'Abombwe' },
+};
+
+const getDisciplineLabel = (key: string, lang: string) => {
+  const label = DISCIPLINE_LABELS[key];
+  return label ? (lang === 'pt-BR' ? label.pt : label.en) : key;
+};
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -99,7 +138,7 @@ export function VampireNarratorSidebar({
   onRequestTest,
   onSceneChange,
 }: VampireNarratorSidebarProps) {
-  const t = useTranslation();
+  const { t, language } = useI18n();
   const { toast } = useToast();
 
   const [newSceneName, setNewSceneName] = useState('');
@@ -336,7 +375,7 @@ export function VampireNarratorSidebar({
             className="w-full bg-destructive hover:bg-destructive/90"
           >
             <Dices className="w-4 h-4 mr-2" />
-            {t.vampiroTests.configureTest}
+            {t.vampiroTests.test}
           </Button>
         </CardContent>
       </Card>
@@ -347,9 +386,6 @@ export function VampireNarratorSidebar({
           <CardTitle className="font-medieval text-base flex items-center gap-2">
             <Users className="w-4 h-4 text-destructive" />
             Coterie
-            <Badge variant="secondary" className="text-xs ml-auto">
-              {participants.length}
-            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -404,14 +440,18 @@ export function VampireNarratorSidebar({
                       </div>
                     </div>
 
-                    {/* Disciplines Summary (read-only) */}
+                    {/* Disciplines Summary (read-only, sorted by level descending) */}
                     {vampData?.disciplines && Object.keys(vampData.disciplines).filter(k => (vampData.disciplines?.[k] || 0) > 0).length > 0 && (
                       <div className="flex flex-wrap gap-1">
-                        {Object.entries(vampData.disciplines).filter(([, v]) => v > 0).slice(0, 3).map(([key, value]) => (
-                          <Badge key={key} variant="outline" className="text-[10px] px-1.5 py-0">
-                            {t.vampiro[key as keyof typeof t.vampiro] || key}: {value}
-                          </Badge>
-                        ))}
+                        {Object.entries(vampData.disciplines)
+                          .filter(([, v]) => v > 0)
+                          .sort(([, a], [, b]) => b - a)
+                          .slice(0, 3)
+                          .map(([key, value]) => (
+                            <Badge key={key} variant="outline" className="text-[10px] px-1.5 py-0">
+                              {getDisciplineLabel(key, language)}: {value}
+                            </Badge>
+                          ))}
                         {Object.entries(vampData.disciplines).filter(([, v]) => v > 0).length > 3 && (
                           <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                             +{Object.entries(vampData.disciplines).filter(([, v]) => v > 0).length - 3}
@@ -528,60 +568,6 @@ export function VampireNarratorSidebar({
                 );
               })}
             </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Scene Management */}
-      <Card className="medieval-card border-destructive/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="font-medieval text-base flex items-center gap-2">
-            <Plus className="w-4 h-4 text-destructive" />
-            {t.scene.create}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {showSceneForm ? (
-            <div className="space-y-2">
-              <Input
-                placeholder={t.scene.name}
-                value={newSceneName}
-                onChange={(e) => setNewSceneName(e.target.value)}
-              />
-              <Textarea
-                placeholder={t.scene.description}
-                value={newSceneDesc}
-                onChange={(e) => setNewSceneDesc(e.target.value)}
-                rows={2}
-              />
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowSceneForm(false)}
-                  className="flex-1"
-                >
-                  {t.common.cancel}
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleCreateScene}
-                  disabled={isCreatingScene || !newSceneName.trim()}
-                  className="flex-1 bg-destructive hover:bg-destructive/90"
-                >
-                  {t.common.create}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <Button
-              variant="outline"
-              onClick={() => setShowSceneForm(true)}
-              className="w-full"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              {t.scene.create}
-            </Button>
           )}
         </CardContent>
       </Card>

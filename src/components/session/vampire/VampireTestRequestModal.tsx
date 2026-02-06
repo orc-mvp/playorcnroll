@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useTranslation } from '@/lib/i18n';
+import { useState, useMemo } from 'react';
+import { useI18n } from '@/lib/i18n/context';
 import {
   Dialog,
   DialogContent,
@@ -69,7 +69,7 @@ export default function VampireTestRequestModal({
   participants,
   onRequestTest,
 }: VampireTestRequestModalProps) {
-  const t = useTranslation();
+  const { t, language } = useI18n();
   
   const [testType, setTestType] = useState<TestType>('attribute_ability');
   const [attribute, setAttribute] = useState<string>('');
@@ -142,6 +142,58 @@ export default function VampireTestRequestModal({
     const targetCount = selectAll ? playersWithCharacters.length : selectedPlayers.length;
     return targetCount > 0;
   };
+
+  // Generate dynamic button label with character names and test type
+  const getButtonLabel = useMemo(() => {
+    // Get test type label
+    const getTestTypeLabel = () => {
+      switch (testType) {
+        case 'attribute_ability':
+          if (!attribute || !ability) return '';
+          const attrLabel = t.vampiro[attribute as keyof typeof t.vampiro] || attribute;
+          const abilLabel = t.vampiro[ability as keyof typeof t.vampiro] || ability;
+          return `${attrLabel} + ${abilLabel}`;
+        case 'willpower':
+          return t.vampiro.willpower;
+        case 'humanity':
+          return t.vampiro.humanity;
+        case 'virtue':
+          if (!virtue) return '';
+          return t.vampiro[virtue as keyof typeof t.vampiro] || virtue;
+        default:
+          return '';
+      }
+    };
+
+    const testLabel = getTestTypeLabel();
+    
+    // Get target names
+    const targetNames = selectAll 
+      ? playersWithCharacters.map(p => p.character?.name || '').filter(Boolean)
+      : selectedPlayers.map(id => 
+          playersWithCharacters.find(p => p.character_id === id)?.character?.name || ''
+        ).filter(Boolean);
+
+    if (targetNames.length === 0 || !testLabel) {
+      return t.vampiroTests.requestTest;
+    }
+
+    if (selectAll && playersWithCharacters.length > 1) {
+      return language === 'pt-BR' 
+        ? `Todos testem ${testLabel}`
+        : `Everyone test ${testLabel}`;
+    }
+
+    if (targetNames.length === 1) {
+      return language === 'pt-BR' 
+        ? `${targetNames[0]} faça um teste de ${testLabel}`
+        : `${targetNames[0]} make a ${testLabel} test`;
+    }
+    
+    return language === 'pt-BR'
+      ? `${targetNames.join(', ')} testem ${testLabel}`
+      : `${targetNames.join(', ')} test ${testLabel}`;
+  }, [testType, attribute, ability, virtue, selectAll, selectedPlayers, playersWithCharacters, language, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -386,10 +438,10 @@ export default function VampireTestRequestModal({
           <Button 
             onClick={handleSubmit}
             disabled={!isValid()}
-            className="bg-destructive hover:bg-destructive/90"
+            className="bg-destructive hover:bg-destructive/90 text-sm"
           >
-            <Dices className="w-4 h-4 mr-1" />
-            {t.vampiroTests.requestTest}
+            <Dices className="w-4 h-4 mr-1 flex-shrink-0" />
+            <span className="truncate max-w-[200px] md:max-w-[300px]">{getButtonLabel}</span>
           </Button>
         </DialogFooter>
       </DialogContent>

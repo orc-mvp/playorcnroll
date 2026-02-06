@@ -434,6 +434,7 @@ export const translations = {
       // Narrator Modal
       requestTest: 'Pedir Teste',
       configureTest: 'Configurar Teste',
+      test: 'Testar',
       testType: 'Tipo de Teste',
       attributeAbility: 'Atributo + Habilidade',
       willpowerOnly: 'Força de Vontade',
@@ -939,6 +940,7 @@ export const translations = {
       // Narrator Modal
       requestTest: 'Request Test',
       configureTest: 'Configure Test',
+      test: 'Test',
       testType: 'Test Type',
       attributeAbility: 'Attribute + Ability',
       willpowerOnly: 'Willpower Only',
