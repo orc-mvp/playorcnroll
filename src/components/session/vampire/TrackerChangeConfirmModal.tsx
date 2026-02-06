@@ -9,9 +9,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from '@/lib/i18n';
-import { Droplets, Sparkles, Heart, AlertTriangle, Users, Crown } from 'lucide-react';
+import { Droplets, Sparkles, Heart, AlertTriangle, Users, Crown, Moon, Zap } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
-export type TrackerType = 'blood' | 'willpower' | 'health';
+export type TrackerType = 'blood' | 'willpower' | 'health' | 'humanity';
 
 interface TrackerChangeConfirmModalProps {
   open: boolean;
@@ -20,6 +21,7 @@ interface TrackerChangeConfirmModalProps {
   newValue: number;
   characterName?: string;
   isNarrator: boolean;
+  isPermanent?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -31,6 +33,7 @@ export function TrackerChangeConfirmModal({
   newValue,
   characterName,
   isNarrator,
+  isPermanent = false,
   onConfirm,
   onCancel,
 }: TrackerChangeConfirmModalProps) {
@@ -48,6 +51,8 @@ export function TrackerChangeConfirmModal({
         return <Sparkles className="w-5 h-5 text-foreground" />;
       case 'health':
         return <Heart className="w-5 h-5 text-destructive" />;
+      case 'humanity':
+        return <Moon className="w-5 h-5 text-foreground" />;
     }
   };
 
@@ -59,6 +64,8 @@ export function TrackerChangeConfirmModal({
         return t.vampiro?.trackerWillpowerChange || 'Vontade';
       case 'health':
         return t.vampiro?.trackerHealthChange || 'Vitalidade';
+      case 'humanity':
+        return t.vampiro?.trackerHumanityChange || 'Humanidade';
     }
   };
 
@@ -87,10 +94,28 @@ export function TrackerChangeConfirmModal({
       <AlertDialogContent className="max-w-md">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2 font-medieval">
-            <AlertTriangle className="w-5 h-5 text-amber-500" />
-            {t.vampiro?.trackerChangeTitle || 'Confirmar Alteração'}
+            <AlertTriangle className={`w-5 h-5 ${isPermanent ? 'text-destructive' : 'text-amber-500'}`} />
+            {isPermanent 
+              ? (t.vampiro?.trackerPermanentTitle || 'Confirmar Alteração PERMANENTE')
+              : (t.vampiro?.trackerChangeTitle || 'Confirmar Alteração')}
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-4">
+            {/* Permanent Warning Banner */}
+            {isPermanent && (
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-destructive/20 border border-destructive/40 text-destructive">
+                <Zap className="w-5 h-5 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-sm">
+                    {t.vampiro?.trackerPermanentWarning || 'ALTERAÇÃO PERMANENTE'}
+                  </p>
+                  <p className="text-xs mt-1 text-destructive/80">
+                    {t.vampiro?.trackerPermanentDescription || 
+                      'Esta mudança afetará a ficha do personagem permanentemente, não apenas esta sessão.'}
+                  </p>
+                </div>
+              </div>
+            )}
+
             <p className="text-muted-foreground">
               {t.vampiro?.trackerChangeDescription || 
                 'Esta alteração será sincronizada em tempo real com todos os participantes da sessão.'}
@@ -105,6 +130,11 @@ export function TrackerChangeConfirmModal({
               <span className={`text-sm font-medium ${difference < 0 ? 'text-destructive' : 'text-primary'}`}>
                 ({differenceText})
               </span>
+              {isPermanent && (
+                <Badge variant="destructive" className="text-xs">
+                  {t.vampiro?.permanent || 'PERMANENTE'}
+                </Badge>
+              )}
             </div>
 
             {/* Critical State Warning */}
@@ -119,7 +149,14 @@ export function TrackerChangeConfirmModal({
 
             {/* Visibility Info */}
             <div className="p-3 rounded-lg bg-muted/30 border text-sm text-muted-foreground">
-              {getVisibilityMessage()}
+              {isPermanent ? (
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <span>{t.vampiro?.trackerVisibleToAll || 'Todos os participantes verão esta mudança'}</span>
+                </div>
+              ) : (
+                getVisibilityMessage()
+              )}
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -127,8 +164,13 @@ export function TrackerChangeConfirmModal({
           <AlertDialogCancel onClick={onCancel}>
             {t.common?.cancel || 'Cancelar'}
           </AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-destructive hover:bg-destructive/90">
-            {t.common?.confirm || 'Confirmar'}
+          <AlertDialogAction 
+            onClick={onConfirm} 
+            className={isPermanent ? 'bg-destructive hover:bg-destructive/90' : 'bg-destructive hover:bg-destructive/90'}
+          >
+            {isPermanent 
+              ? (t.vampiro?.confirmPermanent || '⚠️ Confirmar Alteração')
+              : (t.common?.confirm || 'Confirmar')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

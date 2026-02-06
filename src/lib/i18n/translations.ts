@@ -412,10 +412,21 @@ export const translations = {
       trackerBloodChange: 'Sangue',
       trackerWillpowerChange: 'Vontade',
       trackerHealthChange: 'Vitalidade',
+      trackerHumanityChange: 'Humanidade',
       trackerVisibleToNarrator: 'O Narrador verá esta mudança',
       trackerVisibleToPlayer: 'O jogador {name} verá esta mudança',
       trackerVisibleToAll: 'Todos os participantes verão esta mudança',
       trackerCriticalWarning: 'Atenção: Isso resultará em estado crítico!',
+      
+      // Permanent Changes
+      trackerPermanentTitle: 'Confirmar Alteração PERMANENTE',
+      trackerPermanentWarning: 'ALTERAÇÃO PERMANENTE',
+      trackerPermanentDescription: 'Esta mudança afetará a ficha do personagem permanentemente, não apenas esta sessão.',
+      permanent: 'PERMANENTE',
+      confirmPermanent: '⚠️ Confirmar Alteração',
+      humanityUpdated: 'Humanidade atualizada!',
+      permanentChangeApplied: 'Alteração permanente aplicada à ficha.',
+      humanityChangeNote: 'Clique para alterar (mudança permanente)',
     },
 
     // Vampire Tests System
@@ -906,10 +917,21 @@ export const translations = {
       trackerBloodChange: 'Blood',
       trackerWillpowerChange: 'Willpower',
       trackerHealthChange: 'Vitality',
+      trackerHumanityChange: 'Humanity',
       trackerVisibleToNarrator: 'The Narrator will see this change',
       trackerVisibleToPlayer: 'Player {name} will see this change',
       trackerVisibleToAll: 'All participants will see this change',
       trackerCriticalWarning: 'Warning: This will result in a critical state!',
+      
+      // Permanent Changes
+      trackerPermanentTitle: 'Confirm PERMANENT Change',
+      trackerPermanentWarning: 'PERMANENT CHANGE',
+      trackerPermanentDescription: 'This change will permanently affect the character sheet, not just this session.',
+      permanent: 'PERMANENT',
+      confirmPermanent: '⚠️ Confirm Change',
+      humanityUpdated: 'Humanity updated!',
+      permanentChangeApplied: 'Permanent change applied to character sheet.',
+      humanityChangeNote: 'Click to change (permanent change)',
     },
 
     // Vampire Tests System
