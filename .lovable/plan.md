@@ -1,135 +1,127 @@
 
-# Plano: Melhorias na Sidebar do Narrador Vampiro
+# Plano: Correções de Vitalidade e Melhorias nos Trackers de Vampiro
 
-## Objetivo
-Implementar 5 mudanças na interface de sessão de Vampiro:
-1. Remover card "Nova Cena" da sidebar esquerda
-2. Implementar i18n nas disciplinas da Coterie
-3. Ordenar disciplinas por nível mais alto primeiro
-4. Alterar texto "Configurar Teste" para "Testar"
-5. Alterar texto do botão de teste para incluir nomes de personagens
-6. remover o contador de personagens na Coterie.
+## Resumo das Mudanças
+
+### 1. Inverter a Semântica de Vitalidade
+O sistema de Vampiro usa um modelo de "dano acumulado" onde:
+- **0 dano** = Saudável (sem ferimentos)
+- **7 dano** = Incapacitado (criticamente ferido)
+
+**Problema Atual**: O modal de confirmação e o feed de eventos mostram os valores de dano diretamente (ex: "Vitalidade: 2 → 3"), o que é confuso porque parece que a vitalidade está aumentando quando na verdade o personagem está recebendo mais dano.
+
+**Solução**: Inverter a exibição para mostrar "níveis de saúde restantes":
+- Modal mostrará: `Vitalidade: 5 → 4` (ficou mais ferido)
+- Feed mostrará a mesma lógica invertida
+- Internamente continua armazenando níveis de dano
+
+### 2. Adicionar Botões +/- nos Modais do Narrador
+Na visão da Coterie, ao clicar em um tracker, abrir um modal com controles +/- do lado direito para ajuste rápido.
+
+**Arquivos afetados**:
+- `VampireNarratorSidebar.tsx` - Adicionar modal com controles +/- para Blood, Willpower e Health
+
+**Design proposto**:
+```
+┌─────────────────────────────────────────┐
+│ [Icon] Ajustar Sangue de Marcus         │
+├─────────────────────────────────────────┤
+│                                         │
+│    [ - ]     15     [ + ]               │
+│                                         │
+│    ← Perder      Recuperar →            │
+│                                         │
+├─────────────────────────────────────────┤
+│          [Cancelar]  [Confirmar]        │
+└─────────────────────────────────────────┘
+```
+
+### 3. Simplificar Humanidade na Visão do Jogador
+Remover da seção de Humanidade em `VampireTrackers.tsx`:
+- A badge "PERMANENTE" no header
+- O texto "Clique para alterar (mudança permanente)"
+- A box de exibição deve ficar na coluna da esquerda.
+
+A Humanidade deve aparecer apenas uma vez, de forma limpa, apenas com o modal de confirmação para avisar sobre a permanência.
 
 ---
 
-## Mudanças Detalhadas
+## Detalhes Técnicos
 
-### 1. Remover Card "Nova Cena" (VampireNarratorSidebar)
+### Arquivo 1: `src/components/session/vampire/TrackerChangeConfirmModal.tsx`
 
-**Localização:** Linhas 535-587 do `VampireNarratorSidebar.tsx`
+**Mudanças**:
+- Para `trackerType === 'health'`, inverter os valores exibidos:
+  - `displayedCurrentValue = 7 - currentValue`
+  - `displayedNewValue = 7 - newValue`
+- A diferença também deve ser invertida para health
 
-O card de gerenciamento de cenas será removido da sidebar do Narrador. O gerenciamento de cenas já existe no painel central (`VampireScenePanel`), então esta duplicação é desnecessária.
+### Arquivo 2: `src/components/session/vampire/VampireEventFeed.tsx`
 
-**Ação:** Deletar o bloco de código do card "Scene Management"
+**Mudanças**:
+- Na função `renderTrackerChange`, para health:
+  - Exibir `7 - oldValue` e `7 - newValue`
+  - Inverter o sinal da diferença
 
----
+### Arquivo 3: `src/components/session/vampire/VampireNarratorSidebar.tsx`
 
-### 2. Implementar i18n nas Disciplinas da Coterie
+**Mudanças**:
+1. Criar um novo estado para controlar o modal de ajuste:
+   ```typescript
+   const [trackerModal, setTrackerModal] = useState<{
+     type: TrackerType;
+     participantId: string;
+     characterId?: string;
+     characterName: string;
+     currentValue: number;
+     maxValue?: number;
+     isPermanent?: boolean;
+   } | null>(null);
+   ```
 
-**Localização:** Linhas 408-421 do `VampireNarratorSidebar.tsx`
+2. Substituir os clicks diretos nos trackers por abertura do modal de ajuste
 
-**Problema Atual:**
-```typescript
-{t.vampiro[key as keyof typeof t.vampiro] || key}: {value}
-```
-Isso falha porque as disciplinas (animalism, auspex, etc.) NÃO existem no objeto `t.vampiro`.
+3. Criar novo componente de modal com botões +/- que permitem incrementar/decrementar o valor antes de confirmar
 
-**Solução:**
-Criar um mapa de disciplinas bilíngue similar ao usado em `StepVampiroDisciplines.tsx`:
+4. O modal terá:
+   - Botão `-` para diminuir o valor (perder)
+   - Display do valor atual proposto
+   - Botão `+` para aumentar o valor (recuperar)
+   - Labels: "Perder" à esquerda, "Recuperar" à direita
+   - Botões Cancelar e Confirmar
 
-```typescript
-const DISCIPLINE_LABELS: Record<string, { pt: string; en: string }> = {
-  animalism: { pt: 'Animalismo', en: 'Animalism' },
-  auspex: { pt: 'Auspícios', en: 'Auspex' },
-  celerity: { pt: 'Celeridade', en: 'Celerity' },
-  // ... todas as disciplinas
-};
+### Arquivo 4: `src/components/session/vampire/VampireTrackers.tsx`
 
-const getDisciplineLabel = (key: string, lang: string) => {
-  const label = DISCIPLINE_LABELS[key];
-  return label ? (lang === 'pt-BR' ? label.pt : label.en) : key;
-};
-```
+**Mudanças** (linhas 467-503):
+- Remover a Badge "PERMANENTE" do CardTitle da Humanidade
+- Remover o parágrafo com texto "Clique para alterar (mudança permanente)"
+- Manter apenas o título simples com ícone e nome
 
----
-
-### 3. Ordenar Disciplinas por Nível (Mais Alto Primeiro)
-
-**Localização:** Linhas 408-421 do `VampireNarratorSidebar.tsx`
-
-**Código Atual:**
-```typescript
-Object.entries(vampData.disciplines)
-  .filter(([, v]) => v > 0)
-  .slice(0, 3)
-```
-
-**Código Novo:**
-```typescript
-Object.entries(vampData.disciplines)
-  .filter(([, v]) => v > 0)
-  .sort(([, a], [, b]) => b - a)  // Ordenar por valor decrescente
-  .slice(0, 3)
-```
-
----
-
-### 4. Alterar "Configurar Teste" para "Testar"
-
-**Localização:** Linha 339 do `VampireNarratorSidebar.tsx`
-
-**De:** `{t.vampiroTests.configureTest}` ("Configurar Teste")
-**Para:** Nova chave `{t.vampiroTests.test}` ("Testar")
-
-**Alteração em translations.ts:**
-```typescript
-// PT-BR
-vampiroTests: {
-  test: 'Testar',
-  // ...
-}
-
-// EN
-vampiroTests: {
-  test: 'Test',
-  // ...
-}
+**Antes**:
+```tsx
+<CardTitle className="font-medieval text-sm flex items-center gap-2">
+  <Moon className="w-4 h-4 text-foreground" />
+  {t.vampiro?.humanity || 'Humanidade'}
+  <Badge variant="outline" className="text-[10px] px-1.5 py-0 ml-auto border-destructive/40 text-destructive">
+    <Zap className="w-3 h-3 mr-0.5" />
+    {t.vampiro?.permanent || 'PERMANENTE'}
+  </Badge>
+</CardTitle>
 ```
 
----
+**Depois**:
+```tsx
+<CardTitle className="font-medieval text-sm flex items-center gap-2">
+  <Moon className="w-4 h-4 text-foreground" />
+  {t.vampiro?.humanity || 'Humanidade'}
+</CardTitle>
+```
 
-### 5. Alterar Texto do Botão "Pedir Teste"
-
-**Localização:** `VampireTestRequestModal.tsx` linha 392
-
-**Comportamento Atual:** "Pedir Teste" (estático)
-
-**Comportamento Novo:**
-- 1 jogador selecionado: "[Nome] faça um teste de [tipo]"
-- Múltiplos jogadores: "[Nome, Nome] testem [tipo]"
-- Todos selecionados: "Todos testem [tipo]"
-
-**Implementação:**
-```typescript
-const getButtonLabel = () => {
-  const targetNames = selectAll 
-    ? [language === 'pt-BR' ? 'Todos' : 'Everyone']
-    : selectedPlayers.map(id => 
-        playersWithCharacters.find(p => p.character_id === id)?.character?.name || ''
-      );
-  
-  const testLabel = getTestTypeLabel(); // Atributo + Habilidade, Vontade, etc.
-  
-  if (targetNames.length === 1) {
-    return language === 'pt-BR' 
-      ? `${targetNames[0]} faça um teste de ${testLabel}`
-      : `${targetNames[0]} make a ${testLabel} test`;
-  }
-  
-  return language === 'pt-BR'
-    ? `${targetNames.join(', ')} testem ${testLabel}`
-    : `${targetNames.join(', ')} test ${testLabel}`;
-};
+E remover (linhas 500-502):
+```tsx
+<p className="text-[10px] text-muted-foreground text-center italic">
+  {t.vampiro?.humanityChangeNote || 'Clique para alterar (mudança permanente)'}
+</p>
 ```
 
 ---
@@ -138,67 +130,33 @@ const getButtonLabel = () => {
 
 | Arquivo | Mudanças |
 |---------|----------|
-| `src/components/session/vampire/VampireNarratorSidebar.tsx` | Remover card de cena, adicionar mapa de disciplinas, ordenar disciplinas, trocar texto do botão |
-| `src/components/session/vampire/VampireTestRequestModal.tsx` | Alterar texto do botão de "Pedir Teste" para frase dinâmica |
-| `src/lib/i18n/translations.ts` | Adicionar chave `vampiroTests.test` |
+| `TrackerChangeConfirmModal.tsx` | Inverter exibição de valores para health |
+| `VampireEventFeed.tsx` | Inverter exibição de valores para health no feed |
+| `VampireNarratorSidebar.tsx` | Adicionar modal com controles +/- para todos os trackers |
+| `VampireTrackers.tsx` | Remover badge "PERMANENTE" e texto explicativo da Humanidade |
 
 ---
 
-## Mapa de Disciplinas (Referência)
+## Resultado Esperado
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│  Disciplina        │  PT-BR           │  EN             │
-├─────────────────────────────────────────────────────────┤
-│  animalism         │  Animalismo      │  Animalism      │
-│  auspex            │  Auspícios       │  Auspex         │
-│  celerity          │  Celeridade      │  Celerity       │
-│  chimerstry        │  Quimerismo      │  Chimerstry     │
-│  dementation       │  Demência        │  Dementation    │
-│  dominate          │  Dominação       │  Dominate       │
-│  fortitude         │  Fortitude       │  Fortitude      │
-│  necromancy        │  Necromancia     │  Necromancy     │
-│  obfuscate         │  Ofuscação       │  Obfuscate      │
-│  obtenebration     │  Obtenebração    │  Obtenebration  │
-│  potence           │  Potência        │  Potence        │
-│  presence          │  Presença        │  Presence       │
-│  protean           │  Metamorfose     │  Protean        │
-│  quietus           │  Quietus         │  Quietus        │
-│  serpentis         │  Serpentis       │  Serpentis      │
-│  thaumaturgy       │  Taumaturgia     │  Thaumaturgy    │
-│  vicissitude       │  Vicissitude     │  Vicissitude    │
-│  + outras 12 disciplinas menores...                     │
-└─────────────────────────────────────────────────────────┘
+**Modal de Confirmação (Health)**:
+- Antes: `Vitalidade: 2 → 3` (confuso)
+- Depois: `Vitalidade: 5 → 4` (claro: perdeu um nível de saúde)
+
+**Coterie do Narrador (clique em tracker)**:
+```
+┌────────────────────────────────────┐
+│ 🩸 Ajustar Sangue - Marcus         │
+├────────────────────────────────────┤
+│                                    │
+│   [ - ]      12       [ + ]        │
+│                                    │
+│  Perder ←          → Recuperar     │
+│                                    │
+│      [Cancelar]   [Confirmar]      │
+└────────────────────────────────────┘
 ```
 
----
-
-## Resultado Visual Esperado
-
-**Antes (Coterie):**
-```
-🌙 Marcus
-   Brujah • 10ª Geração
-   [celerity: 3] [potence: 2] [presence: 1]
-```
-
-**Depois (Coterie):**
-```
-🌙 Marcus
-   Brujah • 10ª Geração
-   [Celeridade: 3] [Potência: 2] [Presença: 1]
-```
-
-**Antes (Botão de Teste):**
-```
-[Pedir Teste]
-```
-
-**Depois (Botão de Teste):**
-```
-[Marcus faça um teste de Força + Briga]
-ou
-[Marcus e Elena testem Força de Vontade]
-ou
-[Marcus, José e Elena testem Força de Vontade]
-```
+**Humanidade do Jogador**:
+- Antes: Card com badge "PERMANENTE" e texto explicativo
+- Depois: Card limpo apenas com título "Humanidade" e os círculos clicáveis
