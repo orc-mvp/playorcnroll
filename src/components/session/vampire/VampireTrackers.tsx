@@ -172,7 +172,20 @@ export function VampireTrackers({
   const toggleHealthLevel = (index: number) => {
     setHealthDamage((prev) => {
       const newHealth = [...prev];
-      newHealth[index] = !newHealth[index];
+      const isCurrentlyDamaged = newHealth[index];
+      
+      if (isCurrentlyDamaged) {
+        // Clicking a damaged level: clear this and all levels after it
+        for (let i = index; i < newHealth.length; i++) {
+          newHealth[i] = false;
+        }
+      } else {
+        // Clicking an undamaged level: mark this and all levels before it
+        for (let i = 0; i <= index; i++) {
+          newHealth[i] = true;
+        }
+      }
+      
       return newHealth;
     });
   };
