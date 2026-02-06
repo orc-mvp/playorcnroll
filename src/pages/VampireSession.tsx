@@ -36,7 +36,15 @@ import {
   History,
   ChevronDown,
   Play,
+  FileText,
 } from 'lucide-react';
+import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface SessionData {
   id: string;
@@ -867,6 +875,7 @@ function VampireScenePanel({
 function VampirePlayerPanel({ character }: { character: Participant['character'] }) {
   const { t, language } = useI18n();
   const vampiroData = character?.vampiro_data;
+  const [showSheet, setShowSheet] = useState(false);
 
   if (!character) {
     return (
@@ -882,59 +891,96 @@ function VampirePlayerPanel({ character }: { character: Participant['character']
   }
 
   return (
-    <div className="space-y-4">
-      {/* Character Header */}
-      <Card className="medieval-card border-destructive/20">
-        <CardContent className="pt-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center border border-destructive/30">
-              <Moon className="w-6 h-6 text-destructive" />
-            </div>
-            <div>
-              <h3 className="font-medieval text-lg">{character.name}</h3>
-              {vampiroData?.clan && (
-                <Badge variant="outline" className="border-destructive/30 text-destructive text-xs">
-                  {vampiroData.clan}
-                </Badge>
-              )}
-            </div>
-          </div>
-          {character.concept && (
-            <p className="text-sm text-muted-foreground mt-2 font-body">
-              {character.concept}
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Quick Stats */}
-      {vampiroData && (
+    <>
+      <div className="space-y-4">
+        {/* Character Header */}
         <Card className="medieval-card border-destructive/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-medieval text-sm flex items-center gap-2">
-              <Heart className="w-4 h-4 text-destructive" />
-              {t.vampiro.humanity}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-0.5 justify-center">
-              {Array.from({ length: 10 }, (_, i) => (
-                <div
-                  key={i}
-                  className={`w-3 h-3 rounded-full border-2 ${
-                    i < (vampiroData.humanity || 1)
-                      ? 'bg-foreground border-foreground'
-                      : 'bg-transparent border-muted-foreground/40'
-                  }`}
-                />
-              ))}
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center border border-destructive/30">
+                <Moon className="w-6 h-6 text-destructive" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-medieval text-lg">{character.name}</h3>
+                {vampiroData?.clan && (
+                  <Badge variant="outline" className="border-destructive/30 text-destructive text-xs">
+                    {vampiroData.clan}
+                  </Badge>
+                )}
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground text-center mt-1">
-              {vampiroData.humanity || 1}/10
-            </p>
+            {character.concept && (
+              <p className="text-sm text-muted-foreground mt-2 font-body">
+                {character.concept}
+              </p>
+            )}
+            
+            {/* View Character Sheet Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowSheet(true)}
+              className="w-full mt-3"
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              {language === 'pt-BR' ? 'Ver Ficha Completa' : 'View Full Sheet'}
+            </Button>
           </CardContent>
         </Card>
-      )}
-    </div>
+
+        {/* Quick Stats */}
+        {vampiroData && (
+          <Card className="medieval-card border-destructive/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-medieval text-sm flex items-center gap-2">
+                <Heart className="w-4 h-4 text-destructive" />
+                {t.vampiro.humanity}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-0.5 justify-center">
+                {Array.from({ length: 10 }, (_, i) => (
+                  <div
+                    key={i}
+                    className={`w-3 h-3 rounded-full border-2 ${
+                      i < (vampiroData.humanity || 1)
+                        ? 'bg-foreground border-foreground'
+                        : 'bg-transparent border-muted-foreground/40'
+                    }`}
+                  />
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground text-center mt-1">
+                {vampiroData.humanity || 1}/10
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
+      {/* Character Sheet Modal */}
+      <Dialog open={showSheet} onOpenChange={setShowSheet}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="font-medieval flex items-center gap-2">
+              <Moon className="w-5 h-5 text-destructive" />
+              {language === 'pt-BR' ? 'Minha Ficha' : 'My Character Sheet'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto">
+            {character && character.vampiro_data && (
+              <VampiroCharacterSheet
+                character={{
+                  id: character.id,
+                  name: character.name,
+                  concept: character.concept,
+                  vampiro_data: character.vampiro_data,
+                }}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
