@@ -432,13 +432,6 @@ export default function VampireSession() {
               <span>{participants.length} {language === 'pt-BR' ? 'jogadores' : 'players'}</span>
             </div>
 
-            {/* Current scene */}
-            {currentScene && (
-              <Badge variant="secondary" className="font-body">
-                <BookOpen className="w-3 h-3 mr-1" />
-                {currentScene.name}
-              </Badge>
-            )}
 
             {/* Actions */}
             {isNarrator && (
