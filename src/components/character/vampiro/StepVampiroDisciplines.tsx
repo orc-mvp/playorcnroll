@@ -147,10 +147,8 @@ const BACKGROUNDS_BY_BOOK = [
       { key: 'retainers', labelPt: 'Lacaios', labelEn: 'Retainers' },
       { key: 'status', labelPt: 'Status', labelEn: 'Status' },
       { key: 'elysium', labelPt: 'Elysium', labelEn: 'Elysium' },
-      { key: 'age', labelPt: 'Idade', labelEn: 'Age' },
       { key: 'elder_status', labelPt: 'Status de Ancião', labelEn: 'Elder Status' },
       { key: 'elder_generation', labelPt: 'Geração de Ancião', labelEn: 'Elder Generation' },
-      { key: 'military_force', labelPt: 'Força Militar', labelEn: 'Military Force' },
     ]
   },
   {
