@@ -535,9 +535,9 @@ export default function JoinSession() {
                               <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => navigate('/character/create')}
+                                onClick={() => navigate(`/character/create?system=${validatedSession.game_system}`)}
                               >
-                                Criar Personagem
+                                Criar Personagem de {validatedSession.game_system === 'vampiro_v3' ? 'Vampiro' : 'Heróis Marcados'}
                               </Button>
                             </div>
                           );

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
@@ -91,15 +91,27 @@ const initialVampiroFormData: VampiroFormData = {
 
 export default function CreateCharacter() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { t, language } = useI18n();
   const { toast } = useToast();
+  
+  // Check for pre-selected system from URL params
+  const preSelectedSystem = searchParams.get('system') as GameSystemId | null;
   
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(null);
   const [step, setStep] = useState(0); // Start at step 0 (system selection)
   const [formData, setFormData] = useState<CharacterFormData>(initialFormData);
   const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Auto-select system and skip to step 1 if pre-selected
+  useEffect(() => {
+    if (preSelectedSystem && (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados')) {
+      setGameSystem(preSelectedSystem);
+      setStep(1);
+    }
+  }, [preSelectedSystem]);
 
   const totalSteps = 5; // 0: System, 1: Info, 2: Attributes, 3: Virtues, 4: Disciplines
   const progress = ((step + 1) / totalSteps) * 100;
