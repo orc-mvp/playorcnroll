@@ -6,7 +6,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Sword, Moon } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
+import { Sword, Moon, Trash2 } from 'lucide-react';
 import { 
   ArrowLeft, 
   Plus, 
@@ -46,6 +57,8 @@ export default function MySessions() {
 
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deleteSession, setDeleteSession] = useState<Session | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isNarrator = profile?.role === 'narrator';
 
@@ -130,6 +143,82 @@ export default function MySessions() {
       navigate(`/session/${session.id}/lobby`);
     } else {
       navigate(`/session/${session.id}/lobby`);
+    }
+  };
+
+  const handleDeleteSession = async () => {
+    if (!deleteSession) return;
+    
+    setIsDeleting(true);
+    
+    try {
+      // Delete in order to respect foreign key constraints
+      // 1. Delete test_rolls (via tests)
+      const { data: tests } = await supabase
+        .from('tests')
+        .select('id')
+        .eq('session_id', deleteSession.id);
+      
+      if (tests && tests.length > 0) {
+        const testIds = tests.map(t => t.id);
+        await supabase
+          .from('test_rolls')
+          .delete()
+          .in('test_id', testIds);
+      }
+      
+      // 2. Delete tests
+      await supabase
+        .from('tests')
+        .delete()
+        .eq('session_id', deleteSession.id);
+      
+      // 3. Delete complications
+      await supabase
+        .from('complications')
+        .delete()
+        .eq('session_id', deleteSession.id);
+      
+      // 4. Delete session_events
+      await supabase
+        .from('session_events')
+        .delete()
+        .eq('session_id', deleteSession.id);
+      
+      // 5. Delete session_participants
+      await supabase
+        .from('session_participants')
+        .delete()
+        .eq('session_id', deleteSession.id);
+      
+      // 6. Delete scenes
+      await supabase
+        .from('scenes')
+        .delete()
+        .eq('session_id', deleteSession.id);
+      
+      // 7. Finally delete the session itself
+      const { error } = await supabase
+        .from('sessions')
+        .delete()
+        .eq('id', deleteSession.id);
+      
+      if (error) throw error;
+      
+      // Update local state
+      setSessions(prev => prev.filter(s => s.id !== deleteSession.id));
+      
+      toast.success(
+        language === 'pt-BR' ? 'Sessão excluída com sucesso' : 'Session deleted successfully'
+      );
+    } catch (error) {
+      console.error('Error deleting session:', error);
+      toast.error(
+        language === 'pt-BR' ? 'Erro ao excluir sessão' : 'Error deleting session'
+      );
+    } finally {
+      setIsDeleting(false);
+      setDeleteSession(null);
     }
   };
 
@@ -269,6 +358,17 @@ export default function MySessions() {
                           <span className="font-mono text-xs bg-muted px-2 py-1 rounded">
                             {session.invite_code}
                           </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteSession(session);
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -279,6 +379,38 @@ export default function MySessions() {
           </div>
         )}
       </main>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={!!deleteSession} onOpenChange={(open) => !open && setDeleteSession(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-medieval">
+              {language === 'pt-BR' ? 'Excluir Sessão' : 'Delete Session'}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="font-body">
+              {language === 'pt-BR' 
+                ? `Tem certeza que deseja excluir a sessão "${deleteSession?.name}"? Esta ação não pode ser desfeita. Todos os dados da sessão (cenas, eventos, testes) serão permanentemente removidos.`
+                : `Are you sure you want to delete the session "${deleteSession?.name}"? This action cannot be undone. All session data (scenes, events, tests) will be permanently removed.`
+              }
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              {language === 'pt-BR' ? 'Cancelar' : 'Cancel'}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteSession}
+              disabled={isDeleting}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              {isDeleting 
+                ? (language === 'pt-BR' ? 'Excluindo...' : 'Deleting...') 
+                : (language === 'pt-BR' ? 'Excluir' : 'Delete')
+              }
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
