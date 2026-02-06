@@ -424,6 +424,7 @@ export const translations = {
       difficultyDefault: 'Padrão: 6',
       context: 'Contexto',
       contextPlaceholder: 'Descreva a situação do teste',
+      addContext: 'Adicionar contexto (opcional)',
       
       // Switches
       privateTest: 'Teste Fechado',
@@ -906,6 +907,7 @@ export const translations = {
       difficultyDefault: 'Default: 6',
       context: 'Context',
       contextPlaceholder: 'Describe the test situation',
+      addContext: 'Add context (optional)',
       
       // Switches
       privateTest: 'Private Test',

@@ -8,15 +8,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -24,18 +15,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Dices, Lock, Heart, Star, Users } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Dices, Lock, Heart, Star, Users, ChevronRight, MessageSquare } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   TestType,
   ALL_ATTRIBUTES,
   ALL_ABILITIES,
   VIRTUES,
-  PHYSICAL_ATTRIBUTES,
-  SOCIAL_ATTRIBUTES,
-  MENTAL_ATTRIBUTES,
-  TALENTS,
-  SKILLS,
-  KNOWLEDGES,
 } from '@/lib/vampiro/diceUtils';
 
 interface Participant {
@@ -68,6 +55,14 @@ export interface TestConfig {
   targetCharacterIds: string[];
 }
 
+// Test type options for the toggle buttons
+const TEST_TYPES: { value: TestType; labelKey: string }[] = [
+  { value: 'attribute_ability', labelKey: 'attributeAbility' },
+  { value: 'willpower', labelKey: 'willpowerOnly' },
+  { value: 'humanity', labelKey: 'humanityOnly' },
+  { value: 'virtue', labelKey: 'virtueOnly' },
+];
+
 export default function VampireTestRequestModal({
   open,
   onOpenChange,
@@ -87,6 +82,7 @@ export default function VampireTestRequestModal({
   const [isSpecialized, setIsSpecialized] = useState<boolean>(false);
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(true);
+  const [contextOpen, setContextOpen] = useState<boolean>(false);
 
   // Filter participants with characters
   const playersWithCharacters = participants.filter(p => p.character_id && p.character);
@@ -128,6 +124,7 @@ export default function VampireTestRequestModal({
     setIsSpecialized(false);
     setSelectedPlayers([]);
     setSelectAll(true);
+    setContextOpen(false);
   };
 
   const togglePlayer = (characterId: string) => {
@@ -148,8 +145,8 @@ export default function VampireTestRequestModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
+      <DialogContent className="max-w-[95vw] md:max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle className="font-medieval flex items-center gap-2">
             <Dices className="w-5 h-5 text-destructive" />
             {t.vampiroTests.configureTest}
@@ -159,155 +156,146 @@ export default function VampireTestRequestModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2 overflow-y-auto max-h-[60vh]">
-          {/* Test Type */}
-          <div className="space-y-2">
-            <Label>{t.vampiroTests.testType}</Label>
-            <Select value={testType} onValueChange={(v) => setTestType(v as TestType)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="attribute_ability">{t.vampiroTests.attributeAbility}</SelectItem>
-                <SelectItem value="willpower">{t.vampiroTests.willpowerOnly}</SelectItem>
-                <SelectItem value="humanity">{t.vampiroTests.humanityOnly}</SelectItem>
-                <SelectItem value="virtue">{t.vampiroTests.virtueOnly}</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="flex-1 overflow-y-auto space-y-4 py-2 pr-1">
+          {/* Test Type - Horizontal toggle buttons */}
+          <div className="flex flex-wrap gap-1.5">
+            {TEST_TYPES.map(({ value, labelKey }) => (
+              <Button
+                key={value}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setTestType(value)}
+                className={cn(
+                  "min-h-[36px] text-xs",
+                  testType === value && "bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30"
+                )}
+              >
+                {t.vampiroTests[labelKey as keyof typeof t.vampiroTests]}
+              </Button>
+            ))}
           </div>
 
-          {/* Attribute + Ability selectors */}
+          {/* Attribute + Ability Grid */}
           {testType === 'attribute_ability' && (
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>{t.vampiroTests.selectAttribute}</Label>
-                <Select value={attribute} onValueChange={setAttribute}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t.vampiroTests.selectAttribute} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>{t.vampiro.physical}</SelectLabel>
-                      {PHYSICAL_ATTRIBUTES.map(attr => (
-                        <SelectItem key={attr} value={attr}>
-                          {t.vampiro[attr]}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                    <SelectGroup>
-                      <SelectLabel>{t.vampiro.social}</SelectLabel>
-                      {SOCIAL_ATTRIBUTES.map(attr => (
-                        <SelectItem key={attr} value={attr}>
-                          {t.vampiro[attr]}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                    <SelectGroup>
-                      <SelectLabel>{t.vampiro.mental}</SelectLabel>
-                      {MENTAL_ATTRIBUTES.map(attr => (
-                        <SelectItem key={attr} value={attr}>
-                          {t.vampiro[attr]}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+            <div className="space-y-3">
+              {/* Attributes Grid - 3x3 */}
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t.vampiroTests.selectAttribute}</Label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {ALL_ATTRIBUTES.map(attr => (
+                    <Button
+                      key={attr}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAttribute(attr)}
+                      className={cn(
+                        "min-h-[44px] text-xs font-medium",
+                        attribute === attr && "bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30"
+                      )}
+                    >
+                      {t.vampiro[attr as keyof typeof t.vampiro]}
+                    </Button>
+                  ))}
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label>{t.vampiroTests.selectAbility}</Label>
-                <Select value={ability} onValueChange={setAbility}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t.vampiroTests.selectAbility} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>{t.vampiro.talents}</SelectLabel>
-                      {TALENTS.map(ab => (
-                        <SelectItem key={ab} value={ab}>
-                          {t.vampiro[ab]}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                    <SelectGroup>
-                      <SelectLabel>{t.vampiro.skills}</SelectLabel>
-                      {SKILLS.map(ab => (
-                        <SelectItem key={ab} value={ab}>
-                          {t.vampiro[ab]}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                    <SelectGroup>
-                      <SelectLabel>{t.vampiro.knowledges}</SelectLabel>
-                      {KNOWLEDGES.map(ab => (
-                        <SelectItem key={ab} value={ab}>
-                          {t.vampiro[ab]}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+              {/* Abilities Grid - Responsive */}
+              <div className="space-y-1.5">
+                <Label className="text-xs text-muted-foreground">{t.vampiroTests.selectAbility}</Label>
+                <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1">
+                  {ALL_ABILITIES.map(ab => (
+                    <Button
+                      key={ab}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAbility(ab)}
+                      className={cn(
+                        "min-h-[44px] md:min-h-[36px] text-[10px] md:text-xs font-medium px-1.5",
+                        ability === ab && "bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30"
+                      )}
+                    >
+                      {t.vampiro[ab as keyof typeof t.vampiro]}
+                    </Button>
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          {/* Virtue selector */}
+          {/* Virtue Grid */}
           {testType === 'virtue' && (
-            <div className="space-y-2">
-              <Label>{t.vampiroTests.selectVirtue}</Label>
-              <Select value={virtue} onValueChange={setVirtue}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t.vampiroTests.selectVirtue} />
-                </SelectTrigger>
-                <SelectContent>
-                  {VIRTUES.map(v => (
-                    <SelectItem key={v} value={v}>
-                      {t.vampiro[v]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">{t.vampiroTests.selectVirtue}</Label>
+              <div className="grid grid-cols-3 gap-1.5">
+                {VIRTUES.map(v => (
+                  <Button
+                    key={v}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setVirtue(v)}
+                    className={cn(
+                      "min-h-[44px] text-xs font-medium",
+                      virtue === v && "bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30"
+                    )}
+                  >
+                    {t.vampiro[v as keyof typeof t.vampiro]}
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* Difficulty */}
-          <div className="space-y-2">
-            <Label>{t.vampiroTests.difficulty}</Label>
+          {/* Difficulty - Inline */}
+          <div className="flex items-center gap-3">
+            <Label className="text-sm whitespace-nowrap">{t.vampiroTests.difficulty}:</Label>
             <Input
               type="number"
               min={2}
               max={10}
               value={difficulty}
               onChange={(e) => setDifficulty(parseInt(e.target.value) || 6)}
-              className="w-24"
+              className="w-16 h-9 text-center"
             />
           </div>
 
-          {/* Context */}
-          <div className="space-y-2">
-            <Label>{t.vampiroTests.context}</Label>
-            <Textarea
-              placeholder={t.vampiroTests.contextPlaceholder}
-              value={context}
-              onChange={(e) => setContext(e.target.value)}
-              rows={2}
-            />
-          </div>
+          {/* Collapsible Context */}
+          <Collapsible open={contextOpen} onOpenChange={setContextOpen}>
+            <CollapsibleTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-muted-foreground hover:text-foreground gap-2 h-8"
+              >
+                <ChevronRight className={cn("w-4 h-4 transition-transform", contextOpen && "rotate-90")} />
+                <MessageSquare className="w-4 h-4" />
+                <span className="text-xs">{t.vampiroTests.addContext || "Adicionar contexto (opcional)"}</span>
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="pt-2">
+              <Textarea
+                placeholder={t.vampiroTests.contextPlaceholder}
+                value={context}
+                onChange={(e) => setContext(e.target.value)}
+                rows={2}
+                className="text-sm"
+              />
+            </CollapsibleContent>
+          </Collapsible>
 
-          {/* Switches */}
-          <div className="space-y-3 pt-2">
+          {/* Options - 2 column grid on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-3 bg-muted/30 rounded-lg">
             {/* Private Test */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-muted-foreground" />
-                <div>
-                  <Label htmlFor="private" className="font-normal cursor-pointer">
-                    {t.vampiroTests.privateTest}
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    {t.vampiroTests.privateTestDesc}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Lock className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Label htmlFor="private" className="font-normal cursor-pointer text-sm truncate">
+                  {t.vampiroTests.privateTest}
+                </Label>
               </div>
               <Switch
                 id="private"
@@ -317,17 +305,12 @@ export default function VampireTestRequestModal({
             </div>
 
             {/* Health Penalty */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Heart className="w-4 h-4 text-muted-foreground" />
-                <div>
-                  <Label htmlFor="health" className="font-normal cursor-pointer">
-                    {t.vampiroTests.applyHealthPenalty}
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    {t.vampiroTests.healthPenaltyDesc}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Heart className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Label htmlFor="health" className="font-normal cursor-pointer text-sm truncate">
+                  {t.vampiroTests.applyHealthPenalty}
+                </Label>
               </div>
               <Switch
                 id="health"
@@ -337,17 +320,12 @@ export default function VampireTestRequestModal({
             </div>
 
             {/* Specialized Test */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-muted-foreground" />
-                <div>
-                  <Label htmlFor="specialized" className="font-normal cursor-pointer">
-                    {t.vampiroTests.specializedTest}
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    {t.vampiroTests.specializedTestDesc}
-                  </p>
-                </div>
+            <div className="flex items-center justify-between gap-2 md:col-span-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Star className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                <Label htmlFor="specialized" className="font-normal cursor-pointer text-sm truncate">
+                  {t.vampiroTests.specializedTest}
+                </Label>
               </div>
               <Switch
                 id="specialized"
@@ -357,15 +335,15 @@ export default function VampireTestRequestModal({
             </div>
           </div>
 
-          {/* Player Selection */}
-          <div className="space-y-2 pt-2">
+          {/* Player Selection - Inline */}
+          <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-muted-foreground" />
-              <Label>{t.vampiroTests.selectPlayers}</Label>
+              <Label className="text-sm">{t.vampiroTests.selectPlayers}</Label>
             </div>
             
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
+              <div className="flex items-center gap-1.5">
                 <Checkbox
                   id="all-players"
                   checked={selectAll}
@@ -374,38 +352,34 @@ export default function VampireTestRequestModal({
                     if (checked) setSelectedPlayers([]);
                   }}
                 />
-                <Label htmlFor="all-players" className="font-normal cursor-pointer">
+                <Label htmlFor="all-players" className="font-normal cursor-pointer text-sm">
                   {t.vampiroTests.allPlayers}
                 </Label>
-                <Badge variant="secondary" className="text-xs">
+                <Badge variant="secondary" className="text-xs h-5">
                   {playersWithCharacters.length}
                 </Badge>
               </div>
 
-              {!selectAll && (
-                <div className="pl-6 space-y-1">
-                  {playersWithCharacters.map((p) => (
-                    <div key={p.id} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`player-${p.character_id}`}
-                        checked={selectedPlayers.includes(p.character_id!)}
-                        onCheckedChange={() => togglePlayer(p.character_id!)}
-                      />
-                      <Label 
-                        htmlFor={`player-${p.character_id}`} 
-                        className="font-normal cursor-pointer"
-                      >
-                        {p.character?.name || 'Unknown'}
-                      </Label>
-                    </div>
-                  ))}
+              {!selectAll && playersWithCharacters.map((p) => (
+                <div key={p.id} className="flex items-center gap-1.5">
+                  <Checkbox
+                    id={`player-${p.character_id}`}
+                    checked={selectedPlayers.includes(p.character_id!)}
+                    onCheckedChange={() => togglePlayer(p.character_id!)}
+                  />
+                  <Label 
+                    htmlFor={`player-${p.character_id}`} 
+                    className="font-normal cursor-pointer text-sm"
+                  >
+                    {p.character?.name || 'Unknown'}
+                  </Label>
                 </div>
-              )}
+              ))}
             </div>
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0 pt-2 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t.common.cancel}
           </Button>
