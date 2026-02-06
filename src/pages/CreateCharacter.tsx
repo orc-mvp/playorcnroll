@@ -97,21 +97,24 @@ export default function CreateCharacter() {
   const { toast } = useToast();
   
   // Check for pre-selected system from URL params
-  const preSelectedSystem = searchParams.get('system') as GameSystemId | null;
+  const preSelectedSystem = searchParams.get('system');
   
-  const [gameSystem, setGameSystem] = useState<GameSystemId | null>(null);
-  const [step, setStep] = useState(0); // Start at step 0 (system selection)
+  // Initialize state based on URL param
+  const [gameSystem, setGameSystem] = useState<GameSystemId | null>(() => {
+    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados') {
+      return preSelectedSystem;
+    }
+    return null;
+  });
+  const [step, setStep] = useState(() => {
+    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados') {
+      return 1; // Skip system selection
+    }
+    return 0;
+  });
   const [formData, setFormData] = useState<CharacterFormData>(initialFormData);
   const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Auto-select system and skip to step 1 if pre-selected
-  useEffect(() => {
-    if (preSelectedSystem && (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados')) {
-      setGameSystem(preSelectedSystem);
-      setStep(1);
-    }
-  }, [preSelectedSystem]);
 
   const totalSteps = 5; // 0: System, 1: Info, 2: Attributes, 3: Virtues, 4: Disciplines
   const progress = ((step + 1) / totalSteps) * 100;

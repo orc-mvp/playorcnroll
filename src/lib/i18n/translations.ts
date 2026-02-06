@@ -351,9 +351,7 @@ export const translations = {
       retainers: 'Lacaios',
       herd: 'Rebanho',
       status: 'Status',
-      age: 'Idade',
       dsbh_age: 'Idade (DSBH)',
-      military_force: 'Força Militar',
       
       // Virtues
       virtues: 'Virtudes',
@@ -835,9 +833,7 @@ export const translations = {
       retainers: 'Retainers',
       herd: 'Herd',
       status: 'Status',
-      age: 'Age',
       dsbh_age: 'Age (DSBH)',
-      military_force: 'Military Force',
       
       // Virtues
       virtues: 'Virtues',
