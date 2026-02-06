@@ -39,9 +39,17 @@ export function TrackerChangeConfirmModal({
 }: TrackerChangeConfirmModalProps) {
   const t = useTranslation();
 
-  const difference = newValue - currentValue;
-  const differenceText = difference > 0 ? `+${difference}` : difference.toString();
-  const isCritical = newValue === 0;
+  // For health tracker, invert display values (0 damage = 7 health levels remaining)
+  const isHealthTracker = trackerType === 'health';
+  const displayCurrentValue = isHealthTracker ? 7 - currentValue : currentValue;
+  const displayNewValue = isHealthTracker ? 7 - newValue : newValue;
+  
+  // Calculate difference based on displayed values
+  const displayDifference = displayNewValue - displayCurrentValue;
+  const differenceText = displayDifference > 0 ? `+${displayDifference}` : displayDifference.toString();
+  
+  // Critical state: for health, critical is when health remaining is 0 (i.e., 7 damage levels)
+  const isCritical = isHealthTracker ? displayNewValue === 0 : newValue === 0;
 
   const getTrackerIcon = () => {
     switch (trackerType) {
@@ -125,9 +133,9 @@ export function TrackerChangeConfirmModal({
             <div className="flex items-center justify-center gap-3 p-4 rounded-lg bg-muted/50 border">
               {getTrackerIcon()}
               <span className="font-medieval text-lg">
-                {getTrackerLabel()}: {currentValue} → {newValue}
+                {getTrackerLabel()}: {displayCurrentValue} → {displayNewValue}
               </span>
-              <span className={`text-sm font-medium ${difference < 0 ? 'text-destructive' : 'text-primary'}`}>
+              <span className={`text-sm font-medium ${displayDifference < 0 ? 'text-destructive' : 'text-primary'}`}>
                 ({differenceText})
               </span>
               {isPermanent && (
