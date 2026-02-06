@@ -1,202 +1,244 @@
 
-# Plano: Atualização dos Trackers com Confirmação e Reorganização
+# Plano: Unificar VampireEventFeed com a Estrutura do EventFeed
 
 ## Objetivo
-Reorganizar os trackers (Disciplinas no topo, depois Sangue, Força de Vontade e Vitalidade) e adicionar um modal de confirmação antes de qualquer alteração para sincronização em tempo real com todos os participantes da sala.
+Refatorar o VampireEventFeed para usar a mesma estrutura e padrões do EventFeed de Heróis Marcados, mantendo as adaptações visuais (cores vermelhas/góticas) e regras específicas do Vampiro.
 
 ---
 
-## Componentes Afetados
+## Estrutura Atual vs Nova
 
-### 1. VampireTrackers.tsx (Painel do Jogador - Sidebar Direita)
-**Função atual:** Exibe e permite edição dos trackers do jogador
-**Mudanças:**
-- Reorganizar ordem: Disciplinas → Sangue → Vontade → Vitalidade
-- Adicionar modal de confirmação antes de salvar alterações
+### EventFeed (Heróis Marcados) - Padrão a Seguir
+- Paginação com 10 itens por página (max 100 eventos)
+- Objeto `eventConfig` com padrão { icon, color, label }
+- Contador de eventos no header
+- Formatação de data com date-fns e locale
+- Estado vazio com ícone centralizado
+- Layout flex com overflow handling
+- Botões de navegação "Anterior/Próximo"
 
-### 2. VampireNarratorSidebar.tsx (Coterie - Painel do Narrador)
-**Função atual:** Exibe trackers resumidos dos jogadores para o Narrador
-**Mudanças:**
-- Tornar os trackers interativos (clicáveis pelo Narrador)
-- Adicionar modal de confirmação antes de submeter alterações
-
-### 3. VampiroCharacterSheet.tsx (Ficha do Personagem)
-**Função atual:** Exibe e permite edição local dos trackers na ficha completa
-**Mudanças:**
-- Reorganizar seção Salvatérios: Disciplinas → Sangue → Vontade → Vitalidade
-- Adicionar modal de confirmação para alterações (quando em contexto de sessão)
-
-### 4. VampirePlayerPanel (Inline em VampireSession.tsx)
-**Função atual:** Exibe informações básicas do personagem do jogador
-**Mudanças:**
-- Adicionar visualização resumida de disciplinas e trackers
+### VampireEventFeed (Atual)
+- Sem paginação
+- Switch/case para cada tipo de evento
+- Sem contador de eventos
+- Formatação básica de hora
+- ScrollArea fixa de 300px
 
 ---
 
-## Novo Componente: TrackerChangeConfirmModal
+## Mudanças a Implementar
+
+### 1. Estrutura do Componente
 
 ```text
-┌──────────────────────────────────────────────────────────┐
-│  ⚠️ Confirmar Alteração                         [X]      │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  Você está prestes a alterar:                            │
-│                                                          │
-│  [Ícone Sangue] Sangue: 15 → 12 (-3)                     │
-│                                                          │
-│  Esta alteração será sincronizada em tempo real          │
-│  com todos os participantes da sessão.                   │
-│                                                          │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │  🔴 Narrador verá esta mudança                     │  │
-│  │  👁️ Outros jogadores verão esta mudança            │  │
-│  └────────────────────────────────────────────────────┘  │
-│                                                          │
-│  [Cancelar]                        [✓ Confirmar]         │
-└──────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  📜 Crônica                                   23 eventos    │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─ Evento ────────────────────────────────────────────┐   │
+│  │ 🎲 [Nome] testou Força + Briga (Dif. 6)             │   │
+│  │    [3] [5] [7] [8] [10]  → 3 Sucessos               │   │
+│  │    📖 Nome da Cena               14:32:05           │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                             │
+│  ┌─ Evento ────────────────────────────────────────────┐   │
+│  │ 💧 Marcus • Sangue: 15 → 12 (-3)                    │   │
+│  │    📖 Cena Noturna               14:30:12           │   │
+│  └──────────────────────────────────────────────────────┘   │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│  [◀ Anterior]              1 / 3              [Próximo ▶]   │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Nova Ordem dos Trackers
+### 2. Objeto eventConfig Vampiro
 
-```text
-┌─────────────────────────────────────────────────┐
-│ 1. DISCIPLINAS (somente leitura durante sessão) │
-│    - Lista de disciplinas com níveis            │
-├─────────────────────────────────────────────────┤
-│ 2. SANGUE (Blood Pool)                          │
-│    - Grid 5x10 (50 pontos)                      │
-│    - Clique → Modal de confirmação              │
-├─────────────────────────────────────────────────┤
-│ 3. FORÇA DE VONTADE (Willpower)                 │
-│    - Pontos atuais vs máximo                    │
-│    - Clique → Modal de confirmação              │
-├─────────────────────────────────────────────────┤
-│ 4. VITALIDADE (Health Levels)                   │
-│    - 7 níveis com penalidades                   │
-│    - Seleção progressiva (existente)            │
-│    - Clique → Modal de confirmação              │
-└─────────────────────────────────────────────────┘
-```
-
----
-
-## Fluxo de Confirmação
-
-```text
-[Usuário clica em tracker]
-        │
-        ▼
-[Alteração calculada localmente]
-        │
-        ▼
-[Modal de confirmação abre]
-   "Sangue: 15 → 12 (-3)"
-   "Esta mudança será visível para todos"
-        │
-    ┌───┴───┐
-    ▼       ▼
-[Cancelar] [Confirmar]
-    │           │
-    ▼           ▼
-[Reverte]  [Salva no banco]
-           [Realtime sync]
-           [Event logged]
-```
-
----
-
-## Detalhes Técnicos
-
-### Estrutura do Modal de Confirmação
-
-**Props:**
-- `open: boolean` - Controle de visibilidade
-- `trackerType: 'blood' | 'willpower' | 'health'` - Tipo de tracker
-- `currentValue: number | boolean[]` - Valor atual
-- `newValue: number | boolean[]` - Novo valor proposto
-- `characterName: string` - Nome do personagem (para Narrador)
-- `isNarrator: boolean` - Se é o Narrador fazendo a alteração
-- `onConfirm: () => void` - Callback de confirmação
-- `onCancel: () => void` - Callback de cancelamento
-
-### Mensagens de Confirmação
-
-**Para Jogadores:**
-- "Esta alteração será visível para o Narrador e todos os jogadores."
-
-**Para Narradores:**
-- "Esta alteração será aplicada ao personagem {nome} e visível para o jogador."
-
-### Tradução (i18n)
+Converter o switch/case para um objeto de configuração:
 
 ```typescript
-// Novas chaves em vampiro
-trackerChangeTitle: 'Confirmar Alteração',
-trackerChangeDescription: 'Esta alteração será sincronizada com todos na sessão.',
-trackerBloodChange: 'Sangue',
-trackerWillpowerChange: 'Vontade',
-trackerHealthChange: 'Vitalidade',
-trackerVisibleToNarrator: 'O Narrador verá esta mudança',
-trackerVisibleToPlayer: 'O jogador verá esta mudança',
-trackerVisibleToAll: 'Todos os participantes verão esta mudança',
+const vampireEventConfig = {
+  scene_started: {
+    icon: BookOpen,
+    color: 'text-destructive',
+    bgClass: 'bg-destructive/10 border-destructive/30',
+  },
+  scene_changed: {
+    icon: BookOpen,
+    color: 'text-destructive',
+    bgClass: 'bg-destructive/10 border-destructive/30',
+  },
+  vampire_test_requested: {
+    icon: Dices,
+    color: 'text-amber-500',
+    bgClass: 'bg-muted/30',
+  },
+  vampire_test_result: {
+    icon: Dices,  // dinâmico baseado em resultado
+    color: 'text-green-500',  // dinâmico
+    bgClass: 'bg-muted/30',  // dinâmico baseado em botch/exceptional
+  },
+  tracker_change: {
+    icon: null,  // dinâmico baseado no tipo de tracker
+    color: 'text-destructive',  // dinâmico
+    bgClass: 'bg-muted/30',
+  },
+  critical_state: {
+    icon: Skull,
+    color: 'text-destructive',
+    bgClass: 'bg-destructive/20 border-destructive/40',
+  },
+  player_joined: {
+    icon: UserPlus,
+    color: 'text-green-500',
+    bgClass: 'bg-muted/30',
+  },
+};
 ```
 
 ---
 
-## Arquivos a Criar/Modificar
+### 3. Cores Temáticas do Vampiro
 
-### Criar
-1. `src/components/session/vampire/TrackerChangeConfirmModal.tsx`
-   - Modal de confirmação reutilizável
-
-### Modificar
-1. `src/components/session/vampire/VampireTrackers.tsx`
-   - Reorganizar ordem dos cards
-   - Integrar modal de confirmação
-   - Mover disciplinas para o topo
-
-2. `src/components/session/vampire/VampireNarratorSidebar.tsx`
-   - Tornar trackers da Coterie interativos
-   - Adicionar capacidade de edição pelo Narrador
-   - Integrar modal de confirmação
-
-3. `src/components/character/vampiro/VampiroCharacterSheet.tsx`
-   - Reorganizar seção Salvatérios
-   - Mover Disciplinas para antes de Blood Pool
-
-4. `src/pages/VampireSession.tsx`
-   - Atualizar VampirePlayerPanel com disciplinas
-
-5. `src/lib/i18n/translations.ts`
-   - Adicionar novas chaves de tradução
+| Elemento | Heróis Marcados | Vampiro |
+|----------|-----------------|---------|
+| Header Icon | text-primary (verde) | text-destructive (vermelho) |
+| Cenas | text-blue-500 | text-destructive |
+| Sucesso | text-green-500 | text-green-500 |
+| Falha/Botch | text-red-500 | text-destructive |
+| Excepcional | text-yellow-400 | text-yellow-500 |
+| Tracker Sangue | - | text-destructive |
+| Tracker Vontade | - | text-foreground |
+| Tracker Saúde | - | text-destructive |
+| Tracker Humanidade | - | text-foreground |
 
 ---
 
-## Comportamento do Modal
+### 4. Funcionalidades a Adicionar
 
-### Quando Abre
-- Clique em qualquer ponto do tracker
-- Valor proposto é calculado
-- Estado local é mantido (não salvo ainda)
+1. **Paginação**
+   - ITEMS_PER_PAGE = 10
+   - MAX_EVENTS = 100
+   - Botões Anterior/Próximo com ChevronLeft/ChevronRight
+   - Indicador "página X de Y"
 
-### Ações no Modal
-- **Confirmar:** Salva no banco, dispara realtime sync, fecha modal
-- **Cancelar:** Reverte para valor anterior, fecha modal
-- **Fechar (X):** Mesmo que cancelar
+2. **Contador de eventos**
+   - Exibir total no header: "23 eventos"
 
-### Estados Especiais
-- Se alteração resulta em estado crítico (sangue = 0, vontade = 0):
-  - Modal exibe aviso adicional em vermelho
-  - "Atenção: Isso resultará em estado crítico!"
+3. **Formatação de data**
+   - Usar date-fns com format e locale (ptBR/enUS)
+   - Exibir como "HH:mm:ss"
+
+4. **Layout responsivo**
+   - flex-col com overflow-hidden no CardContent
+   - ScrollArea flex-1
+   - Paginação com border-t
+
+5. **Badge de cena**
+   - Exibir nome da cena em cada evento (se disponível)
+
+---
+
+### 5. Mapeamento de Labels
+
+```typescript
+// Scene events
+scene_started: (data, lang) => data.scene_name
+
+// Test requested
+vampire_test_requested: (data, lang) => 
+  `${lang === 'pt-BR' ? 'Teste de' : 'Test of'} ${getTestLabel(data)}`
+
+// Test result
+vampire_test_result: (data, lang) => {
+  const result = data.is_botch ? t.vampiroTests.botch
+    : data.is_exceptional ? t.vampiroTests.exceptional
+    : data.final_successes > 0 ? `${data.final_successes} ${t.vampiroTests.successes}`
+    : t.vampiroTests.failure;
+  return `${data.character_name}: ${getTestLabel(data.test_config)} → ${result}`;
+}
+
+// Tracker change
+tracker_change: (data, lang) => 
+  `${data.character_name} • ${getTrackerLabel(data.tracker_type)}: ${data.old_value} → ${data.new_value}`
+
+// Critical state
+critical_state: (data, lang) =>
+  `${data.character_name} - ${data.type === 'blood_depleted' ? 'Sangue Esgotado!' : 'Vontade Exaurida!'}`
+```
+
+---
+
+## Arquivo a Modificar
+
+`src/components/session/vampire/VampireEventFeed.tsx`
+
+---
+
+## Estrutura do Código Refatorado
+
+```typescript
+import { useState, useMemo } from 'react';
+import { useI18n } from '@/lib/i18n';
+import { format } from 'date-fns';
+import { ptBR, enUS } from 'date-fns/locale';
+// ... outros imports
+
+const ITEMS_PER_PAGE = 10;
+const MAX_EVENTS = 100;
+
+// Funções helper para labels
+const getTestLabel = (config, t) => { ... };
+const getTrackerIcon = (type) => { ... };
+const getTrackerLabel = (type, t) => { ... };
+
+// Configuração de eventos (icon base, color, bgClass)
+const getVampireEventConfig = (t) => ({ ... });
+
+// Componente principal com paginação
+export function VampireEventFeed({ events, currentUserId, isNarrator }) {
+  const { t, language } = useI18n();
+  const dateLocale = language === 'pt-BR' ? ptBR : enUS;
+  const [currentPage, setCurrentPage] = useState(0);
+  
+  const eventConfig = useMemo(() => getVampireEventConfig(t), [t]);
+  
+  // Filtrar e limitar eventos
+  const filteredEvents = useMemo(() => events.slice(0, MAX_EVENTS), [events]);
+  
+  // Paginação
+  const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+  const paginatedEvents = filteredEvents.slice(
+    currentPage * ITEMS_PER_PAGE,
+    (currentPage + 1) * ITEMS_PER_PAGE
+  );
+  
+  // Renderização com estrutura similar ao EventFeed
+  return (
+    <Card className="medieval-card border-destructive/20 h-full flex flex-col">
+      <CardHeader>
+        {/* Header com contador */}
+      </CardHeader>
+      <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
+        <ScrollArea className="flex-1 px-6">
+          {/* Lista de eventos */}
+        </ScrollArea>
+        {/* Paginação */}
+      </CardContent>
+    </Card>
+  );
+}
+```
 
 ---
 
 ## Resultado Esperado
 
-1. **Reorganização visual clara** - Disciplinas aparecem primeiro como referência, seguidas pelos trackers editáveis
-2. **Confirmação explícita** - Usuários entendem que suas ações afetam todos
-3. **Prevenção de erros** - Cliques acidentais não causam alterações imediatas
-4. **Experiência consistente** - Mesmo comportamento na ficha, sidebar e painel do narrador
-5. **Comunicação clara** - Mensagens indicam quem verá as alterações
+1. **Consistência visual** - Ambos os feeds seguem a mesma estrutura
+2. **Paginação funcional** - Navegação entre páginas de eventos
+3. **Contador informativo** - Usuário sabe quantos eventos existem
+4. **Temática vampírica** - Cores vermelhas/góticas mantidas
+5. **Melhor formatação de data** - Usando date-fns com locale
+6. **Layout responsivo** - Funciona bem em desktop e mobile
+7. **Performance** - Limitado a 100 eventos máximos
