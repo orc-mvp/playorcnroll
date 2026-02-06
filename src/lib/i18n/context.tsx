@@ -9,7 +9,7 @@ interface I18nContextType {
   t: TranslationsType;
 }
 
-const I18nContext = createContext<I18nContextType | undefined>(undefined);
+const I18nContext = createContext<I18nContextType | null>(null);
 
 const STORAGE_KEY = 'heroes-marked-language';
 
@@ -51,9 +51,9 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function useI18n() {
+export function useI18n(): I18nContextType {
   const context = useContext(I18nContext);
-  if (!context) {
+  if (context === null) {
     throw new Error('useI18n must be used within an I18nProvider');
   }
   return context;
