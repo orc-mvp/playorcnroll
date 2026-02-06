@@ -1,148 +1,202 @@
 
-# Plano: Reformulação do Modal "Configurar Teste" para Vampiro
+# Plano: Atualização dos Trackers com Confirmação e Reorganização
 
 ## Objetivo
-Redesenhar o modal de configuração de teste para melhor usabilidade em desktop e mobile, tornando-o mais amplo, organizado e fácil de usar sem rolagem.
+Reorganizar os trackers (Disciplinas no topo, depois Sangue, Força de Vontade e Vitalidade) e adicionar um modal de confirmação antes de qualquer alteração para sincronização em tempo real com todos os participantes da sala.
 
 ---
 
-## Mudanças Propostas
+## Componentes Afetados
 
-### 1. Layout Geral do Modal
+### 1. VampireTrackers.tsx (Painel do Jogador - Sidebar Direita)
+**Função atual:** Exibe e permite edição dos trackers do jogador
+**Mudanças:**
+- Reorganizar ordem: Disciplinas → Sangue → Vontade → Vitalidade
+- Adicionar modal de confirmação antes de salvar alterações
 
-**Desktop:**
-- Aumentar largura de `max-w-md` (448px) para `max-w-2xl` (672px)
-- Distribuir elementos em colunas para aproveitar espaço horizontal
-- Eliminar necessidade de rolagem na maioria dos casos
+### 2. VampireNarratorSidebar.tsx (Coterie - Painel do Narrador)
+**Função atual:** Exibe trackers resumidos dos jogadores para o Narrador
+**Mudanças:**
+- Tornar os trackers interativos (clicáveis pelo Narrador)
+- Adicionar modal de confirmação antes de submeter alterações
 
-**Mobile:**
-- Manter layout vertical responsivo
-- Botões de atributos/habilidades com tamanho touch-friendly (min 44px altura)
+### 3. VampiroCharacterSheet.tsx (Ficha do Personagem)
+**Função atual:** Exibe e permite edição local dos trackers na ficha completa
+**Mudanças:**
+- Reorganizar seção Salvatérios: Disciplinas → Sangue → Vontade → Vitalidade
+- Adicionar modal de confirmação para alterações (quando em contexto de sessão)
+
+### 4. VampirePlayerPanel (Inline em VampireSession.tsx)
+**Função atual:** Exibe informações básicas do personagem do jogador
+**Mudanças:**
+- Adicionar visualização resumida de disciplinas e trackers
 
 ---
 
-### 2. Seleção de Atributos (Nova Abordagem)
+## Novo Componente: TrackerChangeConfirmModal
 
-**Antes:** Dropdown com grupos categorizados (Físico, Social, Mental)
-
-**Depois:** Grid de botões diretos sem categoria visível
-- 9 botões em grid 3x3 (desktop) ou 3 colunas (mobile)
-- Apenas os nomes: Força, Destreza, Vigor, Carisma, etc.
-- Sem labels "Físico", "Social", "Mental"
-- Botão selecionado com destaque visual (borda colorida + fundo)
-
+```text
+┌──────────────────────────────────────────────────────────┐
+│  ⚠️ Confirmar Alteração                         [X]      │
+├──────────────────────────────────────────────────────────┤
+│                                                          │
+│  Você está prestes a alterar:                            │
+│                                                          │
+│  [Ícone Sangue] Sangue: 15 → 12 (-3)                     │
+│                                                          │
+│  Esta alteração será sincronizada em tempo real          │
+│  com todos os participantes da sessão.                   │
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │  🔴 Narrador verá esta mudança                     │  │
+│  │  👁️ Outros jogadores verão esta mudança            │  │
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  [Cancelar]                        [✓ Confirmar]         │
+└──────────────────────────────────────────────────────────┘
 ```
-┌─────────┬─────────────┬────────┐
-│  Força  │  Destreza   │ Vigor  │
-├─────────┼─────────────┼────────┤
-│ Carisma │ Manipulação │Aparênc.│
-├─────────┼─────────────┼────────┤
-│Percepção│Inteligência │Racioc. │
-└─────────┴─────────────┴────────┘
+
+---
+
+## Nova Ordem dos Trackers
+
+```text
+┌─────────────────────────────────────────────────┐
+│ 1. DISCIPLINAS (somente leitura durante sessão) │
+│    - Lista de disciplinas com níveis            │
+├─────────────────────────────────────────────────┤
+│ 2. SANGUE (Blood Pool)                          │
+│    - Grid 5x10 (50 pontos)                      │
+│    - Clique → Modal de confirmação              │
+├─────────────────────────────────────────────────┤
+│ 3. FORÇA DE VONTADE (Willpower)                 │
+│    - Pontos atuais vs máximo                    │
+│    - Clique → Modal de confirmação              │
+├─────────────────────────────────────────────────┤
+│ 4. VITALIDADE (Health Levels)                   │
+│    - 7 níveis com penalidades                   │
+│    - Seleção progressiva (existente)            │
+│    - Clique → Modal de confirmação              │
+└─────────────────────────────────────────────────┘
 ```
 
 ---
 
-### 3. Seleção de Habilidades (Nova Abordagem)
+## Fluxo de Confirmação
 
-**Antes:** Dropdown com grupos (Talentos, Perícias, Conhecimentos)
-
-**Depois:** Grid de botões compactos sem categoria
-- 30 botões em grid responsivo (5-6 por linha desktop, 3 por linha mobile)
-- Apenas nomes traduzidos
-- Botões menores para caber na tela
-- Scroll horizontal interno se necessário (apenas mobile)
-
----
-
-### 4. Campo de Contexto (Colapsável)
-
-**Antes:** Textarea sempre visível com 2 linhas
-
-**Depois:** 
-- Seção colapsável iniciando fechada
-- Clique para expandir e digitar contexto
-- Ícone + texto "Adicionar contexto (opcional)"
-- Quando expandido, mostra textarea
-
----
-
-### 5. Nova Estrutura do Modal
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│  🎲 Configurar Teste                               [X]      │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  [Atributo + Habilidade ▼] [Vontade] [Humanidade] [Virtude] │
-│                                                             │
-│  ┌── Atributo ──────────────────────────────────────────┐  │
-│  │ [Força] [Destreza] [Vigor]                           │  │
-│  │ [Carisma] [Manipulação] [Aparência]                  │  │
-│  │ [Percepção] [Inteligência] [Raciocínio]              │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                                                             │
-│  ┌── Habilidade ────────────────────────────────────────┐  │
-│  │ [Prontidão] [Esportes] [Briga] [Empatia] [Expressão] │  │
-│  │ [Intimidação] [Liderança] [Manha] [Lábia] [Emp.Anim] │  │
-│  │ [Ofícios] [Condução] [Etiqueta] [Armas Fogo] [...]   │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                                                             │
-│  Dificuldade: [6] ─────────────────────────────────────────│
-│                                                             │
-│  ▶ Adicionar contexto (opcional)                           │
-│                                                             │
-│  ┌─ Opções ─────────────────────────────────────────────┐  │
-│  │ 🔒 Teste Privado         ☐  │  💀 Penalidade    ☐    │  │
-│  │ ⭐ Especialização        ☐  │                        │  │
-│  └──────────────────────────────────────────────────────┘  │
-│                                                             │
-│  Jogadores: [✓ Todos (3)]  ou  [ ] Nome1  [ ] Nome2        │
-│                                                             │
-│  [Cancelar]                              [🎲 Solicitar]    │
-└─────────────────────────────────────────────────────────────┘
+```text
+[Usuário clica em tracker]
+        │
+        ▼
+[Alteração calculada localmente]
+        │
+        ▼
+[Modal de confirmação abre]
+   "Sangue: 15 → 12 (-3)"
+   "Esta mudança será visível para todos"
+        │
+    ┌───┴───┐
+    ▼       ▼
+[Cancelar] [Confirmar]
+    │           │
+    ▼           ▼
+[Reverte]  [Salva no banco]
+           [Realtime sync]
+           [Event logged]
 ```
 
 ---
 
 ## Detalhes Técnicos
 
-### Arquivo a modificar
-`src/components/session/vampire/VampireTestRequestModal.tsx`
+### Estrutura do Modal de Confirmação
 
-### Componentes utilizados
-- `Button` com variantes para toggle selection
-- `Collapsible` para campo de contexto
-- `ToggleGroup` (opcional) para tipo de teste
+**Props:**
+- `open: boolean` - Controle de visibilidade
+- `trackerType: 'blood' | 'willpower' | 'health'` - Tipo de tracker
+- `currentValue: number | boolean[]` - Valor atual
+- `newValue: number | boolean[]` - Novo valor proposto
+- `characterName: string` - Nome do personagem (para Narrador)
+- `isNarrator: boolean` - Se é o Narrador fazendo a alteração
+- `onConfirm: () => void` - Callback de confirmação
+- `onCancel: () => void` - Callback de cancelamento
 
-### Classes Tailwind principais
-- Grid: `grid grid-cols-3 gap-2` (atributos)
-- Grid: `grid grid-cols-5 gap-1.5 md:grid-cols-6` (habilidades)
-- Botões touch: `min-h-[44px]` no mobile
-- Modal: `max-w-2xl` no desktop
+### Mensagens de Confirmação
 
-### Estados visuais dos botões
-- Normal: `bg-muted/50 border-border`
-- Selecionado: `bg-destructive/20 border-destructive text-destructive`
-- Hover: `hover:bg-muted`
+**Para Jogadores:**
+- "Esta alteração será visível para o Narrador e todos os jogadores."
+
+**Para Narradores:**
+- "Esta alteração será aplicada ao personagem {nome} e visível para o jogador."
+
+### Tradução (i18n)
+
+```typescript
+// Novas chaves em vampiro
+trackerChangeTitle: 'Confirmar Alteração',
+trackerChangeDescription: 'Esta alteração será sincronizada com todos na sessão.',
+trackerBloodChange: 'Sangue',
+trackerWillpowerChange: 'Vontade',
+trackerHealthChange: 'Vitalidade',
+trackerVisibleToNarrator: 'O Narrador verá esta mudança',
+trackerVisibleToPlayer: 'O jogador verá esta mudança',
+trackerVisibleToAll: 'Todos os participantes verão esta mudança',
+```
 
 ---
 
-## Fluxo de Implementação
+## Arquivos a Criar/Modificar
 
-1. Atualizar DialogContent com nova largura responsiva
-2. Substituir Select de atributos por grid de botões
-3. Substituir Select de habilidades por grid de botões
-4. Converter campo de contexto para Collapsible
-5. Reorganizar switches de opções em layout compacto de 2 colunas
-6. Ajustar seleção de jogadores para formato inline
-7. Testar responsividade em diferentes tamanhos de tela
+### Criar
+1. `src/components/session/vampire/TrackerChangeConfirmModal.tsx`
+   - Modal de confirmação reutilizável
+
+### Modificar
+1. `src/components/session/vampire/VampireTrackers.tsx`
+   - Reorganizar ordem dos cards
+   - Integrar modal de confirmação
+   - Mover disciplinas para o topo
+
+2. `src/components/session/vampire/VampireNarratorSidebar.tsx`
+   - Tornar trackers da Coterie interativos
+   - Adicionar capacidade de edição pelo Narrador
+   - Integrar modal de confirmação
+
+3. `src/components/character/vampiro/VampiroCharacterSheet.tsx`
+   - Reorganizar seção Salvatérios
+   - Mover Disciplinas para antes de Blood Pool
+
+4. `src/pages/VampireSession.tsx`
+   - Atualizar VampirePlayerPanel com disciplinas
+
+5. `src/lib/i18n/translations.ts`
+   - Adicionar novas chaves de tradução
+
+---
+
+## Comportamento do Modal
+
+### Quando Abre
+- Clique em qualquer ponto do tracker
+- Valor proposto é calculado
+- Estado local é mantido (não salvo ainda)
+
+### Ações no Modal
+- **Confirmar:** Salva no banco, dispara realtime sync, fecha modal
+- **Cancelar:** Reverte para valor anterior, fecha modal
+- **Fechar (X):** Mesmo que cancelar
+
+### Estados Especiais
+- Se alteração resulta em estado crítico (sangue = 0, vontade = 0):
+  - Modal exibe aviso adicional em vermelho
+  - "Atenção: Isso resultará em estado crítico!"
 
 ---
 
 ## Resultado Esperado
-- Modal mais intuitivo e rápido de usar
-- Menos cliques para configurar um teste
-- Visibilidade completa sem rolagem (desktop)
-- Botões grandes e fáceis de tocar (mobile)
-- Contexto opcional não ocupa espaço visual desnecessário
+
+1. **Reorganização visual clara** - Disciplinas aparecem primeiro como referência, seguidas pelos trackers editáveis
+2. **Confirmação explícita** - Usuários entendem que suas ações afetam todos
+3. **Prevenção de erros** - Cliques acidentais não causam alterações imediatas
+4. **Experiência consistente** - Mesmo comportamento na ficha, sidebar e painel do narrador
+5. **Comunicação clara** - Mensagens indicam quem verá as alterações
