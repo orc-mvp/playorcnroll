@@ -1,7 +1,12 @@
-import { useTranslation } from '@/lib/i18n';
+import { useState, useMemo } from 'react';
+import { useI18n } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
+import { ptBR, enUS } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 import {
   Scroll,
   Dices,
@@ -17,7 +22,9 @@ import {
   Droplets,
   Sparkles,
   Heart,
-  ArrowRight,
+  UserPlus,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 
 interface SessionEvent {
@@ -32,177 +39,404 @@ interface SessionEvent {
 interface VampireEventFeedProps {
   events: SessionEvent[];
   currentUserId?: string;
+  isNarrator?: boolean;
 }
 
-export function VampireEventFeed({ events, currentUserId }: VampireEventFeedProps) {
-  const t = useTranslation();
+const ITEMS_PER_PAGE = 10;
+const MAX_EVENTS = 100;
 
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString(undefined, {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+// Helper function to get tracker icon
+const getTrackerIcon = (type: string) => {
+  switch (type) {
+    case 'blood': return Droplets;
+    case 'willpower': return Sparkles;
+    case 'health': return Heart;
+    case 'humanity': return Moon;
+    default: return Moon;
+  }
+};
+
+// Helper function to get tracker label
+const getTrackerLabel = (type: string, t: any) => {
+  switch (type) {
+    case 'blood': return t.vampiro?.bloodPool || 'Sangue';
+    case 'willpower': return t.vampiro?.willpowerCurrent || 'Vontade';
+    case 'health': return t.vampiro?.healthLevels || 'Vitalidade';
+    case 'humanity': return t.vampiro?.humanity || 'Humanidade';
+    default: return type;
+  }
+};
+
+// Helper function to get tracker color
+const getTrackerColor = (type: string) => {
+  switch (type) {
+    case 'blood': return 'text-destructive';
+    case 'health': return 'text-destructive';
+    case 'willpower': return 'text-foreground';
+    case 'humanity': return 'text-foreground';
+    default: return 'text-muted-foreground';
+  }
+};
+
+// Helper to get test label
+const getTestLabel = (eventData: Record<string, unknown>, t: any): string => {
+  const testType = eventData.testType as string;
+  const testConfig = eventData as Record<string, unknown>;
+
+  if (testType === 'attribute_ability') {
+    const attr = testConfig.attribute as string;
+    const ability = testConfig.ability as string;
+    const attrLabel = t.vampiro?.[attr] || attr;
+    const abilityLabel = t.vampiro?.[ability] || ability;
+    return `${attrLabel} + ${abilityLabel}`;
+  }
+  if (testType === 'willpower') return t.vampiro?.willpower || 'Willpower';
+  if (testType === 'humanity') return t.vampiro?.humanity || 'Humanity';
+  if (testType === 'virtue') {
+    const virtue = testConfig.virtue as string;
+    return t.vampiro?.[virtue] || virtue;
+  }
+  return testType;
+};
+
+// Event configuration with colors and icons
+const getVampireEventConfig = (t: any) => ({
+  scene_started: {
+    icon: BookOpen,
+    color: 'text-destructive',
+    bgClass: 'bg-destructive/10 border-destructive/30',
+    label: (data: Record<string, unknown>) => data.scene_name as string,
+  },
+  scene_changed: {
+    icon: BookOpen,
+    color: 'text-destructive',
+    bgClass: 'bg-destructive/10 border-destructive/30',
+    label: (data: Record<string, unknown>) => data.scene_name as string,
+  },
+  vampire_test_requested: {
+    icon: Dices,
+    color: 'text-amber-500',
+    bgClass: 'bg-muted/30',
+    label: (data: Record<string, unknown>) => 
+      `${t.vampiroTests?.requestTest || 'Teste'}: ${getTestLabel(data, t)}`,
+  },
+  vampire_test_result: {
+    icon: Dices,
+    color: 'text-green-500',
+    bgClass: 'bg-muted/30',
+    label: (data: Record<string, unknown>) => {
+      const charName = data.character_name as string;
+      const testConfig = data.test_config as Record<string, unknown>;
+      return `${charName}: ${getTestLabel(testConfig || {}, t)}`;
+    },
+  },
+  tracker_change: {
+    icon: Moon,
+    color: 'text-destructive',
+    bgClass: 'bg-muted/30',
+    label: (data: Record<string, unknown>) => {
+      const charName = data.character_name as string;
+      const trackerType = data.tracker_type as string;
+      return `${charName} • ${getTrackerLabel(trackerType, t)}`;
+    },
+  },
+  critical_state: {
+    icon: Skull,
+    color: 'text-destructive',
+    bgClass: 'bg-destructive/20 border-destructive/40',
+    label: (data: Record<string, unknown>) => {
+      const charName = data.character_name as string;
+      const type = data.type as string;
+      const isBlood = type === 'blood_depleted';
+      return `${charName} - ${isBlood ? 'Sangue Esgotado!' : 'Vontade Exaurida!'}`;
+    },
+  },
+  player_joined: {
+    icon: UserPlus,
+    color: 'text-green-500',
+    bgClass: 'bg-muted/30',
+    label: (data: Record<string, unknown>) => 
+      `${data.player_name || data.character_name} entrou na sessão`,
+  },
+});
+
+export function VampireEventFeed({ events, currentUserId, isNarrator = false }: VampireEventFeedProps) {
+  const { t, language } = useI18n();
+  const dateLocale = language === 'pt-BR' ? ptBR : enUS;
+  const [currentPage, setCurrentPage] = useState(0);
+
+  // Get event config with translations
+  const eventConfig = useMemo(() => getVampireEventConfig(t), [t]);
+
+  // Limit to MAX_EVENTS
+  const filteredEvents = useMemo(() => events.slice(0, MAX_EVENTS), [events]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
+  const startIndex = currentPage * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedEvents = filteredEvents.slice(startIndex, endIndex);
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
   };
 
-  const renderEvent = (event: SessionEvent) => {
+  const goToPrevPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Render test result with dice display
+  const renderTestResult = (eventData: Record<string, unknown>) => {
+    const characterName = eventData.character_name as string;
+    const testConfig = eventData.test_config as Record<string, unknown>;
+    const isPrivate = eventData.is_private as boolean;
+    const isBotch = eventData.is_botch as boolean;
+    const isExceptional = eventData.is_exceptional as boolean;
+    const finalSuccesses = eventData.final_successes as number;
+    const baseResults = eventData.base_results as number[];
+    const extraResults = (eventData.extra_results as number[]) || [];
+    const difficulty = testConfig?.difficulty as number;
+    const dicePool = eventData.dice_pool as number;
+
+    return (
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {isBotch ? (
+            <XCircle className="w-4 h-4 text-destructive shrink-0" />
+          ) : isExceptional ? (
+            <Star className="w-4 h-4 text-yellow-500 shrink-0" />
+          ) : finalSuccesses > 0 ? (
+            <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+          ) : (
+            <AlertCircle className="w-4 h-4 text-muted-foreground shrink-0" />
+          )}
+          <span className="font-medieval text-sm">{characterName}</span>
+          <span className="text-xs text-muted-foreground">
+            {t.vampiroTests?.testedWith || 'testou'}
+          </span>
+          <span className="text-sm font-medium">
+            {getTestLabel(testConfig || {}, t)}
+          </span>
+          {isPrivate && <Lock className="w-3 h-3 text-muted-foreground" />}
+        </div>
+
+        {/* Dice display */}
+        <div className="flex flex-wrap gap-1">
+          {baseResults?.map((die, i) => (
+            <span
+              key={`base-${i}`}
+              className={cn(
+                "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+                die >= difficulty
+                  ? 'bg-green-500/20 text-green-500'
+                  : die === 1
+                    ? 'bg-destructive/20 text-destructive'
+                    : 'bg-muted text-muted-foreground'
+              )}
+            >
+              {die}
+            </span>
+          ))}
+          {extraResults?.map((die, i) => (
+            <span
+              key={`extra-${i}`}
+              className={cn(
+                "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold border border-dashed",
+                die >= difficulty
+                  ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500'
+                  : die === 1
+                    ? 'bg-destructive/20 text-destructive border-destructive'
+                    : 'bg-muted text-muted-foreground border-muted-foreground'
+              )}
+            >
+              {die}
+            </span>
+          ))}
+        </div>
+
+        {/* Result badge */}
+        <div className="flex items-center gap-2">
+          {isBotch ? (
+            <Badge variant="destructive" className="text-xs">
+              {t.vampiroTests?.botch || 'Falha Crítica'}
+            </Badge>
+          ) : isExceptional ? (
+            <Badge className="bg-yellow-500 text-xs">
+              {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}
+            </Badge>
+          ) : finalSuccesses > 0 ? (
+            <Badge variant="default" className="bg-green-600 text-xs">
+              {finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'}
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="text-xs">
+              {t.vampiroTests?.failure || 'Falha'}
+            </Badge>
+          )}
+          <span className="text-xs text-muted-foreground">
+            {t.vampiroTests?.poolLabel || 'Pool'}: {dicePool} | {t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  // Render tracker change
+  const renderTrackerChange = (eventData: Record<string, unknown>) => {
+    const trackerType = eventData.tracker_type as string;
+    const charName = eventData.character_name as string;
+    const oldValue = eventData.old_value as number;
+    const newValue = eventData.new_value as number;
+    const isNarratorChange = eventData.is_narrator_change as boolean;
+
+    const TrackerIcon = getTrackerIcon(trackerType);
+    const colorClass = getTrackerColor(trackerType);
+    const label = getTrackerLabel(trackerType, t);
+    const difference = newValue - oldValue;
+    const differenceText = difference > 0 ? `+${difference}` : difference.toString();
+
+    return (
+      <div className="flex items-start gap-2">
+        <TrackerIcon className={cn("w-4 h-4 mt-0.5 shrink-0", colorClass)} />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap text-sm">
+            <span className="font-medieval">{charName}</span>
+            <span className="text-muted-foreground">•</span>
+            <span className={colorClass}>{label}</span>
+          </div>
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-sm text-muted-foreground">{oldValue}</span>
+            <span className="text-muted-foreground">→</span>
+            <span className={cn("text-sm font-medium", difference < 0 ? 'text-destructive' : 'text-green-500')}>
+              {newValue}
+            </span>
+            <Badge 
+              variant={difference < 0 ? "destructive" : "default"} 
+              className={cn("text-xs", difference >= 0 && 'bg-green-600')}
+            >
+              {differenceText}
+            </Badge>
+          </div>
+          {isNarratorChange && (
+            <span className="text-xs text-muted-foreground italic mt-1 block">
+              {language === 'pt-BR' ? 'Alterado pelo Narrador' : 'Changed by Narrator'}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Render critical state
+  const renderCriticalState = (eventData: Record<string, unknown>) => {
+    const criticalType = eventData.type as string;
+    const charName = eventData.character_name as string;
+    const isBlood = criticalType === 'blood_depleted';
+
+    return (
+      <div className={cn(
+        "rounded-lg p-3 animate-pulse",
+        isBlood 
+          ? 'bg-destructive/20 border border-destructive/40' 
+          : 'bg-amber-500/20 border border-amber-500/40'
+      )}>
+        <div className="flex items-center gap-2">
+          {isBlood ? (
+            <Skull className="w-5 h-5 text-destructive" />
+          ) : (
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
+          )}
+          <span className={cn("font-medieval", isBlood ? 'text-destructive' : 'text-amber-500')}>
+            {charName} - {isBlood 
+              ? (language === 'pt-BR' ? 'Sangue Esgotado!' : 'Blood Depleted!') 
+              : (language === 'pt-BR' ? 'Vontade Exaurida!' : 'Willpower Depleted!')}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  // Render scene event
+  const renderSceneEvent = (eventData: Record<string, unknown>) => {
+    return (
+      <div className="flex items-start gap-2">
+        <BookOpen className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
+        <div>
+          <p className="text-sm font-medieval text-destructive">
+            {eventData.scene_name as string}
+          </p>
+          {eventData.scene_description && (
+            <p className="text-xs text-muted-foreground mt-1">
+              {eventData.scene_description as string}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Render test requested
+  const renderTestRequested = (eventData: Record<string, unknown>) => {
+    return (
+      <div className="flex items-start gap-2">
+        <Dices className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="text-sm">
+              <span className="text-muted-foreground">
+                {t.vampiroTests?.requestTest || 'Teste'}:
+              </span>{' '}
+              <span className="font-medium">
+                {getTestLabel(eventData, t)}
+              </span>
+            </p>
+            <Badge variant="outline" className="text-xs">
+              {t.vampiroTests?.difficulty || 'Dif'}: {eventData.difficulty as number}
+            </Badge>
+            {eventData.isPrivate && (
+              <Lock className="w-3 h-3 text-muted-foreground" />
+            )}
+          </div>
+          {eventData.context && (
+            <p className="text-xs text-muted-foreground italic mt-1">
+              "{eventData.context as string}"
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Render event content based on type
+  const renderEventContent = (event: SessionEvent) => {
     const { event_type, event_data } = event;
 
     switch (event_type) {
       case 'scene_started':
       case 'scene_changed':
-        return (
-          <div className="flex items-start gap-2">
-            <BookOpen className="w-4 h-4 text-destructive mt-0.5 shrink-0" />
-            <div>
-              <p className="text-sm font-medieval text-destructive">
-                {event_data.scene_name as string}
-              </p>
-              {event_data.scene_description && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  {event_data.scene_description as string}
-                </p>
-              )}
-            </div>
-          </div>
-        );
-
+        return renderSceneEvent(event_data);
       case 'vampire_test_requested':
-        return (
-          <div className="flex items-start gap-2">
-            <Dices className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm">
-                  <span className="text-muted-foreground">
-                    {t.vampiroTests.requestTest}:
-                  </span>{' '}
-                  <span className="font-medium">
-                    {getTestLabel(event_data, t)}
-                  </span>
-                </p>
-                <Badge variant="outline" className="text-xs">
-                  {t.vampiroTests.difficulty}: {event_data.difficulty as number}
-                </Badge>
-                {event_data.isPrivate && (
-                  <Lock className="w-3 h-3 text-muted-foreground" />
-                )}
-              </div>
-              {event_data.context && (
-                <p className="text-xs text-muted-foreground italic mt-1">
-                  "{event_data.context as string}"
-                </p>
-              )}
-            </div>
-          </div>
-        );
-
+        return renderTestRequested(event_data);
       case 'vampire_test_result':
-        return renderTestResult(event_data, t, currentUserId);
-
-      case 'critical_state': {
-        const criticalType = event_data.type as string;
-        const charName = event_data.character_name as string;
-        const isBlood = criticalType === 'blood_depleted';
-
+        return renderTestResult(event_data);
+      case 'tracker_change':
+        return renderTrackerChange(event_data);
+      case 'critical_state':
+        return renderCriticalState(event_data);
+      case 'player_joined':
         return (
-          <div className={`rounded-lg p-3 animate-pulse ${
-            isBlood 
-              ? 'bg-destructive/20 border border-destructive/40' 
-              : 'bg-amber-500/20 border border-amber-500/40'
-          }`}>
-            <div className="flex items-center gap-2">
-              {isBlood ? (
-                <Skull className="w-5 h-5 text-destructive" />
-              ) : (
-                <AlertTriangle className="w-5 h-5 text-amber-500" />
-              )}
-              <span className={`font-medieval ${isBlood ? 'text-destructive' : 'text-amber-500'}`}>
-                {charName} - {isBlood ? 'Sangue Esgotado!' : 'Vontade Exaurida!'}
-              </span>
-            </div>
+          <div className="flex items-center gap-2">
+            <UserPlus className="w-4 h-4 text-green-500 shrink-0" />
+            <span className="text-sm">
+              {(event_data.player_name as string) || (event_data.character_name as string)} {language === 'pt-BR' ? 'entrou na sessão' : 'joined the session'}
+            </span>
           </div>
         );
-      }
-
-      case 'tracker_change': {
-        const trackerType = event_data.tracker_type as string;
-        const charName = event_data.character_name as string;
-        const oldValue = event_data.old_value as number;
-        const newValue = event_data.new_value as number;
-        const changedBy = event_data.changed_by as string;
-        const isNarratorChange = event_data.is_narrator_change as boolean;
-
-        const getTrackerInfo = () => {
-          switch (trackerType) {
-            case 'blood':
-              return {
-                icon: <Droplets className="w-4 h-4 text-destructive" />,
-                label: t.vampiro?.bloodPool || 'Sangue',
-                colorClass: 'text-destructive',
-              };
-            case 'willpower':
-              return {
-                icon: <Sparkles className="w-4 h-4 text-foreground" />,
-                label: t.vampiro?.willpowerCurrent || 'Vontade',
-                colorClass: 'text-foreground',
-              };
-            case 'health':
-              return {
-                icon: <Heart className="w-4 h-4 text-destructive" />,
-                label: t.vampiro?.healthLevels || 'Vitalidade',
-                colorClass: 'text-destructive',
-              };
-            case 'humanity':
-              return {
-                icon: <Moon className="w-4 h-4 text-foreground" />,
-                label: t.vampiro?.humanity || 'Humanidade',
-                colorClass: 'text-foreground',
-              };
-            default:
-              return {
-                icon: <Moon className="w-4 h-4 text-muted-foreground" />,
-                label: trackerType,
-                colorClass: 'text-muted-foreground',
-              };
-          }
-        };
-
-        const info = getTrackerInfo();
-        const difference = newValue - oldValue;
-        const differenceText = difference > 0 ? `+${difference}` : difference.toString();
-
-        return (
-          <div className="flex items-start gap-2">
-            {info.icon}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap text-sm">
-                <span className="font-medieval">{charName}</span>
-                <span className="text-muted-foreground">•</span>
-                <span className={info.colorClass}>{info.label}</span>
-              </div>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-sm text-muted-foreground">{oldValue}</span>
-                <ArrowRight className="w-3 h-3 text-muted-foreground" />
-                <span className={`text-sm font-medium ${difference < 0 ? 'text-destructive' : 'text-green-500'}`}>
-                  {newValue}
-                </span>
-                <Badge 
-                  variant={difference < 0 ? "destructive" : "default"} 
-                  className={`text-xs ${difference >= 0 ? 'bg-green-600' : ''}`}
-                >
-                  {differenceText}
-                </Badge>
-              </div>
-              {isNarratorChange && (
-                <span className="text-xs text-muted-foreground italic mt-1 block">
-                  Alterado pelo Narrador
-                </span>
-              )}
-            </div>
-          </div>
-        );
-      }
-
       default:
         return (
           <div className="flex items-start gap-2">
@@ -215,163 +449,105 @@ export function VampireEventFeed({ events, currentUserId }: VampireEventFeedProp
     }
   };
 
+  // Get background class for event
+  const getEventBgClass = (eventType: string, eventData: Record<string, unknown>) => {
+    if (eventType === 'scene_started' || eventType === 'scene_changed') {
+      return 'bg-destructive/10 border-destructive/30';
+    }
+    if (eventType === 'critical_state') {
+      return ''; // Critical state has its own styling
+    }
+    if (eventType === 'vampire_test_result') {
+      const isBotch = eventData.is_botch as boolean;
+      const isExceptional = eventData.is_exceptional as boolean;
+      if (isBotch) return 'bg-destructive/10 border-destructive/30';
+      if (isExceptional) return 'bg-yellow-500/10 border-yellow-500/30';
+    }
+    return 'bg-muted/30';
+  };
+
   return (
-    <Card className="medieval-card border-destructive/20 h-full">
-      <CardHeader className="pb-3">
-        <CardTitle className="font-medieval flex items-center gap-2">
-          <Scroll className="w-5 h-5 text-destructive" />
-          {t.vampiro?.chronicle || 'Crônica'}
-        </CardTitle>
+    <Card className="medieval-card border-destructive/20 h-full flex flex-col">
+      <CardHeader className="pb-3 flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <CardTitle className="font-medieval flex items-center gap-2">
+            <Scroll className="w-5 h-5 text-destructive" />
+            {t.vampiro?.chronicle || 'Crônica'}
+          </CardTitle>
+          {filteredEvents.length > 0 && (
+            <span className="text-xs text-muted-foreground font-body">
+              {filteredEvents.length} {language === 'pt-BR' ? 'eventos' : 'events'}
+            </span>
+          )}
+        </div>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px]">
-          {events.length > 0 ? (
-            <div className="space-y-3">
-              {events.map((event) => (
+
+      <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
+        <ScrollArea className="flex-1 px-6">
+          {filteredEvents.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground font-body">
+              <Scroll className="w-10 h-10 mx-auto mb-2 opacity-30" />
+              <p>{language === 'pt-BR' ? 'Nenhum evento ainda' : 'No events yet'}</p>
+            </div>
+          ) : (
+            <div className="space-y-3 pb-2">
+              {paginatedEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="p-3 rounded-lg bg-muted/30 border border-border/50"
+                  className={cn(
+                    "p-3 rounded-lg border border-border/50",
+                    getEventBgClass(event.event_type, event.event_data)
+                  )}
                 >
-                  {renderEvent(event)}
-                  <span className="text-xs text-muted-foreground block mt-2">
-                    {formatTime(event.created_at)}
-                  </span>
+                  {renderEventContent(event)}
+                  
+                  {/* Scene badge and timestamp */}
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    {(event.event_data as any).scene_name && event.event_type !== 'scene_started' && event.event_type !== 'scene_changed' && (
+                      <Badge variant="outline" className="text-xs">
+                        <BookOpen className="w-3 h-3 mr-1" />
+                        {(event.event_data as any).scene_name}
+                      </Badge>
+                    )}
+                    <span className="text-xs text-muted-foreground">
+                      {format(new Date(event.created_at), 'HH:mm:ss', { locale: dateLocale })}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-8 font-body">
-              Nenhum evento ainda
-            </p>
           )}
         </ScrollArea>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-3 border-t border-border shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goToPrevPage}
+              disabled={currentPage === 0}
+              className="h-8"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              {language === 'pt-BR' ? 'Anterior' : 'Previous'}
+            </Button>
+            <span className="text-xs text-muted-foreground font-body">
+              {currentPage + 1} / {totalPages}
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={goToNextPage}
+              disabled={currentPage >= totalPages - 1}
+              className="h-8"
+            >
+              {language === 'pt-BR' ? 'Próximo' : 'Next'}
+              <ChevronRight className="w-4 h-4 ml-1" />
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
-  );
-}
-
-function getTestLabel(
-  eventData: Record<string, unknown>,
-  t: ReturnType<typeof useTranslation>
-): string {
-  const testType = eventData.testType as string;
-  const testConfig = eventData as Record<string, unknown>;
-
-  if (testType === 'attribute_ability') {
-    const attr = testConfig.attribute as string;
-    const ability = testConfig.ability as string;
-    const attrLabel = t.vampiro[attr as keyof typeof t.vampiro] || attr;
-    const abilityLabel = t.vampiro[ability as keyof typeof t.vampiro] || ability;
-    return `${attrLabel} + ${abilityLabel}`;
-  }
-  if (testType === 'willpower') return t.vampiro.willpower;
-  if (testType === 'humanity') return t.vampiro.humanity;
-  if (testType === 'virtue') {
-    const virtue = testConfig.virtue as string;
-    return t.vampiro[virtue as keyof typeof t.vampiro] || virtue;
-  }
-  return testType;
-}
-
-function renderTestResult(
-  eventData: Record<string, unknown>,
-  t: ReturnType<typeof useTranslation>,
-  currentUserId?: string
-) {
-  const characterName = eventData.character_name as string;
-  const testConfig = eventData.test_config as Record<string, unknown>;
-  const isPrivate = eventData.is_private as boolean;
-  const isBotch = eventData.is_botch as boolean;
-  const isExceptional = eventData.is_exceptional as boolean;
-  const finalSuccesses = eventData.final_successes as number;
-  const baseResults = eventData.base_results as number[];
-  const extraResults = (eventData.extra_results as number[]) || [];
-  const difficulty = testConfig?.difficulty as number;
-  const dicePool = eventData.dice_pool as number;
-
-  // For private tests, only show to narrator and player
-  // (In real implementation, this would be filtered server-side)
-  // For now, we show a placeholder for private results
-
-  return (
-    <div className="space-y-2">
-      {/* Header */}
-      <div className="flex items-center gap-2 flex-wrap">
-        {isBotch ? (
-          <XCircle className="w-4 h-4 text-destructive shrink-0" />
-        ) : isExceptional ? (
-          <Star className="w-4 h-4 text-yellow-500 shrink-0" />
-        ) : finalSuccesses > 0 ? (
-          <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
-        ) : (
-          <AlertCircle className="w-4 h-4 text-muted-foreground shrink-0" />
-        )}
-        <span className="font-medieval text-sm">{characterName}</span>
-        <span className="text-xs text-muted-foreground">
-          {t.vampiroTests.testedWith}
-        </span>
-        <span className="text-sm font-medium">
-          {getTestLabel(testConfig, t)}
-        </span>
-        {isPrivate && <Lock className="w-3 h-3 text-muted-foreground" />}
-      </div>
-
-      {/* Dice display */}
-      <div className="flex flex-wrap gap-1">
-        {baseResults?.map((die, i) => (
-          <span
-            key={`base-${i}`}
-            className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold ${
-              die >= difficulty
-                ? 'bg-green-500/20 text-green-500'
-                : die === 1
-                  ? 'bg-destructive/20 text-destructive'
-                  : 'bg-muted text-muted-foreground'
-            }`}
-          >
-            {die}
-          </span>
-        ))}
-        {extraResults?.map((die, i) => (
-          <span
-            key={`extra-${i}`}
-            className={`inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold border border-dashed ${
-              die >= difficulty
-                ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500'
-                : die === 1
-                  ? 'bg-destructive/20 text-destructive border-destructive'
-                  : 'bg-muted text-muted-foreground border-muted-foreground'
-            }`}
-          >
-            {die}
-          </span>
-        ))}
-      </div>
-
-      {/* Result badge */}
-      <div className="flex items-center gap-2">
-        {isBotch ? (
-          <Badge variant="destructive" className="text-xs">
-            {t.vampiroTests.botch}
-          </Badge>
-        ) : isExceptional ? (
-          <Badge className="bg-yellow-500 text-xs">
-            {t.vampiroTests.exceptional}
-          </Badge>
-        ) : finalSuccesses > 0 ? (
-          <Badge variant="default" className="bg-green-600 text-xs">
-            {finalSuccesses} {t.vampiroTests.successes}
-          </Badge>
-        ) : (
-          <Badge variant="secondary" className="text-xs">
-            {t.vampiroTests.failure}
-          </Badge>
-        )}
-        <span className="text-xs text-muted-foreground">
-          {t.vampiroTests.poolLabel}: {dicePool} | {t.vampiroTests.difficultyLabel}:{' '}
-          {difficulty}
-        </span>
-      </div>
-    </div>
   );
 }
