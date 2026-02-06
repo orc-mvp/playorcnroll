@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Dialog,
   DialogContent,
@@ -16,14 +14,13 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
+import { TrackerChangeConfirmModal, TrackerType } from './TrackerChangeConfirmModal';
 import {
   Crown,
   Users,
   Dices,
   Moon,
-  BookOpen,
   Plus,
-  Play,
   Droplets,
   Sparkles,
   Heart,
@@ -75,6 +72,14 @@ interface Scene {
   session_id: string;
 }
 
+interface PendingChange {
+  type: TrackerType;
+  currentValue: number;
+  newValue: number;
+  participantId: string;
+  characterName: string;
+}
+
 interface VampireNarratorSidebarProps {
   sessionId: string;
   participants: Participant[];
@@ -100,6 +105,10 @@ export function VampireNarratorSidebar({
   const [isCreatingScene, setIsCreatingScene] = useState(false);
   const [showSceneForm, setShowSceneForm] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<Participant['character'] | null>(null);
+
+  // Confirmation modal state for narrator edits
+  const [pendingChange, setPendingChange] = useState<PendingChange | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const handleCreateScene = async () => {
     if (!newSceneName.trim()) return;
@@ -196,6 +205,67 @@ export function VampireNarratorSidebar({
     }
   };
 
+  // Handle tracker change request from narrator
+  const requestTrackerChange = (
+    type: TrackerType,
+    currentValue: number,
+    newValue: number,
+    participantId: string,
+    characterName: string
+  ) => {
+    setPendingChange({
+      type,
+      currentValue,
+      newValue,
+      participantId,
+      characterName,
+    });
+    setIsConfirmOpen(true);
+  };
+
+  // Confirm the pending change
+  const confirmChange = async () => {
+    if (!pendingChange) return;
+
+    try {
+      const updateData: Record<string, number | boolean[]> = {};
+      
+      switch (pendingChange.type) {
+        case 'blood':
+          updateData.session_blood_pool = pendingChange.newValue;
+          break;
+        case 'willpower':
+          updateData.session_willpower_current = pendingChange.newValue;
+          break;
+        case 'health':
+          const newHealth = Array(7).fill(false);
+          for (let i = 0; i < pendingChange.newValue; i++) {
+            newHealth[i] = true;
+          }
+          updateData.session_health_damage = newHealth;
+          break;
+      }
+
+      await supabase
+        .from('session_participants')
+        .update(updateData)
+        .eq('id', pendingChange.participantId);
+
+      toast({ title: 'Alteração salva' });
+    } catch (error) {
+      toast({ title: 'Erro ao salvar', variant: 'destructive' });
+    }
+
+    setIsConfirmOpen(false);
+    setPendingChange(null);
+  };
+
+  // Cancel the pending change
+  const cancelChange = () => {
+    setIsConfirmOpen(false);
+    setPendingChange(null);
+  };
+
   return (
     <div className="space-y-4">
       {/* Narrator Badge */}
@@ -284,16 +354,39 @@ export function VampireNarratorSidebar({
                         </p>
                       </div>
                     </div>
+
+                    {/* Disciplines Summary (read-only) */}
+                    {vampData?.disciplines && Object.keys(vampData.disciplines).filter(k => (vampData.disciplines?.[k] || 0) > 0).length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {Object.entries(vampData.disciplines).filter(([, v]) => v > 0).slice(0, 3).map(([key, value]) => (
+                          <Badge key={key} variant="outline" className="text-[10px] px-1.5 py-0">
+                            {t.vampiro[key as keyof typeof t.vampiro] || key}: {value}
+                          </Badge>
+                        ))}
+                        {Object.entries(vampData.disciplines).filter(([, v]) => v > 0).length > 3 && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0">
+                            +{Object.entries(vampData.disciplines).filter(([, v]) => v > 0).length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                     
-                    {/* Trackers Row */}
+                    {/* Interactive Trackers Row */}
                     {p.character && (
                       <div className="grid grid-cols-3 gap-2 text-xs">
-                        {/* Blood Pool */}
-                        <div className={`flex flex-col items-center p-1.5 rounded border ${
-                          isBloodCritical 
-                            ? 'bg-destructive/30 border-destructive' 
-                            : 'bg-destructive/10 border-destructive/20'
-                        }`}>
+                        {/* Blood Pool - Clickable */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newValue = bloodPool > 0 ? bloodPool - 1 : 1;
+                            requestTrackerChange('blood', bloodPool, newValue, p.id, p.character?.name || '');
+                          }}
+                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                            isBloodCritical 
+                              ? 'bg-destructive/30 border-destructive' 
+                              : 'bg-destructive/10 border-destructive/20'
+                          }`}
+                        >
                           {isBloodCritical ? (
                             <Skull className="w-3 h-3 text-destructive mb-0.5 animate-pulse" />
                           ) : (
@@ -301,14 +394,21 @@ export function VampireNarratorSidebar({
                           )}
                           <span className="font-medium text-destructive">{bloodPool}</span>
                           <span className="text-muted-foreground text-[10px]">Sangue</span>
-                        </div>
+                        </button>
                         
-                        {/* Willpower */}
-                        <div className={`flex flex-col items-center p-1.5 rounded border ${
-                          isWillpowerCritical 
-                            ? 'bg-amber-500/30 border-amber-500' 
-                            : 'bg-muted/50 border-border'
-                        }`}>
+                        {/* Willpower - Clickable */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newValue = currentWillpower > 0 ? currentWillpower - 1 : 1;
+                            requestTrackerChange('willpower', currentWillpower, newValue, p.id, p.character?.name || '');
+                          }}
+                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                            isWillpowerCritical 
+                              ? 'bg-amber-500/30 border-amber-500' 
+                              : 'bg-muted/50 border-border'
+                          }`}
+                        >
                           {isWillpowerCritical ? (
                             <AlertTriangle className="w-3 h-3 text-amber-500 mb-0.5 animate-pulse" />
                           ) : (
@@ -318,16 +418,23 @@ export function VampireNarratorSidebar({
                             {currentWillpower}/{maxWillpower}
                           </span>
                           <span className="text-muted-foreground text-[10px]">Vontade</span>
-                        </div>
+                        </button>
                         
-                        {/* Health */}
-                        <div className={`flex flex-col items-center p-1.5 rounded border ${
-                          damagedLevels >= 5 
-                            ? 'bg-destructive/20 border-destructive/40' 
-                            : damagedLevels >= 3 
-                              ? 'bg-orange-500/10 border-orange-500/30' 
-                              : 'bg-muted/50 border-border'
-                        }`}>
+                        {/* Health - Clickable */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newDamagedLevels = damagedLevels < 7 ? damagedLevels + 1 : 0;
+                            requestTrackerChange('health', damagedLevels, newDamagedLevels, p.id, p.character?.name || '');
+                          }}
+                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                            damagedLevels >= 5 
+                              ? 'bg-destructive/20 border-destructive/40' 
+                              : damagedLevels >= 3 
+                                ? 'bg-orange-500/10 border-orange-500/30' 
+                                : 'bg-muted/50 border-border'
+                          }`}
+                        >
                           <Heart className={`w-3 h-3 mb-0.5 ${
                             damagedLevels >= 5 ? 'text-destructive' : damagedLevels >= 3 ? 'text-orange-500' : 'text-foreground'
                           }`} />
@@ -335,7 +442,7 @@ export function VampireNarratorSidebar({
                             damagedLevels >= 5 ? 'text-destructive' : damagedLevels >= 3 ? 'text-orange-500' : ''
                           }`}>{7 - damagedLevels}/7</span>
                           <span className="text-muted-foreground text-[10px]">Vitalidade</span>
-                        </div>
+                        </button>
                       </div>
                     )}
 
@@ -355,6 +462,60 @@ export function VampireNarratorSidebar({
                 );
               })}
             </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Scene Management */}
+      <Card className="medieval-card border-destructive/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="font-medieval text-base flex items-center gap-2">
+            <Plus className="w-4 h-4 text-destructive" />
+            {t.scene.create}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {showSceneForm ? (
+            <div className="space-y-2">
+              <Input
+                placeholder={t.scene.name}
+                value={newSceneName}
+                onChange={(e) => setNewSceneName(e.target.value)}
+              />
+              <Textarea
+                placeholder={t.scene.description}
+                value={newSceneDesc}
+                onChange={(e) => setNewSceneDesc(e.target.value)}
+                rows={2}
+              />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowSceneForm(false)}
+                  className="flex-1"
+                >
+                  {t.common.cancel}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleCreateScene}
+                  disabled={isCreatingScene || !newSceneName.trim()}
+                  className="flex-1 bg-destructive hover:bg-destructive/90"
+                >
+                  {t.common.create}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              variant="outline"
+              onClick={() => setShowSceneForm(true)}
+              className="w-full"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {t.scene.create}
+            </Button>
           )}
         </CardContent>
       </Card>
@@ -382,6 +543,20 @@ export function VampireNarratorSidebar({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Tracker Change Confirmation Modal */}
+      {pendingChange && (
+        <TrackerChangeConfirmModal
+          open={isConfirmOpen}
+          trackerType={pendingChange.type}
+          currentValue={pendingChange.currentValue}
+          newValue={pendingChange.newValue}
+          characterName={pendingChange.characterName}
+          isNarrator={true}
+          onConfirm={confirmChange}
+          onCancel={cancelChange}
+        />
+      )}
     </div>
   );
 }
