@@ -14,6 +14,10 @@ import {
   Moon,
   Skull,
   AlertTriangle,
+  Droplets,
+  Sparkles,
+  Heart,
+  ArrowRight,
 } from 'lucide-react';
 
 interface SessionEvent {
@@ -115,6 +119,85 @@ export function VampireEventFeed({ events, currentUserId }: VampireEventFeedProp
               <span className={`font-medieval ${isBlood ? 'text-destructive' : 'text-amber-500'}`}>
                 {charName} - {isBlood ? 'Sangue Esgotado!' : 'Vontade Exaurida!'}
               </span>
+            </div>
+          </div>
+        );
+      }
+
+      case 'tracker_change': {
+        const trackerType = event_data.tracker_type as string;
+        const charName = event_data.character_name as string;
+        const oldValue = event_data.old_value as number;
+        const newValue = event_data.new_value as number;
+        const changedBy = event_data.changed_by as string;
+        const isNarratorChange = event_data.is_narrator_change as boolean;
+
+        const getTrackerInfo = () => {
+          switch (trackerType) {
+            case 'blood':
+              return {
+                icon: <Droplets className="w-4 h-4 text-destructive" />,
+                label: t.vampiro?.bloodPool || 'Sangue',
+                colorClass: 'text-destructive',
+              };
+            case 'willpower':
+              return {
+                icon: <Sparkles className="w-4 h-4 text-foreground" />,
+                label: t.vampiro?.willpowerCurrent || 'Vontade',
+                colorClass: 'text-foreground',
+              };
+            case 'health':
+              return {
+                icon: <Heart className="w-4 h-4 text-destructive" />,
+                label: t.vampiro?.healthLevels || 'Vitalidade',
+                colorClass: 'text-destructive',
+              };
+            case 'humanity':
+              return {
+                icon: <Moon className="w-4 h-4 text-foreground" />,
+                label: t.vampiro?.humanity || 'Humanidade',
+                colorClass: 'text-foreground',
+              };
+            default:
+              return {
+                icon: <Moon className="w-4 h-4 text-muted-foreground" />,
+                label: trackerType,
+                colorClass: 'text-muted-foreground',
+              };
+          }
+        };
+
+        const info = getTrackerInfo();
+        const difference = newValue - oldValue;
+        const differenceText = difference > 0 ? `+${difference}` : difference.toString();
+
+        return (
+          <div className="flex items-start gap-2">
+            {info.icon}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap text-sm">
+                <span className="font-medieval">{charName}</span>
+                <span className="text-muted-foreground">•</span>
+                <span className={info.colorClass}>{info.label}</span>
+              </div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-sm text-muted-foreground">{oldValue}</span>
+                <ArrowRight className="w-3 h-3 text-muted-foreground" />
+                <span className={`text-sm font-medium ${difference < 0 ? 'text-destructive' : 'text-green-500'}`}>
+                  {newValue}
+                </span>
+                <Badge 
+                  variant={difference < 0 ? "destructive" : "default"} 
+                  className={`text-xs ${difference >= 0 ? 'bg-green-600' : ''}`}
+                >
+                  {differenceText}
+                </Badge>
+              </div>
+              {isNarratorChange && (
+                <span className="text-xs text-muted-foreground italic mt-1 block">
+                  Alterado pelo Narrador
+                </span>
+              )}
             </div>
           </div>
         );

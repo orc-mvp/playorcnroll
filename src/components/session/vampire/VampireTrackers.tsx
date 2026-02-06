@@ -191,9 +191,38 @@ export function VampireTrackers({
     setIsConfirmOpen(true);
   };
 
+  // Emit tracker change event to session feed
+  const emitTrackerChangeEvent = useCallback(
+    async (type: TrackerType, oldValue: number, newValue: number) => {
+      if (!character) return;
+
+      await supabase.from('session_events').insert({
+        session_id: sessionId,
+        scene_id: sceneId,
+        event_type: 'tracker_change',
+        event_data: {
+          tracker_type: type,
+          character_id: character.id,
+          character_name: character.name,
+          old_value: oldValue,
+          new_value: newValue,
+          is_narrator_change: false,
+        },
+      });
+    },
+    [sessionId, sceneId, character]
+  );
+
   // Confirm the pending change
-  const confirmChange = () => {
+  const confirmChange = async () => {
     if (!pendingChange) return;
+
+    // Emit event to feed
+    await emitTrackerChangeEvent(
+      pendingChange.type,
+      pendingChange.currentValue,
+      pendingChange.newValue
+    );
 
     switch (pendingChange.type) {
       case 'blood':
