@@ -53,9 +53,23 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
 
 export function useI18n(): I18nContextType {
   const context = useContext(I18nContext);
+
+  // Fallback to prevent blank-screen crashes if provider wiring breaks during HMR.
   if (context === null) {
-    throw new Error('useI18n must be used within an I18nProvider');
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.error('useI18n must be used within an I18nProvider');
+    }
+
+    return {
+      language: 'en',
+      setLanguage: () => {
+        // no-op
+      },
+      t: translations.en,
+    } as I18nContextType;
   }
+
   return context;
 }
 
