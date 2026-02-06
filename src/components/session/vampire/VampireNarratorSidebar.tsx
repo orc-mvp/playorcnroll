@@ -251,6 +251,20 @@ export function VampireNarratorSidebar({
         .update(updateData)
         .eq('id', pendingChange.participantId);
 
+      // Emit event to session feed
+      await supabase.from('session_events').insert({
+        session_id: sessionId,
+        scene_id: currentScene?.id || null,
+        event_type: 'tracker_change',
+        event_data: {
+          tracker_type: pendingChange.type,
+          character_name: pendingChange.characterName,
+          old_value: pendingChange.currentValue,
+          new_value: pendingChange.newValue,
+          is_narrator_change: true,
+        },
+      });
+
       toast({ title: 'Alteração salva' });
     } catch (error) {
       toast({ title: 'Erro ao salvar', variant: 'destructive' });
