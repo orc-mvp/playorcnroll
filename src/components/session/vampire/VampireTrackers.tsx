@@ -470,10 +470,6 @@ export function VampireTrackers({
           <CardTitle className="font-medieval text-sm flex items-center gap-2">
             <Moon className="w-4 h-4 text-foreground" />
             {t.vampiro?.humanity || 'Humanidade'}
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 ml-auto border-destructive/40 text-destructive">
-              <Zap className="w-3 h-3 mr-0.5" />
-              {t.vampiro?.permanent || 'PERMANENTE'}
-            </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -496,9 +492,6 @@ export function VampireTrackers({
           </div>
           <p className="text-xs text-muted-foreground text-center">
             {humanity}/10
-          </p>
-          <p className="text-[10px] text-muted-foreground text-center italic">
-            {t.vampiro?.humanityChangeNote || 'Clique para alterar (mudança permanente)'}
           </p>
         </CardContent>
       </Card>

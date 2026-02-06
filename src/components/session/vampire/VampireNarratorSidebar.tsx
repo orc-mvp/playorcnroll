@@ -54,6 +54,7 @@ import {
 } from '@/components/ui/dialog';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import { TrackerChangeConfirmModal, TrackerType } from './TrackerChangeConfirmModal';
+import { NarratorTrackerAdjustModal } from './NarratorTrackerAdjustModal';
 import {
   Crown,
   Users,
@@ -151,6 +152,17 @@ export function VampireNarratorSidebar({
   const [pendingChange, setPendingChange] = useState<PendingChange | null>(null);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
+  // Narrator adjust modal state (with +/- controls)
+  const [adjustModal, setAdjustModal] = useState<{
+    type: TrackerType;
+    participantId: string;
+    characterId?: string;
+    characterName: string;
+    currentValue: number;
+    maxValue?: number;
+    isPermanent?: boolean;
+  } | null>(null);
+
   const handleCreateScene = async () => {
     if (!newSceneName.trim()) return;
 
@@ -246,25 +258,41 @@ export function VampireNarratorSidebar({
     }
   };
 
-  // Handle tracker change request from narrator
-  const requestTrackerChange = (
+  // Open the adjust modal (with +/- controls)
+  const openAdjustModal = (
     type: TrackerType,
     currentValue: number,
-    newValue: number,
     participantId: string,
     characterName: string,
     characterId?: string,
+    maxValue?: number,
     isPermanent?: boolean
   ) => {
-    setPendingChange({
+    setAdjustModal({
       type,
-      currentValue,
-      newValue,
       participantId,
       characterId,
       characterName,
+      currentValue,
+      maxValue,
       isPermanent,
     });
+  };
+
+  // Handle confirmation from adjust modal - sets up the pending change and opens confirm modal
+  const handleAdjustConfirm = (newValue: number) => {
+    if (!adjustModal) return;
+    
+    setPendingChange({
+      type: adjustModal.type,
+      currentValue: adjustModal.currentValue,
+      newValue,
+      participantId: adjustModal.participantId,
+      characterId: adjustModal.characterId,
+      characterName: adjustModal.characterName,
+      isPermanent: adjustModal.isPermanent,
+    });
+    setAdjustModal(null);
     setIsConfirmOpen(true);
   };
 
@@ -467,8 +495,7 @@ export function VampireNarratorSidebar({
                         <button
                           type="button"
                           onClick={() => {
-                            const newValue = bloodPool > 0 ? bloodPool - 1 : 1;
-                            requestTrackerChange('blood', bloodPool, newValue, p.id, p.character?.name || '');
+                            openAdjustModal('blood', bloodPool, p.id, p.character?.name || '', undefined, 50);
                           }}
                           className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
                             isBloodCritical 
@@ -482,15 +509,14 @@ export function VampireNarratorSidebar({
                             <Droplets className="w-3 h-3 text-destructive mb-0.5" />
                           )}
                           <span className="font-medium text-destructive">{bloodPool}</span>
-                          <span className="text-muted-foreground text-[10px]">Sangue</span>
+                          <span className="text-muted-foreground text-[10px]">{t.vampiro?.bloodPool || 'Sangue'}</span>
                         </button>
                         
                         {/* Willpower - Clickable */}
                         <button
                           type="button"
                           onClick={() => {
-                            const newValue = currentWillpower > 0 ? currentWillpower - 1 : 1;
-                            requestTrackerChange('willpower', currentWillpower, newValue, p.id, p.character?.name || '');
+                            openAdjustModal('willpower', currentWillpower, p.id, p.character?.name || '', undefined, maxWillpower);
                           }}
                           className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
                             isWillpowerCritical 
@@ -506,15 +532,14 @@ export function VampireNarratorSidebar({
                           <span className={`font-medium ${isWillpowerCritical ? 'text-amber-500' : ''}`}>
                             {currentWillpower}/{maxWillpower}
                           </span>
-                          <span className="text-muted-foreground text-[10px]">Vontade</span>
+                          <span className="text-muted-foreground text-[10px]">{t.vampiro?.willpowerCurrent || 'Vontade'}</span>
                         </button>
                         
                         {/* Health - Clickable */}
                         <button
                           type="button"
                           onClick={() => {
-                            const newDamagedLevels = damagedLevels < 7 ? damagedLevels + 1 : 0;
-                            requestTrackerChange('health', damagedLevels, newDamagedLevels, p.id, p.character?.name || '');
+                            openAdjustModal('health', damagedLevels, p.id, p.character?.name || '', undefined, 7);
                           }}
                           className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
                             damagedLevels >= 5 
@@ -530,7 +555,7 @@ export function VampireNarratorSidebar({
                           <span className={`font-medium ${
                             damagedLevels >= 5 ? 'text-destructive' : damagedLevels >= 3 ? 'text-orange-500' : ''
                           }`}>{7 - damagedLevels}/7</span>
-                          <span className="text-muted-foreground text-[10px]">Vitalidade</span>
+                          <span className="text-muted-foreground text-[10px]">{t.vampiro?.healthLevels || 'Vitalidade'}</span>
                         </button>
                       </div>
                     )}
@@ -540,14 +565,13 @@ export function VampireNarratorSidebar({
                       <button
                         type="button"
                         onClick={() => {
-                          const newValue = humanity > 0 ? humanity - 1 : 1;
-                          requestTrackerChange('humanity', humanity, newValue, p.id, p.character?.name || '', p.character?.id, true);
+                          openAdjustModal('humanity', humanity, p.id, p.character?.name || '', p.character?.id, 10, true);
                         }}
                         className="flex items-center gap-2 p-1.5 rounded border bg-muted/50 border-border cursor-pointer transition-colors hover:bg-muted/70 w-full"
                       >
                         <Moon className="w-3 h-3 text-foreground" />
                         <span className="font-medium text-sm">{humanity}/10</span>
-                        <span className="text-muted-foreground text-[10px] flex-1">Humanidade</span>
+                        <span className="text-muted-foreground text-[10px] flex-1">{t.vampiro?.humanity || 'Humanidade'}</span>
                         <span className="text-[8px] px-1 py-0.5 bg-destructive/20 text-destructive rounded">⚡</span>
                       </button>
                     )}
@@ -595,6 +619,20 @@ export function VampireNarratorSidebar({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Narrator Tracker Adjust Modal */}
+      {adjustModal && (
+        <NarratorTrackerAdjustModal
+          open={!!adjustModal}
+          trackerType={adjustModal.type}
+          characterName={adjustModal.characterName}
+          currentValue={adjustModal.currentValue}
+          maxValue={adjustModal.maxValue}
+          isPermanent={adjustModal.isPermanent}
+          onConfirm={handleAdjustConfirm}
+          onCancel={() => setAdjustModal(null)}
+        />
+      )}
 
       {/* Tracker Change Confirmation Modal */}
       {pendingChange && (

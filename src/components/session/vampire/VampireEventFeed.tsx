@@ -298,8 +298,13 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
     const TrackerIcon = getTrackerIcon(trackerType);
     const colorClass = getTrackerColor(trackerType);
     const label = getTrackerLabel(trackerType, t);
-    const difference = newValue - oldValue;
-    const differenceText = difference > 0 ? `+${difference}` : difference.toString();
+    
+    // For health tracker, invert display values (0 damage = 7 health levels remaining)
+    const isHealthTracker = trackerType === 'health';
+    const displayOldValue = isHealthTracker ? 7 - oldValue : oldValue;
+    const displayNewValue = isHealthTracker ? 7 - newValue : newValue;
+    const displayDifference = displayNewValue - displayOldValue;
+    const differenceText = displayDifference > 0 ? `+${displayDifference}` : displayDifference.toString();
 
     return (
       <div className="flex items-start gap-2">
@@ -316,14 +321,14 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
             )}
           </div>
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-sm text-muted-foreground">{oldValue}</span>
+            <span className="text-sm text-muted-foreground">{displayOldValue}</span>
             <span className="text-muted-foreground">→</span>
-            <span className={cn("text-sm font-medium", difference < 0 ? 'text-destructive' : 'text-green-500')}>
-              {newValue}
+            <span className={cn("text-sm font-medium", displayDifference < 0 ? 'text-destructive' : 'text-green-500')}>
+              {displayNewValue}
             </span>
             <Badge 
-              variant={difference < 0 ? "destructive" : "default"} 
-              className={cn("text-xs", difference >= 0 && 'bg-green-600')}
+              variant={displayDifference < 0 ? "destructive" : "default"} 
+              className={cn("text-xs", displayDifference >= 0 && 'bg-green-600')}
             >
               {differenceText}
             </Badge>

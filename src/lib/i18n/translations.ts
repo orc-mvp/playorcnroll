@@ -427,6 +427,15 @@ export const translations = {
       humanityUpdated: 'Humanidade atualizada!',
       permanentChangeApplied: 'Alteração permanente aplicada à ficha.',
       humanityChangeNote: 'Clique para alterar (mudança permanente)',
+      
+      // Narrator Tracker Adjust Modal
+      adjustTracker: 'Ajustar',
+      lose: 'Perder',
+      recover: 'Recuperar',
+      heal: 'Curar',
+      damage: 'Dano',
+      damageTaken: 'dano',
+      healed: 'curado',
     },
 
     // Vampire Tests System
@@ -933,6 +942,15 @@ export const translations = {
       humanityUpdated: 'Humanity updated!',
       permanentChangeApplied: 'Permanent change applied to character sheet.',
       humanityChangeNote: 'Click to change (permanent change)',
+      
+      // Narrator Tracker Adjust Modal
+      adjustTracker: 'Adjust',
+      lose: 'Lose',
+      recover: 'Recover',
+      heal: 'Heal',
+      damage: 'Damage',
+      damageTaken: 'damage',
+      healed: 'healed',
     },
 
     // Vampire Tests System
