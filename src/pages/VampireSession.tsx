@@ -211,10 +211,46 @@ export default function VampireSession() {
               .eq('user_id', p.user_id)
               .maybeSingle();
 
+            const character = p.characters as Participant['character'];
+            let bloodPool = p.session_blood_pool ?? 0;
+            let willpower = p.session_willpower_current ?? 0;
+            let healthDamage = (p.session_health_damage as boolean[] | null) || [false, false, false, false, false, false, false];
+
+            // Auto-initialize tracker values for vampire characters with zero values
+            if (character?.game_system === 'vampiro_v3' && character.vampiro_data) {
+              const vampiroData = character.vampiro_data as VampiroCharacterData;
+              const needsInit = bloodPool === 0 && willpower === 0;
+
+              if (needsInit) {
+                // Calculate initial blood pool based on generation
+                const generation = parseInt(vampiroData.generation || '13', 10);
+                if (generation <= 7) bloodPool = 20;
+                else if (generation === 8) bloodPool = 15;
+                else if (generation <= 10) bloodPool = 13;
+                else if (generation <= 12) bloodPool = 11;
+                else bloodPool = 10;
+
+                // Willpower starts at max
+                willpower = vampiroData.willpower || 1;
+
+                // Update database with initialized values
+                await supabase
+                  .from('session_participants')
+                  .update({
+                    session_blood_pool: bloodPool,
+                    session_willpower_current: willpower,
+                    session_health_damage: healthDamage,
+                  })
+                  .eq('id', p.id);
+              }
+            }
+
             return {
               ...p,
-              session_health_damage: (p.session_health_damage as boolean[] | null) || [false, false, false, false, false, false, false],
-              character: p.characters as Participant['character'],
+              session_blood_pool: bloodPool,
+              session_willpower_current: willpower,
+              session_health_damage: healthDamage,
+              character,
               profile,
             };
           })

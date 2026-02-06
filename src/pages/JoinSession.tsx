@@ -198,13 +198,45 @@ export default function JoinSession() {
         return;
       }
 
-      // Join the session
+      // Get character data to initialize vampire trackers
+      const { data: characterData } = await supabase
+        .from('characters')
+        .select('game_system, vampiro_data')
+        .eq('id', selectedCharacterId)
+        .single();
+
+      // Prepare initial tracker values for Vampire characters
+      let initialBloodPool = 0;
+      let initialWillpower = 0;
+      let initialHealthDamage = [false, false, false, false, false, false, false];
+
+      if (characterData?.game_system === 'vampiro_v3' && characterData.vampiro_data) {
+        const vampiroData = characterData.vampiro_data as { 
+          generation?: string; 
+          willpower?: number;
+        };
+        // Blood pool based on generation (default to 10 for unknown)
+        const generation = parseInt(vampiroData.generation || '13', 10);
+        if (generation <= 7) initialBloodPool = 20;
+        else if (generation === 8) initialBloodPool = 15;
+        else if (generation <= 10) initialBloodPool = 13;
+        else if (generation <= 12) initialBloodPool = 11;
+        else initialBloodPool = 10;
+        
+        // Willpower starts at max
+        initialWillpower = vampiroData.willpower || 1;
+      }
+
+      // Join the session with initialized tracker values
       const { error: joinError } = await supabase
         .from('session_participants')
         .insert({
           session_id: sessionData.id,
           user_id: user.id,
           character_id: selectedCharacterId,
+          session_blood_pool: initialBloodPool,
+          session_willpower_current: initialWillpower,
+          session_health_damage: initialHealthDamage,
         });
 
       if (joinError) throw joinError;
