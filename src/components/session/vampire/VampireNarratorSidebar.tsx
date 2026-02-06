@@ -10,6 +10,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
+import {
   Crown,
   Users,
   Dices,
@@ -22,6 +29,7 @@ import {
   Heart,
   AlertTriangle,
   Skull,
+  FileText,
 } from 'lucide-react';
 
 interface VampiroCharacterData {
@@ -91,6 +99,7 @@ export function VampireNarratorSidebar({
   const [newSceneDesc, setNewSceneDesc] = useState('');
   const [isCreatingScene, setIsCreatingScene] = useState(false);
   const [showSceneForm, setShowSceneForm] = useState(false);
+  const [selectedCharacter, setSelectedCharacter] = useState<Participant['character'] | null>(null);
 
   const handleCreateScene = async () => {
     if (!newSceneName.trim()) return;
@@ -329,6 +338,19 @@ export function VampireNarratorSidebar({
                         </div>
                       </div>
                     )}
+
+                    {/* View Character Sheet Button */}
+                    {p.character && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedCharacter(p.character)}
+                        className="w-full mt-1 text-xs h-7"
+                      >
+                        <FileText className="w-3 h-3 mr-1" />
+                        Ver Ficha
+                      </Button>
+                    )}
                   </div>
                 );
               })}
@@ -336,6 +358,30 @@ export function VampireNarratorSidebar({
           )}
         </CardContent>
       </Card>
+
+      {/* Character Sheet Modal */}
+      <Dialog open={!!selectedCharacter} onOpenChange={(open) => !open && setSelectedCharacter(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="font-medieval flex items-center gap-2">
+              <Moon className="w-5 h-5 text-destructive" />
+              Ficha de {selectedCharacter?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto">
+            {selectedCharacter && selectedCharacter.vampiro_data && (
+              <VampiroCharacterSheet
+                character={{
+                  id: selectedCharacter.id,
+                  name: selectedCharacter.name,
+                  concept: selectedCharacter.concept,
+                  vampiro_data: selectedCharacter.vampiro_data,
+                }}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
