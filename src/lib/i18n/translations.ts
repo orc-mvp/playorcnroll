@@ -405,6 +405,17 @@ export const translations = {
       willpowerExhausted: 'Vontade Exaurida!',
       vulnerableToCommands: 'Vulnerável a comandos!',
       criticalState: 'Estado Crítico',
+      
+      // Tracker Confirmation Modal
+      trackerChangeTitle: 'Confirmar Alteração',
+      trackerChangeDescription: 'Esta alteração será sincronizada em tempo real com todos os participantes da sessão.',
+      trackerBloodChange: 'Sangue',
+      trackerWillpowerChange: 'Vontade',
+      trackerHealthChange: 'Vitalidade',
+      trackerVisibleToNarrator: 'O Narrador verá esta mudança',
+      trackerVisibleToPlayer: 'O jogador {name} verá esta mudança',
+      trackerVisibleToAll: 'Todos os participantes verão esta mudança',
+      trackerCriticalWarning: 'Atenção: Isso resultará em estado crítico!',
     },
 
     // Vampire Tests System
@@ -888,6 +899,17 @@ export const translations = {
       willpowerExhausted: 'Willpower Exhausted!',
       vulnerableToCommands: 'Vulnerable to commands!',
       criticalState: 'Critical State',
+      
+      // Tracker Confirmation Modal
+      trackerChangeTitle: 'Confirm Change',
+      trackerChangeDescription: 'This change will be synced in real-time with all session participants.',
+      trackerBloodChange: 'Blood',
+      trackerWillpowerChange: 'Willpower',
+      trackerHealthChange: 'Vitality',
+      trackerVisibleToNarrator: 'The Narrator will see this change',
+      trackerVisibleToPlayer: 'Player {name} will see this change',
+      trackerVisibleToAll: 'All participants will see this change',
+      trackerCriticalWarning: 'Warning: This will result in a critical state!',
     },
 
     // Vampire Tests System

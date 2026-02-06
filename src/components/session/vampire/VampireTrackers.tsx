@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 import { toast as sonnerToast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Droplets, Sparkles, Heart, AlertTriangle, Skull } from 'lucide-react';
+import { TrackerChangeConfirmModal, TrackerType } from './TrackerChangeConfirmModal';
 
 interface VampiroCharacterData {
   player?: string;
@@ -45,6 +45,12 @@ const HEALTH_LEVELS = [
   'incapacitated',
 ] as const;
 
+interface PendingChange {
+  type: TrackerType;
+  currentValue: number;
+  newValue: number;
+}
+
 export function VampireTrackers({
   participantId,
   sessionId,
@@ -55,7 +61,6 @@ export function VampireTrackers({
   initialHealthDamage = [false, false, false, false, false, false, false],
 }: VampireTrackersProps) {
   const t = useTranslation();
-  const { toast } = useToast();
 
   const vampiroData = character?.vampiro_data;
   const maxWillpower = vampiroData?.willpower || 1;
@@ -64,6 +69,10 @@ export function VampireTrackers({
   const [currentWillpower, setCurrentWillpower] = useState(initialWillpower);
   const [healthDamage, setHealthDamage] = useState<boolean[]>(initialHealthDamage);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Confirmation modal state
+  const [pendingChange, setPendingChange] = useState<PendingChange | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // Track previous values for critical state detection
   const prevBloodPool = useRef(initialBloodPool);
@@ -122,7 +131,7 @@ export function VampireTrackers({
     prevWillpower.current = currentWillpower;
   }, [currentWillpower, emitCriticalEvent, t]);
 
-  // Debounced save to database
+  // Save to database
   const saveTrackers = useCallback(
     async (blood: number, willpower: number, health: boolean[]) => {
       setIsSaving(true);
@@ -144,50 +153,75 @@ export function VampireTrackers({
     [participantId]
   );
 
-  // Save after changes with debounce
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      saveTrackers(bloodPool, currentWillpower, healthDamage);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [bloodPool, currentWillpower, healthDamage, saveTrackers]);
-
-  const toggleBloodPoint = (index: number) => {
-    if (index < bloodPool) {
-      setBloodPool(index);
-    } else {
-      setBloodPool(index + 1);
-    }
+  // Handle blood pool change request
+  const requestBloodChange = (index: number) => {
+    const newValue = index < bloodPool ? index : index + 1;
+    setPendingChange({
+      type: 'blood',
+      currentValue: bloodPool,
+      newValue,
+    });
+    setIsConfirmOpen(true);
   };
 
-  const toggleWillpowerPoint = (index: number) => {
-    if (index < currentWillpower) {
-      setCurrentWillpower(index);
-    } else {
-      setCurrentWillpower(index + 1);
-    }
+  // Handle willpower change request
+  const requestWillpowerChange = (index: number) => {
+    const newValue = index < currentWillpower ? index : index + 1;
+    setPendingChange({
+      type: 'willpower',
+      currentValue: currentWillpower,
+      newValue,
+    });
+    setIsConfirmOpen(true);
   };
 
-  const toggleHealthLevel = (index: number) => {
-    setHealthDamage((prev) => {
-      const newHealth = [...prev];
-      const isCurrentlyDamaged = newHealth[index];
-      
-      if (isCurrentlyDamaged) {
-        // Clicking a damaged level: clear this and all levels after it
-        for (let i = index; i < newHealth.length; i++) {
-          newHealth[i] = false;
-        }
-      } else {
-        // Clicking an undamaged level: mark this and all levels before it
-        for (let i = 0; i <= index; i++) {
+  // Handle health change request
+  const requestHealthChange = (index: number) => {
+    const currentDamagedLevels = healthDamage.filter(Boolean).length;
+    const isCurrentlyDamaged = healthDamage[index];
+    
+    // Calculate new damaged levels
+    const newDamagedLevels = isCurrentlyDamaged ? index : index + 1;
+    
+    setPendingChange({
+      type: 'health',
+      currentValue: currentDamagedLevels,
+      newValue: newDamagedLevels,
+    });
+    setIsConfirmOpen(true);
+  };
+
+  // Confirm the pending change
+  const confirmChange = () => {
+    if (!pendingChange) return;
+
+    switch (pendingChange.type) {
+      case 'blood':
+        setBloodPool(pendingChange.newValue);
+        saveTrackers(pendingChange.newValue, currentWillpower, healthDamage);
+        break;
+      case 'willpower':
+        setCurrentWillpower(pendingChange.newValue);
+        saveTrackers(bloodPool, pendingChange.newValue, healthDamage);
+        break;
+      case 'health':
+        const newHealth = Array(7).fill(false);
+        for (let i = 0; i < pendingChange.newValue; i++) {
           newHealth[i] = true;
         }
-      }
-      
-      return newHealth;
-    });
+        setHealthDamage(newHealth);
+        saveTrackers(bloodPool, currentWillpower, newHealth);
+        break;
+    }
+
+    setIsConfirmOpen(false);
+    setPendingChange(null);
+  };
+
+  // Cancel the pending change
+  const cancelChange = () => {
+    setIsConfirmOpen(false);
+    setPendingChange(null);
   };
 
   if (!character) {
@@ -205,141 +239,7 @@ export function VampireTrackers({
 
   return (
     <div className="space-y-4">
-      {/* Blood Pool */}
-      <Card className={`medieval-card ${bloodPool === 0 ? 'border-destructive' : 'border-destructive/20'}`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2 text-destructive">
-            <Droplets className="w-4 h-4" />
-            {t.vampiro.bloodPool}
-            {isSaving && (
-              <span className="text-xs text-muted-foreground ml-auto animate-pulse">
-                ...
-              </span>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {/* Critical State Banner */}
-          {bloodPool === 0 && (
-            <div className="bg-destructive/20 border border-destructive rounded-lg p-2 animate-pulse flex items-center gap-2">
-              <Skull className="w-4 h-4 text-destructive" />
-              <span className="text-sm font-medieval text-destructive">
-                {t.vampiro?.hungerFrenzy || 'Frenesi de Fome!'}
-              </span>
-            </div>
-          )}
-
-          <div className="space-y-1">
-            {Array.from({ length: 5 }, (_, rowIndex) => (
-              <div key={rowIndex} className="flex gap-1 justify-center">
-                {Array.from({ length: 10 }, (_, colIndex) => {
-                  const index = rowIndex * 10 + colIndex;
-                  const isFilled = index < bloodPool;
-                  return (
-                    <button
-                      key={colIndex}
-                      type="button"
-                      onClick={() => toggleBloodPoint(index)}
-                      className={`w-3 h-3 rounded-sm border transition-colors cursor-pointer hover:border-destructive ${
-                        isFilled
-                          ? 'bg-destructive border-destructive'
-                          : 'border-destructive/40 bg-destructive/10'
-                      }`}
-                    />
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-          <p className="text-xs text-muted-foreground text-center">
-            {bloodPool}/50
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Willpower */}
-      <Card className={`medieval-card ${currentWillpower === 0 ? 'border-amber-500' : 'border-destructive/20'}`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-destructive" />
-            {t.vampiro.willpowerCurrent}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {/* Critical State Banner */}
-          {currentWillpower === 0 && (
-            <div className="bg-amber-500/20 border border-amber-500 rounded-lg p-2 animate-pulse flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-500" />
-              <span className="text-sm font-medieval text-amber-500">
-                {t.vampiro?.willpowerExhausted || 'Vontade Exaurida!'}
-              </span>
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-1 justify-center">
-            {Array.from({ length: maxWillpower }, (_, i) => {
-              const isFilled = i < currentWillpower;
-              return (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => toggleWillpowerPoint(i)}
-                  className={`w-4 h-4 rounded border-2 transition-colors cursor-pointer hover:border-foreground ${
-                    isFilled
-                      ? 'bg-foreground border-foreground'
-                      : 'border-muted-foreground/40 bg-transparent'
-                  }`}
-                />
-              );
-            })}
-          </div>
-          <p className="text-xs text-muted-foreground text-center">
-            {currentWillpower}/{maxWillpower}
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Health Tracker */}
-      <Card className="medieval-card border-destructive/20">
-        <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2">
-            <Heart className="w-4 h-4 text-destructive" />
-            {t.vampiro.healthLevels}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-1">
-            {HEALTH_LEVELS.map((level, index) => {
-              const isDamaged = healthDamage[index];
-              const levelLabel = t.vampiro[level] || level;
-              // Penalties: bruised=0, hurt=-1, injured=-1, wounded=-2, mauled=-2, crippled=-5
-              const penalties = [0, -1, -1, -2, -2, -5, '—'];
-              
-              return (
-                <button
-                  key={level}
-                  type="button"
-                  onClick={() => toggleHealthLevel(index)}
-                  className={`w-full flex items-center justify-between p-1.5 rounded text-sm transition-colors ${
-                    isDamaged
-                      ? 'bg-destructive/20 border border-destructive/40'
-                      : 'bg-muted/30 hover:bg-muted/50'
-                  }`}
-                >
-                  <span className={isDamaged ? 'text-destructive' : 'text-muted-foreground'}>
-                    {levelLabel}
-                  </span>
-                  <span className={`text-xs ${isDamaged ? 'text-destructive' : 'text-muted-foreground'}`}>
-                    {penalties[index]}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Quick Disciplines */}
+      {/* 1. DISCIPLINES (read-only, at the top) */}
       {vampiroData?.disciplines && Object.keys(vampiroData.disciplines).length > 0 && (
         <Card className="medieval-card border-destructive/20">
           <CardHeader className="pb-2">
@@ -374,6 +274,153 @@ export function VampireTrackers({
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* 2. BLOOD POOL */}
+      <Card className={`medieval-card ${bloodPool === 0 ? 'border-destructive' : 'border-destructive/20'}`}>
+        <CardHeader className="pb-2">
+          <CardTitle className="font-medieval text-sm flex items-center gap-2 text-destructive">
+            <Droplets className="w-4 h-4" />
+            {t.vampiro.bloodPool}
+            {isSaving && (
+              <span className="text-xs text-muted-foreground ml-auto animate-pulse">
+                ...
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {/* Critical State Banner */}
+          {bloodPool === 0 && (
+            <div className="bg-destructive/20 border border-destructive rounded-lg p-2 animate-pulse flex items-center gap-2">
+              <Skull className="w-4 h-4 text-destructive" />
+              <span className="text-sm font-medieval text-destructive">
+                {t.vampiro?.hungerFrenzy || 'Frenesi de Fome!'}
+              </span>
+            </div>
+          )}
+
+          <div className="space-y-1">
+            {Array.from({ length: 5 }, (_, rowIndex) => (
+              <div key={rowIndex} className="flex gap-1 justify-center">
+                {Array.from({ length: 10 }, (_, colIndex) => {
+                  const index = rowIndex * 10 + colIndex;
+                  const isFilled = index < bloodPool;
+                  return (
+                    <button
+                      key={colIndex}
+                      type="button"
+                      onClick={() => requestBloodChange(index)}
+                      className={`w-3 h-3 rounded-sm border transition-colors cursor-pointer hover:border-destructive ${
+                        isFilled
+                          ? 'bg-destructive border-destructive'
+                          : 'border-destructive/40 bg-destructive/10'
+                      }`}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            {bloodPool}/50
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* 3. WILLPOWER */}
+      <Card className={`medieval-card ${currentWillpower === 0 ? 'border-amber-500' : 'border-destructive/20'}`}>
+        <CardHeader className="pb-2">
+          <CardTitle className="font-medieval text-sm flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-destructive" />
+            {t.vampiro.willpowerCurrent}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {/* Critical State Banner */}
+          {currentWillpower === 0 && (
+            <div className="bg-amber-500/20 border border-amber-500 rounded-lg p-2 animate-pulse flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              <span className="text-sm font-medieval text-amber-500">
+                {t.vampiro?.willpowerExhausted || 'Vontade Exaurida!'}
+              </span>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-1 justify-center">
+            {Array.from({ length: maxWillpower }, (_, i) => {
+              const isFilled = i < currentWillpower;
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => requestWillpowerChange(i)}
+                  className={`w-4 h-4 rounded border-2 transition-colors cursor-pointer hover:border-foreground ${
+                    isFilled
+                      ? 'bg-foreground border-foreground'
+                      : 'border-muted-foreground/40 bg-transparent'
+                  }`}
+                />
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            {currentWillpower}/{maxWillpower}
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* 4. HEALTH TRACKER (Vitality) */}
+      <Card className="medieval-card border-destructive/20">
+        <CardHeader className="pb-2">
+          <CardTitle className="font-medieval text-sm flex items-center gap-2">
+            <Heart className="w-4 h-4 text-destructive" />
+            {t.vampiro.healthLevels}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-1">
+            {HEALTH_LEVELS.map((level, index) => {
+              const isDamaged = healthDamage[index];
+              const levelLabel = t.vampiro[level] || level;
+              // Penalties: bruised=0, hurt=-1, injured=-1, wounded=-2, mauled=-2, crippled=-5
+              const penalties = [0, -1, -1, -2, -2, -5, '—'];
+              
+              return (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() => requestHealthChange(index)}
+                  className={`w-full flex items-center justify-between p-1.5 rounded text-sm transition-colors ${
+                    isDamaged
+                      ? 'bg-destructive/20 border border-destructive/40'
+                      : 'bg-muted/30 hover:bg-muted/50'
+                  }`}
+                >
+                  <span className={isDamaged ? 'text-destructive' : 'text-muted-foreground'}>
+                    {levelLabel}
+                  </span>
+                  <span className={`text-xs ${isDamaged ? 'text-destructive' : 'text-muted-foreground'}`}>
+                    {penalties[index]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Confirmation Modal */}
+      {pendingChange && (
+        <TrackerChangeConfirmModal
+          open={isConfirmOpen}
+          trackerType={pendingChange.type}
+          currentValue={pendingChange.currentValue}
+          newValue={pendingChange.newValue}
+          isNarrator={false}
+          onConfirm={confirmChange}
+          onCancel={cancelChange}
+        />
       )}
     </div>
   );
