@@ -1,208 +1,204 @@
 
-# Plano: Suporte para Alteração Permanente de Humanidade/Trilha na Sessão
+# Plano: Melhorias na Sidebar do Narrador Vampiro
 
 ## Objetivo
-Adicionar um tracker de Humanidade/Trilha editável na sessão de Vampiro, com um modal de confirmação especial que alerta sobre a natureza **permanente** da alteração (diferente de Blood/Willpower/Health que são temporários de sessão).
+Implementar 5 mudanças na interface de sessão de Vampiro:
+1. Remover card "Nova Cena" da sidebar esquerda
+2. Implementar i18n nas disciplinas da Coterie
+3. Ordenar disciplinas por nível mais alto primeiro
+4. Alterar texto "Configurar Teste" para "Testar"
+5. Alterar texto do botão de teste para incluir nomes de personagens
+6. remover o contador de personagens na Coterie.
 
 ---
 
-## Diferença Crítica: Alteração Permanente
+## Mudanças Detalhadas
 
-| Tracker | Onde Salva | Natureza |
-|---------|-----------|----------|
-| Sangue | `session_participants.session_blood_pool` | Temporário de sessão |
-| Vontade | `session_participants.session_willpower_current` | Temporário de sessão |
-| Vitalidade | `session_participants.session_health_damage` | Temporário de sessão |
-| **Humanidade** | `characters.vampiro_data.humanity` | **PERMANENTE** |
+### 1. Remover Card "Nova Cena" (VampireNarratorSidebar)
 
-A alteração de Humanidade modifica diretamente a ficha do personagem no banco de dados.
+**Localização:** Linhas 535-587 do `VampireNarratorSidebar.tsx`
 
----
+O card de gerenciamento de cenas será removido da sidebar do Narrador. O gerenciamento de cenas já existe no painel central (`VampireScenePanel`), então esta duplicação é desnecessária.
 
-## Componentes a Modificar
-
-### 1. TrackerChangeConfirmModal.tsx
-**Mudanças:**
-- Adicionar `'humanity'` ao tipo `TrackerType`
-- Adicionar nova prop `isPermanent: boolean`
-- Exibir alerta visual diferenciado para alterações permanentes
-- Mensagem especial: "Esta é uma alteração PERMANENTE na ficha do personagem"
-
-### 2. VampireTrackers.tsx
-**Mudanças:**
-- Adicionar seção de Humanidade após Willpower e antes de Health
-- Implementar lógica de clique para solicitar alteração
-- Salvar alteração no `characters.vampiro_data.humanity` (não em session_participants)
-- Emitir evento para o feed
-
-### 3. VampireNarratorSidebar.tsx
-**Mudanças:**
-- Adicionar exibição de Humanidade na Coterie
-- Permitir que Narrador altere Humanidade de jogadores
-- Integrar com modal de confirmação permanente
-
-### 4. VampireEventFeed.tsx
-**Mudanças:**
-- Já suporta `tracker_type: 'humanity'` (verificado no código)
-- Adicionar indicador visual de "alteração permanente" no evento
-
-### 5. translations.ts
-**Novas chaves:**
-- `trackerHumanityChange`: 'Humanidade'
-- `trackerPermanentWarning`: 'ATENÇÃO: Esta é uma alteração PERMANENTE na ficha do personagem!'
-- `trackerPermanentDescription`: 'A Humanidade será modificada definitivamente, não apenas para esta sessão.'
+**Ação:** Deletar o bloco de código do card "Scene Management"
 
 ---
 
-## Novo Layout do Modal para Alteração Permanente
+### 2. Implementar i18n nas Disciplinas da Coterie
 
-```text
-┌──────────────────────────────────────────────────────────┐
-│  ⚠️ Confirmar Alteração PERMANENTE              [X]      │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │  🚨 ALTERAÇÃO PERMANENTE                           │  │
-│  │  Esta mudança afetará a ficha do personagem       │  │
-│  │  permanentemente, não apenas esta sessão.          │  │
-│  └────────────────────────────────────────────────────┘  │
-│                                                          │
-│  [Ícone Lua] Humanidade: 7 → 6 (-1)                      │
-│                                                          │
-│  Esta alteração será sincronizada em tempo real          │
-│  com todos os participantes da sessão.                   │
-│                                                          │
-│  ┌────────────────────────────────────────────────────┐  │
-│  │  🔴 Narrador verá esta mudança                     │  │
-│  │  👁️ Outros jogadores verão esta mudança            │  │
-│  └────────────────────────────────────────────────────┘  │
-│                                                          │
-│  [Cancelar]                      [⚠️ Confirmar Alteração]│
-└──────────────────────────────────────────────────────────┘
+**Localização:** Linhas 408-421 do `VampireNarratorSidebar.tsx`
+
+**Problema Atual:**
+```typescript
+{t.vampiro[key as keyof typeof t.vampiro] || key}: {value}
 ```
+Isso falha porque as disciplinas (animalism, auspex, etc.) NÃO existem no objeto `t.vampiro`.
 
----
-
-## Nova Seção de Humanidade no VampireTrackers
-
-```text
-┌─────────────────────────────────────────────────┐
-│ 🌙 Humanidade                      ⚡ PERMANENTE │
-├─────────────────────────────────────────────────┤
-│                                                 │
-│  ○ ○ ○ ○ ○ ● ● ● ● ●   (7/10)                  │
-│                                                 │
-│  Clique para alterar (mudança permanente)       │
-└─────────────────────────────────────────────────┘
-```
-
----
-
-## Fluxo Técnico da Alteração Permanente
-
-```text
-[Clique em ponto de Humanidade]
-         │
-         ▼
-[Calcular novo valor]
-         │
-         ▼
-[Abrir Modal com isPermanent=true]
-         │
-     ┌───┴───┐
-     ▼       ▼
-[Cancelar] [Confirmar]
-     │           │
-     ▼           ▼
-[Reverte]  [1. Atualizar characters.vampiro_data]
-           [2. Emitir evento tracker_change]
-           [3. Atualizar estado local]
-           [4. Toast de confirmação]
-```
-
----
-
-## Detalhes Técnicos
-
-### Função de Salvamento Permanente
+**Solução:**
+Criar um mapa de disciplinas bilíngue similar ao usado em `StepVampiroDisciplines.tsx`:
 
 ```typescript
-const saveHumanityPermanently = async (characterId: string, newHumanity: number) => {
-  // 1. Buscar vampiro_data atual
-  const { data: char } = await supabase
-    .from('characters')
-    .select('vampiro_data')
-    .eq('id', characterId)
-    .single();
-  
-  // 2. Atualizar humanity no objeto
-  const updatedData = {
-    ...char.vampiro_data,
-    humanity: newHumanity,
-  };
-  
-  // 3. Salvar de volta
-  await supabase
-    .from('characters')
-    .update({ vampiro_data: updatedData })
-    .eq('id', characterId);
+const DISCIPLINE_LABELS: Record<string, { pt: string; en: string }> = {
+  animalism: { pt: 'Animalismo', en: 'Animalism' },
+  auspex: { pt: 'Auspícios', en: 'Auspex' },
+  celerity: { pt: 'Celeridade', en: 'Celerity' },
+  // ... todas as disciplinas
+};
+
+const getDisciplineLabel = (key: string, lang: string) => {
+  const label = DISCIPLINE_LABELS[key];
+  return label ? (lang === 'pt-BR' ? label.pt : label.en) : key;
 };
 ```
 
-### TrackerType Expandido
+---
 
+### 3. Ordenar Disciplinas por Nível (Mais Alto Primeiro)
+
+**Localização:** Linhas 408-421 do `VampireNarratorSidebar.tsx`
+
+**Código Atual:**
 ```typescript
-export type TrackerType = 'blood' | 'willpower' | 'health' | 'humanity';
+Object.entries(vampData.disciplines)
+  .filter(([, v]) => v > 0)
+  .slice(0, 3)
 ```
 
-### Estrutura do Evento no Feed
-
+**Código Novo:**
 ```typescript
-{
-  event_type: 'tracker_change',
-  event_data: {
-    tracker_type: 'humanity',
-    character_id: 'uuid',
-    character_name: 'Marcus',
-    old_value: 7,
-    new_value: 6,
-    is_narrator_change: false,
-    is_permanent: true, // Nova flag
-  }
+Object.entries(vampData.disciplines)
+  .filter(([, v]) => v > 0)
+  .sort(([, a], [, b]) => b - a)  // Ordenar por valor decrescente
+  .slice(0, 3)
+```
+
+---
+
+### 4. Alterar "Configurar Teste" para "Testar"
+
+**Localização:** Linha 339 do `VampireNarratorSidebar.tsx`
+
+**De:** `{t.vampiroTests.configureTest}` ("Configurar Teste")
+**Para:** Nova chave `{t.vampiroTests.test}` ("Testar")
+
+**Alteração em translations.ts:**
+```typescript
+// PT-BR
+vampiroTests: {
+  test: 'Testar',
+  // ...
 }
+
+// EN
+vampiroTests: {
+  test: 'Test',
+  // ...
+}
+```
+
+---
+
+### 5. Alterar Texto do Botão "Pedir Teste"
+
+**Localização:** `VampireTestRequestModal.tsx` linha 392
+
+**Comportamento Atual:** "Pedir Teste" (estático)
+
+**Comportamento Novo:**
+- 1 jogador selecionado: "[Nome] faça um teste de [tipo]"
+- Múltiplos jogadores: "[Nome, Nome] testem [tipo]"
+- Todos selecionados: "Todos testem [tipo]"
+
+**Implementação:**
+```typescript
+const getButtonLabel = () => {
+  const targetNames = selectAll 
+    ? [language === 'pt-BR' ? 'Todos' : 'Everyone']
+    : selectedPlayers.map(id => 
+        playersWithCharacters.find(p => p.character_id === id)?.character?.name || ''
+      );
+  
+  const testLabel = getTestTypeLabel(); // Atributo + Habilidade, Vontade, etc.
+  
+  if (targetNames.length === 1) {
+    return language === 'pt-BR' 
+      ? `${targetNames[0]} faça um teste de ${testLabel}`
+      : `${targetNames[0]} make a ${testLabel} test`;
+  }
+  
+  return language === 'pt-BR'
+    ? `${targetNames.join(', ')} testem ${testLabel}`
+    : `${targetNames.join(', ')} test ${testLabel}`;
+};
 ```
 
 ---
 
 ## Arquivos a Modificar
 
-1. `src/components/session/vampire/TrackerChangeConfirmModal.tsx`
-   - Adicionar 'humanity' ao TrackerType
-   - Adicionar prop isPermanent
-   - Renderizar alerta de permanência
-
-2. `src/components/session/vampire/VampireTrackers.tsx`
-   - Adicionar card de Humanidade
-   - Implementar requestHumanityChange
-   - Implementar saveHumanityPermanently
-   - Integrar com confirmação
-
-3. `src/components/session/vampire/VampireNarratorSidebar.tsx`
-   - Adicionar Humanidade na exibição da Coterie
-   - Permitir alteração pelo Narrador
-
-4. `src/components/session/vampire/VampireEventFeed.tsx`
-   - Adicionar indicador visual de "permanente" para eventos de humanity
-
-5. `src/lib/i18n/translations.ts`
-   - Adicionar chaves de tradução para permanência
+| Arquivo | Mudanças |
+|---------|----------|
+| `src/components/session/vampire/VampireNarratorSidebar.tsx` | Remover card de cena, adicionar mapa de disciplinas, ordenar disciplinas, trocar texto do botão |
+| `src/components/session/vampire/VampireTestRequestModal.tsx` | Alterar texto do botão de "Pedir Teste" para frase dinâmica |
+| `src/lib/i18n/translations.ts` | Adicionar chave `vampiroTests.test` |
 
 ---
 
-## Resultado Esperado
+## Mapa de Disciplinas (Referência)
 
-1. **Humanidade visível na sessão** - Players e Narrador podem ver a Humanidade atual
-2. **Alteração com confirmação especial** - Modal destaca clareza que é permanente
-3. **Evento no feed** - Alterações de Humanidade aparecem no feed com badge "PERMANENTE"
-4. **Consistência com ficha** - Após alterar, a ficha do personagem reflete o novo valor
-5. **Sincronização em tempo real** - Todos veem a alteração imediatamente
+```text
+┌─────────────────────────────────────────────────────────┐
+│  Disciplina        │  PT-BR           │  EN             │
+├─────────────────────────────────────────────────────────┤
+│  animalism         │  Animalismo      │  Animalism      │
+│  auspex            │  Auspícios       │  Auspex         │
+│  celerity          │  Celeridade      │  Celerity       │
+│  chimerstry        │  Quimerismo      │  Chimerstry     │
+│  dementation       │  Demência        │  Dementation    │
+│  dominate          │  Dominação       │  Dominate       │
+│  fortitude         │  Fortitude       │  Fortitude      │
+│  necromancy        │  Necromancia     │  Necromancy     │
+│  obfuscate         │  Ofuscação       │  Obfuscate      │
+│  obtenebration     │  Obtenebração    │  Obtenebration  │
+│  potence           │  Potência        │  Potence        │
+│  presence          │  Presença        │  Presence       │
+│  protean           │  Metamorfose     │  Protean        │
+│  quietus           │  Quietus         │  Quietus        │
+│  serpentis         │  Serpentis       │  Serpentis      │
+│  thaumaturgy       │  Taumaturgia     │  Thaumaturgy    │
+│  vicissitude       │  Vicissitude     │  Vicissitude    │
+│  + outras 12 disciplinas menores...                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Resultado Visual Esperado
+
+**Antes (Coterie):**
+```
+🌙 Marcus
+   Brujah • 10ª Geração
+   [celerity: 3] [potence: 2] [presence: 1]
+```
+
+**Depois (Coterie):**
+```
+🌙 Marcus
+   Brujah • 10ª Geração
+   [Celeridade: 3] [Potência: 2] [Presença: 1]
+```
+
+**Antes (Botão de Teste):**
+```
+[Pedir Teste]
+```
+
+**Depois (Botão de Teste):**
+```
+[Marcus faça um teste de Força + Briga]
+ou
+[Marcus e Elena testem Força de Vontade]
+ou
+[Marcus, José e Elena testem Força de Vontade]
+```
