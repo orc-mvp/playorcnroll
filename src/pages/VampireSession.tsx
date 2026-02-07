@@ -315,6 +315,11 @@ export default function VampireSession() {
         { event: '*', schema: 'public', table: 'session_participants', filter: `session_id=eq.${sessionId}` },
         () => fetchParticipants()
       )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'characters' },
+        () => fetchParticipants()
+      )
       .subscribe();
 
     return () => {
