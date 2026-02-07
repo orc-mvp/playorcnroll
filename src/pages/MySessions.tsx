@@ -17,7 +17,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Sword, Moon, Trash2 } from 'lucide-react';
+import { Sword, Moon, Trash2, Crown, Users as UsersIcon } from 'lucide-react';
 import { 
   ArrowLeft, 
   Plus, 
@@ -31,7 +31,7 @@ import {
 import { format } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 
-interface Session {
+interface SessionWithRole {
   id: string;
   name: string;
   description: string | null;
@@ -40,7 +40,9 @@ interface Session {
   game_system: string;
   created_at: string;
   updated_at: string;
+  narrator_id: string;
   participant_count?: number;
+  contextRole: 'narrator' | 'player';
 }
 
 const statusConfig: Record<string, { label: string; labelEn: string; icon: React.ElementType; variant: 'default' | 'secondary' | 'outline'; className?: string }> = {
@@ -52,15 +54,13 @@ const statusConfig: Record<string, { label: string; labelEn: string; icon: React
 
 export default function MySessions() {
   const navigate = useNavigate();
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { t, language } = useI18n();
 
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<SessionWithRole[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deleteSession, setDeleteSession] = useState<Session | null>(null);
+  const [deleteSession, setDeleteSession] = useState<SessionWithRole | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  const isNarrator = profile?.role === 'narrator';
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -72,75 +72,65 @@ export default function MySessions() {
     if (!user) return;
 
     const fetchSessions = async () => {
-      if (isNarrator) {
-        // Fetch sessions where user is narrator
-        const { data, error } = await supabase
+      // Fetch both narrator and participant sessions in parallel
+      const [narratorResult, participantResult] = await Promise.all([
+        supabase
           .from('sessions')
           .select('*')
-          .eq('narrator_id', user.id)
-          .order('updated_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching sessions:', error);
-        } else {
-          // Get participant counts
-          const sessionsWithCounts = await Promise.all(
-            (data || []).map(async (session) => {
-              const { count } = await supabase
-                .from('session_participants')
-                .select('*', { count: 'exact', head: true })
-                .eq('session_id', session.id);
-
-              return { ...session, participant_count: count || 0 };
-            })
-          );
-          setSessions(sessionsWithCounts);
-        }
-      } else {
-        // Fetch sessions where user is participant (players don't need invite_code)
-        const { data: participantData, error } = await supabase
+          .eq('narrator_id', user.id),
+        supabase
           .from('session_participants')
           .select(`
             session_id,
-            sessions:session_id (
-              id,
-              name,
-              description,
-              status,
-              game_system,
-              created_at,
-              updated_at
-            )
+            sessions:session_id (*)
           `)
-          .eq('user_id', user.id);
+          .eq('user_id', user.id),
+      ]);
 
-        if (error) {
-          console.error('Error fetching sessions:', error);
-        } else {
-          const sessionsData = participantData
-            ?.map((p) => p.sessions as unknown as Session)
-            .filter(Boolean)
-            .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      const allSessions: SessionWithRole[] = [];
 
-          setSessions(sessionsData || []);
-        }
+      // Add narrator sessions
+      if (narratorResult.data) {
+        // Get participant counts for narrator sessions
+        const withCounts = await Promise.all(
+          narratorResult.data.map(async (session) => {
+            const { count } = await supabase
+              .from('session_participants')
+              .select('*', { count: 'exact', head: true })
+              .eq('session_id', session.id);
+
+            return { ...session, participant_count: count || 0, contextRole: 'narrator' as const };
+          })
+        );
+        allSessions.push(...withCounts);
       }
+
+      // Add participant sessions (exclude ones where user is also narrator)
+      if (participantResult.data) {
+        const narratorIds = new Set(narratorResult.data?.map(s => s.id) || []);
+        participantResult.data.forEach((p) => {
+          const session = p.sessions as unknown as SessionWithRole;
+          if (session && !narratorIds.has(session.id)) {
+            allSessions.push({ ...session, contextRole: 'player' });
+          }
+        });
+      }
+
+      // Sort by updated_at
+      allSessions.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      setSessions(allSessions);
       setLoading(false);
     };
 
     fetchSessions();
-  }, [user, isNarrator]);
+  }, [user]);
 
-  const handleSessionClick = (session: Session) => {
+  const handleSessionClick = (session: SessionWithRole) => {
     if (session.status === 'active') {
-      // Navigate to correct route based on game system
       const route = session.game_system === 'vampiro_v3' 
         ? `/session/vampire/${session.id}` 
         : `/session/${session.id}`;
       navigate(route);
-    } else if (session.status === 'ended') {
-      // For ended sessions, narrator goes to lobby to restart
-      navigate(`/session/${session.id}/lobby`);
     } else {
       navigate(`/session/${session.id}/lobby`);
     }
@@ -153,7 +143,6 @@ export default function MySessions() {
     
     try {
       // Delete in order to respect foreign key constraints
-      // 1. Delete test_rolls (via tests)
       const { data: tests } = await supabase
         .from('tests')
         .select('id')
@@ -161,61 +150,23 @@ export default function MySessions() {
       
       if (tests && tests.length > 0) {
         const testIds = tests.map(t => t.id);
-        await supabase
-          .from('test_rolls')
-          .delete()
-          .in('test_id', testIds);
+        await supabase.from('test_rolls').delete().in('test_id', testIds);
       }
       
-      // 2. Delete tests
-      await supabase
-        .from('tests')
-        .delete()
-        .eq('session_id', deleteSession.id);
+      await supabase.from('tests').delete().eq('session_id', deleteSession.id);
+      await supabase.from('complications').delete().eq('session_id', deleteSession.id);
+      await supabase.from('session_events').delete().eq('session_id', deleteSession.id);
+      await supabase.from('session_participants').delete().eq('session_id', deleteSession.id);
+      await supabase.from('scenes').delete().eq('session_id', deleteSession.id);
       
-      // 3. Delete complications
-      await supabase
-        .from('complications')
-        .delete()
-        .eq('session_id', deleteSession.id);
-      
-      // 4. Delete session_events
-      await supabase
-        .from('session_events')
-        .delete()
-        .eq('session_id', deleteSession.id);
-      
-      // 5. Delete session_participants
-      await supabase
-        .from('session_participants')
-        .delete()
-        .eq('session_id', deleteSession.id);
-      
-      // 6. Delete scenes
-      await supabase
-        .from('scenes')
-        .delete()
-        .eq('session_id', deleteSession.id);
-      
-      // 7. Finally delete the session itself
-      const { error } = await supabase
-        .from('sessions')
-        .delete()
-        .eq('id', deleteSession.id);
-      
+      const { error } = await supabase.from('sessions').delete().eq('id', deleteSession.id);
       if (error) throw error;
       
-      // Update local state
       setSessions(prev => prev.filter(s => s.id !== deleteSession.id));
-      
-      toast.success(
-        language === 'pt-BR' ? 'Sessão excluída com sucesso' : 'Session deleted successfully'
-      );
+      toast.success(language === 'pt-BR' ? 'Sessão excluída com sucesso' : 'Session deleted successfully');
     } catch (error) {
       console.error('Error deleting session:', error);
-      toast.error(
-        language === 'pt-BR' ? 'Erro ao excluir sessão' : 'Error deleting session'
-      );
+      toast.error(language === 'pt-BR' ? 'Erro ao excluir sessão' : 'Error deleting session');
     } finally {
       setIsDeleting(false);
       setDeleteSession(null);
@@ -253,15 +204,13 @@ export default function MySessions() {
             </h1>
           </div>
 
-          {isNarrator && (
-            <Button asChild className="shrink-0">
-              <Link to="/session/create">
-                <Plus className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">{t.session.create}</span>
-                <span className="sm:hidden">Nova</span>
-              </Link>
-            </Button>
-          )}
+          <Button asChild className="shrink-0">
+            <Link to="/session/create">
+              <Plus className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">{t.session.create}</span>
+              <span className="sm:hidden">Nova</span>
+            </Link>
+          </Button>
         </div>
       </header>
 
@@ -273,25 +222,24 @@ export default function MySessions() {
               <BookOpen className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
               <h3 className="font-medieval text-xl mb-2">{t.session.noSessions}</h3>
               <p className="text-muted-foreground font-body mb-6">
-                {isNarrator
-                  ? 'Crie sua primeira sessão para começar uma aventura!'
-                  : 'Entre em uma sessão usando o código de convite.'}
+                {language === 'pt-BR'
+                  ? 'Crie uma sessão ou entre em uma com código de convite!'
+                  : 'Create a session or join one with an invite code!'}
               </p>
-              {isNarrator ? (
+              <div className="flex gap-3 justify-center">
                 <Button asChild>
                   <Link to="/session/create">
                     <Plus className="w-4 h-4 mr-2" />
                     {t.session.create}
                   </Link>
                 </Button>
-              ) : (
-                <Button asChild>
+                <Button asChild variant="outline">
                   <Link to="/join">
                     <Users className="w-4 h-4 mr-2" />
                     {t.session.join}
                   </Link>
                 </Button>
-              )}
+              </div>
             </CardContent>
           </Card>
         ) : (
@@ -299,6 +247,7 @@ export default function MySessions() {
             {sessions.map((session) => {
               const status = statusConfig[session.status] || statusConfig.lobby;
               const StatusIcon = status.icon;
+              const isNarrator = session.contextRole === 'narrator';
 
               return (
                 <Card
@@ -318,6 +267,14 @@ export default function MySessions() {
                           <span className="text-xs text-muted-foreground font-body">
                             {session.game_system === 'vampiro_v3' ? 'Vampiro 3ª Ed.' : 'Heróis Marcados'}
                           </span>
+                          {/* Contextual role badge */}
+                          <Badge variant="outline" className="text-xs">
+                            {isNarrator ? (
+                              <><Crown className="w-3 h-3 mr-1" />{t.roles.narrator}</>
+                            ) : (
+                              <><UsersIcon className="w-3 h-3 mr-1" />{t.roles.player}</>
+                            )}
+                          </Badge>
                         </div>
                         <CardTitle className="font-medieval text-lg truncate">
                           {session.name}
@@ -348,11 +305,10 @@ export default function MySessions() {
                         <div className="flex items-center gap-1">
                           <Users className="w-4 h-4" />
                           <span className="font-body">
-                            {session.participant_count} jogador(es)
+                            {session.participant_count} {language === 'pt-BR' ? 'jogador(es)' : 'player(s)'}
                           </span>
                         </div>
                       )}
-                      {/* Only show invite code to narrators - players don't need to see it */}
                       {isNarrator && (
                         <div className="flex items-center gap-1 ml-auto">
                           <span className="font-mono text-xs bg-muted px-2 py-1 rounded">

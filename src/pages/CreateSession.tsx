@@ -33,9 +33,9 @@ export default function CreateSession() {
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect if not authenticated or not a narrator
-  if (!authLoading && (!user || profile?.role !== 'narrator')) {
-    navigate('/dashboard', { replace: true });
+  // Redirect if not authenticated
+  if (!authLoading && !user) {
+    navigate('/auth', { replace: true });
     return null;
   }
 

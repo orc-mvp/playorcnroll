@@ -6,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 interface Profile {
   id: string;
   user_id: string;
-  role: 'narrator' | 'player';
   display_name: string | null;
   language: 'pt-BR' | 'en';
 }
@@ -16,7 +15,7 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signUp: (email: string, password: string, role: 'narrator' | 'player', displayName?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, displayName?: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<Pick<Profile, 'display_name' | 'language'>>) => Promise<{ error: Error | null }>;
@@ -85,20 +84,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (
     email: string, 
     password: string, 
-    role: 'narrator' | 'player',
     displayName?: string
   ): Promise<{ error: Error | null }> => {
     const redirectUrl = `${window.location.origin}/`;
 
     // Profile is automatically created via database trigger (handle_new_user)
-    // The role and display_name are passed in user metadata
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          role,
           display_name: displayName,
         },
       },

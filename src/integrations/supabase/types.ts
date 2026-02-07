@@ -176,7 +176,6 @@ export type Database = {
           display_name: string | null
           id: string
           language: string
-          role: string
           updated_at: string
           user_id: string
         }
@@ -185,7 +184,6 @@ export type Database = {
           display_name?: string | null
           id?: string
           language?: string
-          role: string
           updated_at?: string
           user_id: string
         }
@@ -194,7 +192,6 @@ export type Database = {
           display_name?: string | null
           id?: string
           language?: string
-          role?: string
           updated_at?: string
           user_id?: string
         }
@@ -503,8 +500,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_role: { Args: { p_user_id: string }; Returns: string }
-      is_narrator: { Args: { p_user_id: string }; Returns: boolean }
       is_session_narrator: {
         Args: { p_session_id: string; p_user_id: string }
         Returns: boolean
