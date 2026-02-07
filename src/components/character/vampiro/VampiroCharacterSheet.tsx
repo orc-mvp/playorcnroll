@@ -68,6 +68,7 @@ interface VampiroCharacterSheetProps {
     willpower?: number;
     healthDamage?: boolean[];
   };
+  readOnly?: boolean;
 }
 
 function DotDisplay({ value, maxValue = 5 }: { value: number; maxValue?: number }) {
@@ -189,7 +190,7 @@ const HEALTH_LEVELS = [
   { key: 'incapacitated', penalty: '' },
 ] as const;
 
-export default function VampiroCharacterSheet({ character, sessionTrackers }: VampiroCharacterSheetProps) {
+export default function VampiroCharacterSheet({ character, sessionTrackers, readOnly = false }: VampiroCharacterSheetProps) {
   const { t, language } = useI18n();
   const data = character.vampiro_data || {};
   const lang = language === 'pt-BR' ? 'pt' : 'en';
@@ -586,8 +587,11 @@ export default function VampiroCharacterSheet({ character, sessionTrackers }: Va
                         <button
                           key={colIndex}
                           type="button"
-                          onClick={() => toggleBloodPoint(index)}
-                          className={`w-4 h-4 rounded-sm border transition-colors cursor-pointer hover:border-destructive ${
+                          onClick={readOnly ? undefined : () => toggleBloodPoint(index)}
+                          disabled={readOnly}
+                          className={`w-4 h-4 rounded-sm border transition-colors ${
+                            readOnly ? '' : 'cursor-pointer hover:border-destructive'
+                          } ${
                             isFilled
                               ? 'bg-destructive border-destructive'
                               : 'border-destructive/40 bg-destructive/10'
@@ -614,8 +618,11 @@ export default function VampiroCharacterSheet({ character, sessionTrackers }: Va
                     <button
                       key={i}
                       type="button"
-                      onClick={() => toggleWillpowerPoint(i)}
-                      className={`w-5 h-5 rounded border-2 transition-colors cursor-pointer hover:border-foreground ${
+                      onClick={readOnly ? undefined : () => toggleWillpowerPoint(i)}
+                      disabled={readOnly}
+                      className={`w-5 h-5 rounded border-2 transition-colors ${
+                        readOnly ? '' : 'cursor-pointer hover:border-foreground'
+                      } ${
                         isFilled
                           ? 'bg-foreground border-foreground'
                           : 'border-muted-foreground/40 bg-transparent'
@@ -641,8 +648,11 @@ export default function VampiroCharacterSheet({ character, sessionTrackers }: Va
                     <div key={level.key} className="flex items-center gap-2">
                       <button
                         type="button"
-                        onClick={() => toggleHealthDamage(index)}
-                        className={`w-4 h-4 rounded border transition-colors cursor-pointer hover:border-foreground ${
+                        onClick={readOnly ? undefined : () => toggleHealthDamage(index)}
+                        disabled={readOnly}
+                        className={`w-4 h-4 rounded border transition-colors ${
+                          readOnly ? '' : 'cursor-pointer hover:border-foreground'
+                        } ${
                           isDamaged
                             ? 'bg-foreground border-foreground'
                             : 'border-muted-foreground/40 bg-transparent'
