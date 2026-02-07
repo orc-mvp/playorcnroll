@@ -63,6 +63,11 @@ interface VampiroCharacterSheetProps {
     concept: string | null;
     vampiro_data: VampiroData | null;
   };
+  sessionTrackers?: {
+    bloodPool?: number;
+    willpower?: number;
+    healthDamage?: boolean[];
+  };
 }
 
 function DotDisplay({ value, maxValue = 5 }: { value: number; maxValue?: number }) {
@@ -184,15 +189,15 @@ const HEALTH_LEVELS = [
   { key: 'incapacitated', penalty: '' },
 ] as const;
 
-export default function VampiroCharacterSheet({ character }: VampiroCharacterSheetProps) {
+export default function VampiroCharacterSheet({ character, sessionTrackers }: VampiroCharacterSheetProps) {
   const { t, language } = useI18n();
   const data = character.vampiro_data || {};
   const lang = language === 'pt-BR' ? 'pt' : 'en';
   
-  // Interactive state for trackers
-  const [bloodPool, setBloodPool] = useState(0);
-  const [currentWillpower, setCurrentWillpower] = useState(0);
-  const [healthDamage, setHealthDamage] = useState<boolean[]>(Array(7).fill(false));
+  // Interactive state for trackers - use session values if provided
+  const [bloodPool, setBloodPool] = useState(sessionTrackers?.bloodPool ?? 0);
+  const [currentWillpower, setCurrentWillpower] = useState(sessionTrackers?.willpower ?? 0);
+  const [healthDamage, setHealthDamage] = useState<boolean[]>(sessionTrackers?.healthDamage ?? Array(7).fill(false));
   
   const attributes = data.attributes || {
     physical: { strength: 1, dexterity: 1, stamina: 1 },

@@ -147,6 +147,7 @@ export function VampireNarratorSidebar({
   const [isCreatingScene, setIsCreatingScene] = useState(false);
   const [showSceneForm, setShowSceneForm] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState<Participant['character'] | null>(null);
+  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
 
   // Confirmation modal state for narrator edits
   const [pendingChange, setPendingChange] = useState<PendingChange | null>(null);
@@ -581,7 +582,7 @@ export function VampireNarratorSidebar({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => setSelectedCharacter(p.character)}
+                        onClick={() => { setSelectedCharacter(p.character); setSelectedParticipant(p); }}
                         className="w-full mt-1 text-xs h-7"
                       >
                         <FileText className="w-3 h-3 mr-1" />
@@ -597,7 +598,7 @@ export function VampireNarratorSidebar({
       </Card>
 
       {/* Character Sheet Modal */}
-      <Dialog open={!!selectedCharacter} onOpenChange={(open) => !open && setSelectedCharacter(null)}>
+      <Dialog open={!!selectedCharacter} onOpenChange={(open) => { if (!open) { setSelectedCharacter(null); setSelectedParticipant(null); } }}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
             <DialogTitle className="font-medieval flex items-center gap-2">
@@ -613,6 +614,11 @@ export function VampireNarratorSidebar({
                   name: selectedCharacter.name,
                   concept: selectedCharacter.concept,
                   vampiro_data: selectedCharacter.vampiro_data,
+                }}
+                sessionTrackers={{
+                  bloodPool: selectedParticipant?.session_blood_pool ?? 0,
+                  willpower: selectedParticipant?.session_willpower_current ?? 0,
+                  healthDamage: selectedParticipant?.session_health_damage ?? [false, false, false, false, false, false, false],
                 }}
               />
             )}
