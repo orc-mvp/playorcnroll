@@ -1,79 +1,128 @@
 
-# Plano Revisado: Melhorias Mobile para Sala de Vampiro (Jogador)
 
-## Hierarquia de Z-Index Corrigida
+# Plano: Papel Contextual por Sessao (Remover Role Fixo)
 
-A ordem de empilhamento no projeto é:
+## Resumo
 
+Remover o conceito de "narrador" ou "jogador" como tipo fixo de usuario. Qualquer usuario pode criar sessoes (tornando-se narrador daquela sessao) ou entrar em sessoes (como jogador). O papel e determinado pelo contexto da sessao.
+
+Como o sistema nao esta em uso, dados existentes podem ser descartados sem preocupacao.
+
+## Mudancas
+
+### 1. Banco de Dados
+
+- Remover a coluna `role` da tabela `profiles`
+- Remover a funcao `is_narrator(uuid)` (nao e usada em nenhuma politica RLS)
+- Remover a funcao `get_user_role(uuid)` (idem)
+- Atualizar o trigger `handle_new_user()` para nao inserir `role`
+
+### 2. Tela de Cadastro (Auth.tsx)
+
+- Remover a selecao de papel (narrador/jogador) no signup
+- Formulario fica: nome de exibicao, email, senha, confirmar senha
+- Remover validacao de `role` no formulario
+
+### 3. Hook useAuth
+
+- Remover `role` do tipo `Profile`
+- Remover parametro `role` da funcao `signUp()`
+- Nao enviar `role` no metadata do Supabase Auth
+
+### 4. Dashboard Unificado (Dashboard.tsx)
+
+- Todos os usuarios veem os mesmos cards:
+  - Criar Sessao
+  - Minhas Sessoes
+  - Entrar em Sessao
+  - Personagens (abre modal com opcoes criar/ver)
+  - Gerenciar Marcas
+- Remover badge "Narrador"/"Jogador" do header
+- Remover logica `isNarrator` que bifurca a UI
+- Atualizar mensagem de boas-vindas para ser generica
+
+### 5. Minhas Sessoes (MySessions.tsx)
+
+- Buscar em paralelo: sessoes onde o usuario e `narrator_id` E sessoes onde e participante
+- Combinar e ordenar por `updated_at`
+- Exibir badge contextual em cada sessao ("Narrador" ou "Jogador")
+- Mostrar invite code e botao excluir apenas nas sessoes onde e narrador
+- Botao "Criar Sessao" visivel para todos
+
+### 6. Atividade Recente (RecentActivity.tsx)
+
+- Remover parametro `isNarrator`
+- Buscar ambos: sessoes criadas pelo usuario + sessoes onde participa + personagens + rolagens
+- Unificar tudo em uma unica lista ordenada
+
+### 7. Custom Marks (CustomMarks.tsx)
+
+- Remover guard que redireciona se nao for narrador
+- Qualquer usuario autenticado pode criar/gerenciar marcas
+
+### 8. Criar Sessao (CreateSession.tsx)
+
+- Remover guard `profile?.role !== 'narrator'`
+- Qualquer usuario autenticado pode criar sessao
+
+### 9. Traducoes (i18n)
+
+- Remover chaves: `auth.selectRole`, `auth.narrator`, `auth.player`, `auth.narratorDesc`, `auth.playerDesc`, `auth.roleRequired`
+- Manter `roles.narrator` e `roles.player` (usados como badges contextuais nas sessoes)
+- Atualizar `dashboard.welcomeNarrator`/`welcomePlayer` para mensagem unica
+- Adicionar novas chaves para badges contextuais
+
+## Secao Tecnica
+
+### Migracao SQL
+
+```text
+-- Remover funcoes nao utilizadas em RLS
+DROP FUNCTION IF EXISTS public.is_narrator(uuid);
+DROP FUNCTION IF EXISTS public.get_user_role(uuid);
+
+-- Remover coluna role de profiles
+ALTER TABLE public.profiles DROP COLUMN IF EXISTS role;
+
+-- Atualizar trigger para nao inserir role
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger LANGUAGE plpgsql
+SECURITY DEFINER SET search_path TO 'public'
+AS $$
+DECLARE
+  v_language TEXT;
+  v_display_name TEXT;
+BEGIN
+  v_language := COALESCE(NEW.raw_user_meta_data->>'language', 'pt-BR');
+  IF v_language NOT IN ('pt-BR', 'en') THEN
+    v_language := 'pt-BR';
+  END IF;
+  v_display_name := LEFT(NEW.raw_user_meta_data->>'display_name', 100);
+
+  INSERT INTO public.profiles (user_id, display_name, language)
+  VALUES (NEW.id, v_display_name, v_language);
+  RETURN NEW;
+EXCEPTION
+  WHEN unique_violation THEN RETURN NEW;
+END;
+$$;
 ```
-z-40   FAB (teste pendente)
-z-50   Modais, Drawers, Dialogs, Popovers
-z-[100] Toasts (notificações)
-```
 
-Isso garante:
-- FAB fica abaixo de modais (some quando um modal abre)
-- Modais ficam abaixo de toasts (notificações sempre visíveis)
-- Nenhum conflito visual entre camadas
+### Impacto em RLS
 
----
+Nenhuma politica RLS usa `is_narrator()` ou `get_user_role()`. Todas usam `is_session_narrator()` e `sessions.narrator_id`, que permanecem intactos. Nenhuma alteracao em RLS e necessaria.
 
-## Mudancas Propostas
+### Arquivos Modificados
 
-### 1. VampireSession.tsx - Navegacao e FAB Mobile
+| Arquivo | Tipo de Mudanca |
+|---|---|
+| Migracao SQL | Drop column, drop functions, update trigger |
+| `src/hooks/useAuth.tsx` | Remover `role` do tipo e do `signUp()` |
+| `src/pages/Auth.tsx` | Remover selecao de papel |
+| `src/pages/Dashboard.tsx` | Dashboard unificado |
+| `src/pages/MySessions.tsx` | Query unificada com badges contextuais |
+| `src/pages/CreateSession.tsx` | Remover guard de role |
+| `src/pages/CustomMarks.tsx` | Remover guard de role |
+| `src/components/dashboard/RecentActivity.tsx` | Remover parametro `isNarrator`, query unificada |
+| `src/lib/i18n/translations.ts` | Atualizar/remover chaves de role |
 
-**FAB de Teste Pendente** (apenas mobile, bottom-left, z-40):
-- Renderizado apenas quando `isMobile === true`
-- Posicionado em `bottom-6 left-6` para nao competir com toasts (bottom-right)
-- `z-40` para ficar abaixo de modais e toasts
-- Pulsa para chamar atencao do jogador
-- Auto-abre drawer quando teste pendente chega
-
-**Tabs reorganizadas** (apenas mobile):
-- 3 abas: Feed, Trackers, Info (Cena + Panel do jogador)
-- Desktop continua com layout de 3 colunas inalterado
-
-### 2. VampireTrackers.tsx - Alvos de Toque Maiores
-
-Todas as mudancas usam breakpoint `md:` para afetar apenas mobile:
-
-| Elemento | Mobile (< 768px) | Desktop (>= 768px) |
-|----------|-------------------|---------------------|
-| Blood Pool celulas | w-5 h-5 | w-3 h-3 (atual) |
-| Willpower/Humanity botoes | w-6 h-6 | w-4 h-4 (atual) |
-| Health levels | p-2.5 | p-1.5 (atual) |
-| Gaps entre elementos | gap-2 | gap-1 (atual) |
-
-### 3. VampirePendingTest.tsx - Dados e Botoes Maiores
-
-| Elemento | Mobile | Desktop |
-|----------|--------|---------|
-| Dados (resultado) | w-12 h-12 | w-8 h-8 (atual) |
-| Botao de rolagem | h-14 | h-10 (atual) |
-
-### 4. Novo: MobilePendingTestDrawer.tsx
-
-Componente wrapper que usa Drawer (slide-up) para exibir teste pendente no mobile. Impede fechamento acidental (sem fechar ao clicar fora).
-
-### 5. translations.ts
-
-Adicionar chaves i18n para novos textos mobile (titulo do drawer, labels das abas).
-
----
-
-## Arquivos a Modificar
-
-| Arquivo | Mudancas |
-|---------|----------|
-| `VampireSession.tsx` | FAB bottom-left z-40, drawer condicional, tabs mobile reorganizadas |
-| `VampireTrackers.tsx` | Tamanhos responsivos `md:` breakpoint |
-| `VampirePendingTest.tsx` | Tamanhos responsivos `md:` breakpoint |
-| `MobilePendingTestDrawer.tsx` | Novo componente |
-| `translations.ts` | Chaves i18n |
-
-## Garantia de Nao-Impacto no Desktop
-
-- FAB: renderizado apenas com `isMobile`
-- Tabs: condicional `isMobile`
-- Tamanhos: mobile-first com `md:` override para valores desktop originais
-- Drawer: apenas mobile; desktop usa fluxo atual
