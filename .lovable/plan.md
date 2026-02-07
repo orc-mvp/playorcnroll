@@ -1,162 +1,79 @@
 
-# Plano: Correções de Vitalidade e Melhorias nos Trackers de Vampiro
+# Plano Revisado: Melhorias Mobile para Sala de Vampiro (Jogador)
 
-## Resumo das Mudanças
+## Hierarquia de Z-Index Corrigida
 
-### 1. Inverter a Semântica de Vitalidade
-O sistema de Vampiro usa um modelo de "dano acumulado" onde:
-- **0 dano** = Saudável (sem ferimentos)
-- **7 dano** = Incapacitado (criticamente ferido)
+A ordem de empilhamento no projeto é:
 
-**Problema Atual**: O modal de confirmação e o feed de eventos mostram os valores de dano diretamente (ex: "Vitalidade: 2 → 3"), o que é confuso porque parece que a vitalidade está aumentando quando na verdade o personagem está recebendo mais dano.
-
-**Solução**: Inverter a exibição para mostrar "níveis de saúde restantes":
-- Modal mostrará: `Vitalidade: 5 → 4` (ficou mais ferido)
-- Feed mostrará a mesma lógica invertida
-- Internamente continua armazenando níveis de dano
-
-### 2. Adicionar Botões +/- nos Modais do Narrador
-Na visão da Coterie, ao clicar em um tracker, abrir um modal com controles +/- do lado direito para ajuste rápido.
-
-**Arquivos afetados**:
-- `VampireNarratorSidebar.tsx` - Adicionar modal com controles +/- para Blood, Willpower e Health
-
-**Design proposto**:
 ```
-┌─────────────────────────────────────────┐
-│ [Icon] Ajustar Sangue de Marcus         │
-├─────────────────────────────────────────┤
-│                                         │
-│    [ - ]     15     [ + ]               │
-│                                         │
-│    ← Perder      Recuperar →            │
-│                                         │
-├─────────────────────────────────────────┤
-│          [Cancelar]  [Confirmar]        │
-└─────────────────────────────────────────┘
+z-40   FAB (teste pendente)
+z-50   Modais, Drawers, Dialogs, Popovers
+z-[100] Toasts (notificações)
 ```
 
-### 3. Simplificar Humanidade na Visão do Jogador
-Remover da seção de Humanidade em `VampireTrackers.tsx`:
-- A badge "PERMANENTE" no header
-- O texto "Clique para alterar (mudança permanente)"
-- A box de exibição deve ficar na coluna da esquerda.
-
-A Humanidade deve aparecer apenas uma vez, de forma limpa, apenas com o modal de confirmação para avisar sobre a permanência.
+Isso garante:
+- FAB fica abaixo de modais (some quando um modal abre)
+- Modais ficam abaixo de toasts (notificações sempre visíveis)
+- Nenhum conflito visual entre camadas
 
 ---
 
-## Detalhes Técnicos
+## Mudancas Propostas
 
-### Arquivo 1: `src/components/session/vampire/TrackerChangeConfirmModal.tsx`
+### 1. VampireSession.tsx - Navegacao e FAB Mobile
 
-**Mudanças**:
-- Para `trackerType === 'health'`, inverter os valores exibidos:
-  - `displayedCurrentValue = 7 - currentValue`
-  - `displayedNewValue = 7 - newValue`
-- A diferença também deve ser invertida para health
+**FAB de Teste Pendente** (apenas mobile, bottom-left, z-40):
+- Renderizado apenas quando `isMobile === true`
+- Posicionado em `bottom-6 left-6` para nao competir com toasts (bottom-right)
+- `z-40` para ficar abaixo de modais e toasts
+- Pulsa para chamar atencao do jogador
+- Auto-abre drawer quando teste pendente chega
 
-### Arquivo 2: `src/components/session/vampire/VampireEventFeed.tsx`
+**Tabs reorganizadas** (apenas mobile):
+- 3 abas: Feed, Trackers, Info (Cena + Panel do jogador)
+- Desktop continua com layout de 3 colunas inalterado
 
-**Mudanças**:
-- Na função `renderTrackerChange`, para health:
-  - Exibir `7 - oldValue` e `7 - newValue`
-  - Inverter o sinal da diferença
+### 2. VampireTrackers.tsx - Alvos de Toque Maiores
 
-### Arquivo 3: `src/components/session/vampire/VampireNarratorSidebar.tsx`
+Todas as mudancas usam breakpoint `md:` para afetar apenas mobile:
 
-**Mudanças**:
-1. Criar um novo estado para controlar o modal de ajuste:
-   ```typescript
-   const [trackerModal, setTrackerModal] = useState<{
-     type: TrackerType;
-     participantId: string;
-     characterId?: string;
-     characterName: string;
-     currentValue: number;
-     maxValue?: number;
-     isPermanent?: boolean;
-   } | null>(null);
-   ```
+| Elemento | Mobile (< 768px) | Desktop (>= 768px) |
+|----------|-------------------|---------------------|
+| Blood Pool celulas | w-5 h-5 | w-3 h-3 (atual) |
+| Willpower/Humanity botoes | w-6 h-6 | w-4 h-4 (atual) |
+| Health levels | p-2.5 | p-1.5 (atual) |
+| Gaps entre elementos | gap-2 | gap-1 (atual) |
 
-2. Substituir os clicks diretos nos trackers por abertura do modal de ajuste
+### 3. VampirePendingTest.tsx - Dados e Botoes Maiores
 
-3. Criar novo componente de modal com botões +/- que permitem incrementar/decrementar o valor antes de confirmar
+| Elemento | Mobile | Desktop |
+|----------|--------|---------|
+| Dados (resultado) | w-12 h-12 | w-8 h-8 (atual) |
+| Botao de rolagem | h-14 | h-10 (atual) |
 
-4. O modal terá:
-   - Botão `-` para diminuir o valor (perder)
-   - Display do valor atual proposto
-   - Botão `+` para aumentar o valor (recuperar)
-   - Labels: "Perder" à esquerda, "Recuperar" à direita
-   - Botões Cancelar e Confirmar
+### 4. Novo: MobilePendingTestDrawer.tsx
 
-### Arquivo 4: `src/components/session/vampire/VampireTrackers.tsx`
+Componente wrapper que usa Drawer (slide-up) para exibir teste pendente no mobile. Impede fechamento acidental (sem fechar ao clicar fora).
 
-**Mudanças** (linhas 467-503):
-- Remover a Badge "PERMANENTE" do CardTitle da Humanidade
-- Remover o parágrafo com texto "Clique para alterar (mudança permanente)"
-- Manter apenas o título simples com ícone e nome
+### 5. translations.ts
 
-**Antes**:
-```tsx
-<CardTitle className="font-medieval text-sm flex items-center gap-2">
-  <Moon className="w-4 h-4 text-foreground" />
-  {t.vampiro?.humanity || 'Humanidade'}
-  <Badge variant="outline" className="text-[10px] px-1.5 py-0 ml-auto border-destructive/40 text-destructive">
-    <Zap className="w-3 h-3 mr-0.5" />
-    {t.vampiro?.permanent || 'PERMANENTE'}
-  </Badge>
-</CardTitle>
-```
-
-**Depois**:
-```tsx
-<CardTitle className="font-medieval text-sm flex items-center gap-2">
-  <Moon className="w-4 h-4 text-foreground" />
-  {t.vampiro?.humanity || 'Humanidade'}
-</CardTitle>
-```
-
-E remover (linhas 500-502):
-```tsx
-<p className="text-[10px] text-muted-foreground text-center italic">
-  {t.vampiro?.humanityChangeNote || 'Clique para alterar (mudança permanente)'}
-</p>
-```
+Adicionar chaves i18n para novos textos mobile (titulo do drawer, labels das abas).
 
 ---
 
 ## Arquivos a Modificar
 
-| Arquivo | Mudanças |
+| Arquivo | Mudancas |
 |---------|----------|
-| `TrackerChangeConfirmModal.tsx` | Inverter exibição de valores para health |
-| `VampireEventFeed.tsx` | Inverter exibição de valores para health no feed |
-| `VampireNarratorSidebar.tsx` | Adicionar modal com controles +/- para todos os trackers |
-| `VampireTrackers.tsx` | Remover badge "PERMANENTE" e texto explicativo da Humanidade |
+| `VampireSession.tsx` | FAB bottom-left z-40, drawer condicional, tabs mobile reorganizadas |
+| `VampireTrackers.tsx` | Tamanhos responsivos `md:` breakpoint |
+| `VampirePendingTest.tsx` | Tamanhos responsivos `md:` breakpoint |
+| `MobilePendingTestDrawer.tsx` | Novo componente |
+| `translations.ts` | Chaves i18n |
 
----
+## Garantia de Nao-Impacto no Desktop
 
-## Resultado Esperado
-
-**Modal de Confirmação (Health)**:
-- Antes: `Vitalidade: 2 → 3` (confuso)
-- Depois: `Vitalidade: 5 → 4` (claro: perdeu um nível de saúde)
-
-**Coterie do Narrador (clique em tracker)**:
-```
-┌────────────────────────────────────┐
-│ 🩸 Ajustar Sangue - Marcus         │
-├────────────────────────────────────┤
-│                                    │
-│   [ - ]      12       [ + ]        │
-│                                    │
-│  Perder ←          → Recuperar     │
-│                                    │
-│      [Cancelar]   [Confirmar]      │
-└────────────────────────────────────┘
-```
-
-**Humanidade do Jogador**:
-- Antes: Card com badge "PERMANENTE" e texto explicativo
-- Depois: Card limpo apenas com título "Humanidade" e os círculos clicáveis
+- FAB: renderizado apenas com `isMobile`
+- Tabs: condicional `isMobile`
+- Tamanhos: mobile-first com `md:` override para valores desktop originais
+- Drawer: apenas mobile; desktop usa fluxo atual
