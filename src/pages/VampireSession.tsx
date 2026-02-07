@@ -17,6 +17,7 @@ import VampireTestRequestModal, { TestConfig } from '@/components/session/vampir
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { VampireEventFeed } from '@/components/session/vampire/VampireEventFeed';
 import { VampirePendingTest } from '@/components/session/vampire/VampirePendingTest';
+import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { VampireTrackers } from '@/components/session/vampire/VampireTrackers';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { 
@@ -370,6 +371,14 @@ export default function VampireSession() {
 
   // Test request modal state
   const [testModalOpen, setTestModalOpen] = useState(false);
+  const [showPendingTestDrawer, setShowPendingTestDrawer] = useState(false);
+
+  // Auto-open drawer when pending test arrives on mobile
+  useEffect(() => {
+    if (pendingTestEvent && !hasRolledForPendingTest && isMobile) {
+      setShowPendingTestDrawer(true);
+    }
+  }, [pendingTestEvent, hasRolledForPendingTest, isMobile]);
 
   const handleRequestTest = async (config: TestConfig) => {
     if (!sessionId) return;
@@ -492,87 +501,94 @@ export default function VampireSession() {
       {/* Main Content */}
       {isMobile ? (
         // Mobile layout with tabs
-        <Tabs defaultValue="scene" className="flex-1 flex flex-col">
-          <TabsList className="grid grid-cols-4 mx-4 mt-2">
-            <TabsTrigger value="scene" className="font-medieval text-xs">
-              <BookOpen className="w-4 h-4 mr-1" />
-              Cena
-            </TabsTrigger>
-            <TabsTrigger value="events" className="font-medieval text-xs">
-              <Scroll className="w-4 h-4 mr-1" />
-              Eventos
-            </TabsTrigger>
-            <TabsTrigger value="blood" className="font-medieval text-xs">
-              <Droplets className="w-4 h-4 mr-1" />
-              Sangue
-            </TabsTrigger>
-            <TabsTrigger value="character" className="font-medieval text-xs">
-              <User className="w-4 h-4 mr-1" />
-              Ficha
-            </TabsTrigger>
-          </TabsList>
+        <>
+          <Tabs defaultValue="feed" className="flex-1 flex flex-col">
+            <TabsList className="grid grid-cols-3 mx-4 mt-2">
+              <TabsTrigger value="feed" className="font-medieval text-xs">
+                <Scroll className="w-4 h-4 mr-1" />
+                {t.mobile.tabFeed}
+              </TabsTrigger>
+              <TabsTrigger value="trackers" className="font-medieval text-xs">
+                <Droplets className="w-4 h-4 mr-1" />
+                {t.mobile.tabTrackers}
+              </TabsTrigger>
+              <TabsTrigger value="info" className="font-medieval text-xs">
+                <User className="w-4 h-4 mr-1" />
+                {t.mobile.tabInfo}
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="scene" className="flex-1 p-4 overflow-auto">
-            <VampireScenePanel 
-              sessionId={sessionId!}
-              currentScene={currentScene}
-              scenes={scenes}
-              isNarrator={isNarrator}
-              onSceneChange={setCurrentScene}
-            />
-          </TabsContent>
+            <TabsContent value="feed" className="flex-1 p-4 overflow-auto">
+              <VampireEventFeed events={events} />
+            </TabsContent>
 
-          <TabsContent value="events" className="flex-1 p-4 overflow-auto">
-            <VampireEventFeed events={events} />
-          </TabsContent>
+            <TabsContent value="trackers" className="flex-1 p-4 overflow-auto">
+              {myParticipant && myCharacter && (
+                <VampireTrackers
+                  participantId={myParticipant.id}
+                  sessionId={sessionId!}
+                  sceneId={currentScene?.id || null}
+                  character={myCharacter}
+                  initialBloodPool={myParticipant.session_blood_pool || 0}
+                  initialWillpower={myParticipant.session_willpower_current || 0}
+                  initialHealthDamage={myParticipant.session_health_damage || [false, false, false, false, false, false, false]}
+                />
+              )}
+            </TabsContent>
 
-          <TabsContent value="blood" className="flex-1 p-4 overflow-auto">
-            {myParticipant && myCharacter && (
-              <VampireTrackers
-                participantId={myParticipant.id}
-                sessionId={sessionId!}
-                sceneId={currentScene?.id || null}
-                character={myCharacter}
-                initialBloodPool={myParticipant.session_blood_pool || 0}
-                initialWillpower={myParticipant.session_willpower_current || 0}
-                initialHealthDamage={myParticipant.session_health_damage || [false, false, false, false, false, false, false]}
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="character" className="flex-1 p-4 overflow-auto">
-             {isNarrator ? (
-              <VampireNarratorSidebar 
-                sessionId={sessionId!}
-                participants={participants}
-                scenes={scenes}
-                currentScene={currentScene}
-                onRequestTest={() => setTestModalOpen(true)}
-                onSceneChange={setCurrentScene}
-              />
-            ) : (
+            <TabsContent value="info" className="flex-1 p-4 overflow-auto">
               <div className="space-y-4">
-                {/* Pending Test */}
-                {pendingTestEvent && !hasRolledForPendingTest && myCharacter && myVampiroData && (
-                  <VampirePendingTest
+                <VampireScenePanel 
+                  sessionId={sessionId!}
+                  currentScene={currentScene}
+                  scenes={scenes}
+                  isNarrator={isNarrator}
+                  onSceneChange={setCurrentScene}
+                />
+                {isNarrator ? (
+                  <VampireNarratorSidebar 
                     sessionId={sessionId!}
-                    sceneId={currentScene?.id || null}
-                    characterId={myCharacter.id}
-                    characterName={myCharacter.name}
-                    vampiroData={myVampiroData}
-                    testEvent={{
-                      id: pendingTestEvent.id,
-                      event_data: pendingTestEvent.event_data as unknown as TestConfig,
-                      created_at: pendingTestEvent.created_at,
-                    }}
-                    onTestComplete={() => {}}
+                    participants={participants}
+                    scenes={scenes}
+                    currentScene={currentScene}
+                    onRequestTest={() => setTestModalOpen(true)}
+                    onSceneChange={setCurrentScene}
                   />
+                ) : (
+                  <VampirePlayerPanel character={myCharacter} />
                 )}
-                <VampirePlayerPanel character={myCharacter} />
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+
+          {/* FAB for Pending Test - only mobile, bottom-left, z-40 */}
+          {!isNarrator && pendingTestEvent && !hasRolledForPendingTest && (
+            <button
+              onClick={() => setShowPendingTestDrawer(true)}
+              className="fixed bottom-6 left-6 z-40 w-14 h-14 rounded-full bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-lg animate-pulse flex items-center justify-center"
+            >
+              <Dices className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Pending Test Drawer - mobile only */}
+          {!isNarrator && pendingTestEvent && !hasRolledForPendingTest && myCharacter && myVampiroData && (
+            <MobilePendingTestDrawer
+              open={showPendingTestDrawer}
+              onOpenChange={setShowPendingTestDrawer}
+              sessionId={sessionId!}
+              sceneId={currentScene?.id || null}
+              characterId={myCharacter.id}
+              characterName={myCharacter.name}
+              vampiroData={myVampiroData}
+              testEvent={{
+                id: pendingTestEvent.id,
+                event_data: pendingTestEvent.event_data as unknown as TestConfig,
+                created_at: pendingTestEvent.created_at,
+              }}
+            />
+          )}
+        </>
       ) : (
         // Desktop layout
         <div className="flex-1 flex overflow-hidden">
