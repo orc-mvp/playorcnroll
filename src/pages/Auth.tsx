@@ -74,7 +74,7 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
         newErrors.confirmPassword = t.auth.passwordMismatch;
       }
       if (!role) {
-        newErrors.role = 'Role is required';
+        newErrors.role = t.auth.roleRequired;
       }
     }
 
@@ -113,13 +113,13 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
         } else {
           toast({
             title: t.auth.checkEmail,
-            description: 'Por favor, verifique sua caixa de entrada.',
+            description: t.auth.checkEmailDesc,
           });
         }
       }
     } catch (err) {
       console.error('Auth error:', err);
-      setErrors({ form: 'An unexpected error occurred' });
+      setErrors({ form: t.auth.unexpectedError });
     } finally {
       setIsSubmitting(false);
     }
@@ -236,7 +236,7 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
             {mode === 'signup' && (
               <div className="space-y-2">
                 <Label htmlFor="displayName" className="font-body">
-                  {t.character.name} ({t.common.cancel.toLowerCase()})
+                  {t.auth.displayName} ({t.auth.optional})
                 </Label>
                 <Input
                   id="displayName"
