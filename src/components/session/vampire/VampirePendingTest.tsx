@@ -190,7 +190,7 @@ export function VampirePendingTest({
             {rollResult.baseResults.map((die, i) => (
               <div
                 key={`base-${i}`}
-                className={`w-8 h-8 rounded flex items-center justify-center font-bold text-sm border-2 ${
+                className={`w-12 h-12 md:w-8 md:h-8 rounded flex items-center justify-center font-bold text-sm border-2 ${
                   die >= config.difficulty
                     ? 'bg-green-500/20 border-green-500 text-green-500'
                     : die === 1
@@ -204,7 +204,7 @@ export function VampirePendingTest({
             {rollResult.extraResults.map((die, i) => (
               <div
                 key={`extra-${i}`}
-                className={`w-8 h-8 rounded flex items-center justify-center font-bold text-sm border-2 border-dashed ${
+                className={`w-12 h-12 md:w-8 md:h-8 rounded flex items-center justify-center font-bold text-sm border-2 border-dashed ${
                   die >= config.difficulty
                     ? 'bg-yellow-500/20 border-yellow-500 text-yellow-500'
                     : die === 1
@@ -321,7 +321,8 @@ export function VampirePendingTest({
         <Button
           onClick={handleRoll}
           disabled={isRolling}
-          className="w-full bg-destructive hover:bg-destructive/90"
+          className="w-full h-14 md:h-10 bg-destructive hover:bg-destructive/90"
+          size="lg"
         >
           {isRolling ? (
             <span className="animate-pulse">{t.vampiroTests.rolling}</span>

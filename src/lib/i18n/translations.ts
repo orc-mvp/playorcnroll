@@ -514,6 +514,14 @@ export const translations = {
       privateResult: 'Resultado Privado',
       onlyNarratorSees: 'Apenas narrador e jogador veem',
     },
+
+    // Mobile UI
+    mobile: {
+      pendingTestTitle: 'Teste Solicitado',
+      tabFeed: 'Feed',
+      tabTrackers: 'Trackers',
+      tabInfo: 'Info',
+    },
   },
 
   en: {
@@ -1028,6 +1036,14 @@ export const translations = {
       poolLabel: 'Pool',
       privateResult: 'Private Result',
       onlyNarratorSees: 'Only narrator and player can see',
+    },
+
+    // Mobile UI
+    mobile: {
+      pendingTestTitle: 'Test Requested',
+      tabFeed: 'Feed',
+      tabTrackers: 'Trackers',
+      tabInfo: 'Info',
     },
   },
 } as const;
