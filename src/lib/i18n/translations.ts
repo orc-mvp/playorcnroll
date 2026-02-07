@@ -50,6 +50,11 @@ export const translations = {
       passwordMismatch: 'Senhas não coincidem',
       userExists: 'Este email já está cadastrado',
       checkEmail: 'Verifique seu email para confirmar a conta',
+      checkEmailDesc: 'Por favor, verifique sua caixa de entrada.',
+      roleRequired: 'Selecione um papel',
+      unexpectedError: 'Ocorreu um erro inesperado',
+      displayName: 'Nome de exibição',
+      optional: 'opcional',
     },
 
     // Roles
@@ -587,6 +592,11 @@ export const translations = {
       passwordMismatch: 'Passwords do not match',
       userExists: 'This email is already registered',
       checkEmail: 'Check your email to confirm your account',
+      checkEmailDesc: 'Please check your inbox.',
+      roleRequired: 'Please select a role',
+      unexpectedError: 'An unexpected error occurred',
+      displayName: 'Display name',
+      optional: 'optional',
     },
 
     // Roles
