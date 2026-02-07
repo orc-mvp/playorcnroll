@@ -90,14 +90,12 @@ export default function CustomMarks() {
   const [formDescription, setFormDescription] = useState('');
   const [formEffect, setFormEffect] = useState('');
 
-  const isNarrator = profile?.role === 'narrator';
-
-  // Redirect if not authenticated or not a narrator
+  // Redirect if not authenticated
   useEffect(() => {
-    if (!authLoading && (!user || !isNarrator)) {
-      navigate('/dashboard', { replace: true });
+    if (!authLoading && !user) {
+      navigate('/auth', { replace: true });
     }
-  }, [authLoading, user, isNarrator, navigate]);
+  }, [authLoading, user, navigate]);
 
   // Fetch custom marks
   useEffect(() => {

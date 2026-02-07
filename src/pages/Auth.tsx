@@ -8,14 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Crown, Users } from 'lucide-react';
 import logoLarge from '@/assets/logo-orcnroll-large.webp';
 
 const emailSchema = z.string().email();
 const passwordSchema = z.string().min(6);
 
 type AuthMode = 'login' | 'signup';
-type Role = 'narrator' | 'player';
 
 interface AuthProps {
   defaultMode?: AuthMode;
@@ -29,12 +27,10 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
   const { t, language, setLanguage } = useI18n();
   const { toast } = useToast();
 
-  // Check URL param for mode override
   const urlMode = searchParams.get('mode') as AuthMode | null;
   const initialMode = urlMode || defaultMode;
 
   const [mode, setMode] = useState<AuthMode>(initialMode);
-  const [role, setRole] = useState<Role | null>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -42,7 +38,6 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Update mode when URL changes
   useEffect(() => {
     const newMode = searchParams.get('mode') as AuthMode | null;
     if (newMode && (newMode === 'login' || newMode === 'signup')) {
@@ -50,7 +45,6 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
     }
   }, [searchParams]);
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (user && !loading) {
       const from = (location.state as { from?: string })?.from || '/dashboard';
@@ -72,9 +66,6 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
     if (mode === 'signup') {
       if (password !== confirmPassword) {
         newErrors.confirmPassword = t.auth.passwordMismatch;
-      }
-      if (!role) {
-        newErrors.role = t.auth.roleRequired;
       }
     }
 
@@ -101,9 +92,7 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
           }
         }
       } else {
-        if (!role) return;
-        
-        const { error } = await signUp(email, password, role, displayName || undefined);
+        const { error } = await signUp(email, password, displayName || undefined);
         if (error) {
           if (error.message.includes('already registered')) {
             setErrors({ form: t.auth.userExists });
@@ -129,8 +118,6 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
     const newMode = mode === 'login' ? 'signup' : 'login';
     setMode(newMode);
     setErrors({});
-    setRole(null);
-    // Update URL without full navigation
     navigate(`/auth?mode=${newMode}`, { replace: true });
   };
 
@@ -190,48 +177,6 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
 
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Role Selection (Signup only) */}
-            {mode === 'signup' && (
-              <div className="space-y-3">
-                <Label className="font-body">{t.auth.selectRole}</Label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setRole('narrator')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      role === 'narrator'
-                        ? 'border-primary bg-primary/10 gold-border'
-                        : 'border-border bg-card hover:border-primary/50'
-                    }`}
-                  >
-                    <Crown className={`w-8 h-8 mx-auto mb-2 ${role === 'narrator' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <p className="font-medieval text-sm">{t.auth.narrator}</p>
-                    <p className="text-xs text-muted-foreground mt-1 font-body">
-                      {t.auth.narratorDesc}
-                    </p>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setRole('player')}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      role === 'player'
-                        ? 'border-primary bg-primary/10 gold-border'
-                        : 'border-border bg-card hover:border-primary/50'
-                    }`}
-                  >
-                    <Users className={`w-8 h-8 mx-auto mb-2 ${role === 'player' ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <p className="font-medieval text-sm">{t.auth.player}</p>
-                    <p className="text-xs text-muted-foreground mt-1 font-body">
-                      {t.auth.playerDesc}
-                    </p>
-                  </button>
-                </div>
-                {errors.role && (
-                  <p className="text-destructive text-sm font-body">{errors.role}</p>
-                )}
-              </div>
-            )}
-
             {/* Display Name (Signup only) */}
             {mode === 'signup' && (
               <div className="space-y-2">

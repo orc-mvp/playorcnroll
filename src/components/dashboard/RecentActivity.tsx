@@ -16,7 +16,7 @@ import {
   Clock,
   CheckCircle
 } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 
 interface ActivityItem {
@@ -31,10 +31,9 @@ interface ActivityItem {
 
 interface RecentActivityProps {
   userId: string;
-  isNarrator: boolean;
 }
 
-export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
+export function RecentActivity({ userId }: RecentActivityProps) {
   const { language } = useI18n();
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
   const [activities, setActivities] = useState<ActivityItem[]>([]);
@@ -46,206 +45,157 @@ export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
       const allActivities: ActivityItem[] = [];
 
       try {
-        if (isNarrator) {
-          // Fetch narrator's sessions
-          const { data: sessions } = await supabase
-            .from('sessions')
-            .select('id, name, status, game_system, created_at, updated_at')
-            .eq('narrator_id', userId)
-            .order('updated_at', { ascending: false })
-            .limit(10);
+        // Fetch sessions where user is narrator
+        const { data: narratorSessions } = await supabase
+          .from('sessions')
+          .select('id, name, status, game_system, created_at, updated_at')
+          .eq('narrator_id', userId)
+          .order('updated_at', { ascending: false })
+          .limit(10);
 
-          if (sessions) {
-            sessions.forEach(session => {
-              // Determine correct route based on game system
-              const getSessionLink = (s: typeof session) => {
-                if (s.status === 'active') {
-                  return s.game_system === 'vampiro_v3' 
-                    ? `/session/vampire/${s.id}` 
-                    : `/session/${s.id}`;
-                }
-                return `/session/${s.id}/lobby`;
-              };
+        if (narratorSessions) {
+          narratorSessions.forEach(session => {
+            const getSessionLink = (s: typeof session) => {
+              if (s.status === 'active') {
+                return s.game_system === 'vampiro_v3' 
+                  ? `/session/vampire/${s.id}` 
+                  : `/session/${s.id}`;
+              }
+              return `/session/${s.id}/lobby`;
+            };
 
-              // Session created
+            allActivities.push({
+              id: `session-created-${session.id}`,
+              type: 'session_created',
+              title: language === 'pt-BR' ? 'Sessão criada' : 'Session created',
+              description: session.name,
+              timestamp: session.created_at,
+              link: getSessionLink(session),
+              metadata: { status: session.status }
+            });
+
+            if (session.status === 'active' && session.updated_at !== session.created_at) {
               allActivities.push({
-                id: `session-created-${session.id}`,
-                type: 'session_created',
-                title: language === 'pt-BR' ? 'Sessão criada' : 'Session created',
+                id: `session-started-${session.id}`,
+                type: 'session_started',
+                title: language === 'pt-BR' ? 'Sessão iniciada' : 'Session started',
                 description: session.name,
-                timestamp: session.created_at,
+                timestamp: session.updated_at,
                 link: getSessionLink(session),
                 metadata: { status: session.status }
               });
+            }
 
-              // Session status changes
-              if (session.status === 'active' && session.updated_at !== session.created_at) {
-                allActivities.push({
-                  id: `session-started-${session.id}`,
-                  type: 'session_started',
-                  title: language === 'pt-BR' ? 'Sessão iniciada' : 'Session started',
-                  description: session.name,
-                  timestamp: session.updated_at,
-                  link: getSessionLink(session),
-                  metadata: { status: session.status }
-                });
-              }
-
-              if (session.status === 'ended') {
-                allActivities.push({
-                  id: `session-ended-${session.id}`,
-                  type: 'session_ended',
-                  title: language === 'pt-BR' ? 'Sessão encerrada' : 'Session ended',
-                  description: session.name,
-                  timestamp: session.updated_at,
-                  link: `/session/${session.id}/lobby`,
-                  metadata: { status: session.status }
-                });
-              }
-            });
-          }
-
-          // Fetch recent events from narrator's sessions
-          const { data: events } = await supabase
-            .from('session_events')
-            .select(`
-              id, 
-              event_type, 
-              event_data, 
-              created_at,
-              sessions!inner(id, name, narrator_id)
-            `)
-            .eq('sessions.narrator_id', userId)
-            .in('event_type', ['dice_rolled', 'player_joined', 'scene_created'])
-            .order('created_at', { ascending: false })
-            .limit(10);
-
-          if (events) {
-            events.forEach(event => {
-              const eventData = event.event_data as Record<string, any>;
-              const sessionName = (event.sessions as any)?.name || '';
-
-              if (event.event_type === 'dice_rolled') {
-                allActivities.push({
-                  id: `event-${event.id}`,
-                  type: 'dice_rolled',
-                  title: language === 'pt-BR' ? 'Rolagem de dados' : 'Dice roll',
-                  description: `${eventData.character_name || 'Jogador'} - ${sessionName}`,
-                  timestamp: event.created_at,
-                  link: `/session/${(event.sessions as any)?.id}`,
-                  metadata: eventData
-                });
-              } else if (event.event_type === 'player_joined') {
-                allActivities.push({
-                  id: `event-${event.id}`,
-                  type: 'session_joined',
-                  title: language === 'pt-BR' ? 'Jogador entrou' : 'Player joined',
-                  description: `${eventData.player_name || 'Jogador'} - ${sessionName}`,
-                  timestamp: event.created_at,
-                  link: `/session/${(event.sessions as any)?.id}`,
-                  metadata: eventData
-                });
-              }
-            });
-          }
-        } else {
-          // Player: Fetch characters
-          const { data: characters } = await supabase
-            .from('characters')
-            .select('id, name, created_at, updated_at')
-            .eq('user_id', userId)
-            .order('updated_at', { ascending: false })
-            .limit(5);
-
-          if (characters) {
-            characters.forEach(char => {
+            if (session.status === 'ended') {
               allActivities.push({
-                id: `char-${char.id}`,
-                type: 'character_created',
-                title: language === 'pt-BR' ? 'Personagem criado' : 'Character created',
-                description: char.name,
-                timestamp: char.created_at,
-                link: `/character/${char.id}`
+                id: `session-ended-${session.id}`,
+                type: 'session_ended',
+                title: language === 'pt-BR' ? 'Sessão encerrada' : 'Session ended',
+                description: session.name,
+                timestamp: session.updated_at,
+                link: `/session/${session.id}/lobby`,
+                metadata: { status: session.status }
               });
-            });
-          }
-
-          // Player: Fetch sessions they participate in
-          const { data: participations } = await supabase
-            .from('session_participants')
-            .select(`
-              id,
-              joined_at,
-              sessions(id, name, status, game_system)
-            `)
-            .eq('user_id', userId)
-            .order('joined_at', { ascending: false })
-            .limit(5);
-
-          if (participations) {
-            participations.forEach(p => {
-              const session = p.sessions as any;
-              if (session) {
-                const link = session.status === 'active' 
-                  ? (session.game_system === 'vampiro_v3' 
-                    ? `/session/vampire/${session.id}` 
-                    : `/session/${session.id}`)
-                  : `/session/${session.id}/lobby`;
-                
-                allActivities.push({
-                  id: `joined-${p.id}`,
-                  type: 'session_joined',
-                  title: language === 'pt-BR' ? 'Entrou na sessão' : 'Joined session',
-                  description: session.name,
-                  timestamp: p.joined_at,
-                  link,
-                  metadata: { status: session.status }
-                });
-              }
-            });
-          }
-
-          // Player: Fetch their dice rolls
-          const { data: rolls } = await supabase
-            .from('test_rolls')
-            .select(`
-              id,
-              dice1,
-              dice2,
-              total,
-              result,
-              rolled_at,
-              characters(name),
-              tests(
-                attribute,
-                sessions(id, name)
-              )
-            `)
-            .eq('user_id', userId)
-            .not('rolled_at', 'is', null)
-            .order('rolled_at', { ascending: false })
-            .limit(5);
-
-          if (rolls) {
-            rolls.forEach(roll => {
-              const charName = (roll.characters as any)?.name || 'Personagem';
-              const sessionName = (roll.tests as any)?.sessions?.name || '';
-              const attr = (roll.tests as any)?.attribute || '';
-
-              allActivities.push({
-                id: `roll-${roll.id}`,
-                type: 'dice_rolled',
-                title: language === 'pt-BR' ? 'Rolagem de dados' : 'Dice roll',
-                description: `${charName} (${attr}) - ${roll.total}`,
-                timestamp: roll.rolled_at!,
-                link: `/session/${(roll.tests as any)?.sessions?.id}`,
-                metadata: { result: roll.result, dice1: roll.dice1, dice2: roll.dice2 }
-              });
-            });
-          }
+            }
+          });
         }
 
-        // Sort all activities by timestamp (most recent first)
+        // Fetch characters
+        const { data: characters } = await supabase
+          .from('characters')
+          .select('id, name, created_at, updated_at')
+          .eq('user_id', userId)
+          .order('updated_at', { ascending: false })
+          .limit(5);
+
+        if (characters) {
+          characters.forEach(char => {
+            allActivities.push({
+              id: `char-${char.id}`,
+              type: 'character_created',
+              title: language === 'pt-BR' ? 'Personagem criado' : 'Character created',
+              description: char.name,
+              timestamp: char.created_at,
+              link: `/character/${char.id}`
+            });
+          });
+        }
+
+        // Fetch sessions where user is participant
+        const { data: participations } = await supabase
+          .from('session_participants')
+          .select(`
+            id,
+            joined_at,
+            sessions(id, name, status, game_system)
+          `)
+          .eq('user_id', userId)
+          .order('joined_at', { ascending: false })
+          .limit(5);
+
+        if (participations) {
+          participations.forEach(p => {
+            const session = p.sessions as any;
+            if (session) {
+              const link = session.status === 'active' 
+                ? (session.game_system === 'vampiro_v3' 
+                  ? `/session/vampire/${session.id}` 
+                  : `/session/${session.id}`)
+                : `/session/${session.id}/lobby`;
+              
+              allActivities.push({
+                id: `joined-${p.id}`,
+                type: 'session_joined',
+                title: language === 'pt-BR' ? 'Entrou na sessão' : 'Joined session',
+                description: session.name,
+                timestamp: p.joined_at,
+                link,
+                metadata: { status: session.status }
+              });
+            }
+          });
+        }
+
+        // Fetch dice rolls
+        const { data: rolls } = await supabase
+          .from('test_rolls')
+          .select(`
+            id,
+            dice1,
+            dice2,
+            total,
+            result,
+            rolled_at,
+            characters(name),
+            tests(
+              attribute,
+              sessions(id, name)
+            )
+          `)
+          .eq('user_id', userId)
+          .not('rolled_at', 'is', null)
+          .order('rolled_at', { ascending: false })
+          .limit(5);
+
+        if (rolls) {
+          rolls.forEach(roll => {
+            const charName = (roll.characters as any)?.name || 'Personagem';
+            const sessionName = (roll.tests as any)?.sessions?.name || '';
+            const attr = (roll.tests as any)?.attribute || '';
+
+            allActivities.push({
+              id: `roll-${roll.id}`,
+              type: 'dice_rolled',
+              title: language === 'pt-BR' ? 'Rolagem de dados' : 'Dice roll',
+              description: `${charName} (${attr}) - ${roll.total}`,
+              timestamp: roll.rolled_at!,
+              link: `/session/${(roll.tests as any)?.sessions?.id}`,
+              metadata: { result: roll.result, dice1: roll.dice1, dice2: roll.dice2 }
+            });
+          });
+        }
+
+        // Sort all activities by timestamp
         allActivities.sort((a, b) => 
           new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         );
@@ -259,7 +209,7 @@ export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
     };
 
     fetchActivity();
-  }, [userId, isNarrator, language]);
+  }, [userId, language]);
 
   const getActivityIcon = (type: ActivityItem['type']) => {
     switch (type) {
@@ -332,10 +282,7 @@ export function RecentActivity({ userId, isNarrator }: RecentActivityProps) {
             <Scroll className="w-10 h-10 mx-auto mb-2 opacity-30" />
             <p>{language === 'pt-BR' ? 'Nenhuma atividade recente' : 'No recent activity'}</p>
             <p className="text-sm mt-2">
-              {isNarrator 
-                ? (language === 'pt-BR' ? 'Crie uma sessão para começar!' : 'Create a session to get started!')
-                : (language === 'pt-BR' ? 'Crie um personagem ou entre em uma sessão!' : 'Create a character or join a session!')
-              }
+              {language === 'pt-BR' ? 'Crie uma sessão ou personagem para começar!' : 'Create a session or character to get started!'}
             </p>
           </div>
         ) : (
