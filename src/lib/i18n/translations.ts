@@ -522,6 +522,20 @@ export const translations = {
       tabTrackers: 'Trackers',
       tabInfo: 'Info',
     },
+
+    // Dashboard
+    dashboard: {
+      createSessionDesc: 'Inicie uma nova aventura',
+      mySessionsDesc: 'Sessões anteriores e em andamento',
+      joinSessionDesc: 'Entre em uma sessão com código',
+      charactersDesc: 'Criar ou visualizar personagens',
+      marksDesc: 'Marcas personalizadas',
+      welcomeNarrator: 'Gerencie suas sessões e conduza aventuras épicas',
+      welcomePlayer: 'Gerencie seus personagens e participe de aventuras',
+      createCharacterDesc: 'Crie um novo herói para suas aventuras',
+      myCharactersDesc: 'Gerencie seus personagens existentes',
+      joinSessionPlayerDesc: 'Entre em uma sessão usando código de convite',
+    },
   },
 
   en: {
@@ -1044,6 +1058,20 @@ export const translations = {
       tabFeed: 'Feed',
       tabTrackers: 'Trackers',
       tabInfo: 'Info',
+    },
+
+    // Dashboard
+    dashboard: {
+      createSessionDesc: 'Start a new adventure',
+      mySessionsDesc: 'Previous and ongoing sessions',
+      joinSessionDesc: 'Join a session with a code',
+      charactersDesc: 'Create or view characters',
+      marksDesc: 'Custom marks',
+      welcomeNarrator: 'Manage your sessions and lead epic adventures',
+      welcomePlayer: 'Manage your characters and join adventures',
+      createCharacterDesc: 'Create a new hero for your adventures',
+      myCharactersDesc: 'Manage your existing characters',
+      joinSessionPlayerDesc: 'Join a session using an invite code',
     },
   },
 } as const;

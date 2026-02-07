@@ -112,14 +112,14 @@ export default function Dashboard() {
           </h2>
           <p className="text-muted-foreground font-body">
             {isNarrator 
-              ? 'Gerencie suas sessões e conduza aventuras épicas'
-              : 'Gerencie seus personagens e participe de aventuras'
+              ? t.dashboard.welcomeNarrator
+              : t.dashboard.welcomePlayer
             }
           </p>
         </div>
 
         {/* Quick Actions */}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 ${isNarrator ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4 md:gap-6 mb-8`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 ${isNarrator ? 'lg:grid-cols-5' : 'lg:grid-cols-3'} gap-4 md:gap-6 mb-8`}>
           {isNarrator ? (
             <>
               {/* Create Session */}
@@ -131,7 +131,7 @@ export default function Dashboard() {
                     </div>
                     <CardTitle className="font-medieval text-base md:text-lg">{t.session.create}</CardTitle>
                     <CardDescription className="font-body text-xs md:text-sm">
-                      Inicie uma nova aventura
+                      {t.dashboard.createSessionDesc}
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -146,7 +146,22 @@ export default function Dashboard() {
                     </div>
                     <CardTitle className="font-medieval text-base md:text-lg">{t.session.mySessions}</CardTitle>
                     <CardDescription className="font-body text-xs md:text-sm">
-                      Sessões anteriores e em andamento
+                      {t.dashboard.mySessionsDesc}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
+
+              {/* Join Session */}
+              <Link to="/join">
+                <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                  <CardHeader className="p-4 md:p-6">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                      <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                    </div>
+                    <CardTitle className="font-medieval text-base md:text-lg">{t.session.join}</CardTitle>
+                    <CardDescription className="font-body text-xs md:text-sm">
+                      {t.dashboard.joinSessionDesc}
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -159,11 +174,11 @@ export default function Dashboard() {
               >
                 <CardHeader className="p-4 md:p-6">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                    <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                    <Scroll className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                   </div>
                   <CardTitle className="font-medieval text-base md:text-lg">{t.nav.characters}</CardTitle>
                   <CardDescription className="font-body text-xs md:text-sm">
-                    Criar ou visualizar personagens
+                    {t.dashboard.charactersDesc}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -173,11 +188,11 @@ export default function Dashboard() {
                 <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
                   <CardHeader className="p-4 md:p-6">
                     <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                      <Scroll className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                      <Crown className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                     </div>
                     <CardTitle className="font-medieval text-base md:text-lg">{t.marks.createCustom}</CardTitle>
                     <CardDescription className="font-body text-xs md:text-sm">
-                      Marcas personalizadas
+                      {t.dashboard.marksDesc}
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -194,7 +209,7 @@ export default function Dashboard() {
                     </div>
                     <CardTitle className="font-medieval">{t.character.create}</CardTitle>
                     <CardDescription className="font-body">
-                      Crie um novo herói para suas aventuras
+                      {t.dashboard.createCharacterDesc}
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -209,7 +224,7 @@ export default function Dashboard() {
                     </div>
                     <CardTitle className="font-medieval">{t.nav.characters}</CardTitle>
                     <CardDescription className="font-body">
-                      Gerencie seus personagens existentes
+                      {t.dashboard.myCharactersDesc}
                     </CardDescription>
                   </CardHeader>
                 </Card>
@@ -224,7 +239,7 @@ export default function Dashboard() {
                     </div>
                     <CardTitle className="font-medieval">{t.session.join}</CardTitle>
                     <CardDescription className="font-body">
-                      Entre em uma sessão usando código de convite
+                      {t.dashboard.joinSessionPlayerDesc}
                     </CardDescription>
                   </CardHeader>
                 </Card>
