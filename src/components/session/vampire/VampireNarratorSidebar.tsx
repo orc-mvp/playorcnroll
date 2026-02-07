@@ -620,6 +620,7 @@ export function VampireNarratorSidebar({
                   willpower: selectedParticipant?.session_willpower_current ?? 0,
                   healthDamage: selectedParticipant?.session_health_damage ?? [false, false, false, false, false, false, false],
                 }}
+                readOnly
               />
             )}
           </div>

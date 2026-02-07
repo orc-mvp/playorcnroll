@@ -991,6 +991,7 @@ function VampirePlayerPanel({ character, sessionTrackers }: { character: Partici
                   vampiro_data: character.vampiro_data,
                 }}
                 sessionTrackers={sessionTrackers}
+                readOnly
               />
             )}
           </div>
