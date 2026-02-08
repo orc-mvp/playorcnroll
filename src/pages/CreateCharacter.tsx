@@ -116,7 +116,7 @@ export default function CreateCharacter() {
   const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalSteps = 5; // 0: System, 1: Info, 2: Attributes, 3: Virtues, 4: Disciplines
+  const totalSteps = gameSystem === 'vampiro_v3' ? 5 : 4; // Vampiro: 0-4, Marcados: 0-3
   const progress = ((step + 1) / totalSteps) * 100;
 
   const validateStep = (currentStep: number): boolean => {
