@@ -147,7 +147,7 @@ export default function CustomMarks() {
     // Validation
     if (!formName.trim()) {
       toast({
-        title: language === 'pt-BR' ? 'Nome obrigatório' : 'Name required',
+        title: t.customMarks.nameRequired,
         variant: 'destructive',
       });
       return;
@@ -155,7 +155,7 @@ export default function CustomMarks() {
 
     if (!formAttribute) {
       toast({
-        title: language === 'pt-BR' ? 'Atributo obrigatório' : 'Attribute required',
+        title: t.customMarks.attributeRequired,
         variant: 'destructive',
       });
       return;
@@ -163,7 +163,7 @@ export default function CustomMarks() {
 
     if (!formDescription.trim()) {
       toast({
-        title: language === 'pt-BR' ? 'Descrição obrigatória' : 'Description required',
+        title: t.customMarks.descriptionRequired,
         variant: 'destructive',
       });
       return;
@@ -171,7 +171,7 @@ export default function CustomMarks() {
 
     if (!formEffect.trim()) {
       toast({
-        title: language === 'pt-BR' ? 'Efeito obrigatório' : 'Effect required',
+        title: t.customMarks.effectRequired,
         variant: 'destructive',
       });
       return;
@@ -209,7 +209,7 @@ export default function CustomMarks() {
         );
 
         toast({
-          title: language === 'pt-BR' ? 'Marca atualizada!' : 'Mark updated!',
+          title: t.customMarks.markUpdated,
         });
       } else {
         // Create new mark
@@ -230,7 +230,7 @@ export default function CustomMarks() {
         setMarks((prev) => [data, ...prev]);
 
         toast({
-          title: language === 'pt-BR' ? 'Marca criada!' : 'Mark created!',
+          title: t.customMarks.markCreated,
         });
       }
 
@@ -239,7 +239,7 @@ export default function CustomMarks() {
     } catch (error: any) {
       console.error('Error saving mark:', error);
       toast({
-        title: language === 'pt-BR' ? 'Erro ao salvar' : 'Error saving',
+        title: t.common.errorSaving,
         description: error.message,
         variant: 'destructive',
       });
@@ -264,12 +264,12 @@ export default function CustomMarks() {
       setMarks((prev) => prev.filter((m) => m.id !== deleteTarget.id));
 
       toast({
-        title: language === 'pt-BR' ? 'Marca excluída' : 'Mark deleted',
+        title: t.customMarks.markDeleted,
       });
     } catch (error: any) {
       console.error('Error deleting mark:', error);
       toast({
-        title: language === 'pt-BR' ? 'Erro ao excluir' : 'Error deleting',
+        title: t.common.errorDeleting,
         description: error.message,
         variant: 'destructive',
       });
@@ -314,9 +314,9 @@ export default function CustomMarks() {
           <Button onClick={openCreateModal} className="shrink-0">
             <Plus className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">
-              {language === 'pt-BR' ? 'Nova Marca' : 'New Mark'}
+              {t.customMarks.newMark}
             </span>
-            <span className="sm:hidden">Nova</span>
+            <span className="sm:hidden">{t.customMarks.newMark}</span>
           </Button>
         </div>
       </header>
@@ -328,16 +328,14 @@ export default function CustomMarks() {
             <CardContent className="py-12 text-center">
               <Star className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
               <h3 className="font-medieval text-xl mb-2">
-                {language === 'pt-BR' ? 'Nenhuma marca personalizada' : 'No custom marks'}
+                {t.customMarks.noCustomMarks}
               </h3>
               <p className="text-muted-foreground font-body mb-6">
-                {language === 'pt-BR'
-                  ? 'Crie marcas únicas para suas campanhas!'
-                  : 'Create unique marks for your campaigns!'}
+                {t.customMarks.createUniqueMarks}
               </p>
               <Button onClick={openCreateModal}>
                 <Plus className="w-4 h-4 mr-2" />
-                {language === 'pt-BR' ? 'Criar Primeira Marca' : 'Create First Mark'}
+                {t.customMarks.createFirstMark}
               </Button>
             </CardContent>
           </Card>
@@ -400,16 +398,10 @@ export default function CustomMarks() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="font-medieval">
-              {editingMark
-                ? language === 'pt-BR'
-                  ? 'Editar Marca'
-                  : 'Edit Mark'
-                : t.marks.createCustom}
+              {editingMark ? t.customMarks.editMark : t.marks.createCustom}
             </DialogTitle>
             <DialogDescription className="font-body">
-              {language === 'pt-BR'
-                ? 'Defina os detalhes da marca menor personalizada'
-                : 'Define the custom minor mark details'}
+              {t.customMarks.defineDetails}
             </DialogDescription>
           </DialogHeader>
 
@@ -417,13 +409,13 @@ export default function CustomMarks() {
             {/* Name */}
             <div className="space-y-2">
               <Label htmlFor="mark-name" className="font-medieval">
-                {language === 'pt-BR' ? 'Nome da Marca' : 'Mark Name'} *
+                {t.customMarks.markName} *
               </Label>
               <Input
                 id="mark-name"
                 value={formName}
                 onChange={(e) => setFormName(e.target.value)}
-                placeholder={language === 'pt-BR' ? 'Ex: Lâmina Veloz' : 'Ex: Swift Blade'}
+                placeholder={t.customMarks.markNamePlaceholder}
                 className="font-body"
                 maxLength={100}
               />
@@ -467,11 +459,7 @@ export default function CustomMarks() {
                 id="mark-description"
                 value={formDescription}
                 onChange={(e) => setFormDescription(e.target.value)}
-                placeholder={
-                  language === 'pt-BR'
-                    ? 'Descreva a origem ou natureza da marca'
-                    : 'Describe the origin or nature of the mark'
-                }
+                placeholder={t.customMarks.descriptionPlaceholder}
                 className="font-body min-h-[80px] resize-none"
                 maxLength={500}
               />
@@ -486,11 +474,7 @@ export default function CustomMarks() {
                 id="mark-effect"
                 value={formEffect}
                 onChange={(e) => setFormEffect(e.target.value)}
-                placeholder={
-                  language === 'pt-BR'
-                    ? 'Descreva o efeito mecânico da marca'
-                    : 'Describe the mechanical effect of the mark'
-                }
+                placeholder={t.customMarks.effectPlaceholder}
                 className="font-body min-h-[80px] resize-none"
                 maxLength={500}
               />
@@ -526,20 +510,10 @@ export default function CustomMarks() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="font-medieval">
-              {language === 'pt-BR' ? 'Excluir Marca?' : 'Delete Mark?'}
+              {t.customMarks.deleteMark}
             </AlertDialogTitle>
             <AlertDialogDescription className="font-body">
-              {language === 'pt-BR' ? (
-                <>
-                  Tem certeza que deseja excluir <strong>{deleteTarget?.name}</strong>? Esta
-                  ação não pode ser desfeita.
-                </>
-              ) : (
-                <>
-                  Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This
-                  action cannot be undone.
-                </>
-              )}
+              {t.customMarks.deleteConfirm} <strong>{deleteTarget?.name}</strong>? {t.customMarks.cannotBeUndone}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

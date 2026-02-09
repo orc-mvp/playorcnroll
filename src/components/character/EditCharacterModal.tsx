@@ -108,7 +108,7 @@ export function EditCharacterModal({
   const handleSave = async () => {
     if (!name.trim()) {
       toast({
-        title: language === 'pt-BR' ? 'Nome é obrigatório' : 'Name is required',
+        title: t.customMarks.nameRequired,
         variant: 'destructive',
       });
       return;
@@ -116,7 +116,7 @@ export function EditCharacterModal({
 
     if (!isValidDistribution) {
       toast({
-        title: language === 'pt-BR' ? 'Distribuição inválida' : 'Invalid distribution',
+        title: t.character.invalidDistribution,
         description: t.character.distributeHint,
         variant: 'destructive',
       });
@@ -154,13 +154,13 @@ export function EditCharacterModal({
 
       onSave(updated);
       toast({
-        title: language === 'pt-BR' ? 'Personagem atualizado!' : 'Character updated!',
+        title: t.character.updated,
       });
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating character:', error);
       toast({
-        title: language === 'pt-BR' ? 'Erro ao salvar' : 'Error saving',
+        title: t.common.errorSaving,
         variant: 'destructive',
       });
     } finally {
@@ -177,9 +177,7 @@ export function EditCharacterModal({
             {t.character.edit}
           </DialogTitle>
           <DialogDescription className="font-body">
-            {language === 'pt-BR'
-              ? 'Edite as informações do seu personagem'
-              : 'Edit your character information'}
+            {t.character.editDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -187,7 +185,7 @@ export function EditCharacterModal({
           <TabsList className="grid w-full grid-cols-2 shrink-0">
             <TabsTrigger value="basic" className="font-medieval">
               <User className="w-4 h-4 mr-1" />
-              {language === 'pt-BR' ? 'Básico' : 'Basic'}
+              {t.character.basic}
             </TabsTrigger>
             <TabsTrigger value="attributes" className="font-medieval">
               <Scroll className="w-4 h-4 mr-1" />
@@ -204,7 +202,7 @@ export function EditCharacterModal({
                 id="edit-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder={language === 'pt-BR' ? 'Nome do personagem' : 'Character name'}
+                placeholder={t.character.namePlaceholder}
                 className="font-body"
                 maxLength={100}
               />
@@ -277,9 +275,7 @@ export function EditCharacterModal({
             </div>
 
             <p className="text-xs text-center text-muted-foreground">
-              {language === 'pt-BR'
-                ? 'Clique em um atributo para alternar o tipo'
-                : 'Click an attribute to cycle the type'}
+              {t.character.clickToCycle}
             </p>
           </TabsContent>
         </Tabs>

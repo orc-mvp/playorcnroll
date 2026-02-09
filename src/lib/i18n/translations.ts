@@ -97,6 +97,12 @@ export const translations = {
       viewDetails: 'Ver Detalhes',
       step: 'Passo',
       of: 'de',
+      invalidDistribution: 'Distribuição inválida',
+      updated: 'Personagem atualizado!',
+      editDescription: 'Edite as informações do seu personagem',
+      basic: 'Básico',
+      namePlaceholder: 'Nome do personagem',
+      clickToCycle: 'Clique em um atributo para alternar o tipo',
     },
 
     // Marks
@@ -914,6 +920,12 @@ export const translations = {
       viewDetails: 'View Details',
       step: 'Step',
       of: 'of',
+      invalidDistribution: 'Invalid distribution',
+      updated: 'Character updated!',
+      editDescription: 'Edit your character information',
+      basic: 'Basic',
+      namePlaceholder: 'Character name',
+      clickToCycle: 'Click an attribute to cycle the type',
     },
 
     // Marks
