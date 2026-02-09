@@ -58,7 +58,7 @@ export function CreateComplicationModal({
 
   const handleSubmit = async () => {
     if (!description.trim()) {
-      toast({ title: 'Descrição é obrigatória', variant: 'destructive' });
+      toast({ title: t.complications.descriptionRequired, variant: 'destructive' });
       return;
     }
 
@@ -87,12 +87,12 @@ export function CreateComplicationModal({
         },
       });
 
-      toast({ title: 'Complicação criada!' });
+      toast({ title: t.complications.complicationCreated });
       onCreated();
       onClose();
     } catch (error) {
       console.error('Error creating complication:', error);
-      toast({ title: 'Erro ao criar complicação', variant: 'destructive' });
+      toast({ title: t.complications.errorCreating, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -107,7 +107,7 @@ export function CreateComplicationModal({
             {t.complications.create}
           </DialogTitle>
           <DialogDescription className="font-body">
-            Criar complicação para <span className="font-medieval text-foreground">{characterName}</span>
+            {t.complications.createFor} <span className="font-medieval text-foreground">{characterName}</span>
           </DialogDescription>
         </DialogHeader>
 
@@ -148,7 +148,7 @@ export function CreateComplicationModal({
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descreva a complicação..."
+              placeholder={t.complications.describePlaceholder}
               className="font-body min-h-[100px] resize-none"
             />
           </div>

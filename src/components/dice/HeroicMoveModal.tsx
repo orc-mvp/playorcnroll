@@ -169,7 +169,7 @@ export function HeroicMoveModal({ characterId, sessionId, isGroupTest, onClose }
       onClose();
     } catch (error) {
       console.error('Error using heroic move:', error);
-      toast({ title: 'Erro ao usar movimento heroico', variant: 'destructive' });
+      toast({ title: t.diceExtras.errorUsingHeroicMove, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }

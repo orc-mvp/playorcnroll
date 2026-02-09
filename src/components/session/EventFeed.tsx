@@ -198,7 +198,7 @@ export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
           </CardTitle>
           {filteredEvents.length > 0 && (
             <span className="text-xs text-muted-foreground font-body">
-              {filteredEvents.length} {language === 'pt-BR' ? 'eventos' : 'events'}
+              {filteredEvents.length} {t.eventFeed.events}
             </span>
           )}
         </div>
@@ -209,7 +209,7 @@ export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
           {filteredEvents.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground font-body">
               <Scroll className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p>{language === 'pt-BR' ? 'Nenhum evento ainda' : 'No events yet'}</p>
+              <p>{t.eventFeed.noEvents}</p>
             </div>
           ) : (
             <div className="space-y-3 pb-2">
@@ -310,7 +310,7 @@ export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
               className="h-8"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
-              {language === 'pt-BR' ? 'Anterior' : 'Previous'}
+              {t.eventFeed.previous}
             </Button>
             <span className="text-xs text-muted-foreground font-body">
               {currentPage + 1} / {totalPages}
@@ -322,7 +322,7 @@ export function EventFeed({ events, isNarrator = false }: EventFeedProps) {
               disabled={currentPage >= totalPages - 1}
               className="h-8"
             >
-              {language === 'pt-BR' ? 'Próximo' : 'Next'}
+              {t.eventFeed.next}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </div>

@@ -161,18 +161,15 @@ export function EndSessionModal({
       });
 
       toast({
-        title: language === 'pt-BR' ? 'Sessão encerrada!' : 'Session ended!',
-        description:
-          language === 'pt-BR'
-            ? `${marksToPermanent.length} marca(s) tornada(s) permanente(s)`
-            : `${marksToPermanent.length} mark(s) made permanent`,
+        title: t.endSessionExtras.sessionEnded,
+        description: `${marksToPermanent.length} ${t.endSessionExtras.marksMadePermanent}`,
       });
 
       onEndSession();
     } catch (error) {
       console.error('Error ending session:', error);
       toast({
-        title: language === 'pt-BR' ? 'Erro ao encerrar' : 'Error ending session',
+        title: t.endSessionExtras.errorEnding,
         variant: 'destructive',
       });
     } finally {
@@ -189,9 +186,7 @@ export function EndSessionModal({
             {t.endSession.title}
           </DialogTitle>
           <DialogDescription className="font-body">
-            {language === 'pt-BR'
-              ? 'Revise o progresso da sessão antes de encerrar'
-              : 'Review session progress before ending'}
+            {t.endSessionExtras.reviewProgress}
           </DialogDescription>
         </DialogHeader>
 
@@ -294,9 +289,7 @@ export function EndSessionModal({
               ) : (
                 <p className="text-sm text-muted-foreground italic flex items-center gap-1">
                   <Check className="w-4 h-4 text-green-500" />
-                  {language === 'pt-BR'
-                    ? 'Todos os movimentos heroicos foram usados!'
-                    : 'All heroic moves have been used!'}
+                  {t.endSessionExtras.allMovesUsed}
                 </p>
               )}
             </div>
@@ -314,9 +307,7 @@ export function EndSessionModal({
           >
             {loading
               ? t.common.loading
-              : language === 'pt-BR'
-              ? 'Confirmar Encerramento'
-              : 'Confirm End'}
+              : t.endSessionExtras.confirmEnd}
           </Button>
         </DialogFooter>
       </DialogContent>

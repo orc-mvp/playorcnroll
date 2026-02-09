@@ -22,7 +22,7 @@ const defaultVirtues = {
 };
 
 export default function StepVampiroVirtues({ formData, updateFormData }: StepVampiroVirtuesProps) {
-  const { language } = useI18n();
+  const { t } = useI18n();
   
   // Defensive defaults for virtues
   const virtues = formData.virtues || defaultVirtues;
@@ -56,12 +56,12 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
   };
 
   const virtue1Label = virtues.virtueType1 === 'conscience'
-    ? (language === 'pt-BR' ? 'Consciência' : 'Conscience')
-    : (language === 'pt-BR' ? 'Convicção' : 'Conviction');
+    ? t.virtues.conscience
+    : t.virtues.conviction;
 
   const virtue2Label = virtues.virtueType2 === 'selfControl'
-    ? (language === 'pt-BR' ? 'Autocontrole' : 'Self-Control')
-    : (language === 'pt-BR' ? 'Instinto' : 'Instinct');
+    ? t.virtues.selfControl
+    : t.virtues.instinct;
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
@@ -69,12 +69,10 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
       <Card className="medieval-card">
         <CardHeader className="text-center pb-4">
           <CardTitle className="font-medieval text-2xl">
-            {language === 'pt-BR' ? 'Virtudes' : 'Virtues'}
+            {t.virtues.virtues}
           </CardTitle>
           <CardDescription className="font-body">
-            {language === 'pt-BR'
-              ? 'Defina as virtudes que guiam seu vampiro'
-              : 'Define the virtues that guide your vampire'}
+            {t.virtues.defineVirtues}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -89,10 +87,10 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="conscience">
-                  {language === 'pt-BR' ? 'Consciência' : 'Conscience'}
+                  {t.virtues.conscience}
                 </SelectItem>
                 <SelectItem value="conviction">
-                  {language === 'pt-BR' ? 'Convicção' : 'Conviction'}
+                  {t.virtues.conviction}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -115,10 +113,10 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="selfControl">
-                  {language === 'pt-BR' ? 'Autocontrole' : 'Self-Control'}
+                  {t.virtues.selfControl}
                 </SelectItem>
                 <SelectItem value="instinct">
-                  {language === 'pt-BR' ? 'Instinto' : 'Instinct'}
+                  {t.virtues.instinct}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -133,7 +131,7 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
           {/* Courage */}
           <div className="flex items-center justify-between gap-4">
             <span className="font-body text-sm w-40">
-              {language === 'pt-BR' ? 'Coragem' : 'Courage'}
+              {t.virtues.courage}
             </span>
             <DotRating
               value={virtues.courage}
@@ -149,7 +147,7 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
       <Card className="medieval-card">
         <CardHeader className="text-center pb-4">
           <CardTitle className="font-medieval text-2xl">
-            {language === 'pt-BR' ? 'Humanidade / Trilha' : 'Humanity / Path'}
+            {t.virtues.humanityPath}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -161,13 +159,13 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="humanity" id="humanity" />
               <Label htmlFor="humanity" className="font-medieval text-sm cursor-pointer">
-                {language === 'pt-BR' ? 'Humanidade' : 'Humanity'}
+                {t.virtues.humanity}
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="path" id="path" />
               <Label htmlFor="path" className="font-medieval text-sm cursor-pointer">
-                {language === 'pt-BR' ? 'Trilha' : 'Path'}
+                {t.virtues.path}
               </Label>
             </div>
           </RadioGroup>
@@ -175,13 +173,13 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
           {moralityType === 'path' && (
             <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
               <Label htmlFor="pathName" className="font-medieval text-sm">
-                {language === 'pt-BR' ? 'Nome da Trilha' : 'Path Name'}
+                {t.virtues.pathName}
               </Label>
               <Input
                 id="pathName"
                 value={pathName}
                 onChange={(e) => updateFormData({ pathName: e.target.value })}
-                placeholder={language === 'pt-BR' ? 'Ex: Trilha do Poder...' : 'Ex: Path of Power...'}
+                placeholder={t.virtues.pathNamePlaceholder}
                 className="font-body bg-input border-border"
               />
             </div>
@@ -190,10 +188,10 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
           <div className="flex items-center justify-between pt-2">
             <span className="font-body text-sm">
               {moralityType === 'humanity'
-                ? (language === 'pt-BR' ? 'Humanidade' : 'Humanity')
-                : (pathName || (language === 'pt-BR' ? 'Trilha' : 'Path'))}
+                ? t.virtues.humanity
+                : (pathName || t.virtues.path)}
               <span className="text-muted-foreground ml-2 text-xs">
-                ({language === 'pt-BR' ? 'auto' : 'auto'}: {virtues.virtueValue1 + virtues.virtueValue2})
+                ({t.virtues.auto}: {virtues.virtueValue1 + virtues.virtueValue2})
               </span>
             </span>
             <DotRating
@@ -210,15 +208,15 @@ export default function StepVampiroVirtues({ formData, updateFormData }: StepVam
       <Card className="medieval-card">
         <CardHeader className="text-center pb-4">
           <CardTitle className="font-medieval text-2xl">
-            {language === 'pt-BR' ? 'Força de Vontade' : 'Willpower'}
+            {t.virtues.willpower}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <span className="font-body text-sm">
-              {language === 'pt-BR' ? 'Força de Vontade' : 'Willpower'}
+              {t.virtues.willpower}
               <span className="text-muted-foreground ml-2 text-xs">
-                ({language === 'pt-BR' ? 'auto' : 'auto'}: {virtues.courage})
+                ({t.virtues.auto}: {virtues.courage})
               </span>
             </span>
             <DotRating

@@ -148,7 +148,7 @@ const getVampireEventConfig = (t: any) => ({
       const charName = data.character_name as string;
       const type = data.type as string;
       const isBlood = type === 'blood_depleted';
-      return `${charName} - ${isBlood ? 'Sangue Esgotado!' : 'Vontade Exaurida!'}`;
+      return `${charName} - ${isBlood ? t.vampiro.bloodDepleted : t.vampiro.willpowerDepleted}`;
     },
   },
   player_joined: {
@@ -156,7 +156,7 @@ const getVampireEventConfig = (t: any) => ({
     color: 'text-green-500',
     bgClass: 'bg-muted/30',
     label: (data: Record<string, unknown>) => 
-      `${data.player_name || data.character_name} entrou na sessão`,
+      `${data.player_name || data.character_name} ${t.eventFeed.joinedSession}`,
   },
 });
 
@@ -316,7 +316,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
             <span className={colorClass}>{label}</span>
             {isPermanent && (
               <Badge variant="destructive" className="text-[10px] px-1 py-0">
-                {language === 'pt-BR' ? 'PERMANENTE' : 'PERMANENT'}
+                {t.eventFeed.permanent}
               </Badge>
             )}
           </div>
@@ -335,7 +335,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
           </div>
           {isNarratorChange && (
             <span className="text-xs text-muted-foreground italic mt-1 block">
-              {language === 'pt-BR' ? 'Alterado pelo Narrador' : 'Changed by Narrator'}
+              {t.eventFeed.changedByNarrator}
             </span>
           )}
         </div>
@@ -364,8 +364,8 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
           )}
           <span className={cn("font-medieval", isBlood ? 'text-destructive' : 'text-amber-500')}>
             {charName} - {isBlood 
-              ? (language === 'pt-BR' ? 'Sangue Esgotado!' : 'Blood Depleted!') 
-              : (language === 'pt-BR' ? 'Vontade Exaurida!' : 'Willpower Depleted!')}
+              ? t.vampiro.bloodDepleted
+              : t.vampiro.willpowerDepleted}
           </span>
         </div>
       </div>
@@ -444,7 +444,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
           <div className="flex items-center gap-2">
             <UserPlus className="w-4 h-4 text-green-500 shrink-0" />
             <span className="text-sm">
-              {(event_data.player_name as string) || (event_data.character_name as string)} {language === 'pt-BR' ? 'entrou na sessão' : 'joined the session'}
+              {(event_data.player_name as string) || (event_data.character_name as string)} {t.eventFeed.joinedSession}
             </span>
           </div>
         );
@@ -487,7 +487,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
           </CardTitle>
           {filteredEvents.length > 0 && (
             <span className="text-xs text-muted-foreground font-body">
-              {filteredEvents.length} {language === 'pt-BR' ? 'eventos' : 'events'}
+              {filteredEvents.length} {t.eventFeed.events}
             </span>
           )}
         </div>
@@ -498,7 +498,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
           {filteredEvents.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground font-body">
               <Scroll className="w-10 h-10 mx-auto mb-2 opacity-30" />
-              <p>{language === 'pt-BR' ? 'Nenhum evento ainda' : 'No events yet'}</p>
+              <p>{t.eventFeed.noEvents}</p>
             </div>
           ) : (
             <div className="space-y-3 pb-2">
@@ -541,7 +541,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
               className="h-8"
             >
               <ChevronLeft className="w-4 h-4 mr-1" />
-              {language === 'pt-BR' ? 'Anterior' : 'Previous'}
+              {t.eventFeed.previous}
             </Button>
             <span className="text-xs text-muted-foreground font-body">
               {currentPage + 1} / {totalPages}
@@ -553,7 +553,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
               disabled={currentPage >= totalPages - 1}
               className="h-8"
             >
-              {language === 'pt-BR' ? 'Próximo' : 'Next'}
+              {t.eventFeed.next}
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </div>
