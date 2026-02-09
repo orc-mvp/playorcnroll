@@ -1,128 +1,209 @@
 
+# Analise de Cobertura i18n por Rota
 
-# Plano: Papel Contextual por Sessao (Remover Role Fixo)
+## Resumo Geral
 
-## Resumo
+O projeto possui 14 rotas e utiliza um sistema centralizado de i18n com suporte a PT-BR e EN. A cobertura atual e **irregular**: algumas paginas usam bem o sistema `t.*`, enquanto outras possuem dezenas de strings hardcoded ou usam o padrao `language === 'pt-BR' ? ... : ...` em vez de chaves centralizadas.
 
-Remover o conceito de "narrador" ou "jogador" como tipo fixo de usuario. Qualquer usuario pode criar sessoes (tornando-se narrador daquela sessao) ou entrar em sessoes (como jogador). O papel e determinado pelo contexto da sessao.
+---
 
-Como o sistema nao esta em uso, dados existentes podem ser descartados sem preocupacao.
+## Analise por Rota
 
-## Mudancas
+### 1. `/` - Index (Landing Page)
+**Cobertura: ~30%**
+- Usa `t.*`: `t.auth.login`, `t.auth.signup`
+- Hardcoded com ternario inline (nao centralizado):
+  - "Teatro da Mente Online" / "Online Theater of the Mind" (3x)
+  - "Jogar" / "Play"
+  - "Recursos da Plataforma" / "Platform Features"
+  - "Dados 3D" / "3D Dice"
+  - "Role dados com animacoes 3D..." / "Roll dice with..."
+  - "Tempo Real" / "Real-time"
+  - "Sincronizacao instantanea..." / "Instant synchronization..."
+  - "Sessoes Gerenciadas" / "Managed Sessions"
+  - "O narrador controla testes..." / "The narrator controls..."
 
-### 1. Banco de Dados
+### 2. `/auth` - Autenticacao
+**Cobertura: ~90%**
+- Usa extensivamente `t.auth.*`, `t.common.*`
+- Hardcoded com ternario:
+  - "Teatro da Mente Online" / "Online Theater of the Mind"
 
-- Remover a coluna `role` da tabela `profiles`
-- Remover a funcao `is_narrator(uuid)` (nao e usada em nenhuma politica RLS)
-- Remover a funcao `get_user_role(uuid)` (idem)
-- Atualizar o trigger `handle_new_user()` para nao inserir `role`
+### 3. `/dashboard` - Dashboard
+**Cobertura: ~95%**
+- Quase tudo via `t.*`
+- Problema menor: texto de boas-vindas usa `.replace('Back', '')`
 
-### 2. Tela de Cadastro (Auth.tsx)
+### 4. `/character/create` - Criar Personagem
+**Cobertura: ~85%**
+- Usa `t.character.*`, `t.common.*`
+- Depende dos sub-componentes (Steps) que precisam verificacao individual
 
-- Remover a selecao de papel (narrador/jogador) no signup
-- Formulario fica: nome de exibicao, email, senha, confirmar senha
-- Remover validacao de `role` no formulario
+### 5. `/characters` - Meus Personagens
+**Cobertura: ~70%**
+- Usa `t.*` para titulos principais
+- Hardcoded com ternario:
+  - "Nenhum personagem" / "No characters"
+  - "Crie seu primeiro heroi..." / "Create your first hero..."
+  - "Excluir Personagem?" / "Delete Character?"
+  - Texto completo de confirmacao de exclusao
+  - "Personagem excluido" / "Character deleted"
+  - "Erro ao excluir" / "Error deleting"
+- Hardcoded apenas PT-BR:
+  - "Novo" (botao mobile)
 
-### 3. Hook useAuth
+### 6. `/character/:id` - Ficha do Personagem
+**Cobertura: ~60%**
+- Muitos ternarios inline ao inves de chaves i18n
+- Strings como "Nenhuma marca menor", "Ativas", "Historico", etc
 
-- Remover `role` do tipo `Profile`
-- Remover parametro `role` da funcao `signUp()`
-- Nao enviar `role` no metadata do Supabase Auth
+### 7. `/session/create` - Criar Sessao
+**Cobertura: ~40%**
+- Usa `t.session.*` para labels basicos
+- Hardcoded apenas PT-BR:
+  - "Nova Aventura"
+  - "Configure sua sessao e convide jogadores"
+  - "Sistema de Jogo" (usa ternario)
+  - "Erro" (titulo de toasts)
+  - "Nome da sessao e obrigatorio"
+  - "Sessao criada!"
+  - "Erro ao criar sessao"
+  - "Tente novamente"
+  - Placeholders: "Ex: A Queda do Rei Sombrio", "Uma breve descricao da aventura"
 
-### 4. Dashboard Unificado (Dashboard.tsx)
+### 8. `/sessions` - Minhas Sessoes
+**Cobertura: ~50%**
+- Alguns campos com ternario inline
+- Hardcoded com ternario: "Excluir Sessao", "Cancelar", "Excluindo...", "jogador(es)"
+- Diversos textos de status e toasts
 
-- Todos os usuarios veem os mesmos cards:
-  - Criar Sessao
-  - Minhas Sessoes
-  - Entrar em Sessao
-  - Personagens (abre modal com opcoes criar/ver)
-  - Gerenciar Marcas
-- Remover badge "Narrador"/"Jogador" do header
-- Remover logica `isNarrator` que bifurca a UI
-- Atualizar mensagem de boas-vindas para ser generica
+### 9. `/join` - Entrar na Sessao
+**Cobertura: ~20%** (pior cobertura)
+- Usa `t.*` apenas para titulo e inviteCode
+- Hardcoded APENAS em PT-BR (sem ingles):
+  - "Codigo invalido"
+  - "Digite o codigo de convite completo"
+  - "Sessao nao encontrada com este codigo"
+  - "Sessao encontrada!"
+  - "Erro ao validar codigo"
+  - "Verifique o codigo e tente novamente"
+  - "Valide o codigo primeiro"
+  - "Selecione um personagem"
+  - "Entrou na sessao!"
+  - "Aguardando o Narrador iniciar..."
+  - "Erro ao entrar na sessao"
+  - "Minhas Aventuras"
+  - "Sessoes que voce ja participou"
+  - "Entrar na Aventura"
+  - "Digite o codigo de convite e escolha seu personagem"
+  - "Verificar"
+  - "Nenhuma aventura ainda"
+  - "Entre em uma sessao para comecar"
+  - "Entrando..."
+  - "Como:" (prefixo personagem)
+  - "Ativa", "Aguardando", "Encerrada" (badges de status)
+  - "Selecione um personagem" (placeholder)
+  - "Voce nao tem personagens do sistema..."
+  - "Criar Personagem de..."
+  - "Sem personagem"
+  - "Sistema:"
 
-### 5. Minhas Sessoes (MySessions.tsx)
+### 10. `/session/:id/lobby` - Lobby da Sessao
+**Cobertura: ~30%**
+- Usa `t.*` para poucos campos
+- Hardcoded APENAS em PT-BR:
+  - "Convide Jogadores"
+  - "Compartilhe o codigo ou link com seus jogadores"
+  - "jogador(es) conectado(s)"
+  - "Aguardando jogadores..."
+  - "Compartilhe o codigo de convite"
+  - "Sem personagem"
+  - "Jogador"
+  - "Sessao nao encontrada"
+  - "copiado!" / "Erro ao copiar"
+  - "Erro ao iniciar sessao"
+  - "Iniciando..." / "Reiniciar Sessao" / "Reiniciando..."
+  - "Esta sessao foi encerrada"
+  - "Esta sessao foi encerrada pelo Narrador"
 
-- Buscar em paralelo: sessoes onde o usuario e `narrator_id` E sessoes onde e participante
-- Combinar e ordenar por `updated_at`
-- Exibir badge contextual em cada sessao ("Narrador" ou "Jogador")
-- Mostrar invite code e botao excluir apenas nas sessoes onde e narrador
-- Botao "Criar Sessao" visivel para todos
+### 11. `/session/:id` - Sessao (Herois Marcados)
+**Cobertura: ~70%**
+- Componentes internos usam bastante `t.*`
+- Sidebar do narrador tem strings hardcoded
 
-### 6. Atividade Recente (RecentActivity.tsx)
+### 12. `/session/vampire/:id` - Sessao Vampiro
+**Cobertura: ~75%**
+- Usa extensivamente `t.vampiro.*` e `t.vampiroTests.*`
+- Alguns hardcoded em componentes internos
 
-- Remover parametro `isNarrator`
-- Buscar ambos: sessoes criadas pelo usuario + sessoes onde participa + personagens + rolagens
-- Unificar tudo em uma unica lista ordenada
+### 13. `/marks` - Marcas Personalizadas
+**Cobertura: ~60%**
+- Hardcoded com ternario: "Nenhuma marca personalizada" / "No custom marks"
 
-### 7. Custom Marks (CustomMarks.tsx)
+### 14. `/*` - Not Found (404)
+**Cobertura: 0%**
+- Totalmente hardcoded em ingles:
+  - "Oops! Page not found"
+  - "Return to Home"
 
-- Remover guard que redireciona se nao for narrador
-- Qualquer usuario autenticado pode criar/gerenciar marcas
+---
 
-### 8. Criar Sessao (CreateSession.tsx)
+## Componentes com Problemas Significativos
 
-- Remover guard `profile?.role !== 'narrator'`
-- Qualquer usuario autenticado pode criar sessao
-
-### 9. Traducoes (i18n)
-
-- Remover chaves: `auth.selectRole`, `auth.narrator`, `auth.player`, `auth.narratorDesc`, `auth.playerDesc`, `auth.roleRequired`
-- Manter `roles.narrator` e `roles.player` (usados como badges contextuais nas sessoes)
-- Atualizar `dashboard.welcomeNarrator`/`welcomePlayer` para mensagem unica
-- Adicionar novas chaves para badges contextuais
-
-## Secao Tecnica
-
-### Migracao SQL
-
-```text
--- Remover funcoes nao utilizadas em RLS
-DROP FUNCTION IF EXISTS public.is_narrator(uuid);
-DROP FUNCTION IF EXISTS public.get_user_role(uuid);
-
--- Remover coluna role de profiles
-ALTER TABLE public.profiles DROP COLUMN IF EXISTS role;
-
--- Atualizar trigger para nao inserir role
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS trigger LANGUAGE plpgsql
-SECURITY DEFINER SET search_path TO 'public'
-AS $$
-DECLARE
-  v_language TEXT;
-  v_display_name TEXT;
-BEGIN
-  v_language := COALESCE(NEW.raw_user_meta_data->>'language', 'pt-BR');
-  IF v_language NOT IN ('pt-BR', 'en') THEN
-    v_language := 'pt-BR';
-  END IF;
-  v_display_name := LEFT(NEW.raw_user_meta_data->>'display_name', 100);
-
-  INSERT INTO public.profiles (user_id, display_name, language)
-  VALUES (NEW.id, v_display_name, v_language);
-  RETURN NEW;
-EXCEPTION
-  WHEN unique_violation THEN RETURN NEW;
-END;
-$$;
-```
-
-### Impacto em RLS
-
-Nenhuma politica RLS usa `is_narrator()` ou `get_user_role()`. Todas usam `is_session_narrator()` e `sessions.narrator_id`, que permanecem intactos. Nenhuma alteracao em RLS e necessaria.
-
-### Arquivos Modificados
-
-| Arquivo | Tipo de Mudanca |
+| Componente | Strings hardcoded (aprox.) |
 |---|---|
-| Migracao SQL | Drop column, drop functions, update trigger |
-| `src/hooks/useAuth.tsx` | Remover `role` do tipo e do `signUp()` |
-| `src/pages/Auth.tsx` | Remover selecao de papel |
-| `src/pages/Dashboard.tsx` | Dashboard unificado |
-| `src/pages/MySessions.tsx` | Query unificada com badges contextuais |
-| `src/pages/CreateSession.tsx` | Remover guard de role |
-| `src/pages/CustomMarks.tsx` | Remover guard de role |
-| `src/components/dashboard/RecentActivity.tsx` | Remover parametro `isNarrator`, query unificada |
-| `src/lib/i18n/translations.ts` | Atualizar/remover chaves de role |
+| `CharacterOptionsModal` | 2 (ternarios inline) |
+| `MarksModal` | 4 (apenas PT-BR) |
+| `NarratorSidebar` | 1 (apenas PT-BR) |
+| `VampireTrackers` | 1 (apenas PT-BR) |
+| `EditVampiroCharacterModal` | 6 (ternarios inline) |
 
+---
+
+## Resumo de Cobertura
+
+| Rota | Cobertura | Padroes usados |
+|---|---|---|
+| `/` (Index) | ~30% | Ternarios inline |
+| `/auth` | ~90% | `t.*` |
+| `/dashboard` | ~95% | `t.*` |
+| `/character/create` | ~85% | `t.*` |
+| `/characters` | ~70% | Misto |
+| `/character/:id` | ~60% | Misto |
+| `/session/create` | ~40% | Hardcoded PT-BR |
+| `/sessions` | ~50% | Misto |
+| `/join` | ~20% | Hardcoded PT-BR |
+| `/session/:id/lobby` | ~30% | Hardcoded PT-BR |
+| `/session/:id` | ~70% | `t.*` |
+| `/session/vampire/:id` | ~75% | `t.*` |
+| `/marks` | ~60% | Misto |
+| `/*` (404) | 0% | Hardcoded EN |
+
+**Media geral estimada: ~55%**
+
+---
+
+## Plano de Correcao
+
+### Fase 1 - Paginas criticas (mais usadas, pior cobertura)
+1. **JoinSession** (~40 strings) - adicionar chaves i18n
+2. **SessionLobby** (~20 strings) - adicionar chaves i18n
+3. **CreateSession** (~15 strings) - adicionar chaves i18n
+
+### Fase 2 - Paginas secundarias
+4. **Index** (~15 strings) - centralizar ternarios em chaves
+5. **NotFound** (3 strings) - adicionar chaves i18n
+6. **MyCharacters** (~10 strings) - centralizar ternarios
+7. **MySessions** (~10 strings) - centralizar ternarios
+
+### Fase 3 - Componentes
+8. **CharacterSheet** (~15 strings inline)
+9. **EditVampiroCharacterModal** (~6 strings)
+10. **MarksModal**, **NarratorSidebar**, **VampireTrackers** (~6 strings)
+
+### Detalhes Tecnicos
+- Adicionar ~120 novas chaves ao arquivo `translations.ts` (tanto PT-BR quanto EN)
+- Substituir todos os padroes `language === 'pt-BR' ? '...' : '...'` por chaves `t.*`
+- Substituir todas as strings hardcoded apenas em PT-BR por chaves `t.*`
+- Manter a estrutura existente de namespaces (`common`, `auth`, `session`, `character`, etc.)
+- Criar novos namespaces conforme necessario: `lobby`, `joinSession`, `landing`, `notFound`
