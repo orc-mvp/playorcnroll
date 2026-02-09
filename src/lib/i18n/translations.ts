@@ -21,6 +21,10 @@ export const translations = {
       yes: 'Sim',
       no: 'Não',
       or: 'ou',
+      saving: 'Salvando...',
+      errorSaving: 'Erro ao salvar',
+      errorDeleting: 'Erro ao excluir',
+      close: 'Fechar',
     },
 
     // Auth
@@ -303,6 +307,20 @@ export const translations = {
       maxComplications: 'tem 3 Complicações ativas!',
       negativeMarkWarning: 'Se ganhar mais uma, elas condensam em MARCA NEGATIVA permanente',
       manifestBefore: 'Manifeste pelo menos uma antes do próximo extremo negativo',
+      descriptionRequired: 'Descrição é obrigatória',
+      complicationCreated: 'Complicação criada!',
+      errorCreating: 'Erro ao criar complicação',
+      createFor: 'Criar complicação para',
+      describePlaceholder: 'Descreva a complicação...',
+      complicationUpdated: 'Complicação atualizada!',
+      errorUpdating: 'Erro ao atualizar complicação',
+      editComplication: 'Editar Complicação',
+      character: 'Personagem',
+      playerCanSee: 'O jogador pode ver esta complicação',
+      onlyNarratorCanSee: 'Apenas o narrador pode ver',
+      errorManifesting: 'Erro ao manifestar complicação',
+      resolveNarratively: 'Resolver narrativamente a complicação de',
+      manifestPlaceholder: 'Como a complicação se manifestou na narrativa...',
     },
 
     // End Session
@@ -614,6 +632,121 @@ export const translations = {
       managedSessionsDesc: 'O narrador controla testes, cenas e progressão',
     },
 
+    // Event Feed
+    eventFeed: {
+      events: 'eventos',
+      noEvents: 'Nenhum evento ainda',
+      previous: 'Anterior',
+      next: 'Próximo',
+      permanent: 'PERMANENTE',
+      changedByNarrator: 'Alterado pelo Narrador',
+      joinedSession: 'entrou na sessão',
+    },
+
+    // Vampire Session
+    vampireSession: {
+      players: 'jogadores',
+      linkCopied: 'Link copiado!',
+      copyInviteLink: 'Copiar link de convite',
+      endSession: 'Encerrar',
+      leave: 'Sair',
+      sceneCreated: 'Cena criada!',
+      errorCreatingScene: 'Erro ao criar cena',
+      errorChangingScene: 'Erro ao trocar cena',
+      currentScene: 'Cena Atual',
+      newScene: 'Nova Cena',
+      noActiveScene: 'Nenhuma cena ativa',
+      sceneName: 'Nome da cena',
+      descriptionOptional: 'Descrição (opcional)',
+      previousScenes: 'Cenas Anteriores',
+      noCharacterSelected: 'Nenhum personagem selecionado',
+      viewFullSheet: 'Ver Ficha Completa',
+      myCharacterSheet: 'Minha Ficha',
+      sessionEndedByNarrator: 'Sessão encerrada pelo Narrador',
+      sessionEnded: 'Sessão encerrada',
+      changeSaved: 'Alteração salva',
+      noPlayersConnected: 'Nenhum jogador conectado',
+      noCharacter: 'Sem personagem',
+      viewSheet: 'Ver Ficha',
+      sheetOf: 'Ficha de',
+      errorSaving: 'Erro ao salvar',
+      critical: 'CRÍTICO',
+    },
+
+    // Virtues (character creation)
+    virtues: {
+      virtues: 'Virtudes',
+      defineVirtues: 'Defina as virtudes que guiam seu vampiro',
+      conscience: 'Consciência',
+      conviction: 'Convicção',
+      selfControl: 'Autocontrole',
+      instinct: 'Instinto',
+      courage: 'Coragem',
+      humanityPath: 'Humanidade / Trilha',
+      humanity: 'Humanidade',
+      path: 'Trilha',
+      pathName: 'Nome da Trilha',
+      pathNamePlaceholder: 'Ex: Trilha do Poder...',
+      willpower: 'Força de Vontade',
+      auto: 'auto',
+    },
+
+    // Custom Marks
+    customMarks: {
+      newMark: 'Nova Marca',
+      noCustomMarks: 'Nenhuma marca personalizada',
+      createUniqueMarks: 'Crie marcas únicas para suas campanhas!',
+      createFirstMark: 'Criar Primeira Marca',
+      editMark: 'Editar Marca',
+      defineDetails: 'Defina os detalhes da marca menor personalizada',
+      markName: 'Nome da Marca',
+      markNamePlaceholder: 'Ex: Lâmina Veloz',
+      nameRequired: 'Nome obrigatório',
+      attributeRequired: 'Atributo obrigatório',
+      descriptionRequired: 'Descrição obrigatória',
+      effectRequired: 'Efeito obrigatório',
+      markUpdated: 'Marca atualizada!',
+      markCreated: 'Marca criada!',
+      markDeleted: 'Marca excluída',
+      selectAttribute: 'Selecione o atributo',
+      descriptionPlaceholder: 'Descreva a origem ou natureza da marca',
+      effectPlaceholder: 'Descreva o efeito mecânico da marca',
+      deleteMark: 'Excluir Marca?',
+      deleteConfirm: 'Tem certeza que deseja excluir',
+      cannotBeUndone: 'Esta ação não pode ser desfeita.',
+    },
+
+    // Character Options Modal
+    characterOptions: {
+      createNew: 'Criar novo personagem',
+      viewCreated: 'Ver personagens criados',
+    },
+
+    // End Session extras
+    endSessionExtras: {
+      sessionEnded: 'Sessão encerrada!',
+      marksMadePermanent: 'marca(s) tornada(s) permanente(s)',
+      errorEnding: 'Erro ao encerrar',
+      reviewProgress: 'Revise o progresso da sessão antes de encerrar',
+      allMovesUsed: 'Todos os movimentos heroicos foram usados!',
+      confirmEnd: 'Confirmar Encerramento',
+    },
+
+    // Dice / Tests extras
+    diceExtras: {
+      errorSavingRoll: 'Erro ao salvar rolagem',
+      errorUsingHeroicMove: 'Erro ao usar movimento heroico',
+      useHeroicMoveNow: 'Usar Movimento Heroico Agora',
+      waitingOtherPlayers: 'Aguardando outros jogadores rolarem...',
+      noHeroicMoves: 'Sem movimentos heroicos disponíveis',
+      temporaryMarkCreated: 'Marca Maior Temporária criada!',
+      narrativeAdded: 'Narrativa Estendida adicionada!',
+      pulledGroup: 'Você puxou o grupo! +1 sucesso coletivo',
+      progressIn: 'Progresso em',
+      describe: 'Descreva...',
+      confirmPullGroup: 'Confirme para adicionar +1 ao resultado coletivo do grupo',
+    },
+
     // Not Found
     notFound: {
       title: 'Página não encontrada',
@@ -705,6 +838,10 @@ export const translations = {
       yes: 'Yes',
       no: 'No',
       or: 'or',
+      saving: 'Saving...',
+      errorSaving: 'Error saving',
+      errorDeleting: 'Error deleting',
+      close: 'Close',
     },
 
     // Auth
@@ -987,6 +1124,20 @@ export const translations = {
       maxComplications: 'has 3 active Complications!',
       negativeMarkWarning: 'If they get another, they condense into a permanent NEGATIVE MARK',
       manifestBefore: 'Manifest at least one before the next negative extreme',
+      descriptionRequired: 'Description is required',
+      complicationCreated: 'Complication created!',
+      errorCreating: 'Error creating complication',
+      createFor: 'Create complication for',
+      describePlaceholder: 'Describe the complication...',
+      complicationUpdated: 'Complication updated!',
+      errorUpdating: 'Error updating complication',
+      editComplication: 'Edit Complication',
+      character: 'Character',
+      playerCanSee: 'Player can see this complication',
+      onlyNarratorCanSee: 'Only the narrator can see',
+      errorManifesting: 'Error manifesting complication',
+      resolveNarratively: 'Narratively resolve the complication of',
+      manifestPlaceholder: 'How the complication manifested in the narrative...',
     },
 
     // End Session
@@ -1296,6 +1447,121 @@ export const translations = {
       realtimeDesc: 'Instant synchronization between narrator and players',
       managedSessions: 'Managed Sessions',
       managedSessionsDesc: 'The narrator controls tests, scenes and progression',
+    },
+
+    // Event Feed
+    eventFeed: {
+      events: 'events',
+      noEvents: 'No events yet',
+      previous: 'Previous',
+      next: 'Next',
+      permanent: 'PERMANENT',
+      changedByNarrator: 'Changed by Narrator',
+      joinedSession: 'joined the session',
+    },
+
+    // Vampire Session
+    vampireSession: {
+      players: 'players',
+      linkCopied: 'Link copied!',
+      copyInviteLink: 'Copy invite link',
+      endSession: 'End Session',
+      leave: 'Leave',
+      sceneCreated: 'Scene created!',
+      errorCreatingScene: 'Error creating scene',
+      errorChangingScene: 'Error changing scene',
+      currentScene: 'Current Scene',
+      newScene: 'New Scene',
+      noActiveScene: 'No active scene',
+      sceneName: 'Scene name',
+      descriptionOptional: 'Description (optional)',
+      previousScenes: 'Previous Scenes',
+      noCharacterSelected: 'No character selected',
+      viewFullSheet: 'View Full Sheet',
+      myCharacterSheet: 'My Character Sheet',
+      sessionEndedByNarrator: 'Session ended by the Narrator',
+      sessionEnded: 'Session ended',
+      changeSaved: 'Change saved',
+      noPlayersConnected: 'No players connected',
+      noCharacter: 'No character',
+      viewSheet: 'View Sheet',
+      sheetOf: 'Sheet of',
+      errorSaving: 'Error saving',
+      critical: 'CRITICAL',
+    },
+
+    // Virtues (character creation)
+    virtues: {
+      virtues: 'Virtues',
+      defineVirtues: 'Define the virtues that guide your vampire',
+      conscience: 'Conscience',
+      conviction: 'Conviction',
+      selfControl: 'Self-Control',
+      instinct: 'Instinct',
+      courage: 'Courage',
+      humanityPath: 'Humanity / Path',
+      humanity: 'Humanity',
+      path: 'Path',
+      pathName: 'Path Name',
+      pathNamePlaceholder: 'Ex: Path of Power...',
+      willpower: 'Willpower',
+      auto: 'auto',
+    },
+
+    // Custom Marks
+    customMarks: {
+      newMark: 'New Mark',
+      noCustomMarks: 'No custom marks',
+      createUniqueMarks: 'Create unique marks for your campaigns!',
+      createFirstMark: 'Create First Mark',
+      editMark: 'Edit Mark',
+      defineDetails: 'Define the custom minor mark details',
+      markName: 'Mark Name',
+      markNamePlaceholder: 'Ex: Swift Blade',
+      nameRequired: 'Name required',
+      attributeRequired: 'Attribute required',
+      descriptionRequired: 'Description required',
+      effectRequired: 'Effect required',
+      markUpdated: 'Mark updated!',
+      markCreated: 'Mark created!',
+      markDeleted: 'Mark deleted',
+      selectAttribute: 'Select attribute',
+      descriptionPlaceholder: 'Describe the origin or nature of the mark',
+      effectPlaceholder: 'Describe the mechanical effect of the mark',
+      deleteMark: 'Delete Mark?',
+      deleteConfirm: 'Are you sure you want to delete',
+      cannotBeUndone: 'This action cannot be undone.',
+    },
+
+    // Character Options Modal
+    characterOptions: {
+      createNew: 'Create new character',
+      viewCreated: 'View created characters',
+    },
+
+    // End Session extras
+    endSessionExtras: {
+      sessionEnded: 'Session ended!',
+      marksMadePermanent: 'mark(s) made permanent',
+      errorEnding: 'Error ending session',
+      reviewProgress: 'Review session progress before ending',
+      allMovesUsed: 'All heroic moves have been used!',
+      confirmEnd: 'Confirm End',
+    },
+
+    // Dice / Tests extras
+    diceExtras: {
+      errorSavingRoll: 'Error saving roll',
+      errorUsingHeroicMove: 'Error using heroic move',
+      useHeroicMoveNow: 'Use Heroic Move Now',
+      waitingOtherPlayers: 'Waiting for other players to roll...',
+      noHeroicMoves: 'No heroic moves available',
+      temporaryMarkCreated: 'Temporary Major Mark created!',
+      narrativeAdded: 'Extended Narrative added!',
+      pulledGroup: 'You pulled the group! +1 collective success',
+      progressIn: 'Progress in',
+      describe: 'Describe...',
+      confirmPullGroup: 'Confirm to add +1 to the group collective result',
     },
 
     // Not Found

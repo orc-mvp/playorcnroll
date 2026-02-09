@@ -209,13 +209,13 @@ export function VampireNarratorSidebar({
         },
       });
 
-      toast({ title: t.vampiroTests.result || 'Cena criada!' });
+      toast({ title: t.vampireSession.sceneCreated });
       setNewSceneName('');
       setNewSceneDesc('');
       setShowSceneForm(false);
       onSceneChange(scene);
     } catch (error) {
-      toast({ title: 'Erro ao criar cena', variant: 'destructive' });
+      toast({ title: t.vampireSession.errorCreatingScene, variant: 'destructive' });
     } finally {
       setIsCreatingScene(false);
     }
@@ -255,7 +255,7 @@ export function VampireNarratorSidebar({
 
       onSceneChange(scene);
     } catch (error) {
-      toast({ title: 'Erro ao trocar cena', variant: 'destructive' });
+      toast({ title: t.vampireSession.errorChangingScene, variant: 'destructive' });
     }
   };
 
@@ -367,9 +367,9 @@ export function VampireNarratorSidebar({
         },
       });
 
-      toast({ title: 'Alteração salva' });
+      toast({ title: t.vampireSession.changeSaved });
     } catch (error) {
-      toast({ title: 'Erro ao salvar', variant: 'destructive' });
+      toast({ title: t.vampireSession.errorSaving, variant: 'destructive' });
     }
 
     setIsConfirmOpen(false);
@@ -420,7 +420,7 @@ export function VampireNarratorSidebar({
         <CardContent>
           {participants.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Nenhum jogador conectado
+              {t.vampireSession.noPlayersConnected}
             </p>
           ) : (
             <div className="space-y-3">
@@ -451,7 +451,7 @@ export function VampireNarratorSidebar({
                     {hasCriticalState && (
                       <Badge variant="destructive" className="text-xs">
                         <AlertTriangle className="w-3 h-3 mr-1" />
-                        CRÍTICO
+                        {t.vampireSession.critical}
                       </Badge>
                     )}
 
@@ -460,7 +460,7 @@ export function VampireNarratorSidebar({
                       <Moon className="w-4 h-4 text-destructive shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="font-medieval text-sm truncate">
-                          {p.character?.name || 'Sem personagem'}
+                          {p.character?.name || t.vampireSession.noCharacter}
                         </p>
                         <p className="text-xs text-muted-foreground capitalize">
                           {vampData?.clan || ''}
@@ -586,7 +586,7 @@ export function VampireNarratorSidebar({
                         className="w-full mt-1 text-xs h-7"
                       >
                         <FileText className="w-3 h-3 mr-1" />
-                        Ver Ficha
+                        {t.vampireSession.viewSheet}
                       </Button>
                     )}
                   </div>
@@ -603,7 +603,7 @@ export function VampireNarratorSidebar({
           <DialogHeader>
             <DialogTitle className="font-medieval flex items-center gap-2">
               <Moon className="w-5 h-5 text-destructive" />
-              Ficha de {selectedCharacter?.name}
+              {t.vampireSession.sheetOf} {selectedCharacter?.name}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-auto">

@@ -140,7 +140,7 @@ export default function VampireSession() {
         .single();
 
       if (sessionError || !sessionData) {
-        toast({ title: 'Sessão não encontrada', variant: 'destructive' });
+        toast({ title: t.session.sessionNotFound, variant: 'destructive' });
         navigate('/dashboard');
         return;
       }
@@ -280,7 +280,7 @@ export default function VampireSession() {
           const updated = payload.new as SessionData;
           setSession(updated);
           if (updated.status === 'completed') {
-            toast({ title: 'Sessão encerrada pelo Narrador' });
+            toast({ title: t.vampireSession.sessionEndedByNarrator });
             navigate('/dashboard');
           }
         }
@@ -343,7 +343,7 @@ export default function VampireSession() {
       .update({ status: 'completed' })
       .eq('id', session.id);
 
-    toast({ title: 'Sessão encerrada' });
+    toast({ title: t.vampireSession.sessionEnded });
     navigate('/dashboard');
   };
 
@@ -443,7 +443,7 @@ export default function VampireSession() {
             {/* Participants count */}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Users className="w-4 h-4" />
-              <span>{participants.length} {language === 'pt-BR' ? 'jogadores' : 'players'}</span>
+              <span>{participants.length} {t.vampireSession.players}</span>
             </div>
 
 
@@ -466,14 +466,14 @@ export default function VampireSession() {
                         onClick={() => {
                           const url = `${window.location.origin}/join/${session.invite_code}`;
                           navigator.clipboard.writeText(url);
-                          toast({ title: language === 'pt-BR' ? 'Link copiado!' : 'Link copied!' });
+                          toast({ title: t.vampireSession.linkCopied });
                         }}
                       >
                         <Link className="w-4 h-4" />
                       </Button>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{language === 'pt-BR' ? 'Copiar link de convite' : 'Copy invite link'}</p>
+                      <p>{t.vampireSession.copyInviteLink}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -487,7 +487,7 @@ export default function VampireSession() {
                 onClick={handleEndSession}
               >
                 <LogOut className="w-4 h-4 mr-1" />
-                {language === 'pt-BR' ? 'Encerrar' : 'End Session'}
+                {t.vampireSession.endSession}
               </Button>
             ) : (
               <Button 
@@ -496,7 +496,7 @@ export default function VampireSession() {
                 onClick={handleLeaveSession}
               >
                 <LogOut className="w-4 h-4 mr-1" />
-                {language === 'pt-BR' ? 'Sair' : 'Leave'}
+                {t.vampireSession.leave}
               </Button>
             )}
           </div>
@@ -744,13 +744,13 @@ function VampireScenePanel({
         event_data: { scene_name: scene.name, scene_description: scene.description },
       });
 
-      toast({ title: language === 'pt-BR' ? 'Cena criada!' : 'Scene created!' });
+      toast({ title: t.vampireSession.sceneCreated });
       setNewSceneName('');
       setNewSceneDesc('');
       setShowNewScene(false);
       onSceneChange(scene);
     } catch (error) {
-      toast({ title: language === 'pt-BR' ? 'Erro ao criar cena' : 'Error creating scene', variant: 'destructive' });
+      toast({ title: t.vampireSession.errorCreatingScene, variant: 'destructive' });
     } finally {
       setIsCreating(false);
     }
@@ -769,7 +769,7 @@ function VampireScenePanel({
       });
       onSceneChange(scene);
     } catch (error) {
-      toast({ title: language === 'pt-BR' ? 'Erro ao trocar cena' : 'Error changing scene', variant: 'destructive' });
+      toast({ title: t.vampireSession.errorChangingScene, variant: 'destructive' });
     }
   };
 
@@ -779,7 +779,7 @@ function VampireScenePanel({
         <div className="flex items-center justify-between">
           <CardTitle className="font-medieval flex items-center gap-2 text-destructive">
             <BookOpen className="w-5 h-5" />
-            {language === 'pt-BR' ? 'Cena Atual' : 'Current Scene'}
+            {t.vampireSession.currentScene}
           </CardTitle>
           
           {isNarrator && (
@@ -790,7 +790,7 @@ function VampireScenePanel({
               onClick={() => setShowNewScene(true)}
             >
               <Plus className="w-3 h-3 mr-1" />
-              {language === 'pt-BR' ? 'Nova Cena' : 'New Scene'}
+              {t.vampireSession.newScene}
             </Button>
           )}
         </div>
@@ -808,7 +808,7 @@ function VampireScenePanel({
           </div>
         ) : (
           <p className="text-muted-foreground text-center py-4 font-body">
-            {language === 'pt-BR' ? 'Nenhuma cena ativa' : 'No active scene'}
+            {t.vampireSession.noActiveScene}
           </p>
         )}
 
@@ -816,13 +816,13 @@ function VampireScenePanel({
         {showNewScene && isNarrator && (
           <div className="space-y-2 pt-3 border-t border-border">
             <Input
-              placeholder={language === 'pt-BR' ? 'Nome da cena' : 'Scene name'}
+              placeholder={t.vampireSession.sceneName}
               value={newSceneName}
               onChange={(e) => setNewSceneName(e.target.value)}
               className="text-sm"
             />
             <Textarea
-              placeholder={language === 'pt-BR' ? 'Descrição (opcional)' : 'Description (optional)'}
+              placeholder={t.vampireSession.descriptionOptional}
               value={newSceneDesc}
               onChange={(e) => setNewSceneDesc(e.target.value)}
               rows={2}
@@ -855,7 +855,7 @@ function VampireScenePanel({
               <Button variant="ghost" size="sm" className="w-full justify-between text-muted-foreground">
                 <span className="flex items-center gap-2">
                   <History className="w-4 h-4" />
-                  {language === 'pt-BR' ? 'Cenas Anteriores' : 'Previous Scenes'} ({previousScenes.length})
+                  {t.vampireSession.previousScenes} ({previousScenes.length})
                 </span>
                 <ChevronDown className={`w-4 h-4 transition-transform ${showHistory ? 'rotate-180' : ''}`} />
               </Button>
@@ -897,7 +897,7 @@ function VampirePlayerPanel({ character, sessionTrackers }: { character: Partici
         <CardContent className="py-8 text-center">
           <Moon className="w-12 h-12 mx-auto mb-3 text-destructive/30" />
           <p className="text-muted-foreground font-body">
-            {language === 'pt-BR' ? 'Nenhum personagem selecionado' : 'No character selected'}
+            {t.vampireSession.noCharacterSelected}
           </p>
         </CardContent>
       </Card>
@@ -937,7 +937,7 @@ function VampirePlayerPanel({ character, sessionTrackers }: { character: Partici
               className="w-full mt-3"
             >
               <FileText className="w-4 h-4 mr-2" />
-              {language === 'pt-BR' ? 'Ver Ficha Completa' : 'View Full Sheet'}
+              {t.vampireSession.viewFullSheet}
             </Button>
           </CardContent>
         </Card>

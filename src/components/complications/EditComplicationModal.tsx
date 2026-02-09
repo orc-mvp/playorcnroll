@@ -83,12 +83,12 @@ export function EditComplicationModal({
 
       if (error) throw error;
 
-      toast({ title: 'Complicação atualizada!', duration: 2000 });
+      toast({ title: t.complications.complicationUpdated, duration: 2000 });
       onUpdated();
       onClose();
     } catch (error: any) {
       toast({
-        title: 'Erro ao atualizar complicação',
+        title: t.complications.errorUpdating,
         description: error.message,
         variant: 'destructive',
       });
@@ -103,14 +103,14 @@ export function EditComplicationModal({
         <DialogHeader>
           <DialogTitle className="font-medieval flex items-center gap-2">
             <Pencil className="w-5 h-5 text-primary" />
-            Editar Complicação
+            {t.complications.editComplication}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 flex-1 overflow-y-auto">
           {/* Character */}
           <div className="text-sm text-muted-foreground font-body">
-            Personagem: <span className="text-foreground font-medieval">{characterName}</span>
+            {t.complications.character}: <span className="text-foreground font-medieval">{characterName}</span>
           </div>
 
           {/* Type Selection */}
@@ -143,7 +143,7 @@ export function EditComplicationModal({
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Descreva a complicação..."
+              placeholder={t.complications.describePlaceholder}
               className="font-body min-h-[100px] resize-none"
             />
           </div>
@@ -160,8 +160,8 @@ export function EditComplicationModal({
                 <p className="font-medieval text-sm">{t.complications.visible}</p>
                 <p className="text-xs text-muted-foreground font-body">
                   {isVisible
-                    ? 'O jogador pode ver esta complicação'
-                    : 'Apenas o narrador pode ver'}
+                    ? t.complications.playerCanSee
+                    : t.complications.onlyNarratorCanSee}
                 </p>
               </div>
             </div>
@@ -170,16 +170,16 @@ export function EditComplicationModal({
 
           <DialogFooter className="pt-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={saving}>
-              Cancelar
+              {t.common.cancel}
             </Button>
             <Button type="submit" disabled={!description.trim() || saving}>
               {saving ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Salvando...
+                  {t.common.saving}
                 </>
               ) : (
-                'Salvar'
+                t.common.save
               )}
             </Button>
           </DialogFooter>

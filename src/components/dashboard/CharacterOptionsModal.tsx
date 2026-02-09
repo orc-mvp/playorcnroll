@@ -44,7 +44,7 @@ export function CharacterOptionsModal({ open, onOpenChange }: CharacterOptionsMo
               </div>
               <CardTitle className="font-medieval text-base">{t.character.create}</CardTitle>
               <CardDescription className="font-body text-xs">
-                {language === 'pt-BR' ? 'Criar novo personagem' : 'Create new character'}
+                {t.characterOptions.createNew}
               </CardDescription>
             </CardHeader>
           </Card>
@@ -60,7 +60,7 @@ export function CharacterOptionsModal({ open, onOpenChange }: CharacterOptionsMo
               </div>
               <CardTitle className="font-medieval text-base">{t.nav.characters}</CardTitle>
               <CardDescription className="font-body text-xs">
-                {language === 'pt-BR' ? 'Ver personagens criados' : 'View created characters'}
+                {t.characterOptions.viewCreated}
               </CardDescription>
             </CardHeader>
           </Card>

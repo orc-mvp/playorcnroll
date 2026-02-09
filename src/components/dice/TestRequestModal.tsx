@@ -242,7 +242,7 @@ export function TestRequestModal({
     } catch (error) {
       console.error('Error saving roll:', error);
       toast({
-        title: 'Erro ao salvar rolagem',
+        title: t.diceExtras.errorSavingRoll,
         variant: 'destructive',
       });
     } finally {
@@ -418,18 +418,18 @@ export function TestRequestModal({
                   onClick={handleUseHeroicMove}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Usar Movimento Heroico Agora
+                  {t.diceExtras.useHeroicMoveNow}
                 </Button>
               )}
 
               {isGroupTest && !allGroupRolled && (
                 <p className="text-xs text-center text-muted-foreground">
-                  Aguardando outros jogadores rolarem...
+                  {t.diceExtras.waitingOtherPlayers}
                 </p>
               )}
               
               <Button onClick={onClose} disabled={isSaving}>
-                {isSaving ? t.common.loading : 'Fechar'}
+                {isSaving ? t.common.loading : t.common.close}
               </Button>
             </div>
           )}

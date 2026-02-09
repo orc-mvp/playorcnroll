@@ -161,7 +161,7 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
           className="w-32 h-32 mx-auto mb-4 object-contain"
         />
         <p className="text-on-light-alt font-body text-lg">
-          {language === 'pt-BR' ? 'Teatro da Mente Online' : 'Online Theater of the Mind'}
+          {t.landing.tagline}
         </p>
       </div>
 

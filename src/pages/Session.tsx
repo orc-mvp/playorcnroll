@@ -96,7 +96,7 @@ export default function Session() {
         .single();
 
       if (sessionError || !sessionData) {
-        toast({ title: 'Sessão não encontrada', variant: 'destructive' });
+        toast({ title: t.session.sessionNotFound, variant: 'destructive' });
         navigate('/dashboard');
         return;
       }
@@ -197,7 +197,7 @@ export default function Session() {
           const updated = payload.new as SessionData;
           setSession(updated);
           if (updated.status === 'completed') {
-            toast({ title: 'Sessão encerrada pelo Narrador' });
+            toast({ title: t.vampireSession.sessionEndedByNarrator });
             navigate('/dashboard');
           }
         }
@@ -262,7 +262,7 @@ export default function Session() {
       .single();
 
     if (error) {
-      toast({ title: 'Erro ao criar cena', variant: 'destructive' });
+      toast({ title: t.vampireSession.errorCreatingScene, variant: 'destructive' });
       return;
     }
 
@@ -280,7 +280,7 @@ export default function Session() {
       event_data: { scene_name: name },
     });
 
-    toast({ title: 'Cena criada!', duration: 2000 });
+    toast({ title: t.vampireSession.sceneCreated, duration: 2000 });
   };
 
   const handleEndSession = async () => {
@@ -291,7 +291,7 @@ export default function Session() {
       .update({ status: 'completed' })
       .eq('id', session.id);
 
-    toast({ title: 'Sessão encerrada' });
+    toast({ title: t.vampireSession.sessionEnded });
     navigate('/dashboard');
   };
 

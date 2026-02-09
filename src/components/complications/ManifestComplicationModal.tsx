@@ -66,7 +66,7 @@ export function ManifestComplicationModal({
       onClose();
     } catch (error) {
       console.error('Error manifesting complication:', error);
-      toast({ title: 'Erro ao manifestar complicação', variant: 'destructive' });
+      toast({ title: t.complications.errorManifesting, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
@@ -81,7 +81,7 @@ export function ManifestComplicationModal({
             {t.complications.manifestComplication}
           </DialogTitle>
           <DialogDescription className="font-body">
-            Resolver narrativamente a complicação de{' '}
+            {t.complications.resolveNarratively}{' '}
             <span className="font-medieval text-foreground">{characterName}</span>
           </DialogDescription>
         </DialogHeader>
@@ -101,7 +101,7 @@ export function ManifestComplicationModal({
               id="manifest-note"
               value={manifestNote}
               onChange={(e) => setManifestNote(e.target.value)}
-              placeholder="Como a complicação se manifestou na narrativa..."
+              placeholder={t.complications.manifestPlaceholder}
               className="font-body min-h-[80px] resize-none"
             />
           </div>
