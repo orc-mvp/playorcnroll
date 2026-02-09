@@ -56,7 +56,6 @@ export default function SessionLobby() {
 
   const isNarrator = session?.narrator_id === user?.id;
 
-  // Fetch session and participants
   useEffect(() => {
     if (!sessionId || !user) return;
 
@@ -69,7 +68,7 @@ export default function SessionLobby() {
 
       if (sessionError || !sessionData) {
         toast({
-          title: 'Sessão não encontrada',
+          title: t.session.sessionNotFound,
           variant: 'destructive',
         });
         navigate('/dashboard');
@@ -78,7 +77,6 @@ export default function SessionLobby() {
 
       setSession(sessionData);
 
-      // Fetch participants with their characters
       const { data: participantsData } = await supabase
         .from('session_participants')
         .select(`
@@ -95,7 +93,6 @@ export default function SessionLobby() {
         .eq('session_id', sessionId);
 
       if (participantsData) {
-        // Fetch profiles for each participant
         const participantsWithProfiles = await Promise.all(
           participantsData.map(async (p) => {
             const { data: profileData } = await supabase
@@ -120,7 +117,6 @@ export default function SessionLobby() {
 
     fetchSession();
 
-    // Subscribe to realtime updates for participants
     const channel = supabase
       .channel(`session-lobby-${sessionId}`)
       .on(
@@ -132,7 +128,6 @@ export default function SessionLobby() {
           filter: `session_id=eq.${sessionId}`,
         },
         () => {
-          // Refetch participants on any change
           fetchSession();
         }
       )
@@ -148,7 +143,6 @@ export default function SessionLobby() {
           const newSession = payload.new as Session;
           setSession(newSession);
           
-          // Redirect to active session if started (with correct route for game system)
           if (newSession.status === 'active') {
             const route = newSession.game_system === 'vampiro_v3' 
               ? `/session/vampire/${sessionId}` 
@@ -168,12 +162,12 @@ export default function SessionLobby() {
     try {
       await navigator.clipboard.writeText(text);
       toast({
-        title: `${label} copiado!`,
+        title: `${label} ${t.session.copied}`,
         duration: 2000,
       });
     } catch {
       toast({
-        title: 'Erro ao copiar',
+        title: t.session.errorCopying,
         variant: 'destructive',
       });
     }
@@ -192,14 +186,13 @@ export default function SessionLobby() {
 
       if (error) throw error;
 
-      // Navigate to correct route based on game system
       const route = session.game_system === 'vampiro_v3' 
         ? `/session/vampire/${session.id}` 
         : `/session/${session.id}`;
       navigate(route);
     } catch (error: any) {
       toast({
-        title: 'Erro ao iniciar sessão',
+        title: t.session.errorStartingSession,
         description: error.message,
         variant: 'destructive',
       });
@@ -226,7 +219,6 @@ export default function SessionLobby() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
@@ -259,7 +251,6 @@ export default function SessionLobby() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-4xl overflow-hidden">
         <div className="grid gap-6 md:grid-cols-2">
           {/* Invite Section */}
@@ -267,14 +258,13 @@ export default function SessionLobby() {
             <CardHeader>
               <CardTitle className="font-medieval flex items-center gap-2">
                 <LinkIcon className="w-5 h-5 text-primary shrink-0" />
-                <span className="truncate">Convide Jogadores</span>
+                <span className="truncate">{t.session.invitePlayers}</span>
               </CardTitle>
               <CardDescription className="font-body">
-                Compartilhe o código ou link com seus jogadores
+                {t.session.shareCodeOrLink}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 overflow-hidden">
-              {/* Invite Code */}
               <div className="space-y-2">
                 <label className="text-sm font-medieval text-muted-foreground">
                   {t.session.inviteCode}
@@ -287,14 +277,13 @@ export default function SessionLobby() {
                     variant="outline"
                     size="icon"
                     className="shrink-0"
-                    onClick={() => copyToClipboard(session.invite_code, 'Código')}
+                    onClick={() => copyToClipboard(session.invite_code, t.session.inviteCode)}
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
 
-              {/* Invite Link */}
               <div className="space-y-2 overflow-hidden">
                 <label className="text-sm font-medieval text-muted-foreground">
                   {t.session.inviteLink}
@@ -307,7 +296,7 @@ export default function SessionLobby() {
                     variant="outline"
                     size="icon"
                     className="shrink-0"
-                    onClick={() => copyToClipboard(inviteLink, 'Link')}
+                    onClick={() => copyToClipboard(inviteLink, t.session.inviteLink)}
                   >
                     <Copy className="w-4 h-4" />
                   </Button>
@@ -324,16 +313,16 @@ export default function SessionLobby() {
                 {t.session.connectedPlayers}
               </CardTitle>
               <CardDescription className="font-body">
-                {participants.length} jogador(es) conectado(s)
+                {participants.length} {t.session.playersConnected}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {participants.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground font-body">
                   <User className="w-12 h-12 mx-auto mb-3 opacity-30" />
-                  <p>Aguardando jogadores...</p>
+                  <p>{t.session.waitingForPlayers}</p>
                   <p className="text-sm mt-1">
-                    Compartilhe o código de convite
+                    {t.session.shareInviteCode}
                   </p>
                 </div>
               ) : (
@@ -348,10 +337,10 @@ export default function SessionLobby() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medieval truncate">
-                          {p.character?.name || 'Sem personagem'}
+                          {p.character?.name || t.session.noCharacter}
                         </p>
                         <p className="text-sm text-muted-foreground font-body truncate">
-                          {p.profile?.display_name || 'Jogador'}
+                          {p.profile?.display_name || t.session.playerLabel}
                         </p>
                       </div>
                     </li>
@@ -390,7 +379,7 @@ export default function SessionLobby() {
               {isStarting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  Iniciando...
+                  {t.session.starting}
                 </>
               ) : (
                 <>
@@ -407,7 +396,7 @@ export default function SessionLobby() {
           <div className="mt-8 flex flex-col items-center gap-4">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 border border-border">
               <span className="text-sm text-muted-foreground font-body">
-                Esta sessão foi encerrada
+                {t.session.sessionEnded}
               </span>
             </div>
             <Button
@@ -419,12 +408,12 @@ export default function SessionLobby() {
               {isStarting ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                  Reiniciando...
+                  {t.session.restarting}
                 </>
               ) : (
                 <>
                   <Play className="w-5 h-5 mr-2" />
-                  Reiniciar Sessão
+                  {t.session.restartSession}
                 </>
               )}
             </Button>
@@ -448,7 +437,7 @@ export default function SessionLobby() {
           <div className="mt-8 text-center">
             <div className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-muted/50 border border-border">
               <span className="font-body text-muted-foreground">
-                Esta sessão foi encerrada pelo Narrador
+                {t.session.sessionEndedByNarrator}
               </span>
             </div>
           </div>
