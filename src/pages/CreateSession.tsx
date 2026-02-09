@@ -25,7 +25,7 @@ function generateInviteCode(): string {
 export default function CreateSession() {
   const navigate = useNavigate();
   const { user, profile, loading: authLoading } = useAuth();
-  const { t, language } = useI18n();
+  const { t } = useI18n();
   const { toast } = useToast();
 
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(null);
@@ -33,7 +33,6 @@ export default function CreateSession() {
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect if not authenticated
   if (!authLoading && !user) {
     navigate('/auth', { replace: true });
     return null;
@@ -44,8 +43,8 @@ export default function CreateSession() {
 
     if (!gameSystem) {
       toast({
-        title: 'Erro',
-        description: language === 'pt-BR' ? 'Selecione um sistema de jogo' : 'Select a game system',
+        title: t.session.error,
+        description: t.session.selectGameSystem,
         variant: 'destructive',
       });
       return;
@@ -54,8 +53,8 @@ export default function CreateSession() {
     const system = getGameSystem(gameSystem);
     if (!system?.available) {
       toast({
-        title: 'Erro',
-        description: language === 'pt-BR' ? 'Este sistema ainda não está disponível' : 'This system is not available yet',
+        title: t.session.error,
+        description: t.session.systemNotAvailable,
         variant: 'destructive',
       });
       return;
@@ -63,8 +62,8 @@ export default function CreateSession() {
 
     if (!name.trim()) {
       toast({
-        title: 'Erro',
-        description: 'Nome da sessão é obrigatório',
+        title: t.session.error,
+        description: t.session.sessionNameRequired,
         variant: 'destructive',
       });
       return;
@@ -93,16 +92,16 @@ export default function CreateSession() {
       if (error) throw error;
 
       toast({
-        title: 'Sessão criada!',
-        description: `Código de convite: ${inviteCode}`,
+        title: t.session.sessionCreated,
+        description: `${t.session.inviteCode}: ${inviteCode}`,
       });
 
       navigate(`/session/${data.id}/lobby`);
     } catch (error: any) {
       console.error('Error creating session:', error);
       toast({
-        title: 'Erro ao criar sessão',
-        description: error.message || 'Tente novamente',
+        title: t.session.errorCreatingSession,
+        description: error.message || t.session.tryAgain,
         variant: 'destructive',
       });
     } finally {
@@ -122,7 +121,6 @@ export default function CreateSession() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-2 sm:gap-4">
           <Button
@@ -139,7 +137,6 @@ export default function CreateSession() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <Card className="medieval-card">
           <CardHeader className="text-center">
@@ -147,19 +144,18 @@ export default function CreateSession() {
               <Wand2 className="w-8 h-8 text-primary" />
             </div>
             <CardTitle className="font-medieval text-2xl">
-              Nova Aventura
+              {t.session.newAdventure}
             </CardTitle>
             <CardDescription className="font-body">
-              Configure sua sessão e convide jogadores
+              {t.session.configureSession}
             </CardDescription>
           </CardHeader>
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Game System Selection */}
               <div className="space-y-2">
                 <Label className="font-medieval">
-                  {language === 'pt-BR' ? 'Sistema de Jogo' : 'Game System'} *
+                  {t.session.gameSystem} *
                 </Label>
                 <GameSystemSelector
                   value={gameSystem}
@@ -168,7 +164,6 @@ export default function CreateSession() {
                 />
               </div>
 
-              {/* Session Name */}
               <div className="space-y-2">
                 <Label htmlFor="name" className="font-medieval">
                   {t.session.name} *
@@ -177,13 +172,12 @@ export default function CreateSession() {
                   id="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ex: A Queda do Rei Sombrio"
+                  placeholder={t.session.sessionNamePlaceholder}
                   className="font-body"
                   disabled={isSubmitting}
                 />
               </div>
 
-              {/* Description */}
               <div className="space-y-2">
                 <Label htmlFor="description" className="font-medieval">
                   {t.session.description}
@@ -192,13 +186,12 @@ export default function CreateSession() {
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Uma breve descrição da aventura (opcional)"
+                  placeholder={t.session.sessionDescPlaceholder}
                   className="font-body min-h-[100px] resize-none"
                   disabled={isSubmitting}
                 />
               </div>
 
-              {/* Submit Button */}
               <Button
                 type="submit"
                 className="w-full font-medieval text-lg h-12"

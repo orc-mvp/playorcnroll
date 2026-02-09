@@ -71,10 +71,7 @@ export default function Index() {
 
         {/* Tagline */}
         <p className="text-xl md:text-2xl text-on-light-alt font-body mb-12 text-center">
-          {language === 'pt-BR' 
-            ? 'Teatro da Mente Online'
-            : 'Online Theater of the Mind'
-          }
+          {t.landing.tagline}
         </p>
 
         {/* Game Systems Grid */}
@@ -120,7 +117,7 @@ export default function Index() {
 
                 <Link to="/login" className="w-full">
                   <Button className="w-full font-medieval">
-                    {language === 'pt-BR' ? 'Jogar' : 'Play'}
+                    {t.landing.play}
                   </Button>
                 </Link>
               </div>
@@ -142,7 +139,7 @@ export default function Index() {
       <section className="py-20 px-4 bg-card/30">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl md:text-4xl font-medieval text-center mb-12 text-foreground">
-            {language === 'pt-BR' ? 'Recursos da Plataforma' : 'Platform Features'}
+            {t.landing.platformFeatures}
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -152,13 +149,10 @@ export default function Index() {
                 <Dices className="w-8 h-8 text-primary" />
               </div>
               <h3 className="font-medieval text-xl mb-2">
-                {language === 'pt-BR' ? 'Dados 3D' : '3D Dice'}
+                {t.landing.dice3d}
               </h3>
               <p className="text-muted-foreground font-body text-sm">
-                {language === 'pt-BR' 
-                  ? 'Role dados com animações 3D realistas em tempo real'
-                  : 'Roll dice with realistic 3D animations in real-time'
-                }
+                {t.landing.dice3dDesc}
               </p>
             </div>
 
@@ -168,13 +162,10 @@ export default function Index() {
                 <Zap className="w-8 h-8 text-primary" />
               </div>
               <h3 className="font-medieval text-xl mb-2">
-                {language === 'pt-BR' ? 'Tempo Real' : 'Real-time'}
+                {t.landing.realtime}
               </h3>
               <p className="text-muted-foreground font-body text-sm">
-                {language === 'pt-BR' 
-                  ? 'Sincronização instantânea entre narrador e jogadores'
-                  : 'Instant synchronization between narrator and players'
-                }
+                {t.landing.realtimeDesc}
               </p>
             </div>
 
@@ -184,13 +175,10 @@ export default function Index() {
                 <Shield className="w-8 h-8 text-primary" />
               </div>
               <h3 className="font-medieval text-xl mb-2">
-                {language === 'pt-BR' ? 'Sessões Gerenciadas' : 'Managed Sessions'}
+                {t.landing.managedSessions}
               </h3>
               <p className="text-muted-foreground font-body text-sm">
-                {language === 'pt-BR' 
-                  ? 'O narrador controla testes, cenas e progressão'
-                  : 'The narrator controls tests, scenes and progression'
-                }
+                {t.landing.managedSessionsDesc}
               </p>
             </div>
           </div>
@@ -206,10 +194,7 @@ export default function Index() {
             className="w-12 h-12 mx-auto mb-4 object-contain"
           />
           <p className="text-sm text-on-light-alt font-body">
-            {language === 'pt-BR' 
-              ? 'Teatro da Mente Online'
-              : 'Online Theater of the Mind'
-            }
+            {t.landing.tagline}
           </p>
         </div>
       </footer>

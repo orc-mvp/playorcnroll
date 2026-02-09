@@ -73,7 +73,7 @@ const systemIcons: Record<string, React.ElementType> = {
 export default function MyCharacters() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { t, language } = useI18n();
+  const { t } = useI18n();
   const { toast } = useToast();
 
   const [characters, setCharacters] = useState<Character[]>([]);
@@ -113,13 +113,13 @@ export default function MyCharacters() {
 
       setCharacters((prev) => prev.filter((c) => c.id !== deleteTarget.id));
       toast({
-        title: language === 'pt-BR' ? 'Personagem excluído' : 'Character deleted',
+        title: t.myCharacters.characterDeleted,
         description: deleteTarget.name,
       });
     } catch (error) {
       console.error('Error deleting character:', error);
       toast({
-        title: language === 'pt-BR' ? 'Erro ao excluir' : 'Error deleting',
+        title: t.myCharacters.errorDeleting,
         variant: 'destructive',
       });
     } finally {
@@ -143,7 +143,6 @@ export default function MyCharacters() {
     return attrs.filter((attr) => char[`${attr}_type` as keyof Character] === 'strong');
   };
 
-  // Pagination
   const totalPages = Math.ceil(characters.length / ITEMS_PER_PAGE);
   const paginatedCharacters = characters.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
@@ -159,7 +158,6 @@ export default function MyCharacters() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -176,7 +174,7 @@ export default function MyCharacters() {
             <Button size="sm">
               <Plus className="w-4 h-4 mr-1" />
               <span className="hidden sm:inline">{t.character.create}</span>
-              <span className="sm:hidden">Novo</span>
+              <span className="sm:hidden">{t.myCharacters.newShort}</span>
             </Button>
           </Link>
         </div>
@@ -197,7 +195,6 @@ export default function MyCharacters() {
                   >
                     <CardContent className="p-4">
                       <div className="flex flex-col gap-3">
-                        {/* Header with avatar and system badge */}
                         <div className="flex items-start justify-between">
                           <Link
                             to={`/character/${char.id}`}
@@ -229,7 +226,6 @@ export default function MyCharacters() {
                           </div>
                         </div>
 
-                        {/* Character info */}
                         <Link to={`/character/${char.id}`} className="flex-1 min-w-0">
                           <h3 className="font-medieval text-base truncate hover:text-primary transition-colors">
                             {char.name}
@@ -241,10 +237,8 @@ export default function MyCharacters() {
                           )}
                         </Link>
 
-                        {/* Stats row - only for herois_marcados */}
                         {char.game_system === 'herois_marcados' && (
                           <div className="flex items-center gap-2 flex-wrap">
-                            {/* Strong Attributes */}
                             <div className="flex items-center gap-0.5">
                               {strongAttrs.map((attr) => {
                                 const AttrIcon = attributeIcons[attr];
@@ -258,12 +252,10 @@ export default function MyCharacters() {
                               })}
                             </div>
 
-                            {/* Minor Marks Count */}
                             <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                               {char.minor_marks?.length || 0} {t.character.minorMarks}
                             </Badge>
 
-                            {/* Heroic Moves */}
                             {char.heroic_moves_stored > 0 && (
                               <div className="flex items-center gap-0.5 text-[10px] text-primary">
                                 <Sparkles className="w-3 h-3" />
@@ -279,7 +271,6 @@ export default function MyCharacters() {
               })}
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-6">
                 <Pagination>
@@ -319,12 +310,10 @@ export default function MyCharacters() {
             <CardContent className="py-12 text-center">
               <User className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
               <h3 className="font-medieval text-lg mb-2">
-                {language === 'pt-BR' ? 'Nenhum personagem' : 'No characters'}
+                {t.myCharacters.noCharacters}
               </h3>
               <p className="text-muted-foreground font-body mb-4">
-                {language === 'pt-BR'
-                  ? 'Crie seu primeiro herói para começar!'
-                  : 'Create your first hero to get started!'}
+                {t.myCharacters.createFirst}
               </p>
               <Link to="/character/create">
                 <Button>
@@ -337,27 +326,14 @@ export default function MyCharacters() {
         )}
       </main>
 
-      {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="font-medieval">
-              {language === 'pt-BR' ? 'Excluir Personagem?' : 'Delete Character?'}
+              {t.myCharacters.deleteCharacter}
             </AlertDialogTitle>
             <AlertDialogDescription className="font-body">
-              {language === 'pt-BR' ? (
-                <>
-                  Tem certeza que deseja excluir <strong>{deleteTarget?.name}</strong>? Esta ação
-                  não pode ser desfeita. Todas as marcas, narrativas e progresso serão perdidos
-                  permanentemente.
-                </>
-              ) : (
-                <>
-                  Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This
-                  action cannot be undone. All marks, narratives, and progress will be permanently
-                  lost.
-                </>
-              )}
+              {t.myCharacters.deleteConfirm.replace('{name}', deleteTarget?.name || '')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

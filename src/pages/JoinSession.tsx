@@ -62,14 +62,12 @@ export default function JoinSession() {
   const [validatedSession, setValidatedSession] = useState<ValidatedSession | null>(null);
   const [isValidating, setIsValidating] = useState(false);
 
-  // Redirect if not authenticated or is a narrator
   useEffect(() => {
     if (!authLoading && !user) {
       navigate('/auth', { replace: true });
     }
   }, [authLoading, user, navigate]);
 
-  // Fetch user's characters
   useEffect(() => {
     if (!user) return;
 
@@ -90,7 +88,6 @@ export default function JoinSession() {
     fetchCharacters();
   }, [user]);
 
-  // Fetch sessions the user has joined
   useEffect(() => {
     if (!user) return;
 
@@ -126,7 +123,7 @@ export default function JoinSession() {
             description: (p.sessions as any).description,
             status: (p.sessions as any).status,
             game_system: (p.sessions as any).game_system || 'herois_marcados',
-            characterName: (p.characters as any)?.name || 'Sem personagem',
+            characterName: (p.characters as any)?.name || t.session.noCharacter,
             joinedAt: p.joined_at,
           }));
         setJoinedSessions(sessions);
@@ -138,21 +135,19 @@ export default function JoinSession() {
     fetchJoinedSessions();
   }, [user]);
 
-  // Auto-join if code is in URL
   useEffect(() => {
     if (code && user && !authLoading && characters.length > 0 && selectedCharacterId) {
       // Don't auto-join, let user select character first
     }
   }, [code, user, authLoading, characters, selectedCharacterId]);
 
-  // Validate invite code and get session info
   const handleValidateCode = async () => {
     const codeToUse = inviteCode.trim().toUpperCase();
 
     if (!codeToUse || codeToUse.length < 6) {
       toast({
-        title: 'Código inválido',
-        description: 'Digite o código de convite completo',
+        title: t.session.invalidCode,
+        description: t.session.enterFullCode,
         variant: 'destructive',
       });
       return;
@@ -167,20 +162,20 @@ export default function JoinSession() {
       );
 
       if (validateError || !validateData?.session) {
-        throw new Error('Sessão não encontrada com este código');
+        throw new Error(t.session.sessionNotFoundWithCode);
       }
 
       setValidatedSession(validateData.session);
-      setSelectedCharacterId(''); // Reset selected character
+      setSelectedCharacterId('');
       
       toast({
-        title: 'Sessão encontrada!',
+        title: t.session.sessionFound,
         description: validateData.session.name,
       });
     } catch (error: any) {
       toast({
-        title: 'Erro ao validar código',
-        description: error.message || 'Verifique o código e tente novamente',
+        title: t.session.errorValidatingCode,
+        description: error.message || t.session.checkCodeAndRetry,
         variant: 'destructive',
       });
     } finally {
@@ -193,8 +188,8 @@ export default function JoinSession() {
 
     if (!validatedSession) {
       toast({
-        title: 'Valide o código primeiro',
-        description: 'Clique em "Verificar" para validar o código',
+        title: t.session.validateFirst,
+        description: t.session.clickVerify,
         variant: 'destructive',
       });
       return;
@@ -202,8 +197,8 @@ export default function JoinSession() {
 
     if (!selectedCharacterId) {
       toast({
-        title: 'Selecione um personagem',
-        description: 'Você precisa escolher um personagem compatível para entrar na sessão',
+        title: t.session.selectCharacter,
+        description: t.session.selectCharacterDesc,
         variant: 'destructive',
       });
       return;
@@ -216,7 +211,6 @@ export default function JoinSession() {
     try {
       const sessionData = validatedSession;
 
-      // Check if already a participant
       const { data: existingParticipant } = await supabase
         .from('session_participants')
         .select('id')
@@ -225,7 +219,6 @@ export default function JoinSession() {
         .single();
 
       if (existingParticipant) {
-        // Already joined, just navigate (with correct route for game system)
         if (sessionData.status === 'active') {
           const route = sessionData.game_system === 'vampiro_v3' 
             ? `/session/vampire/${sessionData.id}` 
@@ -237,14 +230,12 @@ export default function JoinSession() {
         return;
       }
 
-      // Get character data to initialize vampire trackers
       const { data: characterData } = await supabase
         .from('characters')
         .select('game_system, vampiro_data')
         .eq('id', selectedCharacterId)
         .single();
 
-      // Prepare initial tracker values for Vampire characters
       let initialBloodPool = 0;
       let initialWillpower = 0;
       let initialHealthDamage = [false, false, false, false, false, false, false];
@@ -254,7 +245,6 @@ export default function JoinSession() {
           generation?: string; 
           willpower?: number;
         };
-        // Blood pool based on generation (default to 10 for unknown)
         const generation = parseInt(vampiroData.generation || '13', 10);
         if (generation <= 7) initialBloodPool = 20;
         else if (generation === 8) initialBloodPool = 15;
@@ -262,11 +252,9 @@ export default function JoinSession() {
         else if (generation <= 12) initialBloodPool = 11;
         else initialBloodPool = 10;
         
-        // Willpower starts at max
         initialWillpower = vampiroData.willpower || 1;
       }
 
-      // Join the session with initialized tracker values
       const { error: joinError } = await supabase
         .from('session_participants')
         .insert({
@@ -281,11 +269,10 @@ export default function JoinSession() {
       if (joinError) throw joinError;
 
       toast({
-        title: 'Entrou na sessão!',
-        description: 'Aguardando o Narrador iniciar...',
+        title: t.session.joinedSession,
+        description: t.session.waitingNarratorStart,
       });
 
-      // Navigate to lobby or active session (with correct route for game system)
       if (sessionData.status === 'active') {
         const route = sessionData.game_system === 'vampiro_v3' 
           ? `/session/vampire/${sessionData.id}` 
@@ -297,8 +284,8 @@ export default function JoinSession() {
     } catch (error: any) {
       console.error('Error joining session:', error);
       toast({
-        title: 'Erro ao entrar na sessão',
-        description: error.message || 'Verifique o código e tente novamente',
+        title: t.session.errorJoiningSession,
+        description: error.message || t.session.checkCodeAndRetry,
         variant: 'destructive',
       });
     } finally {
@@ -323,21 +310,21 @@ export default function JoinSession() {
         return (
           <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
             <Play className="w-3 h-3 mr-1" />
-            Ativa
+            {t.session.statusActive}
           </Badge>
         );
       case 'lobby':
         return (
           <Badge className="bg-yellow-500/20 text-yellow-500 border-yellow-500/30">
             <Clock className="w-3 h-3 mr-1" />
-            Aguardando
+            {t.session.statusWaiting}
           </Badge>
         );
       case 'ended':
         return (
           <Badge className="bg-muted text-muted-foreground border-muted-foreground/30">
             <XCircle className="w-3 h-3 mr-1" />
-            Encerrada
+            {t.session.statusEnded}
           </Badge>
         );
       default:
@@ -359,9 +346,11 @@ export default function JoinSession() {
     );
   }
 
+  const getSystemLabel = (gameSystem: string) => 
+    gameSystem === 'vampiro_v3' ? 'Vampiro: A Máscara' : 'Heróis Marcados';
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center gap-2 sm:gap-4">
           <Button
@@ -378,10 +367,9 @@ export default function JoinSession() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Previously Joined Sessions - First on mobile, second on desktop */}
+          {/* Previously Joined Sessions */}
           <div className="order-1 lg:order-2">
             {loadingSessions ? (
               <Card className="medieval-card">
@@ -396,10 +384,10 @@ export default function JoinSession() {
                     <History className="w-6 h-6 text-primary" />
                   </div>
                   <CardTitle className="font-medieval text-xl text-center lg:text-left">
-                    Minhas Aventuras
+                    {t.session.myAdventures}
                   </CardTitle>
                   <CardDescription className="font-body text-center lg:text-left">
-                    Sessões que você já participou
+                    {t.session.sessionsParticipated}
                   </CardDescription>
                 </CardHeader>
 
@@ -421,7 +409,7 @@ export default function JoinSession() {
                             </p>
                           )}
                           <p className="text-xs text-primary mt-2 font-body">
-                            Como: {session.characterName}
+                            {t.session.playingAs} {session.characterName}
                           </p>
                         </div>
                         <div className="shrink-0">
@@ -437,17 +425,17 @@ export default function JoinSession() {
                 <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                   <History className="w-12 h-12 text-muted-foreground/30 mb-4" />
                   <p className="font-medieval text-lg text-muted-foreground">
-                    Nenhuma aventura ainda
+                    {t.session.noAdventuresYet}
                   </p>
                   <p className="text-sm text-muted-foreground font-body mt-1">
-                    Entre em uma sessão para começar
+                    {t.session.joinToStart}
                   </p>
                 </CardContent>
               </Card>
             )}
           </div>
 
-          {/* Join New Session Card - Second on mobile, first on desktop */}
+          {/* Join New Session Card */}
           <div className="order-2 lg:order-1">
             <Card className="medieval-card h-full">
               <CardHeader className="text-center lg:text-left">
@@ -455,10 +443,10 @@ export default function JoinSession() {
                   <Users className="w-6 h-6 text-primary" />
                 </div>
                 <CardTitle className="font-medieval text-xl">
-                  Entrar na Aventura
+                  {t.session.joinAdventure}
                 </CardTitle>
                 <CardDescription className="font-body">
-                  Digite o código de convite e escolha seu personagem
+                  {t.session.enterCodeAndChoose}
                 </CardDescription>
               </CardHeader>
 
@@ -475,7 +463,7 @@ export default function JoinSession() {
                         value={inviteCode}
                         onChange={(e) => {
                           setInviteCode(e.target.value.toUpperCase());
-                          setValidatedSession(null); // Reset validation when code changes
+                          setValidatedSession(null);
                           setSelectedCharacterId('');
                         }}
                         placeholder="Ex: ABC123"
@@ -494,7 +482,7 @@ export default function JoinSession() {
                         ) : validatedSession ? (
                           <CheckCircle className="w-4 h-4 text-primary" />
                         ) : (
-                          'Verificar'
+                          t.session.verify
                         )}
                       </Button>
                     </div>
@@ -502,17 +490,17 @@ export default function JoinSession() {
                       <div className="p-2 rounded-lg bg-primary/10 border border-primary/30">
                         <p className="text-sm font-medieval text-primary">{validatedSession.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          Sistema: {validatedSession.game_system === 'vampiro_v3' ? 'Vampiro: A Máscara' : 'Heróis Marcados'}
+                          {t.session.systemLabel} {getSystemLabel(validatedSession.game_system)}
                         </p>
                       </div>
                     )}
                   </div>
 
-                  {/* Character Selection - Only shown after session is validated */}
+                  {/* Character Selection */}
                   {validatedSession && (
                     <div className="space-y-2">
                       <Label htmlFor="character" className="font-medieval">
-                        Personagem ({validatedSession.game_system === 'vampiro_v3' ? 'Vampiro' : 'Heróis Marcados'})
+                        {t.session.character} ({getSystemLabel(validatedSession.game_system)})
                       </Label>
                       {loadingCharacters ? (
                         <div className="flex items-center justify-center py-4">
@@ -527,9 +515,9 @@ export default function JoinSession() {
                           return (
                             <div className="text-center py-4 bg-muted/30 rounded-lg">
                               <p className="text-muted-foreground font-body text-sm mb-3">
-                                Você não tem personagens do sistema{' '}
+                                {t.session.noCharactersForSystem}{' '}
                                 <span className="font-medieval text-foreground">
-                                  {validatedSession.game_system === 'vampiro_v3' ? 'Vampiro' : 'Heróis Marcados'}
+                                  {getSystemLabel(validatedSession.game_system)}
                                 </span>
                               </p>
                               <Button
@@ -537,7 +525,7 @@ export default function JoinSession() {
                                 variant="outline"
                                 onClick={() => navigate(`/character/create?system=${validatedSession.game_system}`)}
                               >
-                                Criar Personagem de {validatedSession.game_system === 'vampiro_v3' ? 'Vampiro' : 'Heróis Marcados'}
+                                {t.session.createCharacterFor} {getSystemLabel(validatedSession.game_system)}
                               </Button>
                             </div>
                           );
@@ -550,7 +538,7 @@ export default function JoinSession() {
                             disabled={isJoining}
                           >
                             <SelectTrigger className="font-body">
-                              <SelectValue placeholder="Selecione um personagem" />
+                              <SelectValue placeholder={t.session.selectCharacterPlaceholder} />
                             </SelectTrigger>
                             <SelectContent>
                               {compatibleCharacters.map((char) => (
@@ -579,7 +567,7 @@ export default function JoinSession() {
                     {isJoining ? (
                       <>
                         <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                        Entrando...
+                        {t.session.joining}
                       </>
                     ) : (
                       t.session.join

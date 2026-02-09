@@ -45,13 +45,6 @@ interface SessionWithRole {
   contextRole: 'narrator' | 'player';
 }
 
-const statusConfig: Record<string, { label: string; labelEn: string; icon: React.ElementType; variant: 'default' | 'secondary' | 'outline'; className?: string }> = {
-  lobby: { label: 'Aguardando', labelEn: 'Waiting', icon: Pause, variant: 'secondary' },
-  active: { label: 'Em Andamento', labelEn: 'Active', icon: Play, variant: 'default' },
-  completed: { label: 'Encerrada', labelEn: 'Completed', icon: CheckCircle, variant: 'outline' },
-  ended: { label: 'Encerrada', labelEn: 'Ended', icon: CheckCircle, variant: 'outline', className: 'bg-muted/50' },
-};
-
 export default function MySessions() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
@@ -72,7 +65,6 @@ export default function MySessions() {
     if (!user) return;
 
     const fetchSessions = async () => {
-      // Fetch both narrator and participant sessions in parallel
       const [narratorResult, participantResult] = await Promise.all([
         supabase
           .from('sessions')
@@ -89,9 +81,7 @@ export default function MySessions() {
 
       const allSessions: SessionWithRole[] = [];
 
-      // Add narrator sessions
       if (narratorResult.data) {
-        // Get participant counts for narrator sessions
         const withCounts = await Promise.all(
           narratorResult.data.map(async (session) => {
             const { count } = await supabase
@@ -105,7 +95,6 @@ export default function MySessions() {
         allSessions.push(...withCounts);
       }
 
-      // Add participant sessions (exclude ones where user is also narrator)
       if (participantResult.data) {
         const narratorIds = new Set(narratorResult.data?.map(s => s.id) || []);
         participantResult.data.forEach((p) => {
@@ -116,7 +105,6 @@ export default function MySessions() {
         });
       }
 
-      // Sort by updated_at
       allSessions.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
       setSessions(allSessions);
       setLoading(false);
@@ -142,7 +130,6 @@ export default function MySessions() {
     setIsDeleting(true);
     
     try {
-      // Delete in order to respect foreign key constraints
       const { data: tests } = await supabase
         .from('tests')
         .select('id')
@@ -163,10 +150,10 @@ export default function MySessions() {
       if (error) throw error;
       
       setSessions(prev => prev.filter(s => s.id !== deleteSession.id));
-      toast.success(language === 'pt-BR' ? 'Sessão excluída com sucesso' : 'Session deleted successfully');
+      toast.success(t.session.sessionDeleted);
     } catch (error) {
       console.error('Error deleting session:', error);
-      toast.error(language === 'pt-BR' ? 'Erro ao excluir sessão' : 'Error deleting session');
+      toast.error(t.session.errorDeletingSession);
     } finally {
       setIsDeleting(false);
       setDeleteSession(null);
@@ -185,9 +172,15 @@ export default function MySessions() {
 
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
 
+  const statusConfig: Record<string, { label: string; icon: React.ElementType; variant: 'default' | 'secondary' | 'outline'; className?: string }> = {
+    lobby: { label: t.session.statusWaiting, icon: Pause, variant: 'secondary' },
+    active: { label: t.session.statusActive, icon: Play, variant: 'default' },
+    completed: { label: t.session.statusEnded, icon: CheckCircle, variant: 'outline' },
+    ended: { label: t.session.statusEnded, icon: CheckCircle, variant: 'outline', className: 'bg-muted/50' },
+  };
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
@@ -208,13 +201,12 @@ export default function MySessions() {
             <Link to="/session/create">
               <Plus className="w-4 h-4 mr-2" />
               <span className="hidden sm:inline">{t.session.create}</span>
-              <span className="sm:hidden">Nova</span>
+              <span className="sm:hidden">{t.session.newFemale}</span>
             </Link>
           </Button>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {sessions.length === 0 ? (
           <Card className="medieval-card">
@@ -222,9 +214,7 @@ export default function MySessions() {
               <BookOpen className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
               <h3 className="font-medieval text-xl mb-2">{t.session.noSessions}</h3>
               <p className="text-muted-foreground font-body mb-6">
-                {language === 'pt-BR'
-                  ? 'Crie uma sessão ou entre em uma com código de convite!'
-                  : 'Create a session or join one with an invite code!'}
+                {t.session.noSessionsDesc}
               </p>
               <div className="flex gap-3 justify-center">
                 <Button asChild>
@@ -267,7 +257,6 @@ export default function MySessions() {
                           <span className="text-xs text-muted-foreground font-body">
                             {session.game_system === 'vampiro_v3' ? 'Vampiro 3ª Ed.' : 'Heróis Marcados'}
                           </span>
-                          {/* Contextual role badge */}
                           <Badge variant="outline" className="text-xs">
                             {isNarrator ? (
                               <><Crown className="w-3 h-3 mr-1" />{t.roles.narrator}</>
@@ -287,7 +276,7 @@ export default function MySessions() {
                       </div>
                       <Badge variant={status.variant} className={`shrink-0 ${status.className || ''}`}>
                         <StatusIcon className="w-3 h-3 mr-1" />
-                        {language === 'pt-BR' ? status.label : status.labelEn}
+                        {status.label}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -305,7 +294,7 @@ export default function MySessions() {
                         <div className="flex items-center gap-1">
                           <Users className="w-4 h-4" />
                           <span className="font-body">
-                            {session.participant_count} {language === 'pt-BR' ? 'jogador(es)' : 'player(s)'}
+                            {session.participant_count} {t.session.players}
                           </span>
                         </div>
                       )}
@@ -336,33 +325,26 @@ export default function MySessions() {
         )}
       </main>
 
-      {/* Delete Confirmation Modal */}
       <AlertDialog open={!!deleteSession} onOpenChange={(open) => !open && setDeleteSession(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="font-medieval">
-              {language === 'pt-BR' ? 'Excluir Sessão' : 'Delete Session'}
+              {t.session.deleteSession}
             </AlertDialogTitle>
             <AlertDialogDescription className="font-body">
-              {language === 'pt-BR' 
-                ? `Tem certeza que deseja excluir a sessão "${deleteSession?.name}"? Esta ação não pode ser desfeita. Todos os dados da sessão (cenas, eventos, testes) serão permanentemente removidos.`
-                : `Are you sure you want to delete the session "${deleteSession?.name}"? This action cannot be undone. All session data (scenes, events, tests) will be permanently removed.`
-              }
+              {t.session.deleteSessionConfirm.replace('{name}', deleteSession?.name || '')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>
-              {language === 'pt-BR' ? 'Cancelar' : 'Cancel'}
+              {t.common.cancel}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDeleteSession}
               disabled={isDeleting}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {isDeleting 
-                ? (language === 'pt-BR' ? 'Excluindo...' : 'Deleting...') 
-                : (language === 'pt-BR' ? 'Excluir' : 'Delete')
-              }
+              {isDeleting ? t.session.deleting : t.common.delete}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
