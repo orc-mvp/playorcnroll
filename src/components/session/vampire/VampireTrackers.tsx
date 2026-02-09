@@ -324,7 +324,7 @@ export function VampireTrackers({
         <CardContent className="py-8 text-center">
           <AlertTriangle className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
           <p className="text-sm text-muted-foreground">
-            Nenhum personagem selecionado
+            {t.narrator?.noCharacterSelected || 'Nenhum personagem selecionado'}
           </p>
         </CardContent>
       </Card>

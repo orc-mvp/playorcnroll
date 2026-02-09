@@ -130,7 +130,7 @@ export default function CharacterSheet() {
 
       if (charError || !charData) {
         toast({
-          title: language === 'pt-BR' ? 'Personagem não encontrado' : 'Character not found',
+          title: t.characterSheet.characterNotFound,
           variant: 'destructive',
         });
         navigate('/dashboard');
@@ -338,7 +338,7 @@ export default function CharacterSheet() {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-4 font-body">
-                    {language === 'pt-BR' ? 'Nenhuma marca menor' : 'No minor marks'}
+                    {t.characterSheet.noMinorMarks}
                   </p>
                 )}
               </CardContent>
@@ -378,7 +378,7 @@ export default function CharacterSheet() {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-4 font-body">
-                    {language === 'pt-BR' ? 'Nenhuma marca maior' : 'No major marks'}
+                    {t.characterSheet.noMajorMarks}
                   </p>
                 )}
 
@@ -541,9 +541,7 @@ export default function CharacterSheet() {
                   </div>
                 ) : (
                   <p className="text-muted-foreground text-center py-4 font-body">
-                    {language === 'pt-BR'
-                      ? 'Nenhuma narrativa estendida'
-                      : 'No extended narratives'}
+                    {t.characterSheet.noExtendedNarratives}
                   </p>
                 )}
               </CardContent>
@@ -562,7 +560,7 @@ export default function CharacterSheet() {
                   {/* Active Complications */}
                   <AccordionItem value="active" className="border-none">
                     <AccordionTrigger className="font-medieval text-sm py-2 hover:no-underline">
-                      {language === 'pt-BR' ? 'Ativas' : 'Active'} ({activeComplications.length})
+                      {t.characterSheet.activeComplications} ({activeComplications.length})
                     </AccordionTrigger>
                     <AccordionContent>
                       {activeComplications.length > 0 ? (
@@ -588,9 +586,7 @@ export default function CharacterSheet() {
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground text-center py-2">
-                          {language === 'pt-BR'
-                            ? 'Nenhuma complicação ativa'
-                            : 'No active complications'}
+                          {t.characterSheet.noActiveComplications}
                         </p>
                       )}
                     </AccordionContent>
@@ -599,7 +595,7 @@ export default function CharacterSheet() {
                   {/* Manifested Complications (History) */}
                   <AccordionItem value="history" className="border-none">
                     <AccordionTrigger className="font-medieval text-sm py-2 hover:no-underline">
-                      {language === 'pt-BR' ? 'Histórico' : 'History'} ({manifestedComplications.length})
+                      {t.characterSheet.complicationsHistory} ({manifestedComplications.length})
                     </AccordionTrigger>
                     <AccordionContent>
                       {manifestedComplications.length > 0 ? (
@@ -626,9 +622,7 @@ export default function CharacterSheet() {
                         </div>
                       ) : (
                         <p className="text-sm text-muted-foreground text-center py-2">
-                          {language === 'pt-BR'
-                            ? 'Nenhuma complicação resolvida'
-                            : 'No resolved complications'}
+                          {t.characterSheet.noResolvedComplications}
                         </p>
                       )}
                     </AccordionContent>

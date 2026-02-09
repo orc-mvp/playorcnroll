@@ -146,7 +146,7 @@ export function EditVampiroCharacterModal({
   character,
   onSave,
 }: EditVampiroCharacterModalProps) {
-  const { language } = useI18n();
+  const { t, language } = useI18n();
   const { toast } = useToast();
 
   const [name, setName] = useState(character.name);
@@ -213,7 +213,7 @@ export function EditVampiroCharacterModal({
   const handleSave = async () => {
     if (!name.trim()) {
       toast({
-        title: language === 'pt-BR' ? 'Nome é obrigatório' : 'Name is required',
+        title: t.editVampiro.nameRequired,
         variant: 'destructive',
       });
       return;
@@ -242,13 +242,13 @@ export function EditVampiroCharacterModal({
 
       onSave(updated);
       toast({
-        title: language === 'pt-BR' ? 'Personagem atualizado!' : 'Character updated!',
+        title: t.editVampiro.characterUpdated,
       });
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating character:', error);
       toast({
-        title: language === 'pt-BR' ? 'Erro ao salvar' : 'Error saving',
+        title: t.editVampiro.errorSaving,
         variant: 'destructive',
       });
     } finally {
@@ -277,12 +277,10 @@ export function EditVampiroCharacterModal({
         <DialogHeader className="shrink-0">
           <DialogTitle className="font-medieval flex items-center gap-2">
             <Moon className="w-5 h-5 text-primary" />
-            {language === 'pt-BR' ? 'Editar Personagem' : 'Edit Character'}
+            {t.editVampiro.editCharacter}
           </DialogTitle>
           <DialogDescription className="font-body">
-            {language === 'pt-BR'
-              ? 'Edite as informações do seu vampiro'
-              : 'Edit your vampire information'}
+            {t.editVampiro.editVampireInfo}
           </DialogDescription>
         </DialogHeader>
 
@@ -290,19 +288,19 @@ export function EditVampiroCharacterModal({
           <TabsList className="grid w-full grid-cols-4 shrink-0">
             <TabsTrigger value="basic" className="font-medieval text-xs">
               <User className="w-3 h-3 mr-1" />
-              Básico
+              {t.editVampiro.tabBasic}
             </TabsTrigger>
             <TabsTrigger value="attributes" className="font-medieval text-xs">
               <Shield className="w-3 h-3 mr-1" />
-              Atributos
+              {t.editVampiro.tabAttributes}
             </TabsTrigger>
             <TabsTrigger value="abilities" className="font-medieval text-xs">
               <Brain className="w-3 h-3 mr-1" />
-              Habilidades
+              {t.editVampiro.tabAbilities}
             </TabsTrigger>
             <TabsTrigger value="virtues" className="font-medieval text-xs">
               <Heart className="w-3 h-3 mr-1" />
-              Virtudes
+              {t.editVampiro.tabVirtues}
             </TabsTrigger>
           </TabsList>
 
@@ -312,20 +310,20 @@ export function EditVampiroCharacterModal({
               <TabsContent value="basic" className="space-y-4 mt-0">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="font-medieval">Nome *</Label>
+                    <Label className="font-medieval">{t.character.name} *</Label>
                     <Input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Nome do personagem"
+                      placeholder={t.editVampiro.characterName}
                       className="font-body"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-medieval">Jogador</Label>
+                    <Label className="font-medieval">{t.vampiro.player}</Label>
                     <Input
                       value={vampiroData.player || ''}
                       onChange={(e) => updateVampiroField('player', e.target.value)}
-                      placeholder="Nome do jogador"
+                      placeholder={t.editVampiro.playerName}
                       className="font-body"
                     />
                   </div>
@@ -333,22 +331,22 @@ export function EditVampiroCharacterModal({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="font-medieval">Crônica</Label>
+                    <Label className="font-medieval">{t.vampiro.chronicle}</Label>
                     <Input
                       value={vampiroData.chronicle || ''}
                       onChange={(e) => updateVampiroField('chronicle', e.target.value)}
-                      placeholder="Nome da crônica"
+                      placeholder={t.editVampiro.chronicleName}
                       className="font-body"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-medieval">Clã</Label>
+                    <Label className="font-medieval">{t.vampiro.clan}</Label>
                     <Select
                       value={vampiroData.clan || ''}
                       onValueChange={(val) => updateVampiroField('clan', val)}
                     >
                       <SelectTrigger className="font-body">
-                        <SelectValue placeholder="Selecione um clã" />
+                        <SelectValue placeholder={t.editVampiro.selectClan} />
                       </SelectTrigger>
                       <SelectContent>
                         {CLANS.map(c => (
@@ -361,13 +359,13 @@ export function EditVampiroCharacterModal({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="font-medieval">Natureza</Label>
+                    <Label className="font-medieval">{t.vampiro.nature}</Label>
                     <Select
                       value={vampiroData.nature || ''}
                       onValueChange={(val) => updateVampiroField('nature', val)}
                     >
                       <SelectTrigger className="font-body">
-                        <SelectValue placeholder="Selecione" />
+                        <SelectValue placeholder={t.editVampiro.select} />
                       </SelectTrigger>
                       <SelectContent>
                         {ARCHETYPES.map(a => (
@@ -377,13 +375,13 @@ export function EditVampiroCharacterModal({
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-medieval">Comportamento</Label>
+                    <Label className="font-medieval">{t.vampiro.demeanor}</Label>
                     <Select
                       value={vampiroData.demeanor || ''}
                       onValueChange={(val) => updateVampiroField('demeanor', val)}
                     >
                       <SelectTrigger className="font-body">
-                        <SelectValue placeholder="Selecione" />
+                        <SelectValue placeholder={t.editVampiro.select} />
                       </SelectTrigger>
                       <SelectContent>
                         {ARCHETYPES.map(a => (
@@ -396,13 +394,13 @@ export function EditVampiroCharacterModal({
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label className="font-medieval">Geração</Label>
+                    <Label className="font-medieval">{t.vampiro.generation}</Label>
                     <Select
                       value={vampiroData.generation || ''}
                       onValueChange={(val) => updateVampiroField('generation', val)}
                     >
                       <SelectTrigger className="font-body">
-                        <SelectValue placeholder="Selecione" />
+                        <SelectValue placeholder={t.editVampiro.select} />
                       </SelectTrigger>
                       <SelectContent>
                         {[8, 9, 10, 11, 12, 13].map(g => (
@@ -412,22 +410,22 @@ export function EditVampiroCharacterModal({
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label className="font-medieval">Senhor</Label>
+                    <Label className="font-medieval">{t.vampiro.sire}</Label>
                     <Input
                       value={vampiroData.sire || ''}
                       onChange={(e) => updateVampiroField('sire', e.target.value)}
-                      placeholder="Nome do senhor"
+                      placeholder={t.editVampiro.sireName}
                       className="font-body"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="font-medieval">Conceito</Label>
+                  <Label className="font-medieval">{t.character.concept}</Label>
                   <Input
                     value={concept}
                     onChange={(e) => setConcept(e.target.value)}
-                    placeholder="Ex: Ativista noturno"
+                    placeholder={t.editVampiro.conceptPlaceholder}
                     className="font-body"
                   />
                 </div>
@@ -437,12 +435,12 @@ export function EditVampiroCharacterModal({
               <TabsContent value="attributes" className="space-y-6 mt-0">
                 {/* Physical */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">Físicos</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.physical}</h4>
                   <div className="space-y-2">
                     {[
-                      { key: 'strength', label: 'Força' },
-                      { key: 'dexterity', label: 'Destreza' },
-                      { key: 'stamina', label: 'Vigor' },
+                      { key: 'strength', label: t.vampiro.strength },
+                      { key: 'dexterity', label: t.vampiro.dexterity },
+                      { key: 'stamina', label: t.vampiro.stamina },
                     ].map(attr => (
                       <div key={attr.key} className="flex items-center justify-between">
                         <span className="font-body text-sm">{attr.label}</span>
@@ -459,12 +457,12 @@ export function EditVampiroCharacterModal({
 
                 {/* Social */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">Sociais</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.social}</h4>
                   <div className="space-y-2">
                     {[
-                      { key: 'charisma', label: 'Carisma' },
-                      { key: 'manipulation', label: 'Manipulação' },
-                      { key: 'appearance', label: 'Aparência' },
+                      { key: 'charisma', label: t.vampiro.charisma },
+                      { key: 'manipulation', label: t.vampiro.manipulation },
+                      { key: 'appearance', label: t.vampiro.appearance },
                     ].map(attr => (
                       <div key={attr.key} className="flex items-center justify-between">
                         <span className="font-body text-sm">{attr.label}</span>
@@ -481,12 +479,12 @@ export function EditVampiroCharacterModal({
 
                 {/* Mental */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">Mentais</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.mental}</h4>
                   <div className="space-y-2">
                     {[
-                      { key: 'perception', label: 'Percepção' },
-                      { key: 'intelligence', label: 'Inteligência' },
-                      { key: 'wits', label: 'Raciocínio' },
+                      { key: 'perception', label: t.vampiro.perception },
+                      { key: 'intelligence', label: t.vampiro.intelligence },
+                      { key: 'wits', label: t.vampiro.wits },
                     ].map(attr => (
                       <div key={attr.key} className="flex items-center justify-between">
                         <span className="font-body text-sm">{attr.label}</span>
@@ -506,11 +504,11 @@ export function EditVampiroCharacterModal({
               <TabsContent value="abilities" className="space-y-6 mt-0">
                 {/* Talents */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">Talentos</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.talents}</h4>
                   <div className="space-y-2">
                     {Object.entries(ABILITY_NAMES.talents).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{label}</span>
+                        <span className="font-body text-sm">{t.vampiro[key as keyof typeof t.vampiro] || label}</span>
                         <DotRating
                           value={abilities.talents[key] || 0}
                           onChange={(val) => updateAbility('talents', key, val)}
@@ -524,11 +522,11 @@ export function EditVampiroCharacterModal({
 
                 {/* Skills */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">Perícias</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.skills}</h4>
                   <div className="space-y-2">
                     {Object.entries(ABILITY_NAMES.skills).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{label}</span>
+                        <span className="font-body text-sm">{t.vampiro[key as keyof typeof t.vampiro] || label}</span>
                         <DotRating
                           value={abilities.skills[key] || 0}
                           onChange={(val) => updateAbility('skills', key, val)}
@@ -542,11 +540,11 @@ export function EditVampiroCharacterModal({
 
                 {/* Knowledges */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">Conhecimentos</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.knowledges}</h4>
                   <div className="space-y-2">
                     {Object.entries(ABILITY_NAMES.knowledges).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{label}</span>
+                        <span className="font-body text-sm">{t.vampiro[key as keyof typeof t.vampiro] || label}</span>
                         <DotRating
                           value={abilities.knowledges[key] || 0}
                           onChange={(val) => updateAbility('knowledges', key, val)}
@@ -562,11 +560,11 @@ export function EditVampiroCharacterModal({
               {/* Virtues Tab */}
               <TabsContent value="virtues" className="space-y-6 mt-0">
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">Virtudes</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.virtues}</h4>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="font-body text-sm">
-                        {virtues.virtueType1 === 'conscience' ? 'Consciência' : 'Convicção'}
+                        {virtues.virtueType1 === 'conscience' ? t.vampiro.conscience : t.vampiro.conviction}
                       </span>
                       <DotRating
                         value={virtues.virtueValue1 || 1}
@@ -577,7 +575,7 @@ export function EditVampiroCharacterModal({
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-body text-sm">
-                        {virtues.virtueType2 === 'selfControl' ? 'Autocontrole' : 'Instinto'}
+                        {virtues.virtueType2 === 'selfControl' ? t.vampiro.selfControl : t.vampiro.instinct}
                       </span>
                       <DotRating
                         value={virtues.virtueValue2 || 1}
@@ -587,7 +585,7 @@ export function EditVampiroCharacterModal({
                       />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">Coragem</span>
+                      <span className="font-body text-sm">{t.vampiro.courage}</span>
                       <DotRating
                         value={virtues.courage || 1}
                         onChange={(val) => updateVirtue('courage', val)}
@@ -600,10 +598,10 @@ export function EditVampiroCharacterModal({
 
                 <div>
                   <h4 className="font-medieval text-sm text-muted-foreground mb-3">
-                    {vampiroData.moralityType === 'path' ? `Trilha: ${vampiroData.pathName}` : 'Humanidade'}
+                    {vampiroData.moralityType === 'path' ? `${t.vampiro.path}: ${vampiroData.pathName}` : t.vampiro.humanity}
                   </h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">Valor</span>
+                    <span className="font-body text-sm">{t.editVampiro.value}</span>
                     <DotRating
                       value={vampiroData.humanity || 1}
                       onChange={(val) => updateVampiroField('humanity', val)}
@@ -614,9 +612,9 @@ export function EditVampiroCharacterModal({
                 </div>
 
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">Força de Vontade</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.willpower}</h4>
                   <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">Valor</span>
+                    <span className="font-body text-sm">{t.editVampiro.value}</span>
                     <DotRating
                       value={vampiroData.willpower || 1}
                       onChange={(val) => updateVampiroField('willpower', val)}
@@ -632,10 +630,10 @@ export function EditVampiroCharacterModal({
 
         <DialogFooter className="gap-2 sm:gap-0 shrink-0 pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
-            {language === 'pt-BR' ? 'Cancelar' : 'Cancel'}
+            {t.common.cancel}
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? (language === 'pt-BR' ? 'Salvando...' : 'Saving...') : (language === 'pt-BR' ? 'Salvar' : 'Save')}
+            {saving ? t.editVampiro.saving : t.common.save}
           </Button>
         </DialogFooter>
       </DialogContent>
