@@ -266,7 +266,7 @@ export function MarksModal({
                 </p>
               ) : filteredMinorMarks.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
-                  Nenhuma marca menor
+                  {t.characterSheet.noMarksEmpty.minor}
                 </p>
               ) : (
                 filteredMinorMarks.map((mark) => renderMarkCard(mark, 'minor'))
@@ -276,7 +276,7 @@ export function MarksModal({
             <TabsContent value="major" className="mt-0 space-y-2">
               {filteredMajorMarks.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
-                  Nenhuma marca maior
+                  {t.characterSheet.noMarksEmpty.major}
                 </p>
               ) : (
                 filteredMajorMarks.map((mark) => renderMarkCard(mark, 'major'))
@@ -286,7 +286,7 @@ export function MarksModal({
             <TabsContent value="epic" className="mt-0 space-y-2">
               {filteredEpicMarks.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
-                  Nenhuma marca épica
+                  {t.characterSheet.noMarksEmpty.epic}
                 </p>
               ) : (
                 filteredEpicMarks.map((mark) => renderMarkCard(mark, 'epic'))
@@ -296,7 +296,7 @@ export function MarksModal({
             <TabsContent value="negative" className="mt-0 space-y-2">
               {filteredNegativeMarks.length === 0 ? (
                 <p className="text-center text-muted-foreground py-4">
-                  Nenhuma marca negativa
+                  {t.characterSheet.noMarksEmpty.negative}
                 </p>
               ) : (
                 filteredNegativeMarks.map((mark) =>

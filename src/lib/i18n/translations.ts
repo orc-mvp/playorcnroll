@@ -631,6 +631,58 @@ export const translations = {
       errorDeleting: 'Erro ao excluir',
       newShort: 'Novo',
     },
+
+    // Character Sheet
+    characterSheet: {
+      characterNotFound: 'Personagem não encontrado',
+      noMinorMarks: 'Nenhuma marca menor',
+      noMajorMarks: 'Nenhuma marca maior',
+      noExtendedNarratives: 'Nenhuma narrativa estendida',
+      activeComplications: 'Ativas',
+      complicationsHistory: 'Histórico',
+      noActiveComplications: 'Nenhuma complicação ativa',
+      noResolvedComplications: 'Nenhuma complicação resolvida',
+      noMarksEmpty: {
+        minor: 'Nenhuma marca menor',
+        major: 'Nenhuma marca maior',
+        epic: 'Nenhuma marca épica',
+        negative: 'Nenhuma marca negativa',
+      },
+    },
+
+    // Narrator
+    narrator: {
+      selectAttributeAndPlayers: 'Selecione atributo e jogadores',
+      chooseAttribute: 'Escolha o atributo',
+      testRequested: 'Teste solicitado!',
+      errorRequestingTest: 'Erro ao solicitar teste',
+      createSceneFirst: 'Crie uma cena primeiro',
+      noPlayersConnected: 'Nenhum jogador conectado',
+      noCharacterSelected: 'Nenhum personagem selecionado',
+      viewPlayerMarks: 'Ver marcas do jogador',
+    },
+
+    // Edit Vampiro
+    editVampiro: {
+      editCharacter: 'Editar Personagem',
+      editVampireInfo: 'Edite as informações do seu vampiro',
+      nameRequired: 'Nome é obrigatório',
+      characterUpdated: 'Personagem atualizado!',
+      errorSaving: 'Erro ao salvar',
+      saving: 'Salvando...',
+      tabBasic: 'Básico',
+      tabAttributes: 'Atributos',
+      tabAbilities: 'Habilidades',
+      tabVirtues: 'Virtudes',
+      selectClan: 'Selecione um clã',
+      select: 'Selecione',
+      characterName: 'Nome do personagem',
+      playerName: 'Nome do jogador',
+      chronicleName: 'Nome da crônica',
+      sireName: 'Nome do senhor',
+      conceptPlaceholder: 'Ex: Ativista noturno',
+      value: 'Valor',
+    },
   },
 
   en: {
@@ -1262,6 +1314,58 @@ export const translations = {
       characterDeleted: 'Character deleted',
       errorDeleting: 'Error deleting',
       newShort: 'New',
+    },
+
+    // Character Sheet
+    characterSheet: {
+      characterNotFound: 'Character not found',
+      noMinorMarks: 'No minor marks',
+      noMajorMarks: 'No major marks',
+      noExtendedNarratives: 'No extended narratives',
+      activeComplications: 'Active',
+      complicationsHistory: 'History',
+      noActiveComplications: 'No active complications',
+      noResolvedComplications: 'No resolved complications',
+      noMarksEmpty: {
+        minor: 'No minor marks',
+        major: 'No major marks',
+        epic: 'No epic marks',
+        negative: 'No negative marks',
+      },
+    },
+
+    // Narrator
+    narrator: {
+      selectAttributeAndPlayers: 'Select attribute and players',
+      chooseAttribute: 'Choose the attribute',
+      testRequested: 'Test requested!',
+      errorRequestingTest: 'Error requesting test',
+      createSceneFirst: 'Create a scene first',
+      noPlayersConnected: 'No players connected',
+      noCharacterSelected: 'No character selected',
+      viewPlayerMarks: 'View player marks',
+    },
+
+    // Edit Vampiro
+    editVampiro: {
+      editCharacter: 'Edit Character',
+      editVampireInfo: 'Edit your vampire information',
+      nameRequired: 'Name is required',
+      characterUpdated: 'Character updated!',
+      errorSaving: 'Error saving',
+      saving: 'Saving...',
+      tabBasic: 'Basic',
+      tabAttributes: 'Attributes',
+      tabAbilities: 'Abilities',
+      tabVirtues: 'Virtues',
+      selectClan: 'Select a clan',
+      select: 'Select',
+      characterName: 'Character name',
+      playerName: 'Player name',
+      chronicleName: 'Chronicle name',
+      sireName: 'Sire name',
+      conceptPlaceholder: 'Ex: Night activist',
+      value: 'Value',
     },
   },
 } as const;

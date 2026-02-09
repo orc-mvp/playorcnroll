@@ -135,7 +135,7 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
   const handleRequestTest = async () => {
     if (!selectedAttribute || selectedPlayers.length === 0 || !currentScene) {
       toast({
-        title: 'Selecione atributo e jogadores',
+        title: t.narrator.selectAttributeAndPlayers,
         variant: 'destructive',
       });
       return;
@@ -164,7 +164,7 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
       // Get character names for the event
       const playerNames = selectedPlayers.map((charId) => {
         const participant = participants.find(p => p.character?.id === charId);
-        return participant?.character?.name || 'Jogador';
+        return participant?.character?.name || t.session.playerLabel;
       });
 
       // Add event
@@ -183,13 +183,13 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
         },
       });
 
-      toast({ title: 'Teste solicitado!', duration: 2000 });
+      toast({ title: t.narrator.testRequested, duration: 2000 });
       setSelectedAttribute('');
       setSelectedPlayers([]);
       setDifficulty(0);
       setContext('');
     } catch (error: any) {
-      toast({ title: 'Erro ao solicitar teste', variant: 'destructive' });
+      toast({ title: t.narrator.errorRequestingTest, variant: 'destructive' });
     } finally {
       setIsRequestingTest(false);
     }
@@ -239,7 +239,7 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
             </Label>
             <Select value={selectedAttribute} onValueChange={setSelectedAttribute}>
               <SelectTrigger className="font-body">
-                <SelectValue placeholder="Escolha o atributo" />
+                <SelectValue placeholder={t.narrator.chooseAttribute} />
               </SelectTrigger>
               <SelectContent>
                 {attributeKeys.map((attr) => {
@@ -337,7 +337,7 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
 
           {!currentScene && (
             <p className="text-xs text-muted-foreground text-center">
-              Crie uma cena primeiro
+              {t.narrator.createSceneFirst}
             </p>
           )}
         </CardContent>
@@ -354,7 +354,7 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
         <CardContent>
           {participants.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Nenhum jogador conectado
+              {t.narrator.noPlayersConnected}
             </p>
           ) : (
             <div className="space-y-2">
@@ -372,10 +372,10 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
                     <User className="w-4 h-4 text-primary shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medieval text-sm truncate">
-                        {p.character?.name || 'Sem personagem'}
+                        {p.character?.name || t.session.noCharacter}
                       </p>
                       <p className="text-xs text-muted-foreground truncate">
-                        {p.profile?.display_name || 'Jogador'}
+                        {p.profile?.display_name || t.session.playerLabel}
                       </p>
                     </div>
                     {p.character && (
@@ -384,7 +384,7 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
                         size="sm"
                         className="h-7 px-2 gap-1 shrink-0"
                         onClick={() => setViewingMarksFor(p)}
-                        title="Ver marcas do jogador"
+                        title={t.narrator.viewPlayerMarks}
                       >
                         <Scroll className="w-3 h-3" />
                         <span className="text-xs">{totalMarks}</span>
