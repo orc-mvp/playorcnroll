@@ -233,7 +233,7 @@ export default function CreateCharacter() {
 
       navigate('/dashboard');
     } catch (error) {
-      console.error('Error creating character:', error);
+      if (import.meta.env.DEV) console.error('Error creating character:', error);
       toast({
         title: 'Erro',
         description: 'Não foi possível criar o personagem.',

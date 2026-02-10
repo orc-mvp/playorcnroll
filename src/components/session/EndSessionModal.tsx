@@ -167,7 +167,7 @@ export function EndSessionModal({
 
       onEndSession();
     } catch (error) {
-      console.error('Error ending session:', error);
+      if (import.meta.env.DEV) console.error('Error ending session:', error);
       toast({
         title: t.endSessionExtras.errorEnding,
         variant: 'destructive',

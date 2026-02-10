@@ -65,7 +65,7 @@ export function ManifestComplicationModal({
       onManifested();
       onClose();
     } catch (error) {
-      console.error('Error manifesting complication:', error);
+      if (import.meta.env.DEV) console.error('Error manifesting complication:', error);
       toast({ title: t.complications.errorManifesting, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);

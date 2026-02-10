@@ -109,7 +109,7 @@ export default function CustomMarks() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching marks:', error);
+        if (import.meta.env.DEV) console.error('Error fetching marks:', error);
       } else {
         setMarks(data || []);
       }
@@ -237,7 +237,7 @@ export default function CustomMarks() {
       setShowCreateModal(false);
       resetForm();
     } catch (error: any) {
-      console.error('Error saving mark:', error);
+      if (import.meta.env.DEV) console.error('Error saving mark:', error);
       toast({
         title: t.common.errorSaving,
         description: error.message,
@@ -267,7 +267,7 @@ export default function CustomMarks() {
         title: t.customMarks.markDeleted,
       });
     } catch (error: any) {
-      console.error('Error deleting mark:', error);
+      if (import.meta.env.DEV) console.error('Error deleting mark:', error);
       toast({
         title: t.common.errorDeleting,
         description: error.message,

@@ -168,7 +168,7 @@ export function HeroicMoveModal({ characterId, sessionId, isGroupTest, onClose }
 
       onClose();
     } catch (error) {
-      console.error('Error using heroic move:', error);
+      if (import.meta.env.DEV) console.error('Error using heroic move:', error);
       toast({ title: t.diceExtras.errorUsingHeroicMove, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);

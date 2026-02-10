@@ -91,7 +91,7 @@ export function CreateComplicationModal({
       onCreated();
       onClose();
     } catch (error) {
-      console.error('Error creating complication:', error);
+      if (import.meta.env.DEV) console.error('Error creating complication:', error);
       toast({ title: t.complications.errorCreating, variant: 'destructive' });
     } finally {
       setIsSubmitting(false);

@@ -78,7 +78,7 @@ export default function JoinSession() {
         .eq('user_id', user.id);
 
       if (error) {
-        console.error('Error fetching characters:', error);
+        if (import.meta.env.DEV) console.error('Error fetching characters:', error);
       } else {
         setCharacters(data || []);
       }
@@ -113,7 +113,7 @@ export default function JoinSession() {
         .order('joined_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching joined sessions:', error);
+        if (import.meta.env.DEV) console.error('Error fetching joined sessions:', error);
       } else if (participations) {
         const sessions: JoinedSession[] = participations
           .filter(p => p.sessions && !['completed'].includes((p.sessions as any).status))
@@ -282,7 +282,7 @@ export default function JoinSession() {
         navigate(`/session/${sessionData.id}/lobby`);
       }
     } catch (error: any) {
-      console.error('Error joining session:', error);
+      if (import.meta.env.DEV) console.error('Error joining session:', error);
       toast({
         title: t.session.errorJoiningSession,
         description: error.message || t.session.checkCodeAndRetry,
