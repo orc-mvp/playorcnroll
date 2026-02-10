@@ -52,6 +52,8 @@ export const translations = {
       checkEmailDesc: 'Por favor, verifique sua caixa de entrada.',
       unexpectedError: 'Ocorreu um erro inesperado',
       displayName: 'Nome de exibição',
+      displayNamePlaceholder: 'Ex: Sir Lancelot',
+      emailPlaceholder: 'heroi@reino.com',
       optional: 'opcional',
     },
 
@@ -129,6 +131,7 @@ export const translations = {
       name: 'Nome da Sessão',
       description: 'Descrição',
       inviteCode: 'Código de Convite',
+      inviteCodePlaceholder: 'Ex: ABC123',
       inviteLink: 'Link de Convite',
       copyCode: 'Copiar Código',
       copyLink: 'Copiar Link',
@@ -875,6 +878,8 @@ export const translations = {
       checkEmailDesc: 'Please check your inbox.',
       unexpectedError: 'An unexpected error occurred',
       displayName: 'Display name',
+      displayNamePlaceholder: 'Ex: Sir Lancelot',
+      emailPlaceholder: 'hero@kingdom.com',
       optional: 'optional',
     },
 
@@ -952,6 +957,7 @@ export const translations = {
       name: 'Session Name',
       description: 'Description',
       inviteCode: 'Invite Code',
+      inviteCodePlaceholder: 'Ex: ABC123',
       inviteLink: 'Invite Link',
       copyCode: 'Copy Code',
       copyLink: 'Copy Link',

@@ -429,9 +429,7 @@ export default function CustomMarks() {
               <Select value={formAttribute} onValueChange={setFormAttribute}>
                 <SelectTrigger className="font-body">
                   <SelectValue
-                    placeholder={
-                      language === 'pt-BR' ? 'Selecione o atributo' : 'Select attribute'
-                    }
+                    placeholder={t.customMarks.selectAttribute}
                   />
                 </SelectTrigger>
                 <SelectContent>

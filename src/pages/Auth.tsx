@@ -188,7 +188,7 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Ex: Sir Lancelot"
+                  placeholder={t.auth.displayNamePlaceholder}
                   className="font-body bg-input border-border"
                 />
               </div>
@@ -202,7 +202,7 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="hero@kingdom.com"
+                placeholder={t.auth.emailPlaceholder}
                 required
                 className="font-body bg-input border-border"
               />
