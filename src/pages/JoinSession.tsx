@@ -466,7 +466,7 @@ export default function JoinSession() {
                           setValidatedSession(null);
                           setSelectedCharacterId('');
                         }}
-                        placeholder="Ex: ABC123"
+                        placeholder={t.session.inviteCodePlaceholder}
                         className="font-mono text-xl text-center tracking-widest uppercase flex-1"
                         maxLength={6}
                         disabled={isJoining || isValidating}
