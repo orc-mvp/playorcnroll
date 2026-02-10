@@ -152,7 +152,7 @@ export default function MySessions() {
       setSessions(prev => prev.filter(s => s.id !== deleteSession.id));
       toast.success(t.session.sessionDeleted);
     } catch (error) {
-      console.error('Error deleting session:', error);
+      if (import.meta.env.DEV) console.error('Error deleting session:', error);
       toast.error(t.session.errorDeletingSession);
     } finally {
       setIsDeleting(false);

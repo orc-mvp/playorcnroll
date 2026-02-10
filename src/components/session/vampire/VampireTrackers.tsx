@@ -155,7 +155,7 @@ export function VampireTrackers({
           })
           .eq('id', participantId);
       } catch (error) {
-        console.error('Error saving trackers:', error);
+        if (import.meta.env.DEV) console.error('Error saving trackers:', error);
       } finally {
         setIsSaving(false);
       }
@@ -269,7 +269,7 @@ export function VampireTrackers({
         duration: 4000,
       });
     } catch (error) {
-      console.error('Error saving humanity:', error);
+      if (import.meta.env.DEV) console.error('Error saving humanity:', error);
       sonnerToast.error(t.common?.save || 'Erro ao salvar');
     }
   };

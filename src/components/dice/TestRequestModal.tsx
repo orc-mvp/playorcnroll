@@ -240,7 +240,7 @@ export function TestRequestModal({
         });
       }
     } catch (error) {
-      console.error('Error saving roll:', error);
+      if (import.meta.env.DEV) console.error('Error saving roll:', error);
       toast({
         title: t.diceExtras.errorSavingRoll,
         variant: 'destructive',
@@ -299,7 +299,7 @@ export function TestRequestModal({
       setShowPullGroupOption(false);
       // Removido: onClose() - modal permanece aberto para jogador ver resultado
     } catch (error) {
-      console.error('Error using pull group:', error);
+      if (import.meta.env.DEV) console.error('Error using pull group:', error);
     }
   };
 

@@ -107,7 +107,7 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
         }
       }
     } catch (err) {
-      console.error('Auth error:', err);
+      if (import.meta.env.DEV) console.error('Auth error:', err);
       setErrors({ form: t.auth.unexpectedError });
     } finally {
       setIsSubmitting(false);

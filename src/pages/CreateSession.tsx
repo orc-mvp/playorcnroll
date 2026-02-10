@@ -98,7 +98,7 @@ export default function CreateSession() {
 
       navigate(`/session/${data.id}/lobby`);
     } catch (error: any) {
-      console.error('Error creating session:', error);
+      if (import.meta.env.DEV) console.error('Error creating session:', error);
       toast({
         title: t.session.errorCreatingSession,
         description: error.message || t.session.tryAgain,

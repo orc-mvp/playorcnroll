@@ -158,7 +158,7 @@ export function EditCharacterModal({
       });
       onOpenChange(false);
     } catch (error) {
-      console.error('Error updating character:', error);
+      if (import.meta.env.DEV) console.error('Error updating character:', error);
       toast({
         title: t.common.errorSaving,
         variant: 'destructive',

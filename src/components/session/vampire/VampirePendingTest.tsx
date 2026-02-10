@@ -146,7 +146,7 @@ export function VampirePendingTest({
               : t.vampiroTests.failure,
       });
     } catch (error) {
-      console.error('Error saving test result:', error);
+      if (import.meta.env.DEV) console.error('Error saving test result:', error);
     }
 
     setIsRolling(false);

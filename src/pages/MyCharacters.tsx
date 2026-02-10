@@ -117,7 +117,7 @@ export default function MyCharacters() {
         description: deleteTarget.name,
       });
     } catch (error) {
-      console.error('Error deleting character:', error);
+      if (import.meta.env.DEV) console.error('Error deleting character:', error);
       toast({
         title: t.myCharacters.errorDeleting,
         variant: 'destructive',
