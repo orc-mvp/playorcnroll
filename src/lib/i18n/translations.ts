@@ -653,6 +653,12 @@ export const translations = {
       createCharacterDesc: 'Crie um novo herói para suas aventuras',
       myCharactersDesc: 'Gerencie seus personagens existentes',
       joinSessionPlayerDesc: 'Entre em uma sessão usando código de convite',
+      sessionsDesc: 'Criar, gerenciar ou entrar em sessões',
+      customization: 'Personalização',
+      customizationDesc: 'Marcas e recursos personalizados',
+      inventory: 'Inventário',
+      inventoryDesc: 'Gerencie itens e equipamentos',
+      comingSoon: 'Em breve',
     },
 
     // Landing Page
@@ -1506,6 +1512,12 @@ export const translations = {
       createCharacterDesc: 'Create a new hero for your adventures',
       myCharactersDesc: 'Manage your existing characters',
       joinSessionPlayerDesc: 'Join a session using an invite code',
+      sessionsDesc: 'Create, manage or join sessions',
+      customization: 'Customization',
+      customizationDesc: 'Custom marks and resources',
+      inventory: 'Inventory',
+      inventoryDesc: 'Manage items and equipment',
+      comingSoon: 'Coming soon',
     },
 
     // Landing Page
