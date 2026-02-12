@@ -486,27 +486,21 @@ export default function VampireSession() {
               </div>
             )}
 
-            {isNarrator ? (
-              <Button 
-                variant="destructive" 
-                size="sm"
-                onClick={handleEndSession}
-              >
-                <LogOut className="w-4 h-4 mr-1" />
-                {t.vampireSession.endSession}
-              </Button>
-            ) : (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleLeaveSession}
-              >
-                <LogOut className="w-4 h-4 mr-1" />
-                {t.vampireSession.leave}
-              </Button>
-            )}
-
-            <UserMenu />
+            <UserMenu extraItems={[
+              isNarrator
+                ? {
+                    label: t.vampireSession.endSession,
+                    icon: <LogOut className="w-4 h-4" />,
+                    onClick: handleEndSession,
+                    variant: 'destructive' as const,
+                  }
+                : {
+                    label: t.vampireSession.leave,
+                    icon: <LogOut className="w-4 h-4" />,
+                    onClick: handleLeaveSession,
+                    variant: 'destructive' as const,
+                  },
+            ]} />
           </div>
         </div>
       </header>
