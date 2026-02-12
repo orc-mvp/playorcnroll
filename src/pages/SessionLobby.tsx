@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { RichTextDisplay } from '@/components/ui/rich-text-display';
 import { 
   ArrowLeft, 
   Copy, 
@@ -360,9 +361,7 @@ export default function SessionLobby() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="font-body text-muted-foreground">
-                {session.description}
-              </p>
+              <RichTextDisplay content={session.description} className="text-muted-foreground" />
             </CardContent>
           </Card>
         )}

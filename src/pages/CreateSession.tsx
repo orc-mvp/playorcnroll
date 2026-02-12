@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { SimpleEditor } from '@/components/ui/simple-editor';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Wand2 } from 'lucide-react';
@@ -182,12 +182,10 @@ export default function CreateSession() {
                 <Label htmlFor="description" className="font-medieval">
                   {t.session.description}
                 </Label>
-                <Textarea
-                  id="description"
+                <SimpleEditor
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                  onChange={setDescription}
                   placeholder={t.session.sessionDescPlaceholder}
-                  className="font-body min-h-[100px] resize-none"
                   disabled={isSubmitting}
                 />
               </div>

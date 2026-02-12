@@ -631,6 +631,17 @@ export const translations = {
       updating: 'Atualizando...',
     },
 
+    // Editor
+    editor: {
+      bold: 'Negrito',
+      italic: 'Itálico',
+      heading: 'Título',
+      bulletList: 'Lista',
+      orderedList: 'Lista Numerada',
+      undo: 'Desfazer',
+      redo: 'Refazer',
+    },
+
     // Dashboard
     dashboard: {
       createSessionDesc: 'Inicie uma nova aventura',
@@ -1471,6 +1482,17 @@ export const translations = {
       errorUpdatingName: 'Error updating name',
       errorUpdatingPassword: 'Error updating password',
       updating: 'Updating...',
+    },
+
+    // Editor
+    editor: {
+      bold: 'Bold',
+      italic: 'Italic',
+      heading: 'Heading',
+      bulletList: 'Bullet List',
+      orderedList: 'Ordered List',
+      undo: 'Undo',
+      redo: 'Redo',
     },
 
     // Dashboard
