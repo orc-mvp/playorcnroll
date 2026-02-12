@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextDisplay } from '@/components/ui/rich-text-display';
+import { SimpleEditor } from '@/components/ui/simple-editor';
 import { 
   ArrowLeft, 
   Copy, 
@@ -15,7 +16,8 @@ import {
   Play,
   Crown,
   User,
-  Loader2
+  Loader2,
+  Pencil
 } from 'lucide-react';
 
 interface Session {
@@ -54,6 +56,9 @@ export default function SessionLobby() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
   const [isStarting, setIsStarting] = useState(false);
+  const [editingDescription, setEditingDescription] = useState(false);
+  const [descriptionDraft, setDescriptionDraft] = useState('');
+  const [savingDescription, setSavingDescription] = useState(false);
 
   const isNarrator = session?.narrator_id === user?.id;
 
@@ -353,15 +358,73 @@ export default function SessionLobby() {
         </div>
 
         {/* Session Description */}
-        {session.description && (
+        {(session.description || isNarrator) && (
           <Card className="medieval-card mt-6">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
               <CardTitle className="font-medieval">
                 {t.session.description}
               </CardTitle>
+              {isNarrator && !editingDescription && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 shrink-0"
+                  onClick={() => {
+                    setDescriptionDraft(session.description || '');
+                    setEditingDescription(true);
+                  }}
+                >
+                  <Pencil className="w-4 h-4" />
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
-              <RichTextDisplay content={session.description} className="text-muted-foreground" />
+              {editingDescription ? (
+                <div className="space-y-3">
+                  <SimpleEditor
+                    value={descriptionDraft}
+                    onChange={setDescriptionDraft}
+                    placeholder={t.session.sessionDescPlaceholder}
+                  />
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingDescription(false)}
+                      disabled={savingDescription}
+                    >
+                      {t.common.cancel}
+                    </Button>
+                    <Button
+                      size="sm"
+                      disabled={savingDescription}
+                      onClick={async () => {
+                        setSavingDescription(true);
+                        const { error } = await supabase
+                          .from('sessions')
+                          .update({ description: descriptionDraft.trim() || null })
+                          .eq('id', session.id);
+                        setSavingDescription(false);
+                        if (error) {
+                          toast({ title: t.common.errorSaving, variant: 'destructive' });
+                        } else {
+                          setSession({ ...session, description: descriptionDraft.trim() || null });
+                          setEditingDescription(false);
+                          toast({ title: t.common.save });
+                        }
+                      }}
+                    >
+                      {savingDescription ? t.common.saving : t.common.save}
+                    </Button>
+                  </div>
+                </div>
+              ) : session.description ? (
+                <RichTextDisplay content={session.description} className="text-muted-foreground" />
+              ) : (
+                <p className="text-sm text-muted-foreground italic font-body">
+                  {t.session.sessionDescPlaceholder}
+                </p>
+              )}
             </CardContent>
           </Card>
         )}
