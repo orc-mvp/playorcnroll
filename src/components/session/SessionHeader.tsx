@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { UserMenu } from '@/components/UserMenu';
 import { ArrowLeft, Crown, LogOut, Sword } from 'lucide-react';
 import { EndSessionModal } from './EndSessionModal';
+import { SessionInfoModal } from './SessionInfoModal';
 import type { SessionData, Participant } from '@/pages/Session';
 
 interface SessionHeaderProps {
@@ -12,12 +13,14 @@ interface SessionHeaderProps {
   isNarrator: boolean;
   participants: Participant[];
   onEndSession: () => void;
+  onSessionUpdate?: (updates: { description: string | null }) => void;
 }
 
-export function SessionHeader({ session, isNarrator, participants, onEndSession }: SessionHeaderProps) {
+export function SessionHeader({ session, isNarrator, participants, onEndSession, onSessionUpdate }: SessionHeaderProps) {
   const navigate = useNavigate();
   const { t } = useI18n();
   const [showEndModal, setShowEndModal] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   return (
     <>
@@ -33,12 +36,15 @@ export function SessionHeader({ session, isNarrator, participants, onEndSession 
               <ArrowLeft className="w-5 h-5" />
             </Button>
             
-            <div className="flex items-center gap-2 min-w-0 flex-1">
+            <button
+              className="flex items-center gap-2 min-w-0 flex-1 text-left hover:opacity-80 transition-opacity"
+              onClick={() => setShowInfoModal(true)}
+            >
               <Sword className="w-5 h-5 text-primary shrink-0" />
-              <h1 className="font-medieval text-base sm:text-lg md:text-xl text-foreground truncate">
+              <h1 className="font-medieval text-base sm:text-lg md:text-xl text-foreground truncate underline-offset-4 hover:underline decoration-primary/30">
                 {session.name}
               </h1>
-            </div>
+            </button>
 
             {isNarrator && (
               <div className="hidden md:flex items-center gap-1 text-primary shrink-0">
@@ -49,12 +55,10 @@ export function SessionHeader({ session, isNarrator, participants, onEndSession 
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Invite Code Display */}
             <div className="hidden md:block text-sm font-mono bg-muted px-2 py-1 rounded">
               {session.invite_code}
             </div>
 
-            {/* End Session (Narrator only) */}
             {isNarrator && (
               <Button variant="destructive" size="sm" onClick={() => setShowEndModal(true)}>
                 <LogOut className="w-4 h-4 mr-1" />
@@ -67,13 +71,20 @@ export function SessionHeader({ session, isNarrator, participants, onEndSession 
         </div>
       </header>
 
-      {/* End Session Modal */}
       <EndSessionModal
         open={showEndModal}
         onOpenChange={setShowEndModal}
         session={session}
         participants={participants}
         onEndSession={onEndSession}
+      />
+
+      <SessionInfoModal
+        open={showInfoModal}
+        onOpenChange={setShowInfoModal}
+        session={session}
+        isNarrator={isNarrator}
+        onSessionUpdate={onSessionUpdate}
       />
     </>
   );

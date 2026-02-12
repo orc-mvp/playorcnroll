@@ -320,6 +320,7 @@ export default function Session() {
           isNarrator={isNarrator} 
           participants={participants}
           onEndSession={handleEndSession}
+          onSessionUpdate={(updates) => setSession(prev => prev ? { ...prev, ...updates } : prev)}
         />
 
         {/* Pending Test Notification for Players */}
@@ -413,6 +414,7 @@ export default function Session() {
         isNarrator={isNarrator} 
         participants={participants}
         onEndSession={handleEndSession}
+        onSessionUpdate={(updates) => setSession(prev => prev ? { ...prev, ...updates } : prev)}
       />
 
       <div className="flex-1 flex overflow-hidden">

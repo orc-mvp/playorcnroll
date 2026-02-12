@@ -21,6 +21,7 @@ import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePend
 import { VampireTrackers } from '@/components/session/vampire/VampireTrackers';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserMenu } from '@/components/UserMenu';
+import { SessionInfoModal } from '@/components/session/SessionInfoModal';
 import { 
   Moon, 
   Users, 
@@ -125,6 +126,7 @@ export default function VampireSession() {
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   const isNarrator = session?.narrator_id === user?.id;
 
@@ -431,10 +433,13 @@ export default function VampireSession() {
             >
               <ChevronLeft className="w-5 h-5" />
             </Button>
-            <div className="flex items-center gap-2">
+            <button
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              onClick={() => setShowInfoModal(true)}
+            >
               <Moon className="w-6 h-6 text-destructive" />
-              <h1 className="font-medieval text-xl text-foreground">{session.name}</h1>
-            </div>
+              <h1 className="font-medieval text-xl text-foreground underline-offset-4 hover:underline decoration-destructive/30">{session.name}</h1>
+            </button>
             <Badge variant="outline" className="border-destructive/30 text-destructive">
               Vampiro: A Máscara
             </Badge>
@@ -682,6 +687,14 @@ export default function VampireSession() {
         onOpenChange={setTestModalOpen}
         participants={participants}
         onRequestTest={handleRequestTest}
+      />
+
+      <SessionInfoModal
+        open={showInfoModal}
+        onOpenChange={setShowInfoModal}
+        session={session}
+        isNarrator={isNarrator}
+        onSessionUpdate={(updates) => setSession(prev => prev ? { ...prev, ...updates } : prev)}
       />
     </div>
   );
