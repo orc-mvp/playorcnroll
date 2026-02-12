@@ -119,11 +119,12 @@ export function ComplicationsNarratorPanel({ sessionId, participants }: Complica
             </CardTitle>
             <Button 
               variant="outline" 
-              size="sm"
+              size="icon"
+              className="h-8 w-8"
               onClick={() => setManagerOpen(true)}
+              title={t.complications?.title || 'Gerenciar'}
             >
-              <Settings2 className="w-4 h-4 mr-1" />
-              Gerenciar
+              <Settings2 className="w-4 h-4" />
             </Button>
           </div>
         </CardHeader>
