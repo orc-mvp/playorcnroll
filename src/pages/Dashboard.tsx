@@ -4,15 +4,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { CharacterOptionsModal } from '@/components/dashboard/CharacterOptionsModal';
+import { SessionOptionsModal } from '@/components/dashboard/SessionOptionsModal';
 import { UserMenu } from '@/components/UserMenu';
 import { 
-  Users, 
-  Plus, 
-  Crown, 
   Scroll,
-  BookOpen
+  BookOpen,
+  Palette,
+  Package,
 } from 'lucide-react';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 
@@ -21,6 +22,7 @@ export default function Dashboard() {
   const { user, profile, loading } = useAuth();
   const { t, language, setLanguage } = useI18n();
   const [showCharacterModal, setShowCharacterModal] = useState(false);
+  const [showSessionModal, setShowSessionModal] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -93,52 +95,23 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Quick Actions - Unified for all users */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
-          {/* Create Session */}
-          <Link to="/session/create">
-            <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
-              <CardHeader className="p-4 md:p-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                  <Plus className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                </div>
-                <CardTitle className="font-medieval text-base md:text-lg">{t.session.create}</CardTitle>
-                <CardDescription className="font-body text-xs md:text-sm">
-                  {t.dashboard.createSessionDesc}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          {/* My Sessions */}
-          <Link to="/sessions">
-            <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
-              <CardHeader className="p-4 md:p-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                  <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                </div>
-                <CardTitle className="font-medieval text-base md:text-lg">{t.session.mySessions}</CardTitle>
-                <CardDescription className="font-body text-xs md:text-sm">
-                  {t.dashboard.mySessionsDesc}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-
-          {/* Join Session */}
-          <Link to="/join">
-            <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
-              <CardHeader className="p-4 md:p-6">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                  <Users className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-                </div>
-                <CardTitle className="font-medieval text-base md:text-lg">{t.session.join}</CardTitle>
-                <CardDescription className="font-body text-xs md:text-sm">
-                  {t.dashboard.joinSessionDesc}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
+        {/* Quick Actions - 4 cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+          {/* Sessions */}
+          <Card 
+            className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full"
+            onClick={() => setShowSessionModal(true)}
+          >
+            <CardHeader className="p-4 md:p-6">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+              </div>
+              <CardTitle className="font-medieval text-base md:text-lg">{t.nav.sessions}</CardTitle>
+              <CardDescription className="font-body text-xs md:text-sm">
+                {t.dashboard.sessionsDesc}
+              </CardDescription>
+            </CardHeader>
+          </Card>
 
           {/* Characters */}
           <Card 
@@ -156,25 +129,47 @@ export default function Dashboard() {
             </CardHeader>
           </Card>
 
-          {/* Manage Marks */}
+          {/* Customization (was Marks) */}
           <Link to="/marks">
             <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
               <CardHeader className="p-4 md:p-6">
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                  <Crown className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                  <Palette className="w-5 h-5 md:w-6 md:h-6 text-primary" />
                 </div>
-                <CardTitle className="font-medieval text-base md:text-lg">{t.marks.createCustom}</CardTitle>
+                <CardTitle className="font-medieval text-base md:text-lg">{t.dashboard.customization}</CardTitle>
                 <CardDescription className="font-body text-xs md:text-sm">
-                  {t.dashboard.marksDesc}
+                  {t.dashboard.customizationDesc}
                 </CardDescription>
               </CardHeader>
             </Card>
           </Link>
+
+          {/* Inventory (coming soon) */}
+          <Card className="medieval-card opacity-60 cursor-default h-full relative">
+            <CardHeader className="p-4 md:p-6">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-muted/50 flex items-center justify-center mb-2">
+                <Package className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
+              </div>
+              <CardTitle className="font-medieval text-base md:text-lg text-muted-foreground">{t.dashboard.inventory}</CardTitle>
+              <CardDescription className="font-body text-xs md:text-sm">
+                {t.dashboard.inventoryDesc}
+              </CardDescription>
+              <Badge variant="secondary" className="mt-2 w-fit font-body text-xs">
+                {t.dashboard.comingSoon}
+              </Badge>
+            </CardHeader>
+          </Card>
         </div>
 
         {/* Recent Activity */}
         <RecentActivity userId={user.id} />
       </main>
+
+      {/* Session Options Modal */}
+      <SessionOptionsModal 
+        open={showSessionModal} 
+        onOpenChange={setShowSessionModal} 
+      />
 
       {/* Character Options Modal */}
       <CharacterOptionsModal 
