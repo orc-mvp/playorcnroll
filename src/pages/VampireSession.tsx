@@ -20,6 +20,7 @@ import { VampirePendingTest } from '@/components/session/vampire/VampirePendingT
 import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { VampireTrackers } from '@/components/session/vampire/VampireTrackers';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { UserMenu } from '@/components/UserMenu';
 import { 
   Moon, 
   Users, 
@@ -499,6 +500,8 @@ export default function VampireSession() {
                 {t.vampireSession.leave}
               </Button>
             )}
+
+            <UserMenu />
           </div>
         </div>
       </header>

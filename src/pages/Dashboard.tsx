@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { CharacterOptionsModal } from '@/components/dashboard/CharacterOptionsModal';
+import { UserMenu } from '@/components/UserMenu';
 import { 
   Users, 
   Plus, 
-  LogOut, 
   Crown, 
   Scroll,
   BookOpen
@@ -18,7 +18,7 @@ import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { user, profile, loading, signOut } = useAuth();
+  const { user, profile, loading } = useAuth();
   const { t, language, setLanguage } = useI18n();
   const [showCharacterModal, setShowCharacterModal] = useState(false);
 
@@ -27,11 +27,6 @@ export default function Dashboard() {
       navigate('/auth', { replace: true });
     }
   }, [user, loading, navigate]);
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/auth');
-  };
 
   if (loading) {
     return (
@@ -81,14 +76,7 @@ export default function Dashboard() {
               </Button>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSignOut}
-              title={t.auth.logout}
-            >
-              <LogOut className="w-4 h-4" />
-            </Button>
+            <UserMenu />
           </div>
         </div>
       </header>

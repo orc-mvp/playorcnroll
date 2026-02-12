@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
+import { UserMenu } from '@/components/UserMenu';
 import { ArrowLeft, Crown, LogOut, Sword } from 'lucide-react';
 import { EndSessionModal } from './EndSessionModal';
 import type { SessionData, Participant } from '@/pages/Session';
@@ -60,6 +61,8 @@ export function SessionHeader({ session, isNarrator, participants, onEndSession 
                 <span className="hidden md:inline">{t.session.end}</span>
               </Button>
             )}
+
+            <UserMenu />
           </div>
         </div>
       </header>

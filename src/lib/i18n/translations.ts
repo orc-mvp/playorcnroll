@@ -615,6 +615,22 @@ export const translations = {
       tabInfo: 'Info',
     },
 
+    // Profile
+    profile: {
+      title: 'Perfil',
+      changeName: 'Alterar Nome',
+      changePassword: 'Alterar Senha',
+      currentPassword: 'Senha Atual',
+      newPassword: 'Nova Senha',
+      confirmNewPassword: 'Confirmar Nova Senha',
+      namePlaceholder: 'Seu nome de exibição',
+      nameUpdated: 'Nome atualizado com sucesso!',
+      passwordUpdated: 'Senha atualizada com sucesso!',
+      errorUpdatingName: 'Erro ao atualizar nome',
+      errorUpdatingPassword: 'Erro ao atualizar senha',
+      updating: 'Atualizando...',
+    },
+
     // Dashboard
     dashboard: {
       createSessionDesc: 'Inicie uma nova aventura',
@@ -1439,6 +1455,22 @@ export const translations = {
       tabFeed: 'Feed',
       tabTrackers: 'Trackers',
       tabInfo: 'Info',
+    },
+
+    // Profile
+    profile: {
+      title: 'Profile',
+      changeName: 'Change Name',
+      changePassword: 'Change Password',
+      currentPassword: 'Current Password',
+      newPassword: 'New Password',
+      confirmNewPassword: 'Confirm New Password',
+      namePlaceholder: 'Your display name',
+      nameUpdated: 'Name updated successfully!',
+      passwordUpdated: 'Password updated successfully!',
+      errorUpdatingName: 'Error updating name',
+      errorUpdatingPassword: 'Error updating password',
+      updating: 'Updating...',
     },
 
     // Dashboard
