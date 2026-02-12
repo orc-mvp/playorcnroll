@@ -205,11 +205,7 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
 
   return (
     <div className="space-y-4">
-      {/* Narrator Badge */}
-      <div className="flex items-center gap-2 text-primary">
-        <Crown className="w-5 h-5" />
-        <span className="font-medieval">{t.roles.narrator}</span>
-      </div>
+      {/* Narrator Badge removed - already shown in header */}
 
       {/* Active Group Test Panel */}
       {activeGroupTest && (
