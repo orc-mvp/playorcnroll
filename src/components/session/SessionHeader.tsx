@@ -22,6 +22,17 @@ export function SessionHeader({ session, isNarrator, participants, onEndSession,
   const [showEndModal, setShowEndModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
 
+  const extraMenuItems = isNarrator
+    ? [
+        {
+          label: t.session.end,
+          icon: <LogOut className="w-4 h-4" />,
+          onClick: () => setShowEndModal(true),
+          variant: 'destructive' as const,
+        },
+      ]
+    : [];
+
   return (
     <>
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -59,14 +70,7 @@ export function SessionHeader({ session, isNarrator, participants, onEndSession,
               {session.invite_code}
             </div>
 
-            {isNarrator && (
-              <Button variant="destructive" size="sm" onClick={() => setShowEndModal(true)}>
-                <LogOut className="w-4 h-4 mr-1" />
-                <span className="hidden md:inline">{t.session.end}</span>
-              </Button>
-            )}
-
-            <UserMenu />
+            <UserMenu extraItems={extraMenuItems} />
           </div>
         </div>
       </header>

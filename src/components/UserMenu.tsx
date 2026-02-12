@@ -21,7 +21,18 @@ function getInitials(name: string | null | undefined): string {
     .toUpperCase();
 }
 
-export function UserMenu() {
+export interface UserMenuExtraItem {
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  variant?: 'default' | 'destructive';
+}
+
+interface UserMenuProps {
+  extraItems?: UserMenuExtraItem[];
+}
+
+export function UserMenu({ extraItems }: UserMenuProps) {
   const { profile, signOut } = useAuth();
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -64,6 +75,25 @@ export function UserMenu() {
           <KeyRound className="w-4 h-4" />
           {t.profile.changePassword}
         </Button>
+
+        {extraItems && extraItems.length > 0 && (
+          <div className="border-t border-border mt-1 pt-1">
+            {extraItems.map((item, i) => (
+              <Button
+                key={i}
+                variant="ghost"
+                className={`w-full justify-start gap-2 font-body ${
+                  item.variant === 'destructive' ? 'text-destructive hover:text-destructive' : ''
+                }`}
+                onClick={item.onClick}
+              >
+                {item.icon}
+                {item.label}
+              </Button>
+            ))}
+          </div>
+        )}
+
         <div className="border-t border-border mt-1 pt-1">
           <Button
             variant="ghost"
