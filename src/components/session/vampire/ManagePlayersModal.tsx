@@ -101,7 +101,7 @@ export function ManagePlayersModal({
             {participants.map((participant) => {
               const isLocked = (participant as any).sheet_locked ?? true;
               const xp = (participant as any).experience_points ?? 0;
-              const displayName = participant.profile?.display_name || participant.user_id.slice(0, 8);
+              const displayName = participant.profile?.display_name || participant.user_id.slice(0, 8).toUpperCase();
               const charName = participant.character?.name || t.managePlayers.noCharacter;
 
               return (
