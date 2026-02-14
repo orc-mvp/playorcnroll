@@ -5,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
@@ -306,9 +306,8 @@ export function EditVampiroCharacterModal({
 
           <div className="flex-1 mt-4 min-h-0">
               {/* Basic Info Tab */}
-              <TabsContent value="basic" className="mt-0">
-                <ScrollArea className="max-h-[50vh]">
-                <div className="space-y-4 pr-4">
+              <TabsContent value="basic" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
+                <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="font-medieval">{t.character.name} *</Label>
@@ -431,13 +430,11 @@ export function EditVampiroCharacterModal({
                   />
                 </div>
                 </div>
-                </ScrollArea>
               </TabsContent>
 
               {/* Attributes Tab */}
-              <TabsContent value="attributes" className="mt-0">
-                <ScrollArea className="max-h-[50vh]">
-                <div className="space-y-6 pr-4">
+              <TabsContent value="attributes" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
+                <div className="space-y-6">
                 {/* Physical */}
                 <div>
                   <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.physical}</h4>
@@ -504,13 +501,11 @@ export function EditVampiroCharacterModal({
                   </div>
                 </div>
                 </div>
-                </ScrollArea>
               </TabsContent>
 
               {/* Abilities Tab */}
-              <TabsContent value="abilities" className="mt-0">
-                <ScrollArea className="max-h-[50vh]">
-                <div className="space-y-6 pr-4">
+              <TabsContent value="abilities" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
+                <div className="space-y-6">
                 {/* Talents */}
                 <div>
                   <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.talents}</h4>
@@ -565,13 +560,11 @@ export function EditVampiroCharacterModal({
                   </div>
                 </div>
                 </div>
-                </ScrollArea>
               </TabsContent>
 
               {/* Virtues Tab */}
-              <TabsContent value="virtues" className="mt-0">
-                <ScrollArea className="max-h-[50vh]">
-                <div className="space-y-6 pr-4">
+              <TabsContent value="virtues" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
+                <div className="space-y-6">
                 <div>
                   <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.virtues}</h4>
                   <div className="space-y-4">
@@ -637,7 +630,6 @@ export function EditVampiroCharacterModal({
                   </div>
                 </div>
                 </div>
-                </ScrollArea>
               </TabsContent>
           </div>
         </Tabs>
