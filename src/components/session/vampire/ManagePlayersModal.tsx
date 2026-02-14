@@ -99,8 +99,8 @@ export function ManagePlayersModal({
         <ScrollArea className="flex-1 max-h-[60vh]">
           <div className="space-y-4 pr-4">
             {participants.map((participant) => {
-              const isLocked = (participant as any).sheet_locked ?? true;
-              const xp = (participant as any).experience_points ?? 0;
+              const isLocked = participant.sheet_locked ?? true;
+              const xp = participant.experience_points ?? 0;
               const displayName = participant.profile?.display_name || participant.user_id.slice(0, 8).toUpperCase();
               const charName = participant.character?.name || t.managePlayers.noCharacter;
 
