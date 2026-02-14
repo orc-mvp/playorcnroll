@@ -304,10 +304,11 @@ export function EditVampiroCharacterModal({
             </TabsTrigger>
           </TabsList>
 
-          <ScrollArea className="flex-1 mt-4">
-            <div className="pr-4">
+          <div className="flex-1 mt-4 min-h-0">
               {/* Basic Info Tab */}
-              <TabsContent value="basic" className="space-y-4 mt-0">
+              <TabsContent value="basic" className="mt-0">
+                <ScrollArea className="max-h-[50vh]">
+                <div className="space-y-4 pr-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="font-medieval">{t.character.name} *</Label>
@@ -429,10 +430,14 @@ export function EditVampiroCharacterModal({
                     className="font-body"
                   />
                 </div>
+                </div>
+                </ScrollArea>
               </TabsContent>
 
               {/* Attributes Tab */}
-              <TabsContent value="attributes" className="space-y-6 mt-0">
+              <TabsContent value="attributes" className="mt-0">
+                <ScrollArea className="max-h-[50vh]">
+                <div className="space-y-6 pr-4">
                 {/* Physical */}
                 <div>
                   <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.physical}</h4>
@@ -498,10 +503,14 @@ export function EditVampiroCharacterModal({
                     ))}
                   </div>
                 </div>
+                </div>
+                </ScrollArea>
               </TabsContent>
 
               {/* Abilities Tab */}
-              <TabsContent value="abilities" className="space-y-6 mt-0">
+              <TabsContent value="abilities" className="mt-0">
+                <ScrollArea className="max-h-[50vh]">
+                <div className="space-y-6 pr-4">
                 {/* Talents */}
                 <div>
                   <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.talents}</h4>
@@ -555,10 +564,14 @@ export function EditVampiroCharacterModal({
                     ))}
                   </div>
                 </div>
+                </div>
+                </ScrollArea>
               </TabsContent>
 
               {/* Virtues Tab */}
-              <TabsContent value="virtues" className="space-y-6 mt-0">
+              <TabsContent value="virtues" className="mt-0">
+                <ScrollArea className="max-h-[50vh]">
+                <div className="space-y-6 pr-4">
                 <div>
                   <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.virtues}</h4>
                   <div className="space-y-4">
@@ -623,9 +636,10 @@ export function EditVampiroCharacterModal({
                     />
                   </div>
                 </div>
+                </div>
+                </ScrollArea>
               </TabsContent>
-            </div>
-          </ScrollArea>
+          </div>
         </Tabs>
 
         <DialogFooter className="gap-2 sm:gap-0 shrink-0 pt-4">
