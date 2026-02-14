@@ -217,7 +217,32 @@ export default function CharacterSheet() {
               variant="outline" 
               size="sm" 
               className="shrink-0" 
-              onClick={() => character.game_system === 'vampiro_v3' ? setShowVampiroEditModal(true) : setShowEditModal(true)}
+              onClick={async () => {
+                // Check if character is in an active session with sheet locked
+                const { data: lockedData } = await supabase
+                  .from('session_participants')
+                  .select('id, session_id, sessions:session_id (status)')
+                  .eq('character_id', character.id) as any;
+
+                const isLocked = lockedData?.some((p: any) => {
+                  const session = p.sessions;
+                  return session?.status === 'active' && (p.sheet_locked === undefined || p.sheet_locked === true);
+                });
+
+                if (isLocked) {
+                  toast({
+                    title: t.managePlayers.sheetLockedToast,
+                    variant: 'destructive',
+                  });
+                  return;
+                }
+
+                if (character.game_system === 'vampiro_v3') {
+                  setShowVampiroEditModal(true);
+                } else {
+                  setShowEditModal(true);
+                }
+              }}
             >
               <Pencil className="w-4 h-4 mr-1" />
               <span className="hidden sm:inline">{t.common.edit}</span>

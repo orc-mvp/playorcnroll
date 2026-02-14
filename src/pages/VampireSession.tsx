@@ -22,6 +22,7 @@ import { VampireTrackers } from '@/components/session/vampire/VampireTrackers';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserMenu } from '@/components/UserMenu';
 import { SessionInfoModal } from '@/components/session/SessionInfoModal';
+import { ManagePlayersModal } from '@/components/session/vampire/ManagePlayersModal';
 import { 
   Moon, 
   Users, 
@@ -127,6 +128,7 @@ export default function VampireSession() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showManagePlayersModal, setShowManagePlayersModal] = useState(false);
 
   const isNarrator = session?.narrator_id === user?.id;
 
@@ -446,11 +448,21 @@ export default function VampireSession() {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Participants count */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Users className="w-4 h-4" />
-              <span>{participants.length} {t.vampireSession.players}</span>
-            </div>
+            {/* Participants count - clickable for narrator */}
+            {isNarrator ? (
+              <button
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                onClick={() => setShowManagePlayersModal(true)}
+              >
+                <Users className="w-4 h-4" />
+                <span className="underline-offset-4 hover:underline">{participants.length} {t.vampireSession.players}</span>
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Users className="w-4 h-4" />
+                <span>{participants.length} {t.vampireSession.players}</span>
+              </div>
+            )}
 
 
             {/* Actions */}
@@ -690,6 +702,15 @@ export default function VampireSession() {
         isNarrator={isNarrator}
         onSessionUpdate={(updates) => setSession(prev => prev ? { ...prev, ...updates } : prev)}
       />
+
+      {isNarrator && sessionId && (
+        <ManagePlayersModal
+          open={showManagePlayersModal}
+          onOpenChange={setShowManagePlayersModal}
+          participants={participants}
+          sessionId={sessionId}
+        />
+      )}
     </div>
   );
 }

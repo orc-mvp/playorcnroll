@@ -858,6 +858,18 @@ export const translations = {
       conceptPlaceholder: 'Ex: Ativista noturno',
       value: 'Valor',
     },
+
+    // Manage Players
+    managePlayers: {
+      title: 'Gerenciar Jogadores',
+      sheetLocked: 'Ficha Bloqueada',
+      sheetUnlocked: 'Ficha Desbloqueada',
+      experience: 'Experiência',
+      lockSheet: 'Bloquear Ficha',
+      unlockSheet: 'Desbloquear Ficha',
+      sheetLockedToast: 'Esta ficha está bloqueada pelo Narrador durante a sessão',
+      noCharacter: 'Sem personagem',
+    },
   },
 
   en: {
@@ -1716,6 +1728,18 @@ export const translations = {
       sireName: 'Sire name',
       conceptPlaceholder: 'Ex: Night activist',
       value: 'Value',
+    },
+
+    // Manage Players
+    managePlayers: {
+      title: 'Manage Players',
+      sheetLocked: 'Sheet Locked',
+      sheetUnlocked: 'Sheet Unlocked',
+      experience: 'Experience',
+      lockSheet: 'Lock Sheet',
+      unlockSheet: 'Unlock Sheet',
+      sheetLockedToast: 'This sheet is locked by the Narrator during the session',
+      noCharacter: 'No character',
     },
   },
 } as const;
