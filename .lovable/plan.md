@@ -1,81 +1,111 @@
 
 
-# Fase Final i18n - Cobertura 100%
+# Plano: Bloqueio de Fichas, XP e Correções de UI no Modal de Edição
 
-Ainda existem aproximadamente **80+ strings** espalhadas em **~20 arquivos** que usam ternarios inline (`language === 'pt-BR' ? ... : ...`) ou strings hardcoded em PT-BR. Abaixo esta o inventario completo e o plano para resolver.
+## Resumo
 
----
-
-## Arquivos Restantes por Categoria
-
-### A. Componentes de Sessao (~30 strings)
-
-| Arquivo | Strings faltantes |
-|---|---|
-| `EventFeed.tsx` | "eventos/events", "Nenhum evento ainda/No events yet", "Anterior/Previous", "Proximo/Next" |
-| `VampireEventFeed.tsx` | "PERMANENTE/PERMANENT", "Alterado pelo Narrador/Changed by Narrator", "Sangue Esgotado!/Blood Depleted!", "Vontade Exaurida!/Willpower Depleted!", "entrou na sessao/joined the session", "eventos/events", "Nenhum evento ainda/No events yet", "Anterior/Previous", "Proximo/Next" |
-| `EndSessionModal.tsx` | "Sessao encerrada!/Session ended!", "Erro ao encerrar/Error ending session" |
-| `ScenePanel.tsx` | `dateLocale` (aceitavel - nao e string de UI) |
-| `VampireNarratorSidebar.tsx` | "Erro ao criar cena", "Erro ao trocar cena", "Erro ao salvar", "Alteracao salva" |
-
-### B. Paginas (~25 strings)
-
-| Arquivo | Strings faltantes |
-|---|---|
-| `VampireSession.tsx` | "jogadores/players", "Link copiado!/Link copied!", "Copiar link de convite/Copy invite link", "Encerrar/End Session", "Sair/Leave", "Cena criada!/Scene created!", "Erro ao criar cena", "Erro ao trocar cena", "Cena Atual/Current Scene", "Nova Cena/New Scene", "Nenhuma cena ativa/No active scene", "Nome da cena/Scene name", "Descricao (opcional)/Description (optional)", "Cenas Anteriores/Previous Scenes", "Nenhum personagem selecionado/No character selected", "Ver Ficha Completa/View Full Sheet", "Minha Ficha/My Character Sheet" |
-| `Session.tsx` | "Erro ao criar cena" |
-| `Auth.tsx` | "Teatro da Mente Online/Online Theater of the Mind" (1 string) |
-| `CustomMarks.tsx` | "Erro ao salvar/Error saving", "Erro ao excluir/Error deleting" |
-
-### C. Componentes de Personagem (~15 strings)
-
-| Arquivo | Strings faltantes |
-|---|---|
-| `StepVampiroVirtues.tsx` | "Virtudes/Virtues", "Consciencia/Conscience", "Conviccao/Conviction", "Autocontrole/Self-Control", "Instinto/Instinct", "Coragem/Courage", "Humanidade/Trilha / Humanity/Path", "Nome da Trilha/Path Name", "Forca de Vontade/Willpower" |
-| `EditCharacterModal.tsx` | "Erro ao salvar/Error saving" |
-| `CharacterOptionsModal.tsx` | "Criar novo personagem/Create new character", "Ver personagens criados/View created characters" |
-
-### D. Componentes de Complicacoes (~10 strings)
-
-| Arquivo | Strings faltantes |
-|---|---|
-| `CreateComplicationModal.tsx` | "Descricao e obrigatoria", "Erro ao criar complicacao", "Complicacao criada!", "Criar complicacao para", "Descreva a complicacao..." |
-| `EditComplicationModal.tsx` | "Complicacao atualizada!", "Erro ao atualizar complicacao", "Editar Complicacao", "Personagem:", "Descreva a complicacao...", "O jogador pode ver/Apenas o narrador pode ver", "Cancelar", "Salvando...", "Salvar" |
-| `ManifestComplicationModal.tsx` | "Erro ao manifestar complicacao", "Resolver narrativamente a complicacao de", "Como a complicacao se manifestou na narrativa..." |
-
-### E. Componentes de Dados/Testes (~5 strings)
-
-| Arquivo | Strings faltantes |
-|---|---|
-| `TestRequestModal.tsx` | "Erro ao salvar rolagem" |
-| `HeroicMoveModal.tsx` | "Erro ao usar movimento heroico" |
+Este plano aborda 4 frentes:
+1. Corrigir a rolagem (scroll) no modal de edição do personagem Vampiro
+2. Adicionar sistema de bloqueio/desbloqueio de fichas pelo Narrador
+3. Tornar o contador de jogadores clicável para abrir o painel de gerenciamento
+4. Adicionar campo de experiência (XP) por jogador, armazenado em banco
 
 ---
 
-## Plano Tecnico
+## 1. Correção de UI: Scroll no Modal de Edição Vampiro
 
-### 1. Adicionar ~80 novas chaves em `translations.ts`
+**Problema**: O `ScrollArea` envolve todos os `TabsContent`, mas os `TabsContent` ficam dentro do `ScrollArea` que não renderiza o conteúdo da aba ativa corretamente -- as abas de Habilidades e Virtudes ficam cortadas sem barra de rolagem visível.
 
-Novos namespaces e expansao dos existentes:
+**Solução**: Mover o `ScrollArea` para dentro de cada `TabsContent` individualmente, garantindo que cada aba tenha sua própria área de rolagem com altura controlada (`max-h-[50vh]`).
 
-- **`eventFeed`**: eventos, noEvents, previous, next, permanent, changedByNarrator, bloodDepleted, willpowerDepleted, joinedSession
-- **`vampireSession`**: players, linkCopied, copyInviteLink, endSession, leave, sceneCreated, currentScene, newScene, noActiveScene, sceneName, descriptionOptional, previousScenes, noCharacterSelected, viewFullSheet, myCharacterSheet
-- **`complications`** (expandir): descriptionRequired, complicationCreated, errorCreating, createFor, describePlaceholder, complicationUpdated, errorUpdating, editComplication, character, playerCanSee, onlyNarratorCanSee, errorManifesting, resolveNarratively, manifestPlaceholder
-- **`common`** (expandir): errorSaving, errorDeleting, saving, save
-- **`virtues`** (novo): virtues, conscience, conviction, selfControl, instinct, courage, humanityPath, humanity, path, pathName, pathNamePlaceholder, willpower
-- **`landing`** (expandir): tagline (para Auth.tsx tambem)
+---
 
-### 2. Atualizar ~20 arquivos
+## 2. Toast de Ficha Bloqueada
 
-Substituir todos os `language === 'pt-BR' ? ... : ...` e strings hardcoded PT-BR por chamadas `t.*`.
+**Problema**: Quando o personagem está em uma sessão ativa, clicar em "Editar" deveria exibir um toast informando que a ficha está bloqueada. Isso não acontece atualmente.
 
-### 3. Manter usos aceitaveis de `language`
+**Solução**: Adicionar uma coluna `sheet_locked` na tabela `session_participants` (default `true`). Na página `CharacterSheet.tsx`, verificar se o personagem participa de uma sessão ativa com `sheet_locked = true`. Se sim, ao clicar em "Editar", exibir um toast e bloquear a abertura do modal.
 
-Os seguintes usos de `language` sao **aceitaveis** e nao precisam ser alterados:
-- `dateLocale = language === 'pt-BR' ? ptBR : enUS` (locale de data do date-fns)
-- Botoes de troca de idioma (`language === 'pt-BR' ? 'default' : 'outline'`)
+---
 
-### Resultado Esperado
+## 3. Painel de Gerenciamento de Jogadores (Narrador)
 
-Cobertura de **100%** em todas as rotas e componentes, com todas as strings de interface centralizadas no arquivo de traducoes.
+**Onde**: No header da sala Vampiro, o contador de jogadores (`{participants.length} Jogadores`) será transformado em um botão clicável (somente para o Narrador).
+
+**Modal**: Ao clicar, abre um modal "Gerenciar Jogadores" com uma lista de cada participante mostrando:
+- Nome do jogador e personagem
+- Toggle de bloqueio/desbloqueio de ficha (ativo/inativo)
+- Campo numérico de XP (com botoes +/-)
+
+---
+
+## 4. Banco de Dados
+
+### Migração SQL
+
+```sql
+-- Adicionar coluna de bloqueio de ficha (default: bloqueada durante sessão)
+ALTER TABLE public.session_participants 
+ADD COLUMN sheet_locked boolean NOT NULL DEFAULT true;
+
+-- Adicionar coluna de experiência
+ALTER TABLE public.session_participants 
+ADD COLUMN experience_points integer NOT NULL DEFAULT 0;
+```
+
+### Política RLS
+
+O Narrador já pode atualizar `session_participants` via a política existente de narrador. Verificaremos se a política existente cobre UPDATE para o narrador; caso contrário, adicionaremos uma política específica.
+
+---
+
+## Detalhes Técnicos
+
+### Arquivos a Criar
+
+| Arquivo | Descrição |
+|---------|-----------|
+| `src/components/session/vampire/ManagePlayersModal.tsx` | Modal com lista de jogadores, toggles de bloqueio e controle de XP |
+
+### Arquivos a Modificar
+
+| Arquivo | Mudança |
+|---------|---------|
+| `src/components/character/vampiro/EditVampiroCharacterModal.tsx` | Mover `ScrollArea` para dentro de cada `TabsContent` |
+| `src/pages/CharacterSheet.tsx` | Verificar `sheet_locked` antes de abrir modal de edição; exibir toast se bloqueado |
+| `src/pages/VampireSession.tsx` | Tornar contador de jogadores clicável, integrar `ManagePlayersModal`, passar dados de participantes |
+| `src/lib/i18n/translations.ts` | Adicionar chaves para bloqueio de fichas, XP, gerenciamento de jogadores |
+
+### Novas Chaves i18n
+
+```text
+managePlayers.title = "Gerenciar Jogadores" / "Manage Players"
+managePlayers.sheetLocked = "Ficha Bloqueada" / "Sheet Locked"
+managePlayers.sheetUnlocked = "Ficha Desbloqueada" / "Sheet Unlocked"
+managePlayers.experience = "Experiência" / "Experience"
+managePlayers.lockSheet = "Bloquear Ficha" / "Lock Sheet"
+managePlayers.unlockSheet = "Desbloquear Ficha" / "Unlock Sheet"
+character.sheetLockedToast = "Esta ficha está bloqueada pelo Narrador durante a sessão" / "This sheet is locked by the Narrator during the session"
+```
+
+### Fluxo de Bloqueio
+
+```text
+CharacterSheet.tsx (ao clicar Editar)
+  -> Consulta session_participants WHERE character_id = X AND sheet_locked = true
+     JOIN sessions WHERE status = 'active'
+  -> Se encontrar: toast de bloqueio, não abre modal
+  -> Se não: abre modal normalmente
+```
+
+### Fluxo do Modal de Gerenciamento
+
+```text
+Narrador clica no contador de jogadores
+  -> Abre ManagePlayersModal
+  -> Lista todos os participantes
+  -> Toggle de bloqueio: UPDATE session_participants SET sheet_locked = !current
+  -> Input de XP: UPDATE session_participants SET experience_points = valor
+  -> Mudanças sincronizadas em tempo real (já existe subscription)
+```
 
