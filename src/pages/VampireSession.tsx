@@ -206,6 +206,8 @@ export default function VampireSession() {
           session_blood_pool,
           session_willpower_current,
           session_health_damage,
+          sheet_locked,
+          experience_points,
           characters:character_id (
             id,
             name,
