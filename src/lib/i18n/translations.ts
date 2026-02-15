@@ -398,7 +398,7 @@ export const translations = {
       knowledges: 'Conhecimentos',
       alertness: 'Prontidão',
       athletics: 'Esportes',
-      awareness: 'Percepção',
+      dodge: 'Esquiva',
       brawl: 'Briga',
       empathy: 'Empatia',
       expression: 'Expressão',
@@ -411,7 +411,7 @@ export const translations = {
       drive: 'Condução',
       etiquette: 'Etiqueta',
       firearms: 'Armas de Fogo',
-      larceny: 'Furto',
+      security: 'Segurança',
       melee: 'Armas Brancas',
       performance: 'Performance',
       stealth: 'Furtividade',
@@ -425,7 +425,7 @@ export const translations = {
       occult: 'Ocultismo',
       politics: 'Política',
       science: 'Ciência',
-      technology: 'Tecnologia',
+      linguistics: 'Linguística',
       
       // Disciplines
       disciplines: 'Disciplinas',
@@ -1285,7 +1285,7 @@ export const translations = {
       knowledges: 'Knowledges',
       alertness: 'Alertness',
       athletics: 'Athletics',
-      awareness: 'Awareness',
+      dodge: 'Dodge',
       brawl: 'Brawl',
       empathy: 'Empathy',
       expression: 'Expression',
@@ -1298,7 +1298,7 @@ export const translations = {
       drive: 'Drive',
       etiquette: 'Etiquette',
       firearms: 'Firearms',
-      larceny: 'Larceny',
+      security: 'Security',
       melee: 'Melee',
       performance: 'Performance',
       stealth: 'Stealth',
@@ -1312,7 +1312,7 @@ export const translations = {
       occult: 'Occult',
       politics: 'Politics',
       science: 'Science',
-      technology: 'Technology',
+      linguistics: 'Linguistics',
       
       // Disciplines
       disciplines: 'Disciplines',

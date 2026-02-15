@@ -308,9 +308,9 @@ export const MENTAL_ATTRIBUTES = ['perception', 'intelligence', 'wits'] as const
 export const ALL_ATTRIBUTES = [...PHYSICAL_ATTRIBUTES, ...SOCIAL_ATTRIBUTES, ...MENTAL_ATTRIBUTES];
 
 // Ability lists for dropdowns
-export const TALENTS = ['alertness', 'athletics', 'awareness', 'brawl', 'empathy', 'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge'] as const;
-export const SKILLS = ['animalKen', 'crafts', 'drive', 'etiquette', 'firearms', 'larceny', 'melee', 'performance', 'stealth', 'survival'] as const;
-export const KNOWLEDGES = ['academics', 'computer', 'finance', 'investigation', 'law', 'medicine', 'occult', 'politics', 'science', 'technology'] as const;
+export const TALENTS = ['alertness', 'athletics', 'brawl', 'dodge', 'empathy', 'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge'] as const;
+export const SKILLS = ['animalKen', 'crafts', 'drive', 'etiquette', 'firearms', 'melee', 'performance', 'security', 'stealth', 'survival'] as const;
+export const KNOWLEDGES = ['academics', 'computer', 'finance', 'investigation', 'law', 'linguistics', 'medicine', 'occult', 'politics', 'science'] as const;
 export const ALL_ABILITIES = [...TALENTS, ...SKILLS, ...KNOWLEDGES];
 
 // Virtue lists for dropdowns

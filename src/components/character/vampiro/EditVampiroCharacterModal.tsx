@@ -105,8 +105,8 @@ const ABILITY_NAMES: Record<string, Record<string, string>> = {
   talents: {
     alertness: 'Prontidão',
     athletics: 'Esportes',
-    awareness: 'Percepção',
     brawl: 'Briga',
+    dodge: 'Esquiva',
     empathy: 'Empatia',
     expression: 'Expressão',
     intimidation: 'Intimidação',
@@ -120,9 +120,9 @@ const ABILITY_NAMES: Record<string, Record<string, string>> = {
     drive: 'Condução',
     etiquette: 'Etiqueta',
     firearms: 'Armas de Fogo',
-    larceny: 'Furto',
     melee: 'Armas Brancas',
     performance: 'Performance',
+    security: 'Segurança',
     stealth: 'Furtividade',
     survival: 'Sobrevivência',
   },
@@ -132,11 +132,11 @@ const ABILITY_NAMES: Record<string, Record<string, string>> = {
     finance: 'Finanças',
     investigation: 'Investigação',
     law: 'Direito',
+    linguistics: 'Linguística',
     medicine: 'Medicina',
     occult: 'Ocultismo',
     politics: 'Política',
     science: 'Ciência',
-    technology: 'Tecnologia',
   },
 };
 
@@ -508,7 +508,10 @@ export function EditVampiroCharacterModal({
                 <div className="space-y-6">
                 {/* Talents */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.talents}</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">
+                    {t.vampiro.talents}{' '}
+                    <span className="text-muted-foreground/60">({Object.values(abilities.talents).reduce((s, v) => s + (v || 0), 0)})</span>
+                  </h4>
                   <div className="space-y-2">
                     {Object.entries(ABILITY_NAMES.talents).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between">
@@ -526,7 +529,10 @@ export function EditVampiroCharacterModal({
 
                 {/* Skills */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.skills}</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">
+                    {t.vampiro.skills}{' '}
+                    <span className="text-muted-foreground/60">({Object.values(abilities.skills).reduce((s, v) => s + (v || 0), 0)})</span>
+                  </h4>
                   <div className="space-y-2">
                     {Object.entries(ABILITY_NAMES.skills).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between">
@@ -544,7 +550,10 @@ export function EditVampiroCharacterModal({
 
                 {/* Knowledges */}
                 <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.knowledges}</h4>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">
+                    {t.vampiro.knowledges}{' '}
+                    <span className="text-muted-foreground/60">({Object.values(abilities.knowledges).reduce((s, v) => s + (v || 0), 0)})</span>
+                  </h4>
                   <div className="space-y-2">
                     {Object.entries(ABILITY_NAMES.knowledges).map(([key, label]) => (
                       <div key={key} className="flex items-center justify-between">
