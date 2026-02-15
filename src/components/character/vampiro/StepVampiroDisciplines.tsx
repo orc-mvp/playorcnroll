@@ -147,7 +147,6 @@ const BACKGROUNDS_BY_BOOK = [
       { key: "influence", labelPt: "Influência", labelEn: "Influence" },
       { key: "mentor", labelPt: "Mentor", labelEn: "Mentor" },
       { key: "resources", labelPt: "Recursos", labelEn: "Resources" },
-      { key: "retainer", labelPt: "Lacaio", labelEn: "Retainer" },
       { key: "retainers", labelPt: "Lacaios", labelEn: "Retainers" },
       { key: "status", labelPt: "Status", labelEn: "Status" },
       { key: "elysium", labelPt: "Elysium", labelEn: "Elysium" },
