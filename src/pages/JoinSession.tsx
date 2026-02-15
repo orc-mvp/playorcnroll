@@ -213,12 +213,60 @@ export default function JoinSession() {
 
       const { data: existingParticipant } = await supabase
         .from('session_participants')
-        .select('id')
+        .select('id, character_id, sheet_locked')
         .eq('session_id', sessionData.id)
         .eq('user_id', user.id)
         .single();
 
       if (existingParticipant) {
+        // If participant exists but selected a new character, update it
+        if (selectedCharacterId && existingParticipant.character_id !== selectedCharacterId) {
+          // Check if sheet is locked by narrator
+          if (existingParticipant.sheet_locked) {
+            toast({
+              title: t.sessionRejoin.sheetLockedByNarrator,
+              variant: 'destructive',
+            });
+            setIsJoining(false);
+            return;
+          }
+
+          // Fetch new character data for initial values
+          const { data: newCharData } = await supabase
+            .from('characters')
+            .select('game_system, vampiro_data')
+            .eq('id', selectedCharacterId)
+            .single();
+
+          let newBloodPool = 0;
+          let newWillpower = 0;
+
+          if (newCharData?.game_system === 'vampiro_v3' && newCharData.vampiro_data) {
+            const vampData = newCharData.vampiro_data as { generation?: string; willpower?: number };
+            const gen = parseInt(vampData.generation || '13', 10);
+            if (gen <= 7) newBloodPool = 20;
+            else if (gen === 8) newBloodPool = 15;
+            else if (gen <= 10) newBloodPool = 13;
+            else if (gen <= 12) newBloodPool = 11;
+            else newBloodPool = 10;
+            newWillpower = vampData.willpower || 1;
+          }
+
+          const { error: updateError } = await supabase
+            .from('session_participants')
+            .update({
+              character_id: selectedCharacterId,
+              session_blood_pool: newBloodPool,
+              session_willpower_current: newWillpower,
+              session_health_damage: [false, false, false, false, false, false, false],
+            })
+            .eq('id', existingParticipant.id);
+
+          if (updateError) throw updateError;
+
+          toast({ title: t.sessionRejoin.characterUpdated });
+        }
+
         if (sessionData.status === 'active') {
           const route = sessionData.game_system === 'vampiro_v3' 
             ? `/session/vampire/${sessionData.id}` 

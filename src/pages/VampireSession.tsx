@@ -41,6 +41,7 @@ import {
   ChevronDown,
   Play,
   FileText,
+  AlertTriangle,
 } from 'lucide-react';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import {
@@ -544,7 +545,7 @@ export default function VampireSession() {
             </TabsContent>
 
             <TabsContent value="trackers" className="flex-1 p-4 overflow-auto">
-              {myParticipant && myCharacter && (
+              {myParticipant && myCharacter ? (
                 <VampireTrackers
                   participantId={myParticipant.id}
                   sessionId={sessionId!}
@@ -554,7 +555,9 @@ export default function VampireSession() {
                   initialWillpower={myParticipant.session_willpower_current || 0}
                   initialHealthDamage={myParticipant.session_health_damage || [false, false, false, false, false, false, false]}
                 />
-              )}
+              ) : !isNarrator && myParticipant && !myCharacter ? (
+                <NoCharacterCard inviteCode={session?.invite_code} />
+              ) : null}
             </TabsContent>
 
             <TabsContent value="info" className="flex-1 p-4 overflow-auto">
@@ -673,7 +676,7 @@ export default function VampireSession() {
           {/* Right Sidebar - Blood/Willpower Tracker */}
           <aside className="w-72 border-l border-destructive/20 bg-gradient-to-b from-destructive/5 to-background overflow-auto">
             <ScrollArea className="h-full p-4">
-              {myParticipant && myCharacter && (
+              {myParticipant && myCharacter ? (
                 <VampireTrackers
                   participantId={myParticipant.id}
                   sessionId={sessionId!}
@@ -683,7 +686,9 @@ export default function VampireSession() {
                   initialWillpower={myParticipant.session_willpower_current || 0}
                   initialHealthDamage={myParticipant.session_health_damage || [false, false, false, false, false, false, false]}
                 />
-              )}
+              ) : !isNarrator && myParticipant && !myCharacter ? (
+                <NoCharacterCard inviteCode={session?.invite_code} />
+              ) : null}
             </ScrollArea>
           </aside>
         </div>
@@ -1031,5 +1036,29 @@ function VampirePlayerPanel({ character, sessionTrackers }: { character: Partici
         </DialogContent>
       </Dialog>
     </>
+  );
+}
+
+// No Character Card Component
+function NoCharacterCard({ inviteCode }: { inviteCode?: string }) {
+  const { t } = useI18n();
+  const navigate = useNavigate();
+
+  return (
+    <Card className="border-destructive/30 bg-destructive/5">
+      <CardContent className="flex flex-col items-center text-center py-8 gap-4">
+        <AlertTriangle className="w-10 h-10 text-destructive" />
+        <p className="text-sm text-muted-foreground">
+          {t.sessionRejoin.noCharacterInSession}
+        </p>
+        <Button
+          variant="outline"
+          className="border-destructive/30 text-destructive hover:bg-destructive/10"
+          onClick={() => navigate(inviteCode ? `/join/${inviteCode}` : '/join')}
+        >
+          {t.sessionRejoin.rejoinWithCharacter}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
