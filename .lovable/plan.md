@@ -1,111 +1,91 @@
+# Plano: Corrigir Vinculação de Personagem para Jogadores Sem Personagem na Sessão
 
+## Problema
 
-# Plano: Bloqueio de Fichas, XP e Correções de UI no Modal de Edição
+Quando um jogador deleta seu personagem enquanto está vinculado a uma sessão, ele fica "preso":
 
-## Resumo
+- O `session_participants` ainda existe com `character_id` apontando para um personagem deletado (ou null)
+- Ao tentar entrar novamente via JoinSession, o sistema encontra o participante existente e redireciona direto para a sala, sem permitir escolher um novo personagem
+- Dentro da sala, o jogador não tem personagem e não consegue usar trackers, testes, etc.
 
-Este plano aborda 4 frentes:
-1. Corrigir a rolagem (scroll) no modal de edição do personagem Vampiro
-2. Adicionar sistema de bloqueio/desbloqueio de fichas pelo Narrador
-3. Tornar o contador de jogadores clicável para abrir o painel de gerenciamento
-4. Adicionar campo de experiência (XP) por jogador, armazenado em banco
+## Solução
 
----
+Três correções complementares:
 
-## 1. Correção de UI: Scroll no Modal de Edição Vampiro
+### 1. JoinSession: Permitir Atualizar Personagem de Participante Existente
 
-**Problema**: O `ScrollArea` envolve todos os `TabsContent`, mas os `TabsContent` ficam dentro do `ScrollArea` que não renderiza o conteúdo da aba ativa corretamente -- as abas de Habilidades e Virtudes ficam cortadas sem barra de rolagem visível.
+Quando o sistema detecta que o jogador já é participante mas seleciona um personagem diferente, em vez de apenas redirecionar, atualizar o `character_id` no registro existente. Mas somente se o narrador permitiu que a ficha fosse editada, caso esteja sem permissão do narrador o jogador recebe um toast de aviso que o narrador não está autorizando.
 
-**Solução**: Mover o `ScrollArea` para dentro de cada `TabsContent` individualmente, garantindo que cada aba tenha sua própria área de rolagem com altura controlada (`max-h-[50vh]`).
+**Arquivo**: `src/pages/JoinSession.tsx`
 
----
+- Quando `existingParticipant` for encontrado E `selectedCharacterId` estiver preenchido, fazer um UPDATE no `character_id` do participante antes de redirecionar
+- Recalcular os valores iniciais de Blood Pool e Willpower para o novo personagem
 
-## 2. Toast de Ficha Bloqueada
+### 2. ManagePlayersModal: Narrador Pode Remover Jogador
 
-**Problema**: Quando o personagem está em uma sessão ativa, clicar em "Editar" deveria exibir um toast informando que a ficha está bloqueada. Isso não acontece atualmente.
+Adicionar um botão de "Remover" no modal de gerenciamento para que o narrador possa remover participantes problemáticos. O narrador pode permitir ou ou bloquear permanentemente o usuário na sala, o bloqueio deve ter dupla confirmação.
 
-**Solução**: Adicionar uma coluna `sheet_locked` na tabela `session_participants` (default `true`). Na página `CharacterSheet.tsx`, verificar se o personagem participa de uma sessão ativa com `sheet_locked = true`. Se sim, ao clicar em "Editar", exibir um toast e bloquear a abertura do modal.
+**Arquivo**: `src/components/session/vampire/ManagePlayersModal.tsx`
 
----
+- Adicionar botão de remover participante (com confirmação)
+- Exibir indicação visual quando o participante não tem personagem vinculado
 
-## 3. Painel de Gerenciamento de Jogadores (Narrador)
+### 3. Sessão Vampiro: Mostrar Estado "Sem Personagem" ao Jogador
 
-**Onde**: No header da sala Vampiro, o contador de jogadores (`{participants.length} Jogadores`) será transformado em um botão clicável (somente para o Narrador).
+Quando o jogador está na sala mas sem personagem vinculado, exibir uma mensagem orientando-o a sair e reentrar com um novo personagem.
 
-**Modal**: Ao clicar, abre um modal "Gerenciar Jogadores" com uma lista de cada participante mostrando:
-- Nome do jogador e personagem
-- Toggle de bloqueio/desbloqueio de ficha (ativo/inativo)
-- Campo numérico de XP (com botoes +/-)
+**Arquivo**: `src/pages/VampireSession.tsx`
 
----
+- Detectar `myParticipant` sem `character` e exibir um card informativo
+- Incluir botão para ir à página de Join Session com o código de convite preenchido
 
-## 4. Banco de Dados
+### 4. Novas Chaves i18n
 
-### Migração SQL
+**Arquivo**: `src/lib/i18n/translations.ts`
 
-```sql
--- Adicionar coluna de bloqueio de ficha (default: bloqueada durante sessão)
-ALTER TABLE public.session_participants 
-ADD COLUMN sheet_locked boolean NOT NULL DEFAULT true;
-
--- Adicionar coluna de experiência
-ALTER TABLE public.session_participants 
-ADD COLUMN experience_points integer NOT NULL DEFAULT 0;
 ```
-
-### Política RLS
-
-O Narrador já pode atualizar `session_participants` via a política existente de narrador. Verificaremos se a política existente cobre UPDATE para o narrador; caso contrário, adicionaremos uma política específica.
-
----
+managePlayers.removePlayer = "Remover Jogador" / "Remove Player"
+managePlayers.removeConfirm = "Tem certeza que deseja remover este jogador?" / "Are you sure you want to remove this player?"
+managePlayers.playerRemoved = "Jogador removido da sessão" / "Player removed from session"
+managePlayers.noCharacterWarning = "Sem personagem vinculado" / "No character linked"
+session.noCharacterInSession = "Você não tem um personagem vinculado a esta sessão." / "You don't have a character linked to this session."
+session.rejoinWithCharacter = "Reentrar com personagem" / "Rejoin with character"
+session.characterUpdated = "Personagem atualizado na sessão" / "Character updated in session"
+```
 
 ## Detalhes Técnicos
 
-### Arquivos a Criar
-
-| Arquivo | Descrição |
-|---------|-----------|
-| `src/components/session/vampire/ManagePlayersModal.tsx` | Modal com lista de jogadores, toggles de bloqueio e controle de XP |
-
-### Arquivos a Modificar
-
-| Arquivo | Mudança |
-|---------|---------|
-| `src/components/character/vampiro/EditVampiroCharacterModal.tsx` | Mover `ScrollArea` para dentro de cada `TabsContent` |
-| `src/pages/CharacterSheet.tsx` | Verificar `sheet_locked` antes de abrir modal de edição; exibir toast se bloqueado |
-| `src/pages/VampireSession.tsx` | Tornar contador de jogadores clicável, integrar `ManagePlayersModal`, passar dados de participantes |
-| `src/lib/i18n/translations.ts` | Adicionar chaves para bloqueio de fichas, XP, gerenciamento de jogadores |
-
-### Novas Chaves i18n
+### Fluxo Corrigido no JoinSession
 
 ```text
-managePlayers.title = "Gerenciar Jogadores" / "Manage Players"
-managePlayers.sheetLocked = "Ficha Bloqueada" / "Sheet Locked"
-managePlayers.sheetUnlocked = "Ficha Desbloqueada" / "Sheet Unlocked"
-managePlayers.experience = "Experiência" / "Experience"
-managePlayers.lockSheet = "Bloquear Ficha" / "Lock Sheet"
-managePlayers.unlockSheet = "Desbloquear Ficha" / "Unlock Sheet"
-character.sheetLockedToast = "Esta ficha está bloqueada pelo Narrador durante a sessão" / "This sheet is locked by the Narrator during the session"
+Jogador entra com código de convite
+  -> Valida código
+  -> Seleciona personagem
+  -> Clica "Entrar"
+  -> Verifica existingParticipant
+     -> Se existe E selectedCharacterId preenchido:
+        UPDATE session_participants SET character_id = novo, blood_pool = X, willpower = Y
+        -> Redireciona para sala
+     -> Se não existe:
+        INSERT (fluxo atual)
 ```
 
-### Fluxo de Bloqueio
+### Fluxo do Narrador (Remover Jogador)
 
 ```text
-CharacterSheet.tsx (ao clicar Editar)
-  -> Consulta session_participants WHERE character_id = X AND sheet_locked = true
-     JOIN sessions WHERE status = 'active'
-  -> Se encontrar: toast de bloqueio, não abre modal
-  -> Se não: abre modal normalmente
+ManagePlayersModal
+  -> Jogador sem personagem exibe badge "Sem personagem"
+  -> Botão "Remover" disponível para qualquer participante
+  -> Ao clicar: confirmação -> DELETE session_participants WHERE id = X
+  -> Jogador removido pode reentrar normalmente com novo personagem
 ```
 
-### Fluxo do Modal de Gerenciamento
+## Arquivos Modificados
 
-```text
-Narrador clica no contador de jogadores
-  -> Abre ManagePlayersModal
-  -> Lista todos os participantes
-  -> Toggle de bloqueio: UPDATE session_participants SET sheet_locked = !current
-  -> Input de XP: UPDATE session_participants SET experience_points = valor
-  -> Mudanças sincronizadas em tempo real (já existe subscription)
-```
 
+| Arquivo                                                 | Mudança                                                                     |
+| ------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `src/pages/JoinSession.tsx`                             | UPDATE character_id quando participante existente seleciona novo personagem |
+| `src/components/session/vampire/ManagePlayersModal.tsx` | Botão remover jogador + badge "sem personagem"                              |
+| `src/pages/VampireSession.tsx`                          | Card informativo quando jogador está sem personagem                         |
+| `src/lib/i18n/translations.ts`                          | Novas chaves para os cenários acima                                         |
