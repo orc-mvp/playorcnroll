@@ -869,6 +869,22 @@ export const translations = {
       unlockSheet: 'Desbloquear Ficha',
       sheetLockedToast: 'Esta ficha está bloqueada pelo Narrador durante a sessão',
       noCharacter: 'Sem personagem',
+      removePlayer: 'Remover Jogador',
+      removeConfirm: 'Tem certeza que deseja remover este jogador da sessão?',
+      playerRemoved: 'Jogador removido da sessão',
+      noCharacterWarning: 'Sem personagem vinculado',
+      blockPlayer: 'Bloquear Jogador',
+      blockConfirm: 'Tem certeza que deseja BLOQUEAR permanentemente este jogador? Ele não poderá reentrar na sessão.',
+      playerBlocked: 'Jogador bloqueado da sessão',
+      errorRemoving: 'Erro ao remover jogador',
+    },
+
+    // Session rejoin
+    sessionRejoin: {
+      noCharacterInSession: 'Você não tem um personagem vinculado a esta sessão.',
+      rejoinWithCharacter: 'Reentrar com personagem',
+      characterUpdated: 'Personagem atualizado na sessão',
+      sheetLockedByNarrator: 'O narrador não está permitindo alterações no momento',
     },
   },
 
@@ -1740,6 +1756,22 @@ export const translations = {
       unlockSheet: 'Unlock Sheet',
       sheetLockedToast: 'This sheet is locked by the Narrator during the session',
       noCharacter: 'No character',
+      removePlayer: 'Remove Player',
+      removeConfirm: 'Are you sure you want to remove this player from the session?',
+      playerRemoved: 'Player removed from session',
+      noCharacterWarning: 'No character linked',
+      blockPlayer: 'Block Player',
+      blockConfirm: 'Are you sure you want to PERMANENTLY BLOCK this player? They will not be able to rejoin the session.',
+      playerBlocked: 'Player blocked from session',
+      errorRemoving: 'Error removing player',
+    },
+
+    // Session rejoin
+    sessionRejoin: {
+      noCharacterInSession: 'You don\'t have a character linked to this session.',
+      rejoinWithCharacter: 'Rejoin with character',
+      characterUpdated: 'Character updated in session',
+      sheetLockedByNarrator: 'The narrator is not allowing changes at this time',
     },
   },
 } as const;
