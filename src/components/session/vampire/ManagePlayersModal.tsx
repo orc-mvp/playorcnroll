@@ -121,7 +121,7 @@ export function ManagePlayersModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-md max-h-[90vh] flex flex-col">
+        <DialogContent className="w-[95vw] max-w-md max-h-[90vh] flex flex-col">
           <DialogHeader className="shrink-0">
             <DialogTitle className="font-medieval">{t.managePlayers.title}</DialogTitle>
             <DialogDescription>
