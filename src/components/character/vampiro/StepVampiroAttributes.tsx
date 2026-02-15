@@ -194,6 +194,10 @@ export default function StepVampiroAttributes({ formData, updateFormData }: Step
     );
   };
 
+  const getAbilityCategoryTotal = (category: AbilityCategory) => {
+    return ABILITIES[category].items.reduce((sum, item) => sum + (formData.abilities[category][item.key] || 0), 0);
+  };
+
   const renderAbilitySection = (category: AbilityCategory) => {
     const section = ABILITIES[category];
     const content = (
@@ -235,7 +239,8 @@ export default function StepVampiroAttributes({ formData, updateFormData }: Step
         <Collapsible open={openSections[category]} onOpenChange={() => toggleSection(category)}>
           <CollapsibleTrigger className="flex items-center justify-between w-full py-2 px-3 bg-muted/50 rounded-md hover:bg-muted transition-colors">
             <span className="font-medieval text-sm">
-              {section.label[language as 'pt-BR' | 'en-US']}
+              {section.label[language as 'pt-BR' | 'en-US']}{' '}
+              <span className="text-muted-foreground/60">({getAbilityCategoryTotal(category)})</span>
             </span>
             <ChevronDown className={`w-4 h-4 transition-transform ${openSections[category] ? 'rotate-180' : ''}`} />
           </CollapsibleTrigger>
@@ -249,7 +254,8 @@ export default function StepVampiroAttributes({ formData, updateFormData }: Step
     return (
       <div className="space-y-3">
         <h4 className="font-medieval text-sm text-center border-b border-border pb-1">
-          {section.label[language as 'pt-BR' | 'en-US']}
+          {section.label[language as 'pt-BR' | 'en-US']}{' '}
+          <span className="text-muted-foreground/60">({getAbilityCategoryTotal(category)})</span>
         </h4>
         {content}
       </div>

@@ -272,9 +272,9 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, read
 
   // Ability keys for translation
   const ABILITY_KEYS = {
-    talents: ['alertness', 'athletics', 'awareness', 'brawl', 'empathy', 'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge'] as const,
-    skills: ['animalKen', 'crafts', 'drive', 'etiquette', 'firearms', 'larceny', 'melee', 'performance', 'stealth', 'survival'] as const,
-    knowledges: ['academics', 'computer', 'finance', 'investigation', 'law', 'medicine', 'occult', 'politics', 'science', 'technology'] as const,
+    talents: ['alertness', 'athletics', 'brawl', 'dodge', 'empathy', 'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge'] as const,
+    skills: ['animalKen', 'crafts', 'drive', 'etiquette', 'firearms', 'melee', 'performance', 'security', 'stealth', 'survival'] as const,
+    knowledges: ['academics', 'computer', 'finance', 'investigation', 'law', 'linguistics', 'medicine', 'occult', 'politics', 'science'] as const,
   };
 
   return (
@@ -403,7 +403,10 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, read
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Talents */}
             <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.talents}</h4>
+              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
+                {t.vampiro.talents}{' '}
+                <span className="text-muted-foreground/60">({ABILITY_KEYS.talents.reduce((sum, k) => sum + (abilities.talents[k] || 0), 0)})</span>
+              </h4>
               <div className="space-y-1">
                 {ABILITY_KEYS.talents.map((key) => (
                   <AbilityRow 
@@ -418,7 +421,10 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, read
             
             {/* Skills */}
             <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.skills}</h4>
+              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
+                {t.vampiro.skills}{' '}
+                <span className="text-muted-foreground/60">({ABILITY_KEYS.skills.reduce((sum, k) => sum + (abilities.skills[k] || 0), 0)})</span>
+              </h4>
               <div className="space-y-1">
                 {ABILITY_KEYS.skills.map((key) => (
                   <AbilityRow 
@@ -433,7 +439,10 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, read
             
             {/* Knowledges */}
             <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.knowledges}</h4>
+              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
+                {t.vampiro.knowledges}{' '}
+                <span className="text-muted-foreground/60">({ABILITY_KEYS.knowledges.reduce((sum, k) => sum + (abilities.knowledges[k] || 0), 0)})</span>
+              </h4>
               <div className="space-y-1">
                 {ABILITY_KEYS.knowledges.map((key) => (
                   <AbilityRow 
