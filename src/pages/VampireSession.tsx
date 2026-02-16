@@ -1068,6 +1068,23 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints }: { 
             </CardContent>
           </Card>
         )}
+
+        {/* Experience Points */}
+        {(experiencePoints ?? 0) > 0 && (
+          <Card className="medieval-card border-destructive/20">
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="font-medieval text-sm">{t.managePlayers.experience}</span>
+                </div>
+                <Badge variant="outline" className="font-mono text-sm px-2">
+                  {experiencePoints} XP
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Character Sheet Modal */}
@@ -1089,6 +1106,7 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints }: { 
                   vampiro_data: character.vampiro_data,
                 }}
                 sessionTrackers={sessionTrackers}
+                experiencePoints={experiencePoints}
                 readOnly
               />
             )}
