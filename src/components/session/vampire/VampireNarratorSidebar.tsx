@@ -91,6 +91,7 @@ interface Participant {
   session_blood_pool?: number;
   session_willpower_current?: number;
   session_health_damage?: boolean[];
+  experience_points?: number;
   character?: {
     id: string;
     name: string;
@@ -434,10 +435,17 @@ export function VampireNarratorSidebar({
                     {/* Character Name & Clan */}
                     <div className="flex items-center gap-2">
                       <Moon className="w-4 h-4 text-destructive shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medieval text-sm truncate">
-                          {p.character?.name || t.vampireSession.noCharacter}
-                        </p>
+                       <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-medieval text-sm truncate">
+                            {p.character?.name || t.vampireSession.noCharacter}
+                          </p>
+                          {(p.experience_points ?? 0) > 0 && (
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 font-mono">
+                              {p.experience_points} XP
+                            </Badge>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground capitalize">
                           {vampData?.clan || ''}
                           {vampData?.generation && ` • ${vampData.generation}ª Geração`}
