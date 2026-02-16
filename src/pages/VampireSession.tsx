@@ -715,7 +715,7 @@ export default function VampireSession() {
 
           {/* Main Content */}
           <main className="flex-1 flex flex-col overflow-hidden">
-            <div className="flex-1 grid grid-rows-[1fr_2fr] gap-4 p-4 overflow-hidden">
+            <div className="flex-1 grid grid-rows-[auto_1fr] gap-4 p-4 overflow-hidden">
               {/* Scene Panel */}
               <div className="overflow-auto min-h-0">
                 <VampireScenePanel 
@@ -858,7 +858,7 @@ function VampireScenePanel({
   const [expandedSceneId, setExpandedSceneId] = useState<string | null>(null);
 
   return (
-    <Card className="medieval-card border-destructive/20 h-full">
+    <Card className="medieval-card border-destructive/20">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="font-medieval flex items-center gap-2 text-destructive">

@@ -420,7 +420,7 @@ export default function Session() {
       <div className="flex-1 flex overflow-hidden">
         {/* Main Content */}
         <main className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 grid grid-rows-[1fr_2fr] gap-4 p-4 overflow-hidden">
+          <div className="flex-1 grid grid-rows-[auto_1fr] gap-4 p-4 overflow-hidden">
             {/* Scene Panel - takes 1/3 of space */}
             <div className="overflow-auto min-h-0">
               <ScenePanel 

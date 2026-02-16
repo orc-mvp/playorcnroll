@@ -50,7 +50,7 @@ export function ScenePanel({ currentScene, scenes, isNarrator, onCreateScene }: 
   };
 
   return (
-    <Card className="medieval-card h-full flex flex-col">
+    <Card className="medieval-card flex flex-col">
       <CardHeader className="pb-3 flex-shrink-0">
         <div className="flex items-center justify-between">
           <CardTitle className="font-medieval flex items-center gap-2">
