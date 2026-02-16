@@ -129,6 +129,7 @@ interface VampireNarratorSidebarProps {
   currentScene: Scene | null;
   onRequestTest: () => void;
   onSceneChange: (scene: Scene) => void;
+  onEventCreated?: (event: { event_type: string; event_data: Record<string, unknown>; scene_id: string | null; session_id: string }) => void;
 }
 
 export function VampireNarratorSidebar({
@@ -138,6 +139,7 @@ export function VampireNarratorSidebar({
   currentScene,
   onRequestTest,
   onSceneChange,
+  onEventCreated,
 }: VampireNarratorSidebarProps) {
   const { t, language } = useI18n();
   const { toast } = useToast();
@@ -353,18 +355,29 @@ export function VampireNarratorSidebar({
       }
 
       // Emit event to session feed
+      const eventData = {
+        tracker_type: pendingChange.type,
+        character_name: pendingChange.characterName,
+        character_id: pendingChange.characterId,
+        old_value: pendingChange.currentValue,
+        new_value: pendingChange.newValue,
+        is_narrator_change: true,
+        is_permanent: pendingChange.isPermanent || false,
+      };
+
       await supabase.from('session_events').insert({
         session_id: sessionId,
         scene_id: currentScene?.id || null,
         event_type: 'tracker_change',
-        event_data: {
-          tracker_type: pendingChange.type,
-          character_name: pendingChange.characterName,
-          old_value: pendingChange.currentValue,
-          new_value: pendingChange.newValue,
-          is_narrator_change: true,
-          is_permanent: pendingChange.isPermanent || false,
-        },
+        event_data: eventData,
+      });
+
+      // Optimistically add event to local feed
+      onEventCreated?.({
+        event_type: 'tracker_change',
+        event_data: eventData,
+        scene_id: currentScene?.id || null,
+        session_id: sessionId,
       });
 
       toast({ title: t.vampireSession.changeSaved });

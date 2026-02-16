@@ -315,7 +315,23 @@ export default function VampireSession() {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'session_events', filter: `session_id=eq.${sessionId}` },
         (payload) => {
-          setEvents((prev) => [payload.new as SessionEvent, ...prev].slice(0, 50));
+          const newEvent = payload.new as SessionEvent;
+          setEvents((prev) => {
+            // Replace local optimistic event or prepend
+            const localIndex = prev.findIndex(
+              (e) =>
+                e.id.startsWith('local-') &&
+                e.event_type === newEvent.event_type &&
+                (e.event_data as any).character_name === (newEvent.event_data as any).character_name &&
+                (e.event_data as any).tracker_type === (newEvent.event_data as any).tracker_type
+            );
+            if (localIndex >= 0) {
+              const updated = [...prev];
+              updated[localIndex] = newEvent;
+              return updated;
+            }
+            return [newEvent, ...prev].slice(0, 50);
+          });
         }
       )
       .on(
@@ -407,6 +423,27 @@ export default function VampireSession() {
     toast({
       title: t.vampiroTests.requestTest,
       description: `${config.testType} - ${t.vampiroTests.difficulty}: ${config.difficulty}`,
+    });
+  };
+
+  // Handle optimistic local event insertion (narrator changes)
+  const handleLocalEvent = (eventPartial: { event_type: string; event_data: Record<string, unknown>; scene_id: string | null; session_id: string }) => {
+    const localEvent: SessionEvent = {
+      id: `local-${Date.now()}`,
+      ...eventPartial,
+      created_at: new Date().toISOString(),
+    };
+    setEvents((prev) => {
+      // Avoid duplicate if realtime already delivered it
+      const isDuplicate = prev.some(
+        (e) =>
+          e.event_type === localEvent.event_type &&
+          (e.event_data as any).character_name === (localEvent.event_data as any).character_name &&
+          (e.event_data as any).tracker_type === (localEvent.event_data as any).tracker_type &&
+          Math.abs(new Date(e.created_at).getTime() - new Date(localEvent.created_at).getTime()) < 3000
+      );
+      if (isDuplicate) return prev;
+      return [localEvent, ...prev].slice(0, 50);
     });
   };
 
@@ -577,6 +614,7 @@ export default function VampireSession() {
                     currentScene={currentScene}
                     onRequestTest={() => setTestModalOpen(true)}
                     onSceneChange={setCurrentScene}
+                    onEventCreated={handleLocalEvent}
                   />
                 ) : (
                   <VampirePlayerPanel character={myCharacter} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} />
@@ -627,6 +665,7 @@ export default function VampireSession() {
                   currentScene={currentScene}
                   onRequestTest={() => setTestModalOpen(true)}
                   onSceneChange={setCurrentScene}
+                  onEventCreated={handleLocalEvent}
                 />
               ) : (
                 <div className="space-y-4">
