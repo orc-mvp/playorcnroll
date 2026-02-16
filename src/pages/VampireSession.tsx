@@ -102,6 +102,7 @@ interface Participant {
   session_blood_pool?: number;
   session_willpower_current?: number;
   session_health_damage?: boolean[];
+  experience_points?: number;
   character?: {
     id: string;
     name: string;
@@ -639,7 +640,7 @@ export default function VampireSession() {
                     onEventCreated={handleLocalEvent}
                   />
                 ) : (
-                  <VampirePlayerPanel character={myCharacter} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} />
+                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} />
                 )}
               </div>
             </TabsContent>
@@ -707,7 +708,7 @@ export default function VampireSession() {
                       onTestComplete={() => {}}
                     />
                   )}
-                  <VampirePlayerPanel character={myCharacter} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} />
+                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} />
                 </div>
               )}
             </ScrollArea>
@@ -976,7 +977,7 @@ function VampireScenePanel({
 // VampireNarratorPanel was replaced by VampireNarratorSidebar component
 
 // Vampire Player Panel Component
-function VampirePlayerPanel({ character, sessionTrackers }: { character: Participant['character']; sessionTrackers?: { bloodPool?: number; willpower?: number; healthDamage?: boolean[] } }) {
+function VampirePlayerPanel({ character, sessionTrackers, experiencePoints }: { character: Participant['character']; sessionTrackers?: { bloodPool?: number; willpower?: number; healthDamage?: boolean[] }; experiencePoints?: number }) {
   const { t, language } = useI18n();
   const vampiroData = character?.vampiro_data;
   const [showSheet, setShowSheet] = useState(false);
@@ -1005,7 +1006,14 @@ function VampirePlayerPanel({ character, sessionTrackers }: { character: Partici
                 <Moon className="w-6 h-6 text-destructive" />
               </div>
               <div className="flex-1">
-                <h3 className="font-medieval text-lg">{character.name}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medieval text-lg">{character.name}</h3>
+                  {(experiencePoints ?? 0) > 0 && (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 font-mono">
+                      {experiencePoints} XP
+                    </Badge>
+                  )}
+                </div>
                 {vampiroData?.clan && (
                   <Badge variant="outline" className="border-destructive/30 text-destructive text-xs">
                     {vampiroData.clan}
