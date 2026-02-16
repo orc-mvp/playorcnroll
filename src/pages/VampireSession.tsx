@@ -39,7 +39,7 @@ import {
   Plus,
   History,
   ChevronDown,
-  Play,
+  Eye,
   FileText,
   AlertTriangle,
 } from 'lucide-react';
@@ -855,22 +855,7 @@ function VampireScenePanel({
     }
   };
 
-  const handleActivateScene = async (scene: Scene) => {
-    try {
-      await supabase.from('scenes').update({ is_active: false }).eq('session_id', sessionId);
-      await supabase.from('scenes').update({ is_active: true }).eq('id', scene.id);
-      await supabase.from('sessions').update({ current_scene_id: scene.id }).eq('id', sessionId);
-      await supabase.from('session_events').insert({
-        session_id: sessionId,
-        scene_id: scene.id,
-        event_type: 'scene_changed',
-        event_data: { scene_name: scene.name },
-      });
-      onSceneChange(scene);
-    } catch (error) {
-      toast({ title: t.vampireSession.errorChangingScene, variant: 'destructive' });
-    }
-  };
+  const [expandedSceneId, setExpandedSceneId] = useState<string | null>(null);
 
   return (
     <Card className="medieval-card border-destructive/20 h-full">
@@ -948,7 +933,7 @@ function VampireScenePanel({
         )}
 
         {/* Previous Scenes Collapsible */}
-        {previousScenes.length > 0 && isNarrator && (
+        {previousScenes.length > 0 && (
           <Collapsible open={showHistory} onOpenChange={setShowHistory}>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="w-full justify-between text-muted-foreground">
@@ -962,14 +947,20 @@ function VampireScenePanel({
             <CollapsibleContent>
               <div className="space-y-1 pt-2">
                 {previousScenes.map((scene) => (
-                  <button
-                    key={scene.id}
-                    onClick={() => handleActivateScene(scene)}
-                    className="w-full flex items-center gap-2 p-2 rounded text-left hover:bg-muted/50 text-sm"
-                  >
-                    <Play className="w-3 h-3 text-muted-foreground" />
-                    <span className="truncate flex-1">{scene.name}</span>
-                  </button>
+                  <div key={scene.id}>
+                    <button
+                      onClick={() => setExpandedSceneId(expandedSceneId === scene.id ? null : scene.id)}
+                      className="w-full flex items-center gap-2 p-2 rounded text-left hover:bg-muted/50 text-sm"
+                    >
+                      <Eye className="w-3 h-3 text-muted-foreground" />
+                      <span className="truncate flex-1">{scene.name}</span>
+                    </button>
+                    {expandedSceneId === scene.id && scene.description && (
+                      <p className="px-2 pb-2 text-xs text-muted-foreground whitespace-pre-wrap">
+                        {scene.description}
+                      </p>
+                    )}
+                  </div>
                 ))}
               </div>
             </CollapsibleContent>

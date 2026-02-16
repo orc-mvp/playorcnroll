@@ -223,43 +223,6 @@ export function VampireNarratorSidebar({
     }
   };
 
-  const handleActivateScene = async (scene: Scene) => {
-    if (scene.id === currentScene?.id) return;
-
-    try {
-      // Deactivate all scenes
-      await supabase
-        .from('scenes')
-        .update({ is_active: false })
-        .eq('session_id', sessionId);
-
-      // Activate selected scene
-      await supabase
-        .from('scenes')
-        .update({ is_active: true })
-        .eq('id', scene.id);
-
-      // Update session
-      await supabase
-        .from('sessions')
-        .update({ current_scene_id: scene.id })
-        .eq('id', sessionId);
-
-      // Add event
-      await supabase.from('session_events').insert({
-        session_id: sessionId,
-        scene_id: scene.id,
-        event_type: 'scene_changed',
-        event_data: {
-          scene_name: scene.name,
-        },
-      });
-
-      onSceneChange(scene);
-    } catch (error) {
-      toast({ title: t.vampireSession.errorChangingScene, variant: 'destructive' });
-    }
-  };
 
   // Open the adjust modal (with +/- controls)
   const openAdjustModal = (
