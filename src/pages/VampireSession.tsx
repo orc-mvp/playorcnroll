@@ -1040,31 +1040,39 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints }: { 
           </CardContent>
         </Card>
 
-        {/* Quick Stats */}
-        {vampiroData && (
+        {/* Disciplines (moved from right sidebar) */}
+        {vampiroData?.disciplines && Object.keys(vampiroData.disciplines).length > 0 && (
           <Card className="medieval-card border-destructive/20">
             <CardHeader className="pb-2">
               <CardTitle className="font-medieval text-sm flex items-center gap-2">
-                <Heart className="w-4 h-4 text-destructive" />
-                {t.vampiro.humanity}
+                <Sparkles className="w-4 h-4 text-destructive" />
+                {t.vampiro.disciplines}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-0.5 justify-center">
-                {Array.from({ length: 10 }, (_, i) => (
-                  <div
-                    key={i}
-                    className={`w-3 h-3 rounded-full border-2 ${
-                      i < (vampiroData.humanity || 1)
-                        ? 'bg-foreground border-foreground'
-                        : 'bg-transparent border-muted-foreground/40'
-                    }`}
-                  />
-                ))}
+              <div className="space-y-1">
+                {Object.entries(vampiroData.disciplines).map(([key, value]) =>
+                  value > 0 ? (
+                    <div key={key} className="flex items-center justify-between text-sm">
+                      <span className="font-body capitalize">
+                        {t.vampiro[key as keyof typeof t.vampiro] || key}
+                      </span>
+                      <div className="flex gap-0.5">
+                        {Array.from({ length: 5 }, (_, i) => (
+                          <div
+                            key={i}
+                            className={`w-2 h-2 rounded-full ${
+                              i < value
+                                ? 'bg-destructive'
+                                : 'bg-muted-foreground/20'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : null
+                )}
               </div>
-              <p className="text-xs text-muted-foreground text-center mt-1">
-                {vampiroData.humanity || 1}/10
-              </p>
             </CardContent>
           </Card>
         )}
