@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Dialog,
   DialogContent,
@@ -48,6 +47,13 @@ interface ManagePlayersModalProps {
   sessionId: string;
 }
 
+interface LocalOverrides {
+  [participantId: string]: {
+    sheet_locked?: boolean;
+    experience_points?: number;
+  };
+}
+
 export function ManagePlayersModal({
   open,
   onOpenChange,
@@ -58,43 +64,82 @@ export function ManagePlayersModal({
   const { toast } = useToast();
   const [updating, setUpdating] = useState<string | null>(null);
   const [removeConfirm, setRemoveConfirm] = useState<string | null>(null);
+  const [localOverrides, setLocalOverrides] = useState<LocalOverrides>({});
+
+  // Clear overrides when participants prop updates (from realtime)
+  useEffect(() => {
+    setLocalOverrides({});
+  }, [participants]);
+
+  const getEffectiveValue = useCallback(
+    <K extends 'sheet_locked' | 'experience_points'>(
+      participant: Participant,
+      key: K
+    ): NonNullable<Participant[K]> => {
+      const override = localOverrides[participant.id];
+      if (override && key in override) {
+        return override[key] as NonNullable<Participant[K]>;
+      }
+      if (key === 'sheet_locked') return (participant.sheet_locked ?? true) as NonNullable<Participant[K]>;
+      return (participant.experience_points ?? 0) as NonNullable<Participant[K]>;
+    },
+    [localOverrides]
+  );
 
   const handleToggleLock = async (participantId: string, currentLocked: boolean) => {
-    setUpdating(participantId);
+    const newValue = !currentLocked;
+    // Optimistic update
+    setLocalOverrides((prev) => ({
+      ...prev,
+      [participantId]: { ...prev[participantId], sheet_locked: newValue },
+    }));
+
     try {
       const { error } = await supabase
         .from('session_participants')
-        .update({ sheet_locked: !currentLocked } as any)
+        .update({ sheet_locked: newValue })
         .eq('id', participantId);
 
       if (error) throw error;
 
       toast({
-        title: !currentLocked ? t.managePlayers.sheetLocked : t.managePlayers.sheetUnlocked,
+        title: newValue ? t.managePlayers.sheetLocked : t.managePlayers.sheetUnlocked,
+        duration: 2000,
       });
     } catch (error) {
       console.error('Error toggling sheet lock:', error);
+      // Revert optimistic update
+      setLocalOverrides((prev) => ({
+        ...prev,
+        [participantId]: { ...prev[participantId], sheet_locked: currentLocked },
+      }));
       toast({ title: t.common.errorSaving, variant: 'destructive' });
-    } finally {
-      setUpdating(null);
     }
   };
 
   const handleXpChange = async (participantId: string, currentXp: number, delta: number) => {
     const newXp = Math.max(0, currentXp + delta);
-    setUpdating(participantId);
+    // Optimistic update
+    setLocalOverrides((prev) => ({
+      ...prev,
+      [participantId]: { ...prev[participantId], experience_points: newXp },
+    }));
+
     try {
       const { error } = await supabase
         .from('session_participants')
-        .update({ experience_points: newXp } as any)
+        .update({ experience_points: newXp })
         .eq('id', participantId);
 
       if (error) throw error;
     } catch (error) {
       console.error('Error updating XP:', error);
+      // Revert optimistic update
+      setLocalOverrides((prev) => ({
+        ...prev,
+        [participantId]: { ...prev[participantId], experience_points: currentXp },
+      }));
       toast({ title: t.common.errorSaving, variant: 'destructive' });
-    } finally {
-      setUpdating(null);
     }
   };
 
@@ -132,8 +177,8 @@ export function ManagePlayersModal({
           <div className="flex-1 max-h-[60vh] overflow-y-auto pr-1">
             <div className="space-y-4">
               {participants.map((participant) => {
-                const isLocked = participant.sheet_locked ?? true;
-                const xp = participant.experience_points ?? 0;
+                const isLocked = getEffectiveValue(participant, 'sheet_locked') as boolean;
+                const xp = getEffectiveValue(participant, 'experience_points') as number;
                 const displayName = participant.profile?.display_name || participant.user_id.slice(0, 8).toUpperCase();
                 const charName = participant.character?.name || t.managePlayers.noCharacter;
                 const hasNoCharacter = !participant.character_id || !participant.character;
@@ -173,7 +218,6 @@ export function ManagePlayersModal({
                       <Switch
                         checked={!isLocked}
                         onCheckedChange={() => handleToggleLock(participant.id, isLocked)}
-                        disabled={updating === participant.id}
                       />
                     </div>
 
@@ -189,7 +233,7 @@ export function ManagePlayersModal({
                           size="icon"
                           className="h-7 w-7"
                           onClick={() => handleXpChange(participant.id, xp, -1)}
-                          disabled={updating === participant.id || xp <= 0}
+                          disabled={xp <= 0}
                         >
                           <Minus className="w-3 h-3" />
                         </Button>
@@ -199,7 +243,6 @@ export function ManagePlayersModal({
                           size="icon"
                           className="h-7 w-7"
                           onClick={() => handleXpChange(participant.id, xp, 1)}
-                          disabled={updating === participant.id}
                         >
                           <Plus className="w-3 h-3" />
                         </Button>
