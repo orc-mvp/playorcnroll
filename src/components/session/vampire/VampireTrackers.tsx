@@ -333,43 +333,6 @@ export function VampireTrackers({
 
   return (
     <div className="space-y-4">
-      {/* 1. DISCIPLINES (read-only, at the top) */}
-      {vampiroData?.disciplines && Object.keys(vampiroData.disciplines).length > 0 && (
-        <Card className="medieval-card border-destructive/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-medieval text-sm flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-destructive" />
-              {t.vampiro.disciplines}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1">
-              {Object.entries(vampiroData.disciplines).map(([key, value]) =>
-                value > 0 ? (
-                  <div key={key} className="flex items-center justify-between text-sm">
-                    <span className="font-body capitalize">
-                      {t.vampiro[key as keyof typeof t.vampiro] || key}
-                    </span>
-                    <div className="flex gap-0.5">
-                      {Array.from({ length: 5 }, (_, i) => (
-                        <div
-                          key={i}
-                          className={`w-2 h-2 rounded-full ${
-                            i < value
-                              ? 'bg-destructive'
-                              : 'bg-muted-foreground/20'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ) : null
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* 2. BLOOD POOL */}
       <Card className={`medieval-card ${bloodPool === 0 ? 'border-destructive' : 'border-destructive/20'}`}>
         <CardHeader className="pb-2">
