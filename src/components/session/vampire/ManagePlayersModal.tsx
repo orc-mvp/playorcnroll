@@ -129,8 +129,8 @@ export function ManagePlayersModal({
             </DialogDescription>
           </DialogHeader>
 
-          <ScrollArea className="flex-1 max-h-[60vh]">
-            <div className="space-y-4 pr-4">
+          <div className="flex-1 max-h-[60vh] overflow-y-auto pr-1">
+            <div className="space-y-4">
               {participants.map((participant) => {
                 const isLocked = participant.sheet_locked ?? true;
                 const xp = participant.experience_points ?? 0;
@@ -223,7 +223,7 @@ export function ManagePlayersModal({
                 );
               })}
             </div>
-          </ScrollArea>
+          </div>
         </DialogContent>
       </Dialog>
 
