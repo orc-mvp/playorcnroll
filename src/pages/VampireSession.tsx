@@ -352,9 +352,9 @@ export default function VampireSession() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, user?.id]);
 
-  // Fallback polling for pending tests (every 8s) to ensure players see tests even if realtime misses
+  // Fallback polling for events (every 4s) to ensure both narrator and players see updates even if realtime misses
   useEffect(() => {
-    if (!sessionId || isNarrator) return;
+    if (!sessionId) return;
 
     const pollInterval = setInterval(async () => {
       const { data: latestEvents } = await supabase
@@ -371,7 +371,7 @@ export default function VampireSession() {
 
     return () => clearInterval(pollInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, isNarrator]);
+  }, [sessionId]);
 
   // Update current scene when session changes
   useEffect(() => {
