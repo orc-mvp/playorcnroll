@@ -367,7 +367,7 @@ export default function VampireSession() {
       if (latestEvents) {
         setEvents(latestEvents as SessionEvent[]);
       }
-    }, 8000);
+    }, 4000);
 
     return () => clearInterval(pollInterval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
