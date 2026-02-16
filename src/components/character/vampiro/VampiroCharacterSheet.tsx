@@ -68,6 +68,7 @@ interface VampiroCharacterSheetProps {
     willpower?: number;
     healthDamage?: boolean[];
   };
+  experiencePoints?: number;
   readOnly?: boolean;
 }
 
@@ -190,7 +191,7 @@ const HEALTH_LEVELS = [
   { key: 'incapacitated', penalty: '' },
 ] as const;
 
-export default function VampiroCharacterSheet({ character, sessionTrackers, readOnly = false }: VampiroCharacterSheetProps) {
+export default function VampiroCharacterSheet({ character, sessionTrackers, experiencePoints, readOnly = false }: VampiroCharacterSheetProps) {
   const { t, language } = useI18n();
   const data = character.vampiro_data || {};
   const lang = language === 'pt-BR' ? 'pt' : 'en';
@@ -290,6 +291,11 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, read
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="font-medieval text-2xl text-foreground">{character.name}</h2>
+                {(experiencePoints ?? 0) > 0 && (
+                  <Badge variant="outline" className="font-mono text-xs px-1.5">
+                    {experiencePoints} XP
+                  </Badge>
+                )}
                 {data.clan && (
                   <Badge variant="outline" className="border-destructive/30 text-destructive">
                     {getClanName(data.clan)}
