@@ -70,7 +70,7 @@ export function ScenePanel({ currentScene, scenes, isNarrator, onCreateScene }: 
                 <DialogHeader>
                   <DialogTitle className="font-medieval">{t.scene.create}</DialogTitle>
                   <DialogDescription className="font-body">
-                    Crie uma nova cena para sua aventura
+                    {t.scene.createDialogDescription}
                   </DialogDescription>
                 </DialogHeader>
 
@@ -83,7 +83,7 @@ export function ScenePanel({ currentScene, scenes, isNarrator, onCreateScene }: 
                       id="scene-name"
                       value={newSceneName}
                       onChange={(e) => setNewSceneName(e.target.value)}
-                      placeholder="Ex: A Taverna do Dragão Cansado"
+                      placeholder={t.scene.namePlaceholder}
                       className="font-body"
                     />
                   </div>
@@ -96,7 +96,7 @@ export function ScenePanel({ currentScene, scenes, isNarrator, onCreateScene }: 
                       id="scene-desc"
                       value={newSceneDescription}
                       onChange={(e) => setNewSceneDescription(e.target.value)}
-                      placeholder="Descreva o ambiente, atmosfera, NPCs presentes..."
+                      placeholder={t.scene.descriptionPlaceholder}
                       className="font-body min-h-[100px] resize-none"
                     />
                   </div>
@@ -169,8 +169,8 @@ export function ScenePanel({ currentScene, scenes, isNarrator, onCreateScene }: 
             <BookOpen className="w-12 h-12 text-muted-foreground/30 mb-3" />
             <p className="text-muted-foreground font-body">
               {isNarrator 
-                ? 'Crie a primeira cena para começar a aventura!'
-                : 'Aguardando o Narrador criar a primeira cena...'}
+                ? t.scene.emptyNarrator
+                : t.scene.emptyPlayer}
             </p>
           </div>
         )}

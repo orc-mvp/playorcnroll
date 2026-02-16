@@ -217,6 +217,11 @@ export const translations = {
       description: 'Descrição da Cena',
       history: 'Histórico de Cenas',
       events: 'Feed de Eventos',
+      createDialogDescription: 'Crie uma nova cena para sua aventura',
+      namePlaceholder: 'Ex: A Taverna do Dragão Cansado',
+      descriptionPlaceholder: 'Descreva o ambiente, atmosfera, NPCs presentes...',
+      emptyNarrator: 'Crie a primeira cena para começar a aventura!',
+      emptyPlayer: 'Aguardando o Narrador criar a primeira cena...',
     },
 
     // Tests
@@ -1106,6 +1111,11 @@ export const translations = {
       description: 'Scene Description',
       history: 'Scene History',
       events: 'Event Feed',
+      createDialogDescription: 'Create a new scene for your adventure',
+      namePlaceholder: 'E.g.: The Tired Dragon Tavern',
+      descriptionPlaceholder: 'Describe the environment, atmosphere, NPCs present...',
+      emptyNarrator: 'Create the first scene to begin the adventure!',
+      emptyPlayer: 'Waiting for the Narrator to create the first scene...',
     },
 
     // Tests
