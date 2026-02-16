@@ -349,7 +349,29 @@ export default function VampireSession() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [sessionId, user, navigate, toast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, user?.id]);
+
+  // Fallback polling for pending tests (every 8s) to ensure players see tests even if realtime misses
+  useEffect(() => {
+    if (!sessionId || isNarrator) return;
+
+    const pollInterval = setInterval(async () => {
+      const { data: latestEvents } = await supabase
+        .from('session_events')
+        .select('*')
+        .eq('session_id', sessionId)
+        .order('created_at', { ascending: false })
+        .limit(50);
+
+      if (latestEvents) {
+        setEvents(latestEvents as SessionEvent[]);
+      }
+    }, 8000);
+
+    return () => clearInterval(pollInterval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionId, isNarrator]);
 
   // Update current scene when session changes
   useEffect(() => {
