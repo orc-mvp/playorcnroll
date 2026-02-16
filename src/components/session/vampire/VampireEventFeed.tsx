@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -164,6 +164,15 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
   const { t, language } = useI18n();
   const dateLocale = language === 'pt-BR' ? ptBR : enUS;
   const [currentPage, setCurrentPage] = useState(0);
+  const prevEventsLength = useRef(events.length);
+
+  // Reset to page 0 when new events arrive
+  useEffect(() => {
+    if (events.length > prevEventsLength.current) {
+      setCurrentPage(0);
+    }
+    prevEventsLength.current = events.length;
+  }, [events.length]);
 
   // Get event config with translations
   const eventConfig = useMemo(() => getVampireEventConfig(t), [t]);
