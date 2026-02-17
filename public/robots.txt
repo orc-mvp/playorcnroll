@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://playorcnroll.lovable.app/sitemap.xml
