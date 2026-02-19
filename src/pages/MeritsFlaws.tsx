@@ -108,8 +108,6 @@ export default function MeritsFlaws() {
       const { data, error } = await supabase
         .from('merits_flaws')
         .select('*')
-        .order('category')
-        .order('cost', { ascending: false })
         .order('name');
 
       if (error) {
