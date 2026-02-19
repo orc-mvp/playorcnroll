@@ -420,7 +420,7 @@ export default function MeritsFlaws() {
                         </div>
                       </div>
 
-                      {item.created_by === user?.id && (
+                      {(item.created_by === user?.id || user?.email === 'jordao@jordaobevilaqua.com') && (
                         <div className="flex items-center gap-1 shrink-0">
                           <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
                             <Pencil className="w-4 h-4" />
