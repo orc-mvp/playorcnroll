@@ -231,7 +231,8 @@ export default function CreateCharacter() {
           : `${gameSystem === 'vampiro_v3' ? vampiroFormData.name : formData.name} was created successfully!`,
       });
 
-      navigate('/dashboard');
+      const returnTo = searchParams.get('returnTo');
+      navigate(returnTo || '/dashboard');
     } catch (error) {
       if (import.meta.env.DEV) console.error('Error creating character:', error);
       toast({
