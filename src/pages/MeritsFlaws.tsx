@@ -85,6 +85,7 @@ export default function MeritsFlaws() {
   // Filters
   const [filterSystem, setFilterSystem] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>('all');
 
   // Form state
   const [formName, setFormName] = useState('');
@@ -244,6 +245,8 @@ export default function MeritsFlaws() {
   const filteredItems = items.filter((item) => {
     if (filterSystem !== 'all' && !item.game_systems?.includes(filterSystem)) return false;
     if (filterCategory !== 'all' && item.category !== filterCategory) return false;
+    if (filterType === 'merit' && item.cost <= 0) return false;
+    if (filterType === 'flaw' && item.cost >= 0) return false;
     return true;
   });
 
@@ -333,6 +336,17 @@ export default function MeritsFlaws() {
                 <SelectItem value="social">{t.meritsFlaws.social}</SelectItem>
                 <SelectItem value="mental">{t.meritsFlaws.mental}</SelectItem>
                 <SelectItem value="supernatural">{t.meritsFlaws.supernatural}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={filterType} onValueChange={setFilterType}>
+              <SelectTrigger className="w-[200px] font-body">
+                <SelectValue placeholder={t.meritsFlaws.filterByType} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t.meritsFlaws.allTypes}</SelectItem>
+                <SelectItem value="merit">{t.meritsFlaws.meritsOnly}</SelectItem>
+                <SelectItem value="flaw">{t.meritsFlaws.flawsOnly}</SelectItem>
               </SelectContent>
             </Select>
           </div>
