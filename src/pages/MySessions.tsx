@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import DOMPurify from 'dompurify';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
@@ -270,7 +271,7 @@ export default function MySessions() {
                         </CardTitle>
                         {session.description && (
                           <CardDescription className="font-body mt-1 line-clamp-2">
-                            {session.description}
+                            {DOMPurify.sanitize(session.description, { ALLOWED_TAGS: [] })}
                           </CardDescription>
                         )}
                       </div>
