@@ -942,6 +942,16 @@ export const translations = {
       meritsOnly: 'Apenas Vantagens',
       flawsOnly: 'Apenas Desvantagens',
     },
+
+    // Customization unified
+    customization: {
+      title: 'Personalização',
+      searchPlaceholder: 'Buscar por nome, descrição, livro...',
+      filterByAttribute: 'Filtrar por atributo',
+      allAttributes: 'Todos os atributos',
+      results: 'resultado(s)',
+      page: 'Página',
+    },
   },
 
   en: {
@@ -1884,6 +1894,16 @@ export const translations = {
       allTypes: 'All',
       meritsOnly: 'Merits only',
       flawsOnly: 'Flaws only',
+    },
+
+    // Customization unified
+    customization: {
+      title: 'Customization',
+      searchPlaceholder: 'Search by name, description, sourcebook...',
+      filterByAttribute: 'Filter by attribute',
+      allAttributes: 'All attributes',
+      results: 'result(s)',
+      page: 'Page',
     },
   },
 } as const;

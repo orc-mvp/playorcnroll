@@ -130,7 +130,7 @@ export default function Dashboard() {
           </Card>
 
           {/* Customization (was Marks) */}
-          <Link to="/marks">
+          <Link to="/customization">
             <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
               <CardHeader className="p-4 md:p-6">
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
