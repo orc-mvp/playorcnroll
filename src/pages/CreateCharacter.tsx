@@ -15,6 +15,7 @@ import StepVampiroBasicInfo, { VampiroFormData } from '@/components/character/va
 import StepVampiroAttributes from '@/components/character/vampiro/StepVampiroAttributes';
 import StepVampiroVirtues from '@/components/character/vampiro/StepVampiroVirtues';
 import StepVampiroDisciplines from '@/components/character/vampiro/StepVampiroDisciplines';
+import StepVampiroMeritsFlaws from '@/components/character/vampiro/StepVampiroMeritsFlaws';
 import GameSystemSelector from '@/components/GameSystemSelector';
 import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
 
@@ -87,6 +88,9 @@ const initialVampiroFormData: VampiroFormData = {
   // Step 4 - Disciplines & Backgrounds
   disciplines: {},
   backgrounds: {},
+  
+  // Step 5 - Merits & Flaws
+  merits_flaws: [],
 };
 
 export default function CreateCharacter() {
@@ -116,7 +120,7 @@ export default function CreateCharacter() {
   const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalSteps = gameSystem === 'vampiro_v3' ? 5 : 4; // Vampiro: 0-4, Marcados: 0-3
+  const totalSteps = gameSystem === 'vampiro_v3' ? 6 : 4; // Vampiro: 0-5, Marcados: 0-3
   const progress = ((step + 1) / totalSteps) * 100;
 
   const validateStep = (currentStep: number): boolean => {
@@ -150,6 +154,9 @@ export default function CreateCharacter() {
           // Virtues step - always valid since virtues have minValue
           return true;
         case 4:
+          return true;
+        case 5:
+          // Merits & Flaws step - always valid (optional)
           return true;
         default:
           return false;
@@ -218,6 +225,7 @@ export default function CreateCharacter() {
             willpower: vampiroFormData.willpower,
             disciplines: vampiroFormData.disciplines,
             backgrounds: vampiroFormData.backgrounds,
+            merits_flaws: vampiroFormData.merits_flaws || [],
           },
         });
 
@@ -335,6 +343,14 @@ export default function CreateCharacter() {
         {/* Vampiro Step 4: Disciplines & Backgrounds */}
         {step === 4 && gameSystem === 'vampiro_v3' && (
           <StepVampiroDisciplines
+            formData={vampiroFormData}
+            updateFormData={updateVampiroFormData}
+          />
+        )}
+
+        {/* Vampiro Step 5: Merits & Flaws */}
+        {step === 5 && gameSystem === 'vampiro_v3' && (
+          <StepVampiroMeritsFlaws
             formData={vampiroFormData}
             updateFormData={updateVampiroFormData}
           />

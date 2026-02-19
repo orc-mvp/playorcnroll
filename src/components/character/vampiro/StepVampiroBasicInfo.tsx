@@ -45,6 +45,9 @@ export interface VampiroFormData {
   // Step 4 - Disciplines & Backgrounds
   disciplines: Record<string, number>;
   backgrounds: Record<string, number>;
+  
+  // Step 5 - Merits & Flaws
+  merits_flaws?: { id: string; name: string; cost: number; category: string }[];
 }
 
 interface StepVampiroBasicInfoProps {
