@@ -321,6 +321,23 @@ export default function CustomMarks() {
         </div>
       </header>
 
+        {/* Sub-navigation */}
+        <div className="container mx-auto px-4 py-3 flex gap-2">
+          <Button variant="default" size="sm" className="font-medieval">
+            <Scroll className="w-4 h-4 mr-1" />
+            {t.marks.createCustom}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="font-medieval"
+            onClick={() => navigate('/merits-flaws')}
+          >
+            <Star className="w-4 h-4 mr-1" />
+            {t.meritsFlaws.title}
+          </Button>
+        </div>
+
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {marks.length === 0 ? (
