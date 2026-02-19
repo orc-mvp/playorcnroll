@@ -120,6 +120,7 @@ export const translations = {
       description: 'Descrição',
       custom: 'Marca Personalizada',
       createCustom: 'Personalização',
+      tabMarks: 'Marcas',
     },
 
     // Session
@@ -1058,6 +1059,7 @@ export const translations = {
       description: 'Description',
       custom: 'Custom Mark',
       createCustom: 'Customization',
+      tabMarks: 'Marks',
     },
 
     // Session
