@@ -119,7 +119,7 @@ export const translations = {
       attribute: 'Atributo',
       description: 'Descrição',
       custom: 'Marca Personalizada',
-      createCustom: 'Criar Marca',
+      createCustom: 'Personalização',
     },
 
     // Session
@@ -1057,7 +1057,7 @@ export const translations = {
       attribute: 'Attribute',
       description: 'Description',
       custom: 'Custom Mark',
-      createCustom: 'Create Mark',
+      createCustom: 'Customization',
     },
 
     // Session
