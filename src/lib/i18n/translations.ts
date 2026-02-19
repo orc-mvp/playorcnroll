@@ -941,6 +941,8 @@ export const translations = {
       allTypes: 'Todos',
       meritsOnly: 'Apenas Vantagens',
       flawsOnly: 'Apenas Desvantagens',
+      filterBySourcebook: 'Filtrar por livro',
+      allSourcebooks: 'Todos os livros',
     },
 
     // Customization unified
@@ -1898,6 +1900,8 @@ export const translations = {
       allTypes: 'All',
       meritsOnly: 'Merits only',
       flawsOnly: 'Flaws only',
+      filterBySourcebook: 'Filter by sourcebook',
+      allSourcebooks: 'All sourcebooks',
     },
 
     // Customization unified

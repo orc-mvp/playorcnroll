@@ -157,6 +157,7 @@ export default function Customization() {
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterAttribute, setFilterAttribute] = useState<string>('all');
+  const [filterSourcebook, setFilterSourcebook] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
 
   // ---- Auth redirect ----
@@ -198,7 +199,7 @@ export default function Customization() {
   // Reset page on filter/tab change
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, searchQuery, filterSystem, filterCategory, filterType, filterAttribute]);
+  }, [activeTab, searchQuery, filterSystem, filterCategory, filterType, filterAttribute, filterSourcebook]);
 
   // ---- Filtered + paginated data ----
   const filteredMarks = useMemo(() => {
@@ -224,9 +225,16 @@ export default function Customization() {
       if (filterCategory !== 'all' && item.category !== filterCategory) return false;
       if (filterType === 'merit' && item.cost <= 0) return false;
       if (filterType === 'flaw' && item.cost >= 0) return false;
+      if (filterSourcebook !== 'all' && (item.sourcebook || '') !== filterSourcebook) return false;
       return true;
     });
-  }, [items, searchQuery, filterSystem, filterCategory, filterType]);
+  }, [items, searchQuery, filterSystem, filterCategory, filterType, filterSourcebook]);
+
+  const availableSourcebooks = useMemo(() => {
+    const books = new Set<string>();
+    items.forEach((item) => { if (item.sourcebook) books.add(item.sourcebook); });
+    return Array.from(books).sort();
+  }, [items]);
 
   const currentItems = activeTab === 'marks' ? filteredMarks : filteredMeritsFlaws;
   const totalPages = Math.max(1, Math.ceil(currentItems.length / ITEMS_PER_PAGE));
@@ -498,6 +506,20 @@ export default function Customization() {
                     <SelectItem value="flaw">{t.meritsFlaws.flawsOnly}</SelectItem>
                   </SelectContent>
                 </Select>
+
+                {availableSourcebooks.length > 0 && (
+                  <Select value={filterSourcebook} onValueChange={setFilterSourcebook}>
+                    <SelectTrigger className="w-[220px] font-body text-sm h-9">
+                      <SelectValue placeholder={t.meritsFlaws.filterBySourcebook} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t.meritsFlaws.allSourcebooks}</SelectItem>
+                      {availableSourcebooks.map((book) => (
+                        <SelectItem key={book} value={book}>{book}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
               </>
             )}
 
