@@ -438,32 +438,6 @@ export default function Customization() {
       {/* Tabs + Search + Filters */}
       <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-[65px] z-40">
         <div className="container mx-auto px-4 py-3 space-y-3">
-          {/* Tabs */}
-          <div className="flex gap-1 p-1 rounded-xl bg-muted/40 border border-border/50 w-full sm:w-auto">
-            <button
-              onClick={() => setActiveTab('merits_flaws')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medieval text-sm transition-all duration-200 flex-1 sm:flex-auto justify-center ${
-                activeTab === 'merits_flaws'
-                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-              }`}
-            >
-              <Star className="w-4 h-4" />
-              {t.meritsFlaws.title}
-            </button>
-            <button
-              onClick={() => setActiveTab('marks')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medieval text-sm transition-all duration-200 flex-1 sm:flex-auto justify-center ${
-                activeTab === 'marks'
-                  ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
-              }`}
-            >
-              <Scroll className="w-4 h-4" />
-              {t.marks.tabMarks}
-            </button>
-          </div>
-
           {/* Search */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -477,6 +451,16 @@ export default function Customization() {
 
           {/* Filters */}
           <div className="flex flex-wrap gap-2">
+            <Select value={activeTab} onValueChange={(v) => setActiveTab(v as ActiveTab)}>
+              <SelectTrigger className="w-[220px] font-body text-sm h-9">
+                <SelectValue placeholder={t.customization.filterByContent} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="merits_flaws">{t.customization.onlyMeritsFlaws}</SelectItem>
+                <SelectItem value="marks">{t.customization.onlyMarks}</SelectItem>
+              </SelectContent>
+            </Select>
+
             {activeTab === 'merits_flaws' && (
               <>
                 <Select value={filterSystem} onValueChange={setFilterSystem}>

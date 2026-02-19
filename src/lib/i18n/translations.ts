@@ -951,6 +951,10 @@ export const translations = {
       allAttributes: 'Todos os atributos',
       results: 'resultado(s)',
       page: 'Página',
+      filterByContent: 'Tipo de conteúdo',
+      allContent: 'Todos',
+      onlyMeritsFlaws: 'Vantagens & Desvantagens',
+      onlyMarks: 'Marcas',
     },
   },
 
@@ -1904,6 +1908,10 @@ export const translations = {
       allAttributes: 'All attributes',
       results: 'result(s)',
       page: 'Page',
+      filterByContent: 'Content type',
+      allContent: 'All',
+      onlyMeritsFlaws: 'Merits & Flaws',
+      onlyMarks: 'Marks',
     },
   },
 } as const;
