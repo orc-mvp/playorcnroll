@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -358,6 +358,7 @@ export function EditVampiroCharacterModal({
   const [concept, setConcept] = useState(character.concept || '');
   const [vampiroData, setVampiroData] = useState<VampiroData>(character.vampiro_data || {});
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState('basic');
   const [availableMeritsFlaws, setAvailableMeritsFlaws] = useState<{ id: string; name: string; description: string; cost: number; category: string; prerequisites: string | null }[]>([]);
 
   // Reset form when character changes
@@ -534,38 +535,58 @@ export function EditVampiroCharacterModal({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs defaultValue="basic" className="flex-1 flex flex-col min-h-0">
-          <TabsList className="grid w-full grid-cols-7 shrink-0">
-            <TabsTrigger value="basic" className="font-medieval text-xs px-1">
-              <User className="w-3 h-3 mr-1" />
-              <span className="hidden sm:inline">{t.editVampiro.tabBasic}</span>
-            </TabsTrigger>
-            <TabsTrigger value="attributes" className="font-medieval text-xs px-1">
-              <Shield className="w-3 h-3 mr-1" />
-              <span className="hidden sm:inline">{t.editVampiro.tabAttributes}</span>
-            </TabsTrigger>
-            <TabsTrigger value="abilities" className="font-medieval text-xs px-1">
-              <Brain className="w-3 h-3 mr-1" />
-              <span className="hidden sm:inline">{t.editVampiro.tabAbilities}</span>
-            </TabsTrigger>
-            <TabsTrigger value="disciplines" className="font-medieval text-xs px-1">
-              <Star className="w-3 h-3 mr-1" />
-              <span className="hidden sm:inline">{t.editVampiro.tabDisciplines}</span>
-            </TabsTrigger>
-            <TabsTrigger value="backgrounds" className="font-medieval text-xs px-1">
-              <BookOpen className="w-3 h-3 mr-1" />
-              <span className="hidden sm:inline">{t.editVampiro.tabBackgrounds}</span>
-            </TabsTrigger>
-            <TabsTrigger value="meritsflaws" className="font-medieval text-xs px-1">
-              <Sparkles className="w-3 h-3 mr-1" />
-              <span className="hidden sm:inline">{t.meritsFlaws.title}</span>
-            </TabsTrigger>
-            <TabsTrigger value="virtues" className="font-medieval text-xs px-1">
-              <Heart className="w-3 h-3 mr-1" />
-              <span className="hidden sm:inline">{t.editVampiro.tabVirtues}</span>
-            </TabsTrigger>
-          </TabsList>
+        <div className="flex-1 flex flex-col min-h-0">
+          <Select value={activeTab} onValueChange={setActiveTab}>
+            <SelectTrigger className="w-full font-medieval shrink-0">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="basic">
+                <div className="flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  {t.editVampiro.tabBasic}
+                </div>
+              </SelectItem>
+              <SelectItem value="attributes">
+                <div className="flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  {t.editVampiro.tabAttributes}
+                </div>
+              </SelectItem>
+              <SelectItem value="abilities">
+                <div className="flex items-center gap-2">
+                  <Brain className="w-4 h-4" />
+                  {t.editVampiro.tabAbilities}
+                </div>
+              </SelectItem>
+              <SelectItem value="disciplines">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4" />
+                  {t.editVampiro.tabDisciplines}
+                </div>
+              </SelectItem>
+              <SelectItem value="backgrounds">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-4 h-4" />
+                  {t.editVampiro.tabBackgrounds}
+                </div>
+              </SelectItem>
+              <SelectItem value="meritsflaws">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  {t.meritsFlaws.title}
+                </div>
+              </SelectItem>
+              <SelectItem value="virtues">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-4 h-4" />
+                  {t.editVampiro.tabVirtues}
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
 
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 mt-4 min-h-0">
               {/* Basic Info Tab */}
               <TabsContent value="basic" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
@@ -1050,6 +1071,7 @@ export function EditVampiroCharacterModal({
               </TabsContent>
           </div>
         </Tabs>
+        </div>
 
         <DialogFooter className="gap-2 sm:gap-0 shrink-0 pt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
