@@ -137,6 +137,48 @@ export type Database = {
           },
         ]
       }
+      merits_flaws: {
+        Row: {
+          category: string
+          cost: number
+          created_at: string
+          created_by: string
+          description: string
+          game_systems: string[]
+          id: string
+          name: string
+          prerequisites: string | null
+          sourcebook: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          cost?: number
+          created_at?: string
+          created_by: string
+          description?: string
+          game_systems?: string[]
+          id?: string
+          name: string
+          prerequisites?: string | null
+          sourcebook?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          cost?: number
+          created_at?: string
+          created_by?: string
+          description?: string
+          game_systems?: string[]
+          id?: string
+          name?: string
+          prerequisites?: string | null
+          sourcebook?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       minor_marks: {
         Row: {
           attribute: string
