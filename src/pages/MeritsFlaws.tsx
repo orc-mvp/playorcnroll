@@ -108,7 +108,6 @@ export default function MeritsFlaws() {
       const { data, error } = await supabase
         .from('merits_flaws')
         .select('*')
-        .eq('created_by', user.id)
         .order('category')
         .order('cost', { ascending: false })
         .order('name');
@@ -421,19 +420,21 @@ export default function MeritsFlaws() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-1 shrink-0">
-                        <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => setDeleteTarget(item)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
+                      {item.created_by === user?.id && (
+                        <div className="flex items-center gap-1 shrink-0">
+                          <Button variant="ghost" size="icon" onClick={() => openEditModal(item)}>
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setDeleteTarget(item)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
