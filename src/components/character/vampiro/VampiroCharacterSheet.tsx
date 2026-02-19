@@ -54,6 +54,7 @@ interface VampiroData {
   willpower?: number;
   disciplines?: Record<string, number>;
   backgrounds?: Record<string, number>;
+  merits_flaws?: { id: string; name: string; cost: number; category: string }[];
 }
 
 interface VampiroCharacterSheetProps {
@@ -522,6 +523,83 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
           </CardContent>
         </Card>
       </div>
+
+      {/* Merits & Flaws */}
+      {(() => {
+        const meritsFlaws = data.merits_flaws || [];
+        if (meritsFlaws.length === 0) return null;
+        
+        const merits = meritsFlaws.filter((m: any) => m.cost > 0);
+        const flaws = meritsFlaws.filter((m: any) => m.cost <= 0);
+        const categoryLabel = (cat: string) =>
+          (t.meritsFlaws[cat as keyof typeof t.meritsFlaws] as string) || cat;
+
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Merits */}
+            <Card className="medieval-card">
+              <CardHeader className="pb-3">
+                <CardTitle className="font-medieval flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-green-500" />
+                  {t.meritsFlaws.merit}{lang === 'pt' ? 's' : 's'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {merits.length > 0 ? (
+                  <div className="space-y-2">
+                    {merits.map((m: any) => (
+                      <div key={m.id} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="font-body">{m.name}</span>
+                          <Badge variant="secondary" className="text-[10px]">{categoryLabel(m.category)}</Badge>
+                        </div>
+                        <Badge variant="outline" className="border-green-500/50 text-green-500 text-xs">
+                          +{m.cost} {t.meritsFlaws.points}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-4 text-sm font-body">
+                    {t.common.none}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Flaws */}
+            <Card className="medieval-card">
+              <CardHeader className="pb-3">
+                <CardTitle className="font-medieval flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-red-500" />
+                  {t.meritsFlaws.flaw}{lang === 'pt' ? 's' : 's'}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {flaws.length > 0 ? (
+                  <div className="space-y-2">
+                    {flaws.map((m: any) => (
+                      <div key={m.id} className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          <span className="font-body">{m.name}</span>
+                          <Badge variant="secondary" className="text-[10px]">{categoryLabel(m.category)}</Badge>
+                        </div>
+                        <Badge variant="outline" className="border-red-500/50 text-red-500 text-xs">
+                          {m.cost} {t.meritsFlaws.points}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-center py-4 text-sm font-body">
+                    {t.common.none}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        );
+      })()}
 
       {/* Virtues, Humanity & Willpower */}
       <Card className="medieval-card">
