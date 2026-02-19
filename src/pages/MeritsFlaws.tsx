@@ -519,7 +519,7 @@ export default function MeritsFlaws() {
                 onChange={(e) => setFormDescription(e.target.value)}
                 placeholder={t.meritsFlaws.descriptionPlaceholder}
                 className="font-body min-h-[80px] resize-none"
-                maxLength={1000}
+                maxLength={2000}
               />
             </div>
 

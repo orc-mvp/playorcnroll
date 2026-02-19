@@ -731,11 +731,11 @@ export default function Customization() {
             </div>
             <div className="space-y-2">
               <Label className="font-medieval">{t.marks.description} *</Label>
-              <Textarea value={markFormDescription} onChange={(e) => setMarkFormDescription(e.target.value)} placeholder={t.customMarks.descriptionPlaceholder} className="font-body min-h-[80px] resize-none" maxLength={500} />
+              <Textarea value={markFormDescription} onChange={(e) => setMarkFormDescription(e.target.value)} placeholder={t.customMarks.descriptionPlaceholder} className="font-body min-h-[80px] resize-none" maxLength={1000} />
             </div>
             <div className="space-y-2">
               <Label className="font-medieval">{t.marks.effect} *</Label>
-              <Textarea value={markFormEffect} onChange={(e) => setMarkFormEffect(e.target.value)} placeholder={t.customMarks.effectPlaceholder} className="font-body min-h-[80px] resize-none" maxLength={500} />
+              <Textarea value={markFormEffect} onChange={(e) => setMarkFormEffect(e.target.value)} placeholder={t.customMarks.effectPlaceholder} className="font-body min-h-[80px] resize-none" maxLength={1000} />
             </div>
           </div>
           <DialogFooter>
@@ -778,7 +778,7 @@ export default function Customization() {
             </div>
             <div className="space-y-2">
               <Label className="font-medieval">{t.meritsFlaws.description} *</Label>
-              <Textarea value={formDescription} onChange={(e) => setFormDescription(e.target.value)} placeholder={t.meritsFlaws.descriptionPlaceholder} className="font-body min-h-[80px] resize-none" maxLength={1000} />
+              <Textarea value={formDescription} onChange={(e) => setFormDescription(e.target.value)} placeholder={t.meritsFlaws.descriptionPlaceholder} className="font-body min-h-[80px] resize-none" maxLength={2000} />
             </div>
             <div className="space-y-2">
               <Label className="font-medieval">{t.meritsFlaws.prerequisites}</Label>

@@ -476,7 +476,7 @@ export default function CustomMarks() {
                 onChange={(e) => setFormDescription(e.target.value)}
                 placeholder={t.customMarks.descriptionPlaceholder}
                 className="font-body min-h-[80px] resize-none"
-                maxLength={500}
+maxLength={1000}
               />
             </div>
 
@@ -491,7 +491,7 @@ export default function CustomMarks() {
                 onChange={(e) => setFormEffect(e.target.value)}
                 placeholder={t.customMarks.effectPlaceholder}
                 className="font-body min-h-[80px] resize-none"
-                maxLength={500}
+                maxLength={1000}
               />
             </div>
           </div>
