@@ -21,6 +21,7 @@ import {
   Flame,
   Star,
 } from 'lucide-react';
+import { toTitleCase } from '@/lib/textUtils';
 
 interface VampiroData {
   player?: string;
@@ -550,7 +551,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
                     {merits.map((m: any) => (
                       <div key={m.id} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
-                          <span className="font-body">{m.name}</span>
+                          <span className="font-body">{toTitleCase(m.name)}</span>
                           <Badge variant="secondary" className="text-[10px]">{categoryLabel(m.category)}</Badge>
                         </div>
                         <Badge variant="outline" className="border-green-500/50 text-green-500 text-xs">
@@ -581,7 +582,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
                     {flaws.map((m: any) => (
                       <div key={m.id} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
-                          <span className="font-body">{m.name}</span>
+                          <span className="font-body">{toTitleCase(m.name)}</span>
                           <Badge variant="secondary" className="text-[10px]">{categoryLabel(m.category)}</Badge>
                         </div>
                         <Badge variant="outline" className="border-red-500/50 text-red-500 text-xs">

@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Star, Loader2 } from 'lucide-react';
 import { VampiroFormData } from './StepVampiroBasicInfo';
+import { toTitleCase } from '@/lib/textUtils';
 
 interface MeritFlawItem {
   id: string;
@@ -152,7 +153,7 @@ export default function StepVampiroMeritsFlaws({ formData, updateFormData }: Ste
                             />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-medieval text-sm">{item.name}</span>
+                                <span className="font-medieval text-sm">{toTitleCase(item.name)}</span>
                                 <Badge
                                   variant="outline"
                                   className={`text-xs ${

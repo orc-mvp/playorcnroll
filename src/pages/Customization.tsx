@@ -63,6 +63,7 @@ import {
   Flame,
 } from 'lucide-react';
 import { GAME_SYSTEMS } from '@/lib/gameSystems';
+import { toTitleCase } from '@/lib/textUtils';
 
 // ---- Types ----
 
@@ -605,7 +606,7 @@ export default function Customization() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1 flex-wrap">
-                              <h3 className="font-medieval text-base">{item.name}</h3>
+                              <h3 className="font-medieval text-base">{toTitleCase(item.name)}</h3>
                               <Badge variant="outline" className={isMerit ? 'border-green-500/50 text-green-500' : 'border-red-500/50 text-red-500'}>
                                 {isMerit ? '+' : ''}{item.cost} {t.meritsFlaws.points}
                               </Badge>
