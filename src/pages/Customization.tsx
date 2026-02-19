@@ -612,7 +612,7 @@ export default function Customization() {
                               </Badge>
                               <Badge variant="secondary" className="text-xs">{categoryLabel(item.category)}</Badge>
                             </div>
-                            <p className="text-sm text-muted-foreground font-body mb-1 line-clamp-2">{item.description}</p>
+                            <p className="text-sm text-muted-foreground font-body mb-1">{item.description}</p>
                             {item.prerequisites && (
                               <p className="text-xs text-muted-foreground/70 font-body italic">
                                 {t.meritsFlaws.prerequisites}: {item.prerequisites}
