@@ -43,6 +43,7 @@ const App = () => (
             <Route path="/customization" element={<Customization />} />
             <Route path="/marks" element={<Customization />} />
             <Route path="/merits-flaws" element={<Customization />} />
+            <Route path="/features" element={<Customization />} />
             <Route path="/session/:sessionId/lobby" element={<SessionLobby />} />
             <Route path="/session/:sessionId" element={<Session />} />
             <Route path="/session/vampire/:sessionId" element={<VampireSession />} />
