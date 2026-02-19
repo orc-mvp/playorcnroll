@@ -322,7 +322,7 @@ export default function CustomMarks() {
       </header>
 
         {/* Sub-navigation */}
-        <div className="container mx-auto px-4 py-3 flex gap-2">
+        <div className="container mx-auto px-4 py-3 flex gap-2 border-b border-border bg-card/50 backdrop-blur-sm sticky top-[65px] z-40">
           <Button variant="default" size="sm" className="font-medieval">
             <Scroll className="w-4 h-4 mr-1" />
             {t.marks.tabMarks}

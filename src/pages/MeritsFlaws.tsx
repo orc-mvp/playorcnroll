@@ -40,6 +40,7 @@ import {
   ArrowLeft,
   Plus,
   Star,
+  Scroll,
   Trash2,
   Pencil,
   Loader2,
@@ -272,14 +273,14 @@ export default function MeritsFlaws() {
               variant="ghost"
               size="icon"
               className="shrink-0"
-              onClick={() => navigate('/marks')}
+              onClick={() => navigate('/dashboard')}
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
             <div className="flex items-center gap-2 min-w-0">
               <Star className="w-5 h-5 text-primary shrink-0" />
               <h1 className="font-medieval text-lg sm:text-xl md:text-2xl text-foreground truncate">
-                {t.meritsFlaws.title}
+                {t.marks.createCustom}
               </h1>
             </div>
           </div>
@@ -291,7 +292,22 @@ export default function MeritsFlaws() {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* Sub-navigation */}
+      <div className="container mx-auto px-4 py-3 flex gap-2 border-b border-border bg-card/50 backdrop-blur-sm sticky top-[65px] z-40">
+        <Button
+          variant="outline"
+          size="sm"
+          className="font-medieval"
+          onClick={() => navigate('/marks')}
+        >
+          <Scroll className="w-4 h-4 mr-1" />
+          {t.marks.tabMarks}
+        </Button>
+        <Button variant="default" size="sm" className="font-medieval">
+          <Star className="w-4 h-4 mr-1" />
+          {t.meritsFlaws.title}
+        </Button>
+      </div>
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Filters */}
         {items.length > 0 && (
