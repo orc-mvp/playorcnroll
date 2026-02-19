@@ -325,7 +325,7 @@ export default function CustomMarks() {
         <div className="container mx-auto px-4 py-3 flex gap-2">
           <Button variant="default" size="sm" className="font-medieval">
             <Scroll className="w-4 h-4 mr-1" />
-            {t.marks.createCustom}
+            {t.marks.tabMarks}
           </Button>
           <Button
             variant="outline"
