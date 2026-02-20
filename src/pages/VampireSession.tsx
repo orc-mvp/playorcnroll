@@ -103,6 +103,7 @@ interface Participant {
   session_willpower_current?: number;
   session_health_damage?: boolean[];
   experience_points?: number;
+  sheet_locked?: boolean;
   character?: {
     id: string;
     name: string;
@@ -640,7 +641,7 @@ export default function VampireSession() {
                     onEventCreated={handleLocalEvent}
                   />
                 ) : (
-                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} />
+                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} sheetLocked={myParticipant?.sheet_locked ?? true} />
                 )}
               </div>
             </TabsContent>
@@ -708,7 +709,7 @@ export default function VampireSession() {
                       onTestComplete={() => {}}
                     />
                   )}
-                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} />
+                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} sheetLocked={myParticipant?.sheet_locked ?? true} />
                 </div>
               )}
             </ScrollArea>
@@ -977,7 +978,7 @@ function VampireScenePanel({
 // VampireNarratorPanel was replaced by VampireNarratorSidebar component
 
 // Vampire Player Panel Component
-function VampirePlayerPanel({ character, sessionTrackers, experiencePoints }: { character: Participant['character']; sessionTrackers?: { bloodPool?: number; willpower?: number; healthDamage?: boolean[] }; experiencePoints?: number }) {
+function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, sheetLocked = true }: { character: Participant['character']; sessionTrackers?: { bloodPool?: number; willpower?: number; healthDamage?: boolean[] }; experiencePoints?: number; sheetLocked?: boolean }) {
   const { t, language } = useI18n();
   const vampiroData = character?.vampiro_data;
   const [showSheet, setShowSheet] = useState(false);
@@ -1115,7 +1116,7 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints }: { 
                 }}
                 sessionTrackers={sessionTrackers}
                 experiencePoints={experiencePoints}
-                readOnly
+                readOnly={sheetLocked}
               />
             )}
           </div>
