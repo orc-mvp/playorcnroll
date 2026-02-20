@@ -469,16 +469,6 @@ export default function Customization() {
 
           {/* Filters */}
           <div className="flex flex-wrap gap-2">
-            <Select value={activeTab} onValueChange={(v) => setActiveTab(v as ActiveTab)}>
-              <SelectTrigger className="w-[220px] font-body text-sm h-9">
-                <SelectValue placeholder={t.customization.filterByContent} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="merits_flaws">{t.customization.onlyMeritsFlaws}</SelectItem>
-                <SelectItem value="marks">{t.customization.onlyMarks}</SelectItem>
-              </SelectContent>
-            </Select>
-
             {activeTab === 'merits_flaws' && (
               <>
                 <Select value={filterSystem} onValueChange={setFilterSystem}>
