@@ -221,7 +221,7 @@ export default function CharacterSheet() {
                 // Check if character is in an active session with sheet locked
                 const { data: lockedData } = await supabase
                   .from('session_participants')
-                  .select('id, session_id, sessions:session_id (status)')
+                  .select('id, session_id, sheet_locked, sessions:session_id (status)')
                   .eq('character_id', character.id) as any;
 
                 const isLocked = lockedData?.some((p: any) => {
