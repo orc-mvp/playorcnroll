@@ -119,7 +119,7 @@ export default function Customization() {
   const { t, language } = useI18n();
   const { toast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>('merits_flaws');
+  // activeTab is now derived from filterSystem (no longer state)
 
   // ---- Marks state ----
   const [marks, setMarks] = useState<CustomMark[]>([]);
@@ -154,6 +154,9 @@ export default function Customization() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSystem, setFilterSystem] = useState<string>('all');
+
+  // Auto-switch content type based on system
+  const activeTab: ActiveTab = filterSystem === 'herois_marcados' ? 'marks' : 'merits_flaws';
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterAttribute, setFilterAttribute] = useState<string>('all');
@@ -469,20 +472,21 @@ export default function Customization() {
 
           {/* Filters */}
           <div className="flex flex-wrap gap-2">
+            {/* System filter — always visible */}
+            <Select value={filterSystem} onValueChange={setFilterSystem}>
+              <SelectTrigger className="w-[180px] font-body text-sm h-9">
+                <SelectValue placeholder={t.meritsFlaws.filterBySystem} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t.meritsFlaws.allSystems}</SelectItem>
+                {GAME_SYSTEMS.filter((s) => s.available).map((sys) => (
+                  <SelectItem key={sys.id} value={sys.id}>{sys.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             {activeTab === 'merits_flaws' && (
               <>
-                <Select value={filterSystem} onValueChange={setFilterSystem}>
-                  <SelectTrigger className="w-[180px] font-body text-sm h-9">
-                    <SelectValue placeholder={t.meritsFlaws.filterBySystem} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t.meritsFlaws.allSystems}</SelectItem>
-                    {GAME_SYSTEMS.filter((s) => s.available).map((sys) => (
-                      <SelectItem key={sys.id} value={sys.id}>{sys.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-
                 <Select value={filterCategory} onValueChange={setFilterCategory}>
                   <SelectTrigger className="w-[180px] font-body text-sm h-9">
                     <SelectValue placeholder={t.meritsFlaws.filterByCategory} />
