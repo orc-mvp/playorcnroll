@@ -158,6 +158,7 @@ export default function Customization() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterAttribute, setFilterAttribute] = useState<string>('all');
   const [filterSourcebook, setFilterSourcebook] = useState<string>('all');
+  const [filterCost, setFilterCost] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
 
   // ---- Auth redirect ----
@@ -199,7 +200,7 @@ export default function Customization() {
   // Reset page on filter/tab change
   useEffect(() => {
     setCurrentPage(1);
-  }, [activeTab, searchQuery, filterSystem, filterCategory, filterType, filterAttribute, filterSourcebook]);
+  }, [activeTab, searchQuery, filterSystem, filterCategory, filterType, filterAttribute, filterSourcebook, filterCost]);
 
   // ---- Filtered + paginated data ----
   const filteredMarks = useMemo(() => {
@@ -226,9 +227,18 @@ export default function Customization() {
       if (filterType === 'merit' && item.cost <= 0) return false;
       if (filterType === 'flaw' && item.cost >= 0) return false;
       if (filterSourcebook !== 'all' && (item.sourcebook || '') !== filterSourcebook) return false;
+      if (filterCost !== 'all') {
+        const costNum = Math.abs(item.cost);
+        if (filterCost === '1' && costNum !== 1) return false;
+        if (filterCost === '2' && costNum !== 2) return false;
+        if (filterCost === '3' && costNum !== 3) return false;
+        if (filterCost === '4' && costNum !== 4) return false;
+        if (filterCost === '5' && costNum !== 5) return false;
+        if (filterCost === '6+' && costNum < 6) return false;
+      }
       return true;
     });
-  }, [items, searchQuery, filterSystem, filterCategory, filterType, filterSourcebook]);
+  }, [items, searchQuery, filterSystem, filterCategory, filterType, filterSourcebook, filterCost]);
 
   const availableSourcebooks = useMemo(() => {
     const books = new Set<string>();
@@ -504,6 +514,21 @@ export default function Customization() {
                     <SelectItem value="all">{t.meritsFlaws.allTypes}</SelectItem>
                     <SelectItem value="merit">{t.meritsFlaws.meritsOnly}</SelectItem>
                     <SelectItem value="flaw">{t.meritsFlaws.flawsOnly}</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Select value={filterCost} onValueChange={setFilterCost}>
+                  <SelectTrigger className="w-[180px] font-body text-sm h-9">
+                    <SelectValue placeholder={t.customization.filterByCost} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t.customization.allCosts}</SelectItem>
+                    <SelectItem value="1">1 {t.meritsFlaws.points}</SelectItem>
+                    <SelectItem value="2">2 {t.meritsFlaws.points}</SelectItem>
+                    <SelectItem value="3">3 {t.meritsFlaws.points}</SelectItem>
+                    <SelectItem value="4">4 {t.meritsFlaws.points}</SelectItem>
+                    <SelectItem value="5">5 {t.meritsFlaws.points}</SelectItem>
+                    <SelectItem value="6+">6+ {t.meritsFlaws.points}</SelectItem>
                   </SelectContent>
                 </Select>
 

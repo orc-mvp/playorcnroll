@@ -957,6 +957,8 @@ export const translations = {
       allContent: 'Todos',
       onlyMeritsFlaws: 'Vantagens & Desvantagens',
       onlyMarks: 'Marcas',
+      filterByCost: 'Filtrar por pontos',
+      allCosts: 'Todos os pontos',
     },
   },
 
@@ -1916,6 +1918,8 @@ export const translations = {
       allContent: 'All',
       onlyMeritsFlaws: 'Merits & Flaws',
       onlyMarks: 'Marks',
+      filterByCost: 'Filter by points',
+      allCosts: 'All points',
     },
   },
 } as const;
