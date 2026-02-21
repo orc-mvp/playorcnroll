@@ -946,6 +946,8 @@ export function EditVampiroCharacterModal({
                   {(() => {
                     const selectedMF = (vampiroData.merits_flaws || []) as { id: string; name: string; cost: number; category: string }[];
                     const totalCost = selectedMF.reduce((s, m) => s + m.cost, 0);
+                    const freebiePoints = 15;
+                    const remaining = freebiePoints - totalCost;
                     const categoryLabelFn = (cat: string) =>
                       (t.meritsFlaws[cat as keyof typeof t.meritsFlaws] as string) || cat;
 
@@ -960,9 +962,9 @@ export function EditVampiroCharacterModal({
                     return (
                       <>
                         <div className="flex items-center justify-center gap-3 p-2 rounded-lg bg-muted/30 border border-border">
-                          <span className="font-medieval text-xs">{language === 'pt-BR' ? 'Balanço' : 'Balance'}:</span>
-                          <Badge variant="outline" className={`text-xs ${totalCost > 0 ? 'border-green-500/50 text-green-500' : totalCost < 0 ? 'border-red-500/50 text-red-500' : ''}`}>
-                            {totalCost > 0 ? '+' : ''}{totalCost} {t.meritsFlaws.points}
+                          <span className="font-medieval text-xs">{t.meritsFlaws.freebiePoints}:</span>
+                          <Badge variant="outline" className={`text-xs ${remaining >= 0 ? 'border-green-500/50 text-green-500' : 'border-red-500/50 text-red-500'}`}>
+                            {remaining} {t.meritsFlaws.freebieRemaining} ({t.meritsFlaws.freebieTotal} {freebiePoints})
                           </Badge>
                         </div>
                         {availableMeritsFlaws.length === 0 ? (

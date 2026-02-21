@@ -543,6 +543,54 @@ export type Database = {
           },
         ]
       }
+      xp_log: {
+        Row: {
+          amount: number
+          character_id: string
+          created_at: string
+          id: string
+          narrator_id: string
+          narrator_name: string
+          note: string | null
+          session_id: string | null
+        }
+        Insert: {
+          amount: number
+          character_id: string
+          created_at?: string
+          id?: string
+          narrator_id: string
+          narrator_name: string
+          note?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          amount?: number
+          character_id?: string
+          created_at?: string
+          id?: string
+          narrator_id?: string
+          narrator_name?: string
+          note?: string | null
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "xp_log_character_id_fkey"
+            columns: ["character_id"]
+            isOneToOne: false
+            referencedRelation: "characters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "xp_log_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
