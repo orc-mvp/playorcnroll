@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { getDisciplineLabel as getDisciplineLabelFromI18n } from '@/lib/vampiro/disciplineLabels';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
@@ -516,11 +517,7 @@ export function EditVampiroCharacterModal({
     courage: 1,
   };
 
-  const getDisciplineLabel = (key: string) => {
-    const info = DISCIPLINE_MAP[key];
-    if (!info) return key;
-    return language === 'pt-BR' ? info.labelPt : info.labelEn;
-  };
+  const getDisciplineLabel = (key: string) => getDisciplineLabelFromI18n(key, language, t);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

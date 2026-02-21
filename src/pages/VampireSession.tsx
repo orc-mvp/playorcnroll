@@ -1009,7 +1009,7 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, shee
                   value > 0 ? (
                     <div key={key} className="flex items-center justify-between text-sm">
                       <span className="font-body capitalize">
-                        {getDisciplineLabel(key, language)}
+                        {getDisciplineLabel(key, language, t)}
                       </span>
                       <div className="flex gap-0.5">
                         {Array.from({ length: 5 }, (_, i) => (
