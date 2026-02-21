@@ -104,6 +104,26 @@ export default function MyCharacters() {
 
     setDeleting(true);
     try {
+      // Check if character is in any active session
+      const { data: activeParticipations } = await supabase
+        .from('session_participants')
+        .select('id, session_id, sessions!inner(status)')
+        .eq('character_id', deleteTarget.id);
+
+      const inActiveSession = activeParticipations?.some(
+        (p: any) => p.sessions?.status !== 'ended'
+      );
+
+      if (inActiveSession) {
+        toast({
+          title: t.myCharacters.cannotDeleteInSession,
+          variant: 'destructive',
+        });
+        setDeleting(false);
+        setDeleteTarget(null);
+        return;
+      }
+
       const { error } = await supabase
         .from('characters')
         .delete()
