@@ -41,6 +41,7 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
+import { getDisciplineLabel } from '@/lib/vampiro/disciplineLabels';
 import {
   Dialog,
   DialogContent,
@@ -1008,7 +1009,7 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, shee
                   value > 0 ? (
                     <div key={key} className="flex items-center justify-between text-sm">
                       <span className="font-body capitalize">
-                        {t.vampiro[key as keyof typeof t.vampiro] || key}
+                        {getDisciplineLabel(key, language)}
                       </span>
                       <div className="flex gap-0.5">
                         {Array.from({ length: 5 }, (_, i) => (
