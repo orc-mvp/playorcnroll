@@ -205,6 +205,8 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
   const [currentWillpower, setCurrentWillpower] = useState(sessionTrackers?.willpower ?? 0);
   const [healthDamage, setHealthDamage] = useState<boolean[]>(sessionTrackers?.healthDamage ?? Array(7).fill(false));
   const [xpLog, setXpLog] = useState<{ id: string; amount: number; narrator_name: string; note: string | null; created_at: string }[]>([]);
+  const [expandedMeritFlaw, setExpandedMeritFlaw] = useState<string | null>(null);
+  const [meritFlawDescriptions, setMeritFlawDescriptions] = useState<Record<string, { description: string; prerequisites: string | null }>>({});
 
   // Fetch XP log
   useEffect(() => {
@@ -566,6 +568,87 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
         const categoryLabel = (cat: string) =>
           (t.meritsFlaws[cat as keyof typeof t.meritsFlaws] as string) || cat;
 
+        // Group by category then sort alphabetically
+        const groupAndSort = (items: any[]) => {
+          const grouped: Record<string, any[]> = {};
+          items.forEach((m) => {
+            if (!grouped[m.category]) grouped[m.category] = [];
+            grouped[m.category].push(m);
+          });
+          // Sort categories alphabetically, then items within each category
+          return Object.entries(grouped)
+            .sort(([a], [b]) => categoryLabel(a).localeCompare(categoryLabel(b)))
+            .map(([cat, items]) => ({
+              category: cat,
+              items: items.sort((a: any, b: any) => a.name.localeCompare(b.name)),
+            }));
+        };
+
+        const MeritFlawItem = ({ m, isMerit }: { m: any; isMerit: boolean }) => {
+          const isExpanded = expandedMeritFlaw === m.id;
+          const desc = meritFlawDescriptions[m.id];
+          
+          return (
+            <div key={m.id}>
+              <button
+                type="button"
+                className="w-full flex items-center justify-between text-sm py-1.5 px-2 rounded-md hover:bg-muted/40 transition-colors text-left"
+                onClick={() => {
+                  if (isExpanded) {
+                    setExpandedMeritFlaw(null);
+                  } else {
+                    setExpandedMeritFlaw(m.id);
+                    // Fetch description if not cached
+                    if (!meritFlawDescriptions[m.id]) {
+                      supabase
+                        .from('merits_flaws')
+                        .select('description, prerequisites')
+                        .eq('id', m.id)
+                        .single()
+                        .then(({ data: mfData }) => {
+                          if (mfData) {
+                            setMeritFlawDescriptions((prev) => ({
+                              ...prev,
+                              [m.id]: { description: mfData.description, prerequisites: mfData.prerequisites },
+                            }));
+                          }
+                        });
+                    }
+                  }
+                }}
+              >
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <span className="font-body">{toTitleCase(m.name)}</span>
+                </div>
+                <Badge
+                  variant="outline"
+                  className={`text-xs shrink-0 ${
+                    isMerit
+                      ? 'border-green-500/50 text-green-500'
+                      : 'border-red-500/50 text-red-500'
+                  }`}
+                >
+                  {isMerit ? '+' : ''}{m.cost} {t.meritsFlaws.points}
+                </Badge>
+              </button>
+              {isExpanded && (
+                <div className="px-2 pb-2 text-xs text-muted-foreground font-body animate-in fade-in-0 slide-in-from-top-1 duration-200">
+                  {desc ? (
+                    <>
+                      <p>{desc.description}</p>
+                      {desc.prerequisites && (
+                        <p className="mt-1 italic">{t.meritsFlaws.prerequisites}: {desc.prerequisites}</p>
+                      )}
+                    </>
+                  ) : (
+                    <p>{t.common.loading}</p>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        };
+
         return (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Merits */}
@@ -578,16 +661,13 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
               </CardHeader>
               <CardContent>
                 {merits.length > 0 ? (
-                  <div className="space-y-2">
-                    {merits.map((m: any) => (
-                      <div key={m.id} className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="font-body">{toTitleCase(m.name)}</span>
-                          <Badge variant="secondary" className="text-[10px]">{categoryLabel(m.category)}</Badge>
+                  <div className="space-y-3">
+                    {groupAndSort(merits).map(({ category, items }) => (
+                      <div key={category}>
+                        <h5 className="font-medieval text-xs text-muted-foreground/70 mb-1">{categoryLabel(category)}</h5>
+                        <div className="space-y-0.5">
+                          {items.map((m: any) => <MeritFlawItem key={m.id} m={m} isMerit={true} />)}
                         </div>
-                        <Badge variant="outline" className="border-green-500/50 text-green-500 text-xs">
-                          +{m.cost} {t.meritsFlaws.points}
-                        </Badge>
                       </div>
                     ))}
                   </div>
@@ -609,16 +689,13 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
               </CardHeader>
               <CardContent>
                 {flaws.length > 0 ? (
-                  <div className="space-y-2">
-                    {flaws.map((m: any) => (
-                      <div key={m.id} className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="font-body">{toTitleCase(m.name)}</span>
-                          <Badge variant="secondary" className="text-[10px]">{categoryLabel(m.category)}</Badge>
+                  <div className="space-y-3">
+                    {groupAndSort(flaws).map(({ category, items }) => (
+                      <div key={category}>
+                        <h5 className="font-medieval text-xs text-muted-foreground/70 mb-1">{categoryLabel(category)}</h5>
+                        <div className="space-y-0.5">
+                          {items.map((m: any) => <MeritFlawItem key={m.id} m={m} isMerit={false} />)}
                         </div>
-                        <Badge variant="outline" className="border-red-500/50 text-red-500 text-xs">
-                          {m.cost} {t.meritsFlaws.points}
-                        </Badge>
                       </div>
                     ))}
                   </div>
