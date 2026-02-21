@@ -81,7 +81,7 @@ export default function VampireTestRequestModal({
   const [applyHealthPenalty, setApplyHealthPenalty] = useState<boolean>(false);
   const [isSpecialized, setIsSpecialized] = useState<boolean>(false);
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
-  const [selectAll, setSelectAll] = useState<boolean>(true);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
   const [contextOpen, setContextOpen] = useState<boolean>(false);
 
   // Filter participants with characters
@@ -123,17 +123,29 @@ export default function VampireTestRequestModal({
     setApplyHealthPenalty(false);
     setIsSpecialized(false);
     setSelectedPlayers([]);
-    setSelectAll(true);
+    setSelectAll(false);
     setContextOpen(false);
   };
 
   const togglePlayer = (characterId: string) => {
-    setSelectedPlayers(prev => 
-      prev.includes(characterId)
-        ? prev.filter(id => id !== characterId)
-        : [...prev, characterId]
-    );
-    setSelectAll(false);
+    if (selectAll) {
+      // Switching from "all" to individual: select everyone except the toggled one
+      const allIds = playersWithCharacters.map(p => p.character_id!).filter(Boolean);
+      setSelectedPlayers(allIds.filter(id => id !== characterId));
+      setSelectAll(false);
+    } else {
+      setSelectedPlayers(prev => {
+        const next = prev.includes(characterId)
+          ? prev.filter(id => id !== characterId)
+          : [...prev, characterId];
+        // If all are selected individually, switch to selectAll
+        if (next.length === playersWithCharacters.length) {
+          setSelectAll(true);
+          return [];
+        }
+        return next;
+      });
+    }
   };
 
   const isValid = () => {
@@ -387,46 +399,51 @@ export default function VampireTestRequestModal({
             </div>
           </div>
 
-          {/* Player Selection - Inline */}
+          {/* Player Selection - Toggle Buttons */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-muted-foreground" />
               <Label className="text-sm">{t.vampiroTests.selectPlayers}</Label>
             </div>
             
-            <div className="flex flex-wrap gap-2 items-center">
-              <div className="flex items-center gap-1.5">
-                <Checkbox
-                  id="all-players"
-                  checked={selectAll}
-                  onCheckedChange={(checked) => {
-                    setSelectAll(checked === true);
-                    if (checked) setSelectedPlayers([]);
-                  }}
-                />
-                <Label htmlFor="all-players" className="font-normal cursor-pointer text-sm">
-                  {t.vampiroTests.allPlayers}
-                </Label>
-                <Badge variant="secondary" className="text-xs h-5">
+            <div className="flex flex-wrap gap-1.5">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectAll(true);
+                  setSelectedPlayers([]);
+                }}
+                className={cn(
+                  "min-h-[44px] md:min-h-[36px] text-xs",
+                  selectAll && "bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30"
+                )}
+              >
+                {t.vampiroTests.allPlayers}
+                <Badge variant="secondary" className="ml-1.5 text-[10px] h-4 px-1">
                   {playersWithCharacters.length}
                 </Badge>
-              </div>
+              </Button>
 
-              {!selectAll && playersWithCharacters.map((p) => (
-                <div key={p.id} className="flex items-center gap-1.5">
-                  <Checkbox
-                    id={`player-${p.character_id}`}
-                    checked={selectedPlayers.includes(p.character_id!)}
-                    onCheckedChange={() => togglePlayer(p.character_id!)}
-                  />
-                  <Label 
-                    htmlFor={`player-${p.character_id}`} 
-                    className="font-normal cursor-pointer text-sm"
+              {playersWithCharacters.map((p) => {
+                const isSelected = selectAll || selectedPlayers.includes(p.character_id!);
+                return (
+                  <Button
+                    key={p.id}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => togglePlayer(p.character_id!)}
+                    className={cn(
+                      "min-h-[44px] md:min-h-[36px] text-xs",
+                      isSelected && "bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30"
+                    )}
                   >
                     {p.character?.name || 'Unknown'}
-                  </Label>
-                </div>
-              ))}
+                  </Button>
+                );
+              })}
             </div>
           </div>
         </div>
