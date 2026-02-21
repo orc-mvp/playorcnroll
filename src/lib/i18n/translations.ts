@@ -811,6 +811,7 @@ export const translations = {
       deleteConfirm: 'Tem certeza que deseja excluir {name}? Esta ação não pode ser desfeita. Todas as marcas, narrativas e progresso serão perdidos permanentemente.',
       characterDeleted: 'Personagem excluído',
       errorDeleting: 'Erro ao excluir',
+      cannotDeleteInSession: 'Este personagem está em uma sessão ativa. Fale com o narrador para removê-lo da sessão primeiro.',
       newShort: 'Novo',
     },
 
@@ -1787,6 +1788,7 @@ export const translations = {
       deleteConfirm: 'Are you sure you want to delete {name}? This action cannot be undone. All marks, narratives, and progress will be permanently lost.',
       characterDeleted: 'Character deleted',
       errorDeleting: 'Error deleting',
+      cannotDeleteInSession: 'This character is in an active session. Talk to the narrator to remove it from the session first.',
       newShort: 'New',
     },
 

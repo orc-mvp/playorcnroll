@@ -1,0 +1,1 @@
+ALTER TABLE public.session_participants ALTER COLUMN sheet_locked SET DEFAULT false;
