@@ -151,6 +151,13 @@ const getVampireEventConfig = (t: any) => ({
       return `${charName} - ${isBlood ? t.vampiro.bloodDepleted : t.vampiro.willpowerDepleted}`;
     },
   },
+  narrator_roll: {
+    icon: Dices,
+    color: 'text-destructive',
+    bgClass: 'bg-muted/30',
+    label: (data: Record<string, unknown>) =>
+      `${t.vampiroTests?.narratorRolled || 'Narrador rolou'}: ${data.dice_count}d10`,
+  },
   player_joined: {
     icon: UserPlus,
     color: 'text-green-500',
@@ -432,6 +439,73 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
     );
   };
 
+  // Render narrator roll
+  const renderNarratorRoll = (eventData: Record<string, unknown>) => {
+    const diceCount = eventData.dice_count as number;
+    const difficulty = eventData.difficulty as number;
+    const results = eventData.results as number[];
+    const finalSuccesses = eventData.final_successes as number;
+    const isBotch = eventData.is_botch as boolean;
+    const isExceptional = eventData.is_exceptional as boolean;
+    const context = eventData.context as string | undefined;
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <Dices className="w-4 h-4 text-destructive shrink-0" />
+          <span className="font-medieval text-sm">
+            {t.vampiroTests?.narratorRolled || 'Narrador rolou'}
+          </span>
+          <Badge variant="outline" className="text-xs">
+            {diceCount}d10 | {t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}
+          </Badge>
+        </div>
+
+        {context && (
+          <p className="text-xs text-muted-foreground italic">"{context}"</p>
+        )}
+
+        <div className="flex flex-wrap gap-1">
+          {results?.map((die, i) => (
+            <span
+              key={i}
+              className={cn(
+                "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+                die >= difficulty
+                  ? 'bg-green-500/20 text-green-500'
+                  : die === 1
+                    ? 'bg-destructive/20 text-destructive'
+                    : 'bg-muted text-muted-foreground'
+              )}
+            >
+              {die}
+            </span>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {isBotch ? (
+            <Badge variant="destructive" className="text-xs">
+              {t.vampiroTests?.botch || 'Falha Crítica'}
+            </Badge>
+          ) : isExceptional ? (
+            <Badge className="bg-yellow-500 text-xs">
+              {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}
+            </Badge>
+          ) : finalSuccesses > 0 ? (
+            <Badge variant="default" className="bg-green-600 text-xs">
+              {finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'}
+            </Badge>
+          ) : (
+            <Badge variant="secondary" className="text-xs">
+              {t.vampiroTests?.failure || 'Falha'}
+            </Badge>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   // Render event content based on type
   const renderEventContent = (event: SessionEvent) => {
     const { event_type, event_data } = event;
@@ -448,6 +522,8 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
         return renderTrackerChange(event_data);
       case 'critical_state':
         return renderCriticalState(event_data);
+      case 'narrator_roll':
+        return renderNarratorRoll(event_data);
       case 'player_joined':
         return (
           <div className="flex items-center gap-2">
