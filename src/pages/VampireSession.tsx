@@ -19,9 +19,7 @@ import { VampireEventFeed } from '@/components/session/vampire/VampireEventFeed'
 import { VampirePendingTest } from '@/components/session/vampire/VampirePendingTest';
 import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { VampireTrackers } from '@/components/session/vampire/VampireTrackers';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { UserMenu } from '@/components/UserMenu';
-import { SessionInfoModal } from '@/components/session/SessionInfoModal';
+import { SessionHeader } from '@/components/session/SessionHeader';
 import { ManagePlayersModal } from '@/components/session/vampire/ManagePlayersModal';
 import { 
   Moon, 
@@ -34,8 +32,6 @@ import {
   Droplets,
   Heart,
   Sparkles,
-  ChevronLeft,
-  Link,
   Plus,
   History,
   ChevronDown,
@@ -130,7 +126,6 @@ export default function VampireSession() {
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showInfoModal, setShowInfoModal] = useState(false);
   const [showManagePlayersModal, setShowManagePlayersModal] = useState(false);
 
   const isNarrator = session?.narrator_id === user?.id;
@@ -487,99 +482,15 @@ export default function VampireSession() {
   // Desktop layout
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Vampire Session Header */}
-      <header className="border-b border-destructive/20 bg-gradient-to-r from-destructive/10 to-background px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => navigate('/dashboard')}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </Button>
-            <button
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-              onClick={() => setShowInfoModal(true)}
-            >
-              <Moon className="w-6 h-6 text-destructive" />
-              <h1 className="font-medieval text-xl text-foreground underline-offset-4 hover:underline decoration-destructive/30">{session.name}</h1>
-            </button>
-            <Badge variant="outline" className="border-destructive/30 text-destructive">
-              Vampiro: A Máscara
-            </Badge>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {/* Participants count - clickable for narrator */}
-            {isNarrator ? (
-              <button
-                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setShowManagePlayersModal(true)}
-              >
-                <Users className="w-4 h-4" />
-                <span className="underline-offset-4 hover:underline">{participants.length} {t.vampireSession.players}</span>
-              </button>
-            ) : (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Users className="w-4 h-4" />
-                <span>{participants.length} {t.vampireSession.players}</span>
-              </div>
-            )}
-
-
-            {/* Actions */}
-            {isNarrator && (
-              <div className="flex items-center gap-2">
-                {/* Invite Code Badge */}
-                <Badge variant="outline" className="font-mono text-xs border-destructive/30">
-                  {session.invite_code}
-                </Badge>
-                
-                {/* Copy Link Button */}
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => {
-                          const url = `${window.location.origin}/join/${session.invite_code}`;
-                          navigator.clipboard.writeText(url);
-                          toast({ title: t.vampireSession.linkCopied });
-                        }}
-                      >
-                        <Link className="w-4 h-4" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>{t.vampireSession.copyInviteLink}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            )}
-
-            <UserMenu extraItems={[
-              isNarrator
-                ? {
-                    label: t.vampireSession.endSession,
-                    icon: <LogOut className="w-4 h-4" />,
-                    onClick: handleEndSession,
-                    variant: 'destructive' as const,
-                  }
-                : {
-                    label: t.vampireSession.leave,
-                    icon: <LogOut className="w-4 h-4" />,
-                    onClick: handleLeaveSession,
-                    variant: 'destructive' as const,
-                  },
-            ]} />
-          </div>
-        </div>
-      </header>
+      <SessionHeader
+        session={session}
+        isNarrator={isNarrator}
+        participants={participants as any}
+        onEndSession={handleEndSession}
+        onSessionUpdate={(updates) => setSession(prev => prev ? { ...prev, ...updates } : prev)}
+        onManagePlayers={() => setShowManagePlayersModal(true)}
+        onLeaveSession={handleLeaveSession}
+      />
 
       {/* Main Content */}
       {isMobile ? (
@@ -765,13 +676,8 @@ export default function VampireSession() {
         onRequestTest={handleRequestTest}
       />
 
-      <SessionInfoModal
-        open={showInfoModal}
-        onOpenChange={setShowInfoModal}
-        session={session}
-        isNarrator={isNarrator}
-        onSessionUpdate={(updates) => setSession(prev => prev ? { ...prev, ...updates } : prev)}
-      />
+
+
 
       {isNarrator && sessionId && (
         <ManagePlayersModal
