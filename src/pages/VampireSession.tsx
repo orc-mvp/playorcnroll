@@ -496,67 +496,85 @@ export default function VampireSession() {
       {isMobile ? (
         // Mobile layout with tabs
         <>
-          <Tabs defaultValue="feed" className="flex-1 flex flex-col">
-            <TabsList className="grid grid-cols-3 mx-4 mt-2">
-              <TabsTrigger value="feed" className="font-medieval text-xs">
-                <Scroll className="w-4 h-4 mr-1" />
-                {t.mobile.tabFeed}
-              </TabsTrigger>
-              <TabsTrigger value="trackers" className="font-medieval text-xs">
-                <Droplets className="w-4 h-4 mr-1" />
-                {t.mobile.tabTrackers}
-              </TabsTrigger>
-              <TabsTrigger value="info" className="font-medieval text-xs">
-                <User className="w-4 h-4 mr-1" />
-                {t.mobile.tabInfo}
-              </TabsTrigger>
-            </TabsList>
+          {(() => {
+            const hasTrackers = !!(myParticipant && myCharacter);
+            const showTrackersTab = hasTrackers || (!isNarrator && myParticipant && !myCharacter);
+            const tabCount = 2 + (showTrackersTab ? 1 : 0) + 1; // feed + info + scenes + optional trackers
+            return (
+              <Tabs defaultValue="feed" className="flex-1 flex flex-col">
+                <TabsList className={`grid mx-4 mt-2`} style={{ gridTemplateColumns: `repeat(${tabCount}, minmax(0, 1fr))` }}>
+                  <TabsTrigger value="feed" className="font-medieval text-xs">
+                    <Scroll className="w-4 h-4 mr-1" />
+                    {t.mobile.tabFeed}
+                  </TabsTrigger>
+                  <TabsTrigger value="scenes" className="font-medieval text-xs">
+                    <BookOpen className="w-4 h-4 mr-1" />
+                    {t.mobile.tabScenes}
+                  </TabsTrigger>
+                  {showTrackersTab && (
+                    <TabsTrigger value="trackers" className="font-medieval text-xs">
+                      <Droplets className="w-4 h-4 mr-1" />
+                      {t.mobile.tabTrackers}
+                    </TabsTrigger>
+                  )}
+                  <TabsTrigger value="info" className="font-medieval text-xs">
+                    <User className="w-4 h-4 mr-1" />
+                    {t.mobile.tabInfo}
+                  </TabsTrigger>
+                </TabsList>
 
-            <TabsContent value="feed" className="flex-1 p-4 overflow-auto">
-              <VampireEventFeed events={events} />
-            </TabsContent>
+                <TabsContent value="feed" className="flex-1 p-4 overflow-auto">
+                  <VampireEventFeed events={events} />
+                </TabsContent>
 
-            <TabsContent value="trackers" className="flex-1 p-4 overflow-auto">
-              {myParticipant && myCharacter ? (
-                <VampireTrackers
-                  participantId={myParticipant.id}
-                  sessionId={sessionId!}
-                  sceneId={currentScene?.id || null}
-                  character={myCharacter}
-                  initialBloodPool={myParticipant.session_blood_pool || 0}
-                  initialWillpower={myParticipant.session_willpower_current || 0}
-                  initialHealthDamage={myParticipant.session_health_damage || [false, false, false, false, false, false, false]}
-                />
-              ) : !isNarrator && myParticipant && !myCharacter ? (
-                <NoCharacterCard inviteCode={session?.invite_code} />
-              ) : null}
-            </TabsContent>
-
-            <TabsContent value="info" className="flex-1 p-4 overflow-auto">
-              <div className="space-y-4">
-                <VampireScenePanel 
-                  sessionId={sessionId!}
-                  currentScene={currentScene}
-                  scenes={scenes}
-                  isNarrator={isNarrator}
-                  onSceneChange={setCurrentScene}
-                />
-                {isNarrator ? (
-                  <VampireNarratorSidebar 
+                <TabsContent value="scenes" className="flex-1 p-4 overflow-auto">
+                  <VampireScenePanel 
                     sessionId={sessionId!}
-                    participants={participants}
-                    scenes={scenes}
                     currentScene={currentScene}
-                    onRequestTest={() => setTestModalOpen(true)}
+                    scenes={scenes}
+                    isNarrator={isNarrator}
                     onSceneChange={setCurrentScene}
-                    onEventCreated={handleLocalEvent}
                   />
-                ) : (
-                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} sheetLocked={myParticipant?.sheet_locked ?? true} />
+                </TabsContent>
+
+                {showTrackersTab && (
+                  <TabsContent value="trackers" className="flex-1 p-4 overflow-auto">
+                    {myParticipant && myCharacter ? (
+                      <VampireTrackers
+                        participantId={myParticipant.id}
+                        sessionId={sessionId!}
+                        sceneId={currentScene?.id || null}
+                        character={myCharacter}
+                        initialBloodPool={myParticipant.session_blood_pool || 0}
+                        initialWillpower={myParticipant.session_willpower_current || 0}
+                        initialHealthDamage={myParticipant.session_health_damage || [false, false, false, false, false, false, false]}
+                      />
+                    ) : !isNarrator && myParticipant && !myCharacter ? (
+                      <NoCharacterCard inviteCode={session?.invite_code} />
+                    ) : null}
+                  </TabsContent>
                 )}
-              </div>
-            </TabsContent>
-          </Tabs>
+
+                <TabsContent value="info" className="flex-1 p-4 overflow-auto">
+                  <div className="space-y-4">
+                    {isNarrator ? (
+                      <VampireNarratorSidebar 
+                        sessionId={sessionId!}
+                        participants={participants}
+                        scenes={scenes}
+                        currentScene={currentScene}
+                        onRequestTest={() => setTestModalOpen(true)}
+                        onSceneChange={setCurrentScene}
+                        onEventCreated={handleLocalEvent}
+                      />
+                    ) : (
+                      <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} sheetLocked={myParticipant?.sheet_locked ?? true} />
+                    )}
+                  </div>
+                </TabsContent>
+              </Tabs>
+            );
+          })()}
 
           {/* FAB for Pending Test - only mobile, bottom-left, z-40 */}
           {!isNarrator && pendingTestEvent && !hasRolledForPendingTest && (
