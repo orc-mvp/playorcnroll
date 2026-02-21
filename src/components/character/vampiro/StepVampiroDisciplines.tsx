@@ -1,4 +1,5 @@
 import { useI18n } from "@/lib/i18n";
+import { getDisciplineLabel as getDisciplineLabelFromI18n } from "@/lib/vampiro/disciplineLabels";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -228,7 +229,7 @@ const BACKGROUNDS_BY_BOOK = [
 ];
 
 export default function StepVampiroDisciplines({ formData, updateFormData }: StepVampiroDisciplinesProps) {
-  const { language } = useI18n();
+  const { t, language } = useI18n();
 
   // Defensive defaults
   const disciplines = formData.disciplines || {};
@@ -256,11 +257,7 @@ export default function StepVampiroDisciplines({ formData, updateFormData }: Ste
   };
 
   // Get label for a discipline
-  const getDisciplineLabel = (key: string) => {
-    const info = DISCIPLINE_MAP[key];
-    if (!info) return key;
-    return language === "pt-BR" ? info.labelPt : info.labelEn;
-  };
+  const getDisciplineLabel = (key: string) => getDisciplineLabelFromI18n(key, language, t);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

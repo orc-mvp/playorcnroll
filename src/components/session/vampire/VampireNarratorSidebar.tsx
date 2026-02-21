@@ -434,7 +434,7 @@ export function VampireNarratorSidebar({
                           .slice(0, 3)
                           .map(([key, value]) => (
                             <Badge key={key} variant="outline" className="text-[10px] px-1.5 py-0">
-                              {getDisciplineLabel(key, language)}: {value}
+                              {getDisciplineLabel(key, language, t)}: {value}
                             </Badge>
                           ))}
                         {Object.entries(vampData.disciplines).filter(([, v]) => v > 0).length > 3 && (
