@@ -1,6 +1,7 @@
 // Vampiro Character Sheet with i18n support
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
@@ -20,6 +21,7 @@ import {
   Users,
   Flame,
   Star,
+  Award,
 } from 'lucide-react';
 import { toTitleCase } from '@/lib/textUtils';
 
@@ -202,6 +204,35 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
   const [bloodPool, setBloodPool] = useState(sessionTrackers?.bloodPool ?? 0);
   const [currentWillpower, setCurrentWillpower] = useState(sessionTrackers?.willpower ?? 0);
   const [healthDamage, setHealthDamage] = useState<boolean[]>(sessionTrackers?.healthDamage ?? Array(7).fill(false));
+  const [xpLog, setXpLog] = useState<{ id: string; amount: number; narrator_name: string; note: string | null; created_at: string }[]>([]);
+
+  // Fetch XP log
+  useEffect(() => {
+    const fetchXpLog = async () => {
+      const { data: logs } = await supabase
+        .from('xp_log')
+        .select('id, amount, narrator_name, note, created_at')
+        .eq('character_id', character.id)
+        .order('created_at', { ascending: false });
+      if (logs) setXpLog(logs);
+    };
+    fetchXpLog();
+
+    // Realtime subscription
+    const channel = supabase
+      .channel(`xp_log_${character.id}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'xp_log',
+        filter: `character_id=eq.${character.id}`,
+      }, () => {
+        fetchXpLog();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [character.id]);
   
   const attributes = data.attributes || {
     physical: { strength: 1, dexterity: 1, stamina: 1 },
@@ -762,6 +793,51 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* XP Log */}
+      <Card className="medieval-card">
+        <CardHeader className="pb-3">
+          <CardTitle className="font-medieval flex items-center gap-2">
+            <Award className="w-5 h-5 text-destructive" />
+            {t.xpLog.title}
+            {xpLog.length > 0 && (
+              <Badge variant="outline" className="ml-auto font-mono">
+                {t.xpLog.totalXp}: {xpLog.reduce((sum, e) => sum + e.amount, 0)}
+              </Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {xpLog.length > 0 ? (
+            <div className="space-y-2">
+              {xpLog.map((entry) => (
+                <div key={entry.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 border border-border text-sm">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="font-mono text-xs border-green-500/50 text-green-500">
+                        +{entry.amount} XP
+                      </Badge>
+                      <span className="text-muted-foreground font-body text-xs">
+                        {t.xpLog.by} {entry.narrator_name}
+                      </span>
+                    </div>
+                    {entry.note && (
+                      <p className="text-xs text-muted-foreground font-body mt-1 truncate">{entry.note}</p>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground/60 shrink-0 ml-2">
+                    {new Date(entry.created_at).toLocaleDateString(language)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center py-4 text-sm font-body">
+              {t.xpLog.noEntries}
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

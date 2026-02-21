@@ -62,6 +62,8 @@ export default function StepVampiroMeritsFlaws({ formData, updateFormData }: Ste
   };
 
   const totalCost = selected.reduce((sum, s) => sum + s.cost, 0);
+  const freebiePoints = 15;
+  const remaining = freebiePoints - totalCost;
 
   const categoryLabel = (cat: string) =>
     (t.meritsFlaws[cat as keyof typeof t.meritsFlaws] as string) || cat;
@@ -98,19 +100,17 @@ export default function StepVampiroMeritsFlaws({ formData, updateFormData }: Ste
           {/* Points summary */}
           <div className="flex items-center justify-center gap-4 mb-4 p-3 rounded-lg bg-muted/30 border border-border">
             <span className="font-medieval text-sm">
-              {language === 'pt-BR' ? 'Balanço de pontos' : 'Point balance'}:
+              {t.meritsFlaws.freebiePoints}:
             </span>
             <Badge
               variant="outline"
               className={
-                totalCost > 0
+                remaining >= 0
                   ? 'border-green-500/50 text-green-500'
-                  : totalCost < 0
-                  ? 'border-red-500/50 text-red-500'
-                  : 'border-muted'
+                  : 'border-red-500/50 text-red-500'
               }
             >
-              {totalCost > 0 ? '+' : ''}{totalCost} {t.meritsFlaws.points}
+              {remaining} {t.meritsFlaws.freebieRemaining} ({t.meritsFlaws.freebieTotal} {freebiePoints})
             </Badge>
             <span className="text-xs text-muted-foreground">
               ({selected.length} {language === 'pt-BR' ? 'selecionado(s)' : 'selected'})

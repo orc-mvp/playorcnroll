@@ -944,6 +944,20 @@ export const translations = {
       flawsOnly: 'Apenas Desvantagens',
       filterBySourcebook: 'Filtrar por livro',
       allSourcebooks: 'Todos os livros',
+      freebiePoints: 'Pontos Livres',
+      freebieRemaining: 'restantes',
+      freebieTotal: 'de',
+      freebieExceeded: 'Pontos insuficientes',
+    },
+
+    // XP Log
+    xpLog: {
+      title: 'Experiência',
+      totalXp: 'XP Total',
+      noEntries: 'Nenhum ponto de experiência recebido ainda.',
+      pointsAwarded: 'pontos concedidos',
+      by: 'por',
+      session: 'Sessão',
     },
 
     // Customization unified
@@ -1906,6 +1920,20 @@ export const translations = {
       flawsOnly: 'Flaws only',
       filterBySourcebook: 'Filter by sourcebook',
       allSourcebooks: 'All sourcebooks',
+      freebiePoints: 'Freebie Points',
+      freebieRemaining: 'remaining',
+      freebieTotal: 'of',
+      freebieExceeded: 'Insufficient points',
+    },
+
+    // XP Log
+    xpLog: {
+      title: 'Experience',
+      totalXp: 'Total XP',
+      noEntries: 'No experience points received yet.',
+      pointsAwarded: 'points awarded',
+      by: 'by',
+      session: 'Session',
     },
 
     // Customization unified
