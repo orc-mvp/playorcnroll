@@ -619,6 +619,7 @@ export const translations = {
       tabFeed: 'Feed',
       tabTrackers: 'Trackers',
       tabInfo: 'Info',
+      tabScenes: 'Cenas',
     },
 
     // Profile
@@ -1596,6 +1597,7 @@ export const translations = {
       tabFeed: 'Feed',
       tabTrackers: 'Trackers',
       tabInfo: 'Info',
+      tabScenes: 'Scenes',
     },
 
     // Profile
