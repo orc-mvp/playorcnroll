@@ -92,7 +92,7 @@ export default function Session() {
       .delete()
       .eq('session_id', session.id)
       .eq('user_id', user.id);
-    toast({ title: t.vampireSession.sessionEnded });
+    toast({ title: t.vampireSession.leftSession });
     navigate('/dashboard');
   };
 
