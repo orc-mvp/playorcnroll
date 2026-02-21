@@ -11,6 +11,7 @@ import { EventFeed } from '@/components/session/EventFeed';
 import { NarratorSidebar } from '@/components/session/NarratorSidebar';
 import { PlayerSidebar } from '@/components/session/PlayerSidebar';
 import { PendingTestNotification } from '@/components/dice/PendingTestNotification';
+import { ManagePlayersModal } from '@/components/session/vampire/ManagePlayersModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, Scroll, User, Dices } from 'lucide-react';
 
@@ -80,8 +81,20 @@ export default function Session() {
   const [events, setEvents] = useState<SessionEvent[]>([]);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showManagePlayersModal, setShowManagePlayersModal] = useState(false);
 
   const isNarrator = session?.narrator_id === user?.id;
+
+  const handleLeaveSession = async () => {
+    if (!session || !user) return;
+    await supabase
+      .from('session_participants')
+      .delete()
+      .eq('session_id', session.id)
+      .eq('user_id', user.id);
+    toast({ title: t.vampireSession.sessionEnded });
+    navigate('/dashboard');
+  };
 
   // Fetch session data
   useEffect(() => {
@@ -147,6 +160,8 @@ export default function Session() {
           id,
           user_id,
           character_id,
+          sheet_locked,
+          experience_points,
           characters:character_id (
             id,
             name,
@@ -321,6 +336,8 @@ export default function Session() {
           participants={participants}
           onEndSession={handleEndSession}
           onSessionUpdate={(updates) => setSession(prev => prev ? { ...prev, ...updates } : prev)}
+          onManagePlayers={() => setShowManagePlayersModal(true)}
+          onLeaveSession={handleLeaveSession}
         />
 
         {/* Pending Test Notification for Players */}
@@ -402,6 +419,13 @@ export default function Session() {
             )}
           </TabsContent>
         </Tabs>
+
+        <ManagePlayersModal
+          open={showManagePlayersModal}
+          onOpenChange={setShowManagePlayersModal}
+          participants={participants as any}
+          sessionId={session.id}
+        />
       </div>
     );
   }
@@ -415,6 +439,8 @@ export default function Session() {
         participants={participants}
         onEndSession={handleEndSession}
         onSessionUpdate={(updates) => setSession(prev => prev ? { ...prev, ...updates } : prev)}
+        onManagePlayers={() => setShowManagePlayersModal(true)}
+        onLeaveSession={handleLeaveSession}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -468,6 +494,13 @@ export default function Session() {
           )}
         </aside>
       </div>
+
+      <ManagePlayersModal
+        open={showManagePlayersModal}
+        onOpenChange={setShowManagePlayersModal}
+        participants={participants as any}
+        sessionId={session.id}
+      />
     </div>
   );
 }
