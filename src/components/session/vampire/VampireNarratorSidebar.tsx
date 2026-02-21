@@ -126,21 +126,23 @@ interface PendingChange {
 interface VampireNarratorSidebarProps {
   sessionId: string;
   participants: Participant[];
-  scenes: Scene[];
-  currentScene: Scene | null;
-  onRequestTest: () => void;
-  onSceneChange: (scene: Scene) => void;
-  onEventCreated?: (event: { event_type: string; event_data: Record<string, unknown>; scene_id: string | null; session_id: string }) => void;
+   scenes: Scene[];
+   currentScene: Scene | null;
+   onRequestTest: () => void;
+   onRequestRoll: () => void;
+   onSceneChange: (scene: Scene) => void;
+   onEventCreated?: (event: { event_type: string; event_data: Record<string, unknown>; scene_id: string | null; session_id: string }) => void;
 }
 
 export function VampireNarratorSidebar({
   sessionId,
   participants,
-  scenes,
-  currentScene,
-  onRequestTest,
-  onSceneChange,
-  onEventCreated,
+   scenes,
+   currentScene,
+   onRequestTest,
+   onRequestRoll,
+   onSceneChange,
+   onEventCreated,
 }: VampireNarratorSidebarProps) {
   const { t, language } = useI18n();
   const { toast } = useToast();
@@ -375,13 +377,21 @@ export function VampireNarratorSidebar({
             {t.vampiroTests.requestTest}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-2">
           <Button
             onClick={onRequestTest}
             className="w-full bg-destructive hover:bg-destructive/90"
           >
             <Dices className="w-4 h-4 mr-2" />
             {t.vampiroTests.test}
+          </Button>
+          <Button
+            onClick={onRequestRoll}
+            variant="outline"
+            className="w-full border-destructive/30 hover:bg-destructive/10"
+          >
+            <Dices className="w-4 h-4 mr-2" />
+            {t.vampiroTests.roll}
           </Button>
         </CardContent>
       </Card>

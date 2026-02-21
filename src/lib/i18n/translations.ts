@@ -611,6 +611,11 @@ export const translations = {
       poolLabel: 'Pool',
       privateResult: 'Resultado Privado',
       onlyNarratorSees: 'Apenas narrador e jogador veem',
+      narratorRoll: 'Rolar Dados',
+      narratorRollDesc: 'Escolha quantos d10 o narrador vai rolar.',
+      diceCount: 'Quantidade de Dados',
+      roll: 'Rolar',
+      narratorRolled: 'Narrador rolou',
     },
 
     // Mobile UI
@@ -1589,6 +1594,11 @@ export const translations = {
       poolLabel: 'Pool',
       privateResult: 'Private Result',
       onlyNarratorSees: 'Only narrator and player can see',
+      narratorRoll: 'Roll Dice',
+      narratorRollDesc: 'Choose how many d10 the narrator will roll.',
+      diceCount: 'Dice Count',
+      roll: 'Roll',
+      narratorRolled: 'Narrator rolled',
     },
 
     // Mobile UI

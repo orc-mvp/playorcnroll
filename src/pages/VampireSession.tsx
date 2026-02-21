@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import VampireTestRequestModal, { TestConfig } from '@/components/session/vampire/VampireTestRequestModal';
+import NarratorRollModal, { NarratorRollResult } from '@/components/session/vampire/NarratorRollModal';
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { VampireEventFeed } from '@/components/session/vampire/VampireEventFeed';
 import { VampirePendingTest } from '@/components/session/vampire/VampirePendingTest';
@@ -419,6 +420,7 @@ export default function VampireSession() {
 
   // Test request modal state
   const [testModalOpen, setTestModalOpen] = useState(false);
+  const [rollModalOpen, setRollModalOpen] = useState(false);
   const [showPendingTestDrawer, setShowPendingTestDrawer] = useState(false);
 
   // Auto-open drawer when pending test arrives on mobile
@@ -564,6 +566,7 @@ export default function VampireSession() {
                         scenes={scenes}
                         currentScene={currentScene}
                         onRequestTest={() => setTestModalOpen(true)}
+                        onRequestRoll={() => setRollModalOpen(true)}
                         onSceneChange={setCurrentScene}
                         onEventCreated={handleLocalEvent}
                       />
@@ -617,6 +620,7 @@ export default function VampireSession() {
                   scenes={scenes}
                   currentScene={currentScene}
                   onRequestTest={() => setTestModalOpen(true)}
+                  onRequestRoll={() => setRollModalOpen(true)}
                   onSceneChange={setCurrentScene}
                   onEventCreated={handleLocalEvent}
                 />
@@ -694,7 +698,31 @@ export default function VampireSession() {
         onRequestTest={handleRequestTest}
       />
 
-
+      {/* Narrator Roll Modal */}
+      <NarratorRollModal
+        open={rollModalOpen}
+        onOpenChange={setRollModalOpen}
+        onRollComplete={async (result) => {
+          if (!sessionId) return;
+          await supabase.from('session_events').insert([{
+            session_id: sessionId,
+            scene_id: currentScene?.id || null,
+            event_type: 'narrator_roll',
+            event_data: {
+              dice_count: result.diceCount,
+              difficulty: result.difficulty,
+              results: result.results,
+              successes: result.successes,
+              ones_count: result.onesCount,
+              final_successes: result.finalSuccesses,
+              is_botch: result.isBotch,
+              is_exceptional: result.isExceptional,
+              context: result.context,
+              scene_name: currentScene?.name || null,
+            },
+          }]);
+        }}
+      />
 
 
       {isNarrator && sessionId && (
