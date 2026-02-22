@@ -1050,7 +1050,7 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, shee
 
         {/* Coterie - Other Players */}
         {(() => {
-          const coterieMembers = participants.filter(p => p.character_id && p.character?.name && p.user_id !== currentUserId);
+          const coterieMembers = participants.filter(p => p.character_id && p.user_id !== currentUserId);
           if (coterieMembers.length === 0) return null;
           return (
             <Card className="medieval-card border-destructive/20">
@@ -1069,9 +1069,9 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, shee
                       </div>
                       <div className="min-w-0">
                         <p className="font-medieval text-sm truncate">
-                          {p.character?.name}
+                          {p.character?.name || p.profile?.display_name || t.vampireSession.noCharacter}
                         </p>
-                        {p.profile?.display_name && (
+                        {p.character?.name && p.profile?.display_name && (
                           <p className="text-xs text-muted-foreground font-body truncate">
                             {p.profile.display_name}
                           </p>
