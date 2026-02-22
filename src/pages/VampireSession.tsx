@@ -1049,26 +1049,27 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, shee
         )}
 
         {/* Coterie - Other Players */}
-        {participants.length > 0 && (
-          <Card className="medieval-card border-destructive/20">
-            <CardHeader className="pb-2">
-              <CardTitle className="font-medieval text-sm flex items-center gap-2">
-                <Users className="w-4 h-4 text-destructive" />
-                {t.vampireSession.coterie}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {participants
-                  .filter(p => p.character_id && p.user_id !== currentUserId)
-                  .map(p => (
+        {(() => {
+          const coterieMembers = participants.filter(p => p.character_id && p.character?.name && p.user_id !== currentUserId);
+          if (coterieMembers.length === 0) return null;
+          return (
+            <Card className="medieval-card border-destructive/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="font-medieval text-sm flex items-center gap-2">
+                  <Users className="w-4 h-4 text-destructive" />
+                  {t.vampireSession.coterie}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {coterieMembers.map(p => (
                     <div key={p.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30">
                       <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center border border-destructive/20">
                         <User className="w-4 h-4 text-destructive/70" />
                       </div>
                       <div className="min-w-0">
                         <p className="font-medieval text-sm truncate">
-                          {p.character?.name || t.vampireSession.noCharacter}
+                          {p.character?.name}
                         </p>
                         {p.profile?.display_name && (
                           <p className="text-xs text-muted-foreground font-body truncate">
@@ -1078,10 +1079,11 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, shee
                       </div>
                     </div>
                   ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
       </div>
 
       {/* Character Sheet Modal */}
