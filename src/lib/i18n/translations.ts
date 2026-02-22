@@ -760,6 +760,7 @@ export const translations = {
       sheetOf: 'Ficha de',
       errorSaving: 'Erro ao salvar',
       critical: 'CRÍTICO',
+      coterie: 'Coterie',
     },
 
     // Virtues (character creation)
@@ -1777,6 +1778,7 @@ export const translations = {
       sheetOf: 'Sheet of',
       errorSaving: 'Error saving',
       critical: 'CRITICAL',
+      coterie: 'Coterie',
     },
 
     // Virtues (character creation)

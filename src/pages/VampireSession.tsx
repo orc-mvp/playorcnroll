@@ -572,7 +572,7 @@ export default function VampireSession() {
                         onEventCreated={handleLocalEvent}
                       />
                     ) : (
-                      <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} sheetLocked={myParticipant?.sheet_locked ?? true} />
+                      <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} sheetLocked={myParticipant?.sheet_locked ?? true} participants={participants} currentUserId={user?.id} />
                     )}
                   </div>
                 </TabsContent>
@@ -643,7 +643,7 @@ export default function VampireSession() {
                       onTestComplete={() => {}}
                     />
                   )}
-                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} sheetLocked={myParticipant?.sheet_locked ?? true} />
+                  <VampirePlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ bloodPool: myParticipant?.session_blood_pool ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage as boolean[] ?? [false,false,false,false,false,false,false] }} sheetLocked={myParticipant?.sheet_locked ?? true} participants={participants} currentUserId={user?.id} />
                 </div>
               )}
             </ScrollArea>
@@ -931,7 +931,7 @@ function VampireScenePanel({
 // VampireNarratorPanel was replaced by VampireNarratorSidebar component
 
 // Vampire Player Panel Component
-function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, sheetLocked = true }: { character: Participant['character']; sessionTrackers?: { bloodPool?: number; willpower?: number; healthDamage?: boolean[] }; experiencePoints?: number; sheetLocked?: boolean }) {
+function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, sheetLocked = true, participants = [], currentUserId }: { character: Participant['character']; sessionTrackers?: { bloodPool?: number; willpower?: number; healthDamage?: boolean[] }; experiencePoints?: number; sheetLocked?: boolean; participants?: Participant[]; currentUserId?: string }) {
   const { t, language } = useI18n();
   const vampiroData = character?.vampiro_data;
   const [showSheet, setShowSheet] = useState(false);
@@ -1043,6 +1043,41 @@ function VampirePlayerPanel({ character, sessionTrackers, experiencePoints, shee
                 <Badge variant="outline" className="font-mono text-sm px-2">
                   {experiencePoints} XP
                 </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Coterie - Other Players */}
+        {participants.length > 0 && (
+          <Card className="medieval-card border-destructive/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-medieval text-sm flex items-center gap-2">
+                <Users className="w-4 h-4 text-destructive" />
+                {t.vampireSession.coterie}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {participants
+                  .filter(p => p.character_id && p.user_id !== currentUserId)
+                  .map(p => (
+                    <div key={p.id} className="flex items-center gap-2 p-2 rounded-lg bg-muted/30">
+                      <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center border border-destructive/20">
+                        <User className="w-4 h-4 text-destructive/70" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-medieval text-sm truncate">
+                          {p.character?.name || t.vampireSession.noCharacter}
+                        </p>
+                        {p.profile?.display_name && (
+                          <p className="text-xs text-muted-foreground font-body truncate">
+                            {p.profile.display_name}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
               </div>
             </CardContent>
           </Card>
