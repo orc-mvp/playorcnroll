@@ -117,25 +117,25 @@ export default function NarratorRollModal({ open, onOpenChange, onRollComplete }
             {/* Difficulty */}
             <div className="space-y-2">
               <Label className="font-medieval">{t.vampiroTests.difficulty}</Label>
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-8 w-8"
+                  className="h-10 w-10"
                   onClick={() => setDifficulty(Math.max(2, difficulty - 1))}
                   disabled={difficulty <= 2}
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="w-5 h-5" />
                 </Button>
                 <span className="text-2xl font-bold w-12 text-center font-medieval">{difficulty}</span>
                 <Button
                   variant="outline"
                   size="icon"
-                  className="h-8 w-8"
+                  className="h-10 w-10"
                   onClick={() => setDifficulty(Math.min(10, difficulty + 1))}
                   disabled={difficulty >= 10}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-5 h-5" />
                 </Button>
               </div>
             </div>

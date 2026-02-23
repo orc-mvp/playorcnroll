@@ -16,7 +16,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Dices, Lock, Heart, Star, Users, ChevronRight, MessageSquare } from 'lucide-react';
+import { Dices, Lock, Heart, Star, Users, ChevronRight, MessageSquare, Minus, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   TestType,
@@ -316,14 +316,25 @@ export default function VampireTestRequestModal({
           {/* Difficulty - Inline */}
           <div className="flex items-center gap-3">
             <Label className="text-sm whitespace-nowrap">{t.vampiroTests.difficulty}:</Label>
-            <Input
-              type="number"
-              min={2}
-              max={10}
-              value={difficulty}
-              onChange={(e) => setDifficulty(parseInt(e.target.value) || 6)}
-              className="w-16 h-9 text-center"
-            />
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 shrink-0"
+              onClick={() => setDifficulty(Math.max(2, difficulty - 1))}
+              disabled={difficulty <= 2}
+            >
+              <Minus className="w-5 h-5" />
+            </Button>
+            <span className="text-2xl font-bold w-10 text-center font-medieval">{difficulty}</span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-10 w-10 shrink-0"
+              onClick={() => setDifficulty(Math.min(10, difficulty + 1))}
+              disabled={difficulty >= 10}
+            >
+              <Plus className="w-5 h-5" />
+            </Button>
           </div>
 
           {/* Collapsible Context */}

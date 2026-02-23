@@ -26,7 +26,9 @@ import {
   Brain,
   Flame,
   Scroll,
-  Eye
+  Eye,
+  Minus,
+  Plus
 } from 'lucide-react';
 import { GroupTestPanel } from '@/components/dice/GroupTestPanel';
 import { ComplicationsNarratorPanel } from '@/components/complications/ComplicationsNarratorPanel';
@@ -258,18 +260,26 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
             <Label className="text-sm font-medieval text-muted-foreground">
               {t.tests.difficulty}: {t.tests[difficultyLabels[difficulty] as keyof typeof t.tests] || 'Normal'}
             </Label>
-            <Slider
-              value={[difficulty]}
-              onValueChange={([val]) => setDifficulty(val)}
-              min={-3}
-              max={3}
-              step={1}
-              className="py-2"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>-3</span>
-              <span>0</span>
-              <span>+3</span>
+            <div className="flex items-center gap-3 justify-center">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10"
+                onClick={() => setDifficulty(Math.max(-3, difficulty - 1))}
+                disabled={difficulty <= -3}
+              >
+                <Minus className="w-5 h-5" />
+              </Button>
+              <span className="text-2xl font-bold w-10 text-center font-medieval">{difficulty > 0 ? `+${difficulty}` : difficulty}</span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10"
+                onClick={() => setDifficulty(Math.min(3, difficulty + 1))}
+                disabled={difficulty >= 3}
+              >
+                <Plus className="w-5 h-5" />
+              </Button>
             </div>
           </div>
 
