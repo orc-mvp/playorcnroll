@@ -722,6 +722,8 @@ export const translations = {
       eventAdded: 'Mesa agendada!',
       createdBy: 'Agendado por',
       anonymous: 'Anônimo',
+      editEvent: 'Editar Mesa',
+      eventUpdated: 'Mesa atualizada!',
     },
 
     // Landing Page
@@ -1757,6 +1759,8 @@ export const translations = {
       eventAdded: 'Game scheduled!',
       createdBy: 'Scheduled by',
       anonymous: 'Anonymous',
+      editEvent: 'Edit Game',
+      eventUpdated: 'Game updated!',
     },
 
     // Landing Page
