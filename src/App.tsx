@@ -18,6 +18,7 @@ import JoinSession from "./pages/JoinSession";
 import MySessions from "./pages/MySessions";
 import VampireSession from "./pages/VampireSession";
 import Profile from "./pages/Profile";
+import GameCalendar from "./pages/GameCalendar";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="/join/:code" element={<JoinSession />} />
             <Route path="/sessions" element={<MySessions />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/calendar" element={<GameCalendar />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

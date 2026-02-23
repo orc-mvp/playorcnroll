@@ -14,6 +14,7 @@ import {
   BookOpen,
   Palette,
   Package,
+  CalendarDays,
 } from 'lucide-react';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 
@@ -85,18 +86,8 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8 text-center">
-          <h2 className="font-medieval text-3xl md:text-4xl text-foreground mb-2 text-shadow-medieval">
-            {t.auth.loginTitle.replace('Back', '')} {profile.display_name || ''}
-          </h2>
-          <p className="text-muted-foreground font-body">
-            {t.dashboard.welcomeGeneric}
-          </p>
-        </div>
-
-        {/* Quick Actions - 4 cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        {/* Quick Actions - 5 cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
           {/* Sessions */}
           <Card 
             className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full"
@@ -139,6 +130,21 @@ export default function Dashboard() {
                 <CardTitle className="font-medieval text-base md:text-lg">{t.dashboard.customization}</CardTitle>
                 <CardDescription className="font-body text-xs md:text-sm">
                   {t.dashboard.customizationDesc}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
+
+          {/* Calendar */}
+          <Link to="/calendar">
+            <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+              <CardHeader className="p-4 md:p-6">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                  <CalendarDays className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                </div>
+                <CardTitle className="font-medieval text-base md:text-lg">{t.calendar.cardTitle}</CardTitle>
+                <CardDescription className="font-body text-xs md:text-sm">
+                  {t.calendar.cardDesc}
                 </CardDescription>
               </CardHeader>
             </Card>
