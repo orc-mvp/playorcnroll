@@ -125,6 +125,7 @@ export default function GameCalendar() {
     setNewStartTime('');
     setNewEndTime('');
     setShowAddModal(false);
+    await fetchEvents();
   };
 
   const handleEditEvent = (event: CalendarEvent) => {
@@ -159,6 +160,7 @@ export default function GameCalendar() {
     setNewDescription('');
     setNewStartTime('');
     setNewEndTime('');
+    await fetchEvents();
   };
 
   const handleDeleteEvent = async (eventId: string) => {
