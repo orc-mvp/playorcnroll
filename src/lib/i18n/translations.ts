@@ -707,6 +707,23 @@ export const translations = {
       comingSoon: 'Em breve',
     },
 
+    // Calendar
+    calendar: {
+      title: 'Calendário de Mesas',
+      cardTitle: 'Calendário',
+      cardDesc: 'Agende e veja datas de mesas',
+      addEvent: 'Adicionar Mesa',
+      eventTitle: 'Título da Mesa',
+      eventTitlePlaceholder: 'Ex: Sessão de Vampiro',
+      eventDescription: 'Descrição',
+      eventDescriptionPlaceholder: 'Detalhes sobre a mesa (opcional)',
+      noEvents: 'Nenhuma mesa agendada nesta data',
+      selectDate: 'Selecione uma data',
+      eventAdded: 'Mesa agendada!',
+      createdBy: 'Agendado por',
+      anonymous: 'Anônimo',
+    },
+
     // Landing Page
     landing: {
       tagline: 'Teatro da Mente Online',
@@ -1723,6 +1740,23 @@ export const translations = {
       inventory: 'Inventory',
       inventoryDesc: 'Manage items and equipment',
       comingSoon: 'Coming soon',
+    },
+
+    // Calendar
+    calendar: {
+      title: 'Game Calendar',
+      cardTitle: 'Calendar',
+      cardDesc: 'Schedule and view game dates',
+      addEvent: 'Add Game',
+      eventTitle: 'Game Title',
+      eventTitlePlaceholder: 'E.g.: Vampire Session',
+      eventDescription: 'Description',
+      eventDescriptionPlaceholder: 'Details about the game (optional)',
+      noEvents: 'No games scheduled for this date',
+      selectDate: 'Select a date',
+      eventAdded: 'Game scheduled!',
+      createdBy: 'Scheduled by',
+      anonymous: 'Anonymous',
     },
 
     // Landing Page
