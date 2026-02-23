@@ -42,7 +42,7 @@ export const HEALTH_PENALTIES: Record<string, number> = {
   incapacitated: -999, // Can't act
 };
 
-export type TestType = 'attribute_ability' | 'willpower' | 'humanity' | 'virtue';
+export type TestType = 'attribute_ability' | 'attribute_only' | 'willpower' | 'humanity' | 'virtue';
 
 export type AttributeKey = 
   | 'strength' | 'dexterity' | 'stamina'
@@ -158,6 +158,11 @@ export function calculateDicePool(
     case 'attribute_ability':
       if (attribute && ability) {
         pool = getAttributeValue(data, attribute) + getAbilityValue(data, ability);
+      }
+      break;
+    case 'attribute_only':
+      if (attribute) {
+        pool = getAttributeValue(data, attribute);
       }
       break;
     case 'willpower':

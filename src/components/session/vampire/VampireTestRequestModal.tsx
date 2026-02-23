@@ -58,6 +58,7 @@ export interface TestConfig {
 // Test type options for the toggle buttons
 const TEST_TYPES: { value: TestType; labelKey: string }[] = [
   { value: 'attribute_ability', labelKey: 'attributeAbility' },
+  { value: 'attribute_only', labelKey: 'attributeOnly' },
   { value: 'willpower', labelKey: 'willpowerOnly' },
   { value: 'humanity', labelKey: 'humanityOnly' },
   { value: 'virtue', labelKey: 'virtueOnly' },
@@ -96,7 +97,7 @@ export default function VampireTestRequestModal({
 
     const config: TestConfig = {
       testType,
-      attribute: testType === 'attribute_ability' ? attribute : undefined,
+      attribute: (testType === 'attribute_ability' || testType === 'attribute_only') ? attribute : undefined,
       ability: testType === 'attribute_ability' ? ability : undefined,
       virtue: testType === 'virtue' ? virtue : undefined,
       difficulty,
@@ -150,6 +151,7 @@ export default function VampireTestRequestModal({
 
   const isValid = () => {
     if (testType === 'attribute_ability' && (!attribute || !ability)) return false;
+    if (testType === 'attribute_only' && !attribute) return false;
     if (testType === 'virtue' && !virtue) return false;
     const targetCount = selectAll ? playersWithCharacters.length : selectedPlayers.length;
     return targetCount > 0;
@@ -165,6 +167,9 @@ export default function VampireTestRequestModal({
           const attrLabel = t.vampiro[attribute as keyof typeof t.vampiro] || attribute;
           const abilLabel = t.vampiro[ability as keyof typeof t.vampiro] || ability;
           return `${attrLabel} + ${abilLabel}`;
+        case 'attribute_only':
+          if (!attribute) return '';
+          return t.vampiro[attribute as keyof typeof t.vampiro] || attribute;
         case 'willpower':
           return t.vampiro.willpower;
         case 'humanity':
@@ -241,7 +246,7 @@ export default function VampireTestRequestModal({
           </div>
 
           {/* Attribute + Ability Grid */}
-          {testType === 'attribute_ability' && (
+          {(testType === 'attribute_ability' || testType === 'attribute_only') && (
             <div className="space-y-3">
               {/* Attributes Grid - 3x3 */}
               <div className="space-y-1.5">
@@ -265,7 +270,8 @@ export default function VampireTestRequestModal({
                 </div>
               </div>
               
-              {/* Abilities Grid - Responsive */}
+              {/* Abilities Grid - Only for attribute_ability */}
+              {testType === 'attribute_ability' && (
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">{t.vampiroTests.selectAbility}</Label>
                 <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1">
@@ -286,6 +292,7 @@ export default function VampireTestRequestModal({
                   ))}
                 </div>
               </div>
+              )}
             </div>
           )}
 

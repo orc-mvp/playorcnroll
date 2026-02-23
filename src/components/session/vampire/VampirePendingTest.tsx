@@ -81,6 +81,11 @@ export function VampirePendingTest({
             getAbilityValue(vampiroData, config.ability);
         }
         break;
+      case 'attribute_only':
+        if (config.attribute) {
+          pool = getAttributeValue(vampiroData, config.attribute);
+        }
+        break;
       case 'willpower':
         pool = vampiroData.willpower || 1;
         break;
@@ -158,6 +163,10 @@ export function VampirePendingTest({
       const attrLabel = t.vampiro[config.attribute as keyof typeof t.vampiro] || config.attribute;
       const abilityLabel = t.vampiro[config.ability as keyof typeof t.vampiro] || config.ability;
       return `${attrLabel} + ${abilityLabel}`;
+    }
+    if (config.testType === 'attribute_only') {
+      const attrLabel = t.vampiro[config.attribute as keyof typeof t.vampiro] || config.attribute;
+      return attrLabel;
     }
     if (config.testType === 'willpower') return t.vampiro.willpower;
     if (config.testType === 'humanity') return t.vampiro.humanity;
