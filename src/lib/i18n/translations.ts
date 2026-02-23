@@ -724,6 +724,8 @@ export const translations = {
       anonymous: 'Anônimo',
       editEvent: 'Editar Mesa',
       eventUpdated: 'Mesa atualizada!',
+      startTime: 'Início',
+      endTime: 'Fim',
     },
 
     // Landing Page
@@ -1761,6 +1763,8 @@ export const translations = {
       anonymous: 'Anonymous',
       editEvent: 'Edit Game',
       eventUpdated: 'Game updated!',
+      startTime: 'Start',
+      endTime: 'End',
     },
 
     // Landing Page

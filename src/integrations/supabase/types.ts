@@ -18,24 +18,30 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
+          end_time: string | null
           event_date: string
           id: string
+          start_time: string | null
           title: string
           user_id: string
         }
         Insert: {
           created_at?: string
           description?: string | null
+          end_time?: string | null
           event_date: string
           id?: string
+          start_time?: string | null
           title: string
           user_id: string
         }
         Update: {
           created_at?: string
           description?: string | null
+          end_time?: string | null
           event_date?: string
           id?: string
+          start_time?: string | null
           title?: string
           user_id?: string
         }
