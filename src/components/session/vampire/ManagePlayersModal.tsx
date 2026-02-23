@@ -23,7 +23,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Lock, Unlock, Minus, Plus, Sparkles, User, Trash2, AlertTriangle } from 'lucide-react';
+import { Lock, Unlock, Minus, Plus, Sparkles, User, Trash2, AlertTriangle, ShieldBan, ShieldCheck } from 'lucide-react';
 
 interface Participant {
   id: string;
@@ -65,6 +65,43 @@ export function ManagePlayersModal({
   const [updating, setUpdating] = useState<string | null>(null);
   const [removeConfirm, setRemoveConfirm] = useState<string | null>(null);
   const [localOverrides, setLocalOverrides] = useState<LocalOverrides>({});
+  const [joinLocked, setJoinLocked] = useState(false);
+  const [loadingJoinLock, setLoadingJoinLock] = useState(true);
+
+  // Fetch current join_locked state
+  useEffect(() => {
+    if (!open) return;
+    const fetchJoinLock = async () => {
+      setLoadingJoinLock(true);
+      const { data } = await supabase
+        .from('sessions')
+        .select('join_locked')
+        .eq('id', sessionId)
+        .single();
+      if (data) setJoinLocked(data.join_locked ?? false);
+      setLoadingJoinLock(false);
+    };
+    fetchJoinLock();
+  }, [open, sessionId]);
+
+  const handleToggleJoinLock = async () => {
+    const newValue = !joinLocked;
+    setJoinLocked(newValue); // optimistic
+    try {
+      const { error } = await supabase
+        .from('sessions')
+        .update({ join_locked: newValue })
+        .eq('id', sessionId);
+      if (error) throw error;
+      toast({
+        title: newValue ? t.managePlayers.joinLockedEnabled : t.managePlayers.joinLockedDisabled,
+        duration: 2000,
+      });
+    } catch {
+      setJoinLocked(!newValue); // revert
+      toast({ title: t.common.errorSaving, variant: 'destructive' });
+    }
+  };
 
   // Clear overrides when participants prop updates (from realtime)
   useEffect(() => {
@@ -195,6 +232,23 @@ export function ManagePlayersModal({
           </DialogHeader>
 
           <div className="flex-1 max-h-[60vh] overflow-y-auto pr-1">
+            {/* Join lock switch */}
+            <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/30 mb-4">
+              <div className="flex items-center gap-2">
+                {joinLocked ? (
+                  <ShieldBan className="w-4 h-4 text-destructive" />
+                ) : (
+                  <ShieldCheck className="w-4 h-4 text-green-500" />
+                )}
+                <Label className="text-sm font-medium">{t.managePlayers.joinLocked}</Label>
+              </div>
+              <Switch
+                checked={joinLocked}
+                onCheckedChange={handleToggleJoinLock}
+                disabled={loadingJoinLock}
+              />
+            </div>
+
             <div className="space-y-4">
               {participants.map((participant) => {
                 const isLocked = getEffectiveValue(participant, 'sheet_locked') as boolean;

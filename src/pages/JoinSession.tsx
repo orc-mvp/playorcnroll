@@ -32,6 +32,7 @@ interface ValidatedSession {
   description: string | null;
   status: string;
   game_system: string;
+  join_locked?: boolean;
 }
 
 interface JoinedSession {
@@ -211,6 +212,8 @@ export default function JoinSession() {
     try {
       const sessionData = validatedSession;
 
+      // Check if session is locked for new players
+      // First check if user is already a participant (they can rejoin)
       const { data: existingParticipant } = await supabase
         .from('session_participants')
         .select('id, character_id, sheet_locked')
@@ -275,6 +278,16 @@ export default function JoinSession() {
         } else {
           navigate(`/session/${sessionData.id}/lobby`);
         }
+        return;
+      }
+
+      // Block new players if join is locked
+      if (sessionData.join_locked) {
+        toast({
+          title: t.managePlayers.joinLockedByNarrator,
+          variant: 'destructive',
+        });
+        setIsJoining(false);
         return;
       }
 

@@ -411,6 +411,7 @@ export type Database = {
           game_system: string
           id: string
           invite_code: string
+          join_locked: boolean
           name: string
           narrator_id: string
           status: string
@@ -423,6 +424,7 @@ export type Database = {
           game_system?: string
           id?: string
           invite_code: string
+          join_locked?: boolean
           name: string
           narrator_id: string
           status?: string
@@ -435,6 +437,7 @@ export type Database = {
           game_system?: string
           id?: string
           invite_code?: string
+          join_locked?: boolean
           name?: string
           narrator_id?: string
           status?: string

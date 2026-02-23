@@ -1,0 +1,1 @@
+ALTER TABLE public.sessions ADD COLUMN join_locked boolean NOT NULL DEFAULT false;
