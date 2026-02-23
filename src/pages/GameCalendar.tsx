@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { UserMenu } from '@/components/UserMenu';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarDays, Plus, Trash2, ArrowLeft } from 'lucide-react';
+import { CalendarDays, Plus, Trash2, ArrowLeft, Pencil } from 'lucide-react';
 import { format, parseISO, isSameDay } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
@@ -36,6 +36,7 @@ export default function GameCalendar() {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [loadingEvents, setLoadingEvents] = useState(true);
@@ -116,6 +117,34 @@ export default function GameCalendar() {
     setNewTitle('');
     setNewDescription('');
     setShowAddModal(false);
+  };
+
+  const handleEditEvent = (event: CalendarEvent) => {
+    setEditingEvent(event);
+    setNewTitle(event.title);
+    setNewDescription(event.description || '');
+  };
+
+  const handleUpdateEvent = async () => {
+    if (!editingEvent || !newTitle.trim()) return;
+
+    const { error } = await supabase
+      .from('calendar_events')
+      .update({
+        title: newTitle.trim(),
+        description: newDescription.trim() || null,
+      })
+      .eq('id', editingEvent.id);
+
+    if (error) {
+      toast({ title: t.common.errorSaving, variant: 'destructive' });
+      return;
+    }
+
+    toast({ title: t.calendar.eventUpdated });
+    setEditingEvent(null);
+    setNewTitle('');
+    setNewDescription('');
   };
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -229,14 +258,26 @@ export default function GameCalendar() {
                         </p>
                       </div>
                       {(event.user_id === user.id || isAdmin) && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 h-8 w-8 text-destructive hover:text-destructive"
-                          onClick={() => handleDeleteEvent(event.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        <div className="flex shrink-0 gap-1">
+                          {event.user_id === user.id && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                              onClick={() => handleEditEvent(event)}
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteEvent(event.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -281,6 +322,47 @@ export default function GameCalendar() {
                 {t.common.cancel}
               </Button>
               <Button onClick={handleAddEvent} disabled={!newTitle.trim()}>
+                {t.common.save}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Event Modal */}
+      <Dialog open={!!editingEvent} onOpenChange={(open) => { if (!open) { setEditingEvent(null); setNewTitle(''); setNewDescription(''); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="font-medieval">{t.calendar.editEvent}</DialogTitle>
+            <DialogDescription className="font-body">
+              {editingEvent && format(parseISO(editingEvent.event_date), 'PPP', { locale })}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-1 block">{t.calendar.eventTitle}</label>
+              <Input
+                value={newTitle}
+                onChange={e => setNewTitle(e.target.value)}
+                placeholder={t.calendar.eventTitlePlaceholder}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">
+                {t.calendar.eventDescription}
+              </label>
+              <Textarea
+                value={newDescription}
+                onChange={e => setNewDescription(e.target.value)}
+                placeholder={t.calendar.eventDescriptionPlaceholder}
+                rows={3}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => { setEditingEvent(null); setNewTitle(''); setNewDescription(''); }}>
+                {t.common.cancel}
+              </Button>
+              <Button onClick={handleUpdateEvent} disabled={!newTitle.trim()}>
                 {t.common.save}
               </Button>
             </div>
