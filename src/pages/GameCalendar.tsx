@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { UserMenu } from '@/components/UserMenu';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarDays, Plus, Trash2, ArrowLeft, Pencil } from 'lucide-react';
+import { CalendarDays, Plus, Trash2, ArrowLeft, Pencil, Clock } from 'lucide-react';
 import { format, parseISO, isSameDay } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
@@ -22,6 +22,8 @@ interface CalendarEvent {
   title: string;
   event_date: string;
   description: string | null;
+  start_time: string | null;
+  end_time: string | null;
   created_at: string;
   profile?: { display_name: string | null };
 }
@@ -39,6 +41,8 @@ export default function GameCalendar() {
   const [editingEvent, setEditingEvent] = useState<CalendarEvent | null>(null);
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
+  const [newStartTime, setNewStartTime] = useState('');
+  const [newEndTime, setNewEndTime] = useState('');
   const [loadingEvents, setLoadingEvents] = useState(true);
 
   const locale = language === 'pt-BR' ? ptBR : enUS;
@@ -106,6 +110,8 @@ export default function GameCalendar() {
       title: newTitle.trim(),
       event_date: format(selectedDate, 'yyyy-MM-dd'),
       description: newDescription.trim() || null,
+      start_time: newStartTime || null,
+      end_time: newEndTime || null,
     });
 
     if (error) {
@@ -116,6 +122,8 @@ export default function GameCalendar() {
     toast({ title: t.calendar.eventAdded });
     setNewTitle('');
     setNewDescription('');
+    setNewStartTime('');
+    setNewEndTime('');
     setShowAddModal(false);
   };
 
@@ -123,6 +131,8 @@ export default function GameCalendar() {
     setEditingEvent(event);
     setNewTitle(event.title);
     setNewDescription(event.description || '');
+    setNewStartTime(event.start_time || '');
+    setNewEndTime(event.end_time || '');
   };
 
   const handleUpdateEvent = async () => {
@@ -133,6 +143,8 @@ export default function GameCalendar() {
       .update({
         title: newTitle.trim(),
         description: newDescription.trim() || null,
+        start_time: newStartTime || null,
+        end_time: newEndTime || null,
       })
       .eq('id', editingEvent.id);
 
@@ -145,6 +157,8 @@ export default function GameCalendar() {
     setEditingEvent(null);
     setNewTitle('');
     setNewDescription('');
+    setNewStartTime('');
+    setNewEndTime('');
   };
 
   const handleDeleteEvent = async (eventId: string) => {
@@ -247,15 +261,21 @@ export default function GameCalendar() {
                       <div className="min-w-0">
                         <p className="font-medieval text-sm font-semibold truncate">
                           {event.title}
-                        </p>
-                        {event.description && (
-                          <p className="text-xs text-muted-foreground font-body">
-                            {event.description}
-                          </p>
-                        )}
-                        <p className="text-xs text-muted-foreground/70 font-body mt-1">
-                          {t.calendar.createdBy}: {event.profile?.display_name || t.calendar.anonymous}
-                        </p>
+                         </p>
+                         {(event.start_time || event.end_time) && (
+                           <p className="text-xs text-muted-foreground font-body flex items-center gap-1">
+                             <Clock className="w-3 h-3" />
+                             {event.start_time || '?'} - {event.end_time || '?'}
+                           </p>
+                         )}
+                         {event.description && (
+                           <p className="text-xs text-muted-foreground font-body">
+                             {event.description}
+                           </p>
+                         )}
+                         <p className="text-xs text-muted-foreground/70 font-body mt-1">
+                           {t.calendar.createdBy}: {event.profile?.display_name || t.calendar.anonymous}
+                         </p>
                       </div>
                       {(event.user_id === user.id || isAdmin) && (
                         <div className="flex shrink-0 gap-1">
@@ -306,6 +326,24 @@ export default function GameCalendar() {
                 placeholder={t.calendar.eventTitlePlaceholder}
               />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-medium mb-1 block">{t.calendar.startTime}</label>
+                <Input
+                  type="time"
+                  value={newStartTime}
+                  onChange={e => setNewStartTime(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">{t.calendar.endTime}</label>
+                <Input
+                  type="time"
+                  value={newEndTime}
+                  onChange={e => setNewEndTime(e.target.value)}
+                />
+              </div>
+            </div>
             <div>
               <label className="text-sm font-medium mb-1 block">
                 {t.calendar.eventDescription}
@@ -330,7 +368,7 @@ export default function GameCalendar() {
       </Dialog>
 
       {/* Edit Event Modal */}
-      <Dialog open={!!editingEvent} onOpenChange={(open) => { if (!open) { setEditingEvent(null); setNewTitle(''); setNewDescription(''); } }}>
+      <Dialog open={!!editingEvent} onOpenChange={(open) => { if (!open) { setEditingEvent(null); setNewTitle(''); setNewDescription(''); setNewStartTime(''); setNewEndTime(''); } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle className="font-medieval">{t.calendar.editEvent}</DialogTitle>
@@ -347,6 +385,24 @@ export default function GameCalendar() {
                 placeholder={t.calendar.eventTitlePlaceholder}
               />
             </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-sm font-medium mb-1 block">{t.calendar.startTime}</label>
+                <Input
+                  type="time"
+                  value={newStartTime}
+                  onChange={e => setNewStartTime(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-1 block">{t.calendar.endTime}</label>
+                <Input
+                  type="time"
+                  value={newEndTime}
+                  onChange={e => setNewEndTime(e.target.value)}
+                />
+              </div>
+            </div>
             <div>
               <label className="text-sm font-medium mb-1 block">
                 {t.calendar.eventDescription}
@@ -359,7 +415,7 @@ export default function GameCalendar() {
               />
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => { setEditingEvent(null); setNewTitle(''); setNewDescription(''); }}>
+              <Button variant="outline" onClick={() => { setEditingEvent(null); setNewTitle(''); setNewDescription(''); setNewStartTime(''); setNewEndTime(''); }}>
                 {t.common.cancel}
               </Button>
               <Button onClick={handleUpdateEvent} disabled={!newTitle.trim()}>
