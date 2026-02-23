@@ -950,6 +950,10 @@ export const translations = {
       blockConfirm: 'Tem certeza que deseja BLOQUEAR permanentemente este jogador? Ele não poderá reentrar na sessão.',
       playerBlocked: 'Jogador bloqueado da sessão',
       errorRemoving: 'Erro ao remover jogador',
+      joinLocked: 'Bloquear entrada de novos jogadores',
+      joinLockedEnabled: 'Entrada bloqueada',
+      joinLockedDisabled: 'Entrada liberada',
+      joinLockedByNarrator: 'O narrador bloqueou a entrada de novos jogadores nesta sessão',
     },
 
     // Session rejoin
@@ -1990,6 +1994,10 @@ export const translations = {
       blockConfirm: 'Are you sure you want to PERMANENTLY BLOCK this player? They will not be able to rejoin the session.',
       playerBlocked: 'Player blocked from session',
       errorRemoving: 'Error removing player',
+      joinLocked: 'Block new players from joining',
+      joinLockedEnabled: 'Joining blocked',
+      joinLockedDisabled: 'Joining open',
+      joinLockedByNarrator: 'The narrator has blocked new players from joining this session',
     },
 
     // Session rejoin
