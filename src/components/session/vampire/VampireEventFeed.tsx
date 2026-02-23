@@ -90,6 +90,10 @@ const getTestLabel = (eventData: Record<string, unknown>, t: any): string => {
     const abilityLabel = t.vampiro?.[ability] || ability;
     return `${attrLabel} + ${abilityLabel}`;
   }
+  if (testType === 'attribute_only') {
+    const attr = testConfig.attribute as string;
+    return t.vampiro?.[attr] || attr;
+  }
   if (testType === 'willpower') return t.vampiro?.willpower || 'Willpower';
   if (testType === 'humanity') return t.vampiro?.humanity || 'Humanity';
   if (testType === 'virtue') {
