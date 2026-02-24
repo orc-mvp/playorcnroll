@@ -207,15 +207,47 @@ export default function CreateCharacter() {
             merits_flaws: vampiroFormData.merits_flaws || [],
           },
         });
-
+        if (error) throw error;
+      } else if (gameSystem === 'lobisomem_w20') {
+        const { error } = await supabase.from('characters').insert({
+          user_id: user.id,
+          name: lobisomemFormData.name.trim(),
+          concept: lobisomemFormData.concept.trim() || null,
+          game_system: gameSystem,
+          vampiro_data: {
+            player: lobisomemFormData.player,
+            chronicle: lobisomemFormData.chronicle,
+            nature: lobisomemFormData.nature,
+            demeanor: lobisomemFormData.demeanor,
+            tribe: lobisomemFormData.tribe,
+            auspice: lobisomemFormData.auspice,
+            rank: lobisomemFormData.rank,
+            breed: lobisomemFormData.breed,
+            pack: lobisomemFormData.pack,
+            totem: lobisomemFormData.totem,
+            attributes: lobisomemFormData.attributes,
+            abilities: lobisomemFormData.abilities,
+            specializations: lobisomemFormData.specializations,
+            gnosis: lobisomemFormData.gnosis,
+            rage: lobisomemFormData.rage,
+            willpower: lobisomemFormData.willpower,
+            gifts: lobisomemFormData.gifts,
+            backgrounds: lobisomemFormData.backgrounds,
+            merits_flaws: lobisomemFormData.merits_flaws || [],
+          },
+        });
         if (error) throw error;
       }
+
+      const charName = gameSystem === 'vampiro_v3' ? vampiroFormData.name
+        : gameSystem === 'lobisomem_w20' ? lobisomemFormData.name
+        : formData.name;
 
       toast({
         title: t.character.create,
         description: language === 'pt-BR' 
-          ? `${gameSystem === 'vampiro_v3' ? vampiroFormData.name : formData.name} foi criado com sucesso!`
-          : `${gameSystem === 'vampiro_v3' ? vampiroFormData.name : formData.name} was created successfully!`,
+          ? `${charName} foi criado com sucesso!`
+          : `${charName} was created successfully!`,
       });
 
       const returnTo = searchParams.get('returnTo');
@@ -337,23 +369,44 @@ export default function CreateCharacter() {
 
         {/* Heróis Marcados Steps */}
         {step === 1 && gameSystem === 'herois_marcados' && (
-          <StepBasicInfo
-            formData={formData}
-            updateFormData={updateFormData}
-          />
+          <StepBasicInfo formData={formData} updateFormData={updateFormData} />
         )}
-
         {step === 2 && gameSystem === 'herois_marcados' && (
-          <StepAttributes
-            formData={formData}
-            updateFormData={updateFormData}
-          />
+          <StepAttributes formData={formData} updateFormData={updateFormData} />
+        )}
+        {step === 3 && gameSystem === 'herois_marcados' && (
+          <StepMinorMarks formData={formData} updateFormData={updateFormData} />
         )}
 
-        {step === 3 && gameSystem === 'herois_marcados' && (
-          <StepMinorMarks
-            formData={formData}
-            updateFormData={updateFormData}
+        {/* Lobisomem Steps */}
+        {step === 1 && gameSystem === 'lobisomem_w20' && (
+          <StepLobisomemBasicInfo
+            formData={lobisomemFormData}
+            updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 2 && gameSystem === 'lobisomem_w20' && (
+          <StepLobisomemAttributes
+            formData={lobisomemFormData}
+            updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 3 && gameSystem === 'lobisomem_w20' && (
+          <StepLobisomemGifts
+            formData={lobisomemFormData}
+            updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 4 && gameSystem === 'lobisomem_w20' && (
+          <StepLobisomemBackgrounds
+            formData={lobisomemFormData}
+            updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 5 && gameSystem === 'lobisomem_w20' && (
+          <StepLobisomemMeritsFlaws
+            formData={lobisomemFormData}
+            updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
           />
         )}
 
@@ -363,46 +416,21 @@ export default function CreateCharacter() {
             {t.common.back}
           </Button>
 
-          {step === 0 && (
-            <Button 
-              onClick={handleNext}
-              disabled={!validateStep(step)}
-            >
+          {step < totalSteps - 1 && (
+            <Button onClick={handleNext} disabled={!validateStep(step)}>
               {t.common.next}
             </Button>
           )}
 
-          {step > 0 && step < totalSteps - 1 && gameSystem === 'vampiro_v3' && (
-            <Button 
-              onClick={handleNext}
-              disabled={!validateStep(step)}
-            >
-              {t.common.next}
-            </Button>
-          )}
-
-          {step === totalSteps - 1 && gameSystem === 'vampiro_v3' && (
-            <Button 
+          {step === totalSteps - 1 && (
+            <Button
               onClick={handleSubmit}
-              disabled={!vampiroFormData.name.trim() || !vampiroFormData.clan || isSubmitting}
-            >
-              {isSubmitting ? t.common.loading : t.common.finish}
-            </Button>
-          )}
-
-          {step > 0 && step < totalSteps - 1 && gameSystem === 'herois_marcados' && (
-            <Button 
-              onClick={handleNext}
-              disabled={!validateStep(step)}
-            >
-              {t.common.next}
-            </Button>
-          )}
-
-          {step === totalSteps - 1 && gameSystem === 'herois_marcados' && (
-            <Button 
-              onClick={handleSubmit}
-              disabled={!validateStep(step) || isSubmitting}
+              disabled={
+                (gameSystem === 'herois_marcados' && !validateStep(step)) ||
+                (gameSystem === 'vampiro_v3' && (!vampiroFormData.name.trim() || !vampiroFormData.clan)) ||
+                (gameSystem === 'lobisomem_w20' && (!lobisomemFormData.name.trim() || !lobisomemFormData.tribe)) ||
+                isSubmitting
+              }
             >
               {isSubmitting ? t.common.loading : t.common.finish}
             </Button>
