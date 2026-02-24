@@ -1,4 +1,4 @@
-import { Sword, Moon } from 'lucide-react';
+import { Sword, Moon, Dog } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useI18n } from '@/lib/i18n';
 import { GAME_SYSTEMS, GameSystemId } from '@/lib/gameSystems';
@@ -14,6 +14,7 @@ interface GameSystemSelectorProps {
 const systemIcons: Record<GameSystemId, React.ReactNode> = {
   herois_marcados: <Sword className="w-8 h-8" />,
   vampiro_v3: <Moon className="w-8 h-8" />,
+  lobisomem_w20: <Dog className="w-8 h-8" />,
 };
 
 export default function GameSystemSelector({
@@ -42,6 +43,8 @@ export default function GameSystemSelector({
               isSelected
                 ? system.color === 'primary'
                   ? 'border-primary bg-primary/10'
+                  : system.color === 'emerald'
+                  ? 'border-emerald-500 bg-emerald-500/10'
                   : 'border-red-500 bg-red-500/10'
                 : 'border-border bg-card hover:border-muted-foreground/50',
               isDisabled && 'opacity-50 cursor-not-allowed',
@@ -62,6 +65,8 @@ export default function GameSystemSelector({
                 'p-3 rounded-full',
                 system.color === 'primary'
                   ? 'bg-primary/20 text-primary'
+                  : system.color === 'emerald'
+                  ? 'bg-emerald-500/20 text-emerald-500'
                   : 'bg-red-500/20 text-red-500'
               )}
             >

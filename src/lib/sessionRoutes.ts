@@ -5,6 +5,9 @@ export function getSessionRoute(sessionId: string, gameSystem: string): string {
   if (gameSystem === 'vampiro_v3') {
     return `/session/vampire/${sessionId}`;
   }
+  if (gameSystem === 'lobisomem_w20') {
+    return `/session/werewolf/${sessionId}`;
+  }
   return `/session/${sessionId}`;
 }
 

@@ -7,7 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Sword, Construction } from 'lucide-react';
+import { ArrowLeft, Sword, Construction, Dog } from 'lucide-react';
 import StepBasicInfo from '@/components/character/StepBasicInfo';
 import StepAttributes from '@/components/character/StepAttributes';
 import StepMinorMarks from '@/components/character/StepMinorMarks';
@@ -18,6 +18,11 @@ import StepVampiroDisciplines from '@/components/character/vampiro/StepVampiroDi
 import StepVampiroMeritsFlaws from '@/components/character/vampiro/StepVampiroMeritsFlaws';
 import GameSystemSelector from '@/components/GameSystemSelector';
 import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
+import StepLobisomemBasicInfo, { LobisomemFormData } from '@/components/character/lobisomem/StepLobisomemBasicInfo';
+import StepLobisomemAttributes from '@/components/character/lobisomem/StepLobisomemAttributes';
+import StepLobisomemGifts from '@/components/character/lobisomem/StepLobisomemGifts';
+import StepLobisomemBackgrounds from '@/components/character/lobisomem/StepLobisomemBackgrounds';
+import StepLobisomemMeritsFlaws from '@/components/character/lobisomem/StepLobisomemMeritsFlaws';
 
 export type AttributeType = 'strong' | 'neutral' | 'weak';
 
@@ -48,48 +53,33 @@ const initialFormData: CharacterFormData = {
 };
 
 const initialVampiroFormData: VampiroFormData = {
-  // Step 1 - Basic Info
-  name: '',
-  player: '',
-  chronicle: '',
-  nature: '',
-  demeanor: '',
-  clan: '',
-  generation: '',
-  sire: '',
-  concept: '',
-  
-  // Step 2 - Attributes & Abilities
+  name: '', player: '', chronicle: '', nature: '', demeanor: '',
+  clan: '', generation: '', sire: '', concept: '',
   attributes: {
     physical: { strength: 1, dexterity: 1, stamina: 1 },
     social: { charisma: 1, manipulation: 1, appearance: 1 },
     mental: { perception: 1, intelligence: 1, wits: 1 },
   },
-  abilities: {
-    talents: {},
-    skills: {},
-    knowledges: {},
-  },
+  abilities: { talents: {}, skills: {}, knowledges: {} },
   specializations: {},
-  
-  // Step 3 - Virtues, Humanity/Path, Willpower
-  virtues: {
-    virtueType1: 'conscience',
-    virtueValue1: 1,
-    virtueType2: 'selfControl',
-    virtueValue2: 1,
-    courage: 1,
+  virtues: { virtueType1: 'conscience', virtueValue1: 1, virtueType2: 'selfControl', virtueValue2: 1, courage: 1 },
+  moralityType: 'humanity', pathName: '', humanity: 2, willpower: 1,
+  disciplines: {}, backgrounds: {}, merits_flaws: [],
+};
+
+const initialLobisomemFormData: LobisomemFormData = {
+  name: '', player: '', chronicle: '', nature: '', demeanor: '',
+  tribe: '', auspice: '', rank: '', breed: '', pack: '', totem: '', concept: '',
+  attributes: {
+    physical: { strength: 1, dexterity: 1, stamina: 1 },
+    social: { charisma: 1, manipulation: 1, appearance: 1 },
+    mental: { perception: 1, intelligence: 1, wits: 1 },
   },
-  moralityType: 'humanity',
-  pathName: '',
-  humanity: 2,
-  willpower: 1,
-  
-  // Step 4 - Disciplines & Backgrounds
-  disciplines: {},
+  abilities: { talents: {}, skills: {}, knowledges: {} },
+  specializations: {},
+  gifts: {},
   backgrounds: {},
-  
-  // Step 5 - Merits & Flaws
+  gnosis: 1, rage: 1, willpower: 1,
   merits_flaws: [],
 };
 
@@ -105,61 +95,50 @@ export default function CreateCharacter() {
   
   // Initialize state based on URL param
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(() => {
-    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados') {
-      return preSelectedSystem;
+    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados' || preSelectedSystem === 'lobisomem_w20') {
+      return preSelectedSystem as GameSystemId;
     }
     return null;
   });
   const [step, setStep] = useState(() => {
-    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados') {
-      return 1; // Skip system selection
+    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados' || preSelectedSystem === 'lobisomem_w20') {
+      return 1;
     }
     return 0;
   });
   const [formData, setFormData] = useState<CharacterFormData>(initialFormData);
   const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
+  const [lobisomemFormData, setLobisomemFormData] = useState<LobisomemFormData>(initialLobisomemFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalSteps = gameSystem === 'vampiro_v3' ? 6 : 4; // Vampiro: 0-5, Marcados: 0-3
+  const totalSteps = gameSystem === 'vampiro_v3' ? 6 : gameSystem === 'lobisomem_w20' ? 6 : 4;
   const progress = ((step + 1) / totalSteps) * 100;
 
   const validateStep = (currentStep: number): boolean => {
     if (gameSystem === 'herois_marcados') {
       switch (currentStep) {
-        case 0:
-          return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
-        case 1:
-          return formData.name.trim().length >= 2;
+        case 0: return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
+        case 1: return formData.name.trim().length >= 2;
         case 2: {
           const types = Object.values(formData.attributes);
-          const strongCount = types.filter(t => t === 'strong').length;
-          const neutralCount = types.filter(t => t === 'neutral').length;
-          const weakCount = types.filter(t => t === 'weak').length;
-          return strongCount === 2 && neutralCount === 1 && weakCount === 2;
+          return types.filter(t => t === 'strong').length === 2 && types.filter(t => t === 'neutral').length === 1 && types.filter(t => t === 'weak').length === 2;
         }
-        case 3:
-          return formData.selectedMarks.length === 2;
-        default:
-          return false;
+        case 3: return formData.selectedMarks.length === 2;
+        default: return false;
       }
     } else if (gameSystem === 'vampiro_v3') {
       switch (currentStep) {
-        case 0:
-          return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
-        case 1:
-          return vampiroFormData.name.trim().length >= 2 && vampiroFormData.clan.length > 0;
-        case 2:
-          return true;
-        case 3:
-          // Virtues step - always valid since virtues have minValue
-          return true;
-        case 4:
-          return true;
-        case 5:
-          // Merits & Flaws step - always valid (optional)
-          return true;
-        default:
-          return false;
+        case 0: return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
+        case 1: return vampiroFormData.name.trim().length >= 2 && vampiroFormData.clan.length > 0;
+        case 2: case 3: case 4: case 5: return true;
+        default: return false;
+      }
+    } else if (gameSystem === 'lobisomem_w20') {
+      switch (currentStep) {
+        case 0: return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
+        case 1: return lobisomemFormData.name.trim().length >= 2 && lobisomemFormData.tribe.length > 0 && lobisomemFormData.auspice.length > 0;
+        case 2: case 3: case 4: case 5: return true;
+        default: return false;
       }
     }
     return currentStep === 0 && gameSystem !== null;
