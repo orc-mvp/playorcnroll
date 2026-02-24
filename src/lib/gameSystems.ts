@@ -1,4 +1,4 @@
-export type GameSystemId = 'herois_marcados' | 'vampiro_v3';
+export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20';
 
 export interface GameSystem {
   id: GameSystemId;
@@ -37,6 +37,18 @@ export const GAME_SYSTEMS: GameSystem[] = [
     color: 'red',
     available: true,
     features: ['Pool de d10', 'Fome', 'Humanidade', 'Disciplinas']
+  },
+  {
+    id: 'lobisomem_w20',
+    name: 'Lobisomem: O Apocalipse',
+    shortName: 'W20',
+    description: {
+      'pt-BR': 'Fúria e honra na luta contra a Wyrm.',
+      'en': 'Rage and honor in the fight against the Wyrm.'
+    },
+    color: 'emerald',
+    available: true,
+    features: ['Pool de d10', 'Fúria', 'Gnose', 'Dons']
   }
 ];
 

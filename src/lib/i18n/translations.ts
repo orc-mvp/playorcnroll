@@ -1043,6 +1043,102 @@ export const translations = {
       filterByCost: 'Filtrar por pontos',
       allCosts: 'Todos os pontos',
     },
+
+    // Lobisomem
+    lobisomem: {
+      // Basic Info
+      tribe: 'Tribo',
+      auspice: 'Augúrio',
+      rank: 'Posto',
+      breed: 'Raça',
+      pack: 'Matilha',
+      totem: 'Totem',
+      gnosis: 'Gnose',
+      rage: 'Fúria',
+      gifts: 'Dons',
+      giftLevel: 'Nível {level}',
+      addGift: 'Adicionar Dom',
+      giftPlaceholder: 'Nome do Dom...',
+      noGifts: 'Nenhum dom',
+      form: 'Forma',
+      currentForm: 'Forma Atual',
+
+      // Tribes
+      tribe_blackFuries: 'Fúrias Negras',
+      tribe_boneGnawers: 'Roedores de Ossos',
+      tribe_childrenOfGaia: 'Filhos de Gaia',
+      tribe_fianna: 'Fianna',
+      tribe_getOfFenris: 'Cria de Fenris',
+      tribe_glassWalkers: 'Andarilhos do Asfalto',
+      tribe_redTalons: 'Garras Vermelhas',
+      tribe_shadowLords: 'Senhores das Sombras',
+      tribe_silentStriders: 'Peregrinos Silenciosos',
+      tribe_silverFangs: 'Presas de Prata',
+      tribe_stargazers: 'Contempladores de Estrelas',
+      tribe_uktena: 'Uktena',
+      tribe_wendigo: 'Wendigo',
+
+      // Auspices
+      auspice_ragabash: 'Ragabash',
+      auspice_theurge: 'Theurge',
+      auspice_philodox: 'Philodox',
+      auspice_galliard: 'Galliard',
+      auspice_ahroun: 'Ahroun',
+
+      // Breeds
+      breed_homid: 'Hominídeo',
+      breed_metis: 'Impuro',
+      breed_lupus: 'Lupino',
+
+      // Forms
+      form_hominid: 'Hominídeo',
+      form_glabro: 'Glabro',
+      form_crinos: 'Crinos',
+      form_hispo: 'Hispo',
+      form_lupus: 'Lupus',
+
+      // Ranks
+      rank_cliath: 'Cliath',
+      rank_fostern: 'Fostern',
+      rank_adren: 'Adren',
+      rank_athro: 'Athro',
+      rank_elder: 'Ancião',
+
+      // Character Sheet
+      defineIdentity: 'Defina a identidade do seu Garou',
+      basicInfo: 'Informações Básicas',
+      selectTribe: 'Selecione a tribo',
+      selectAuspice: 'Selecione o augúrio',
+      selectBreed: 'Selecione a raça',
+      selectRank: 'Selecione o posto',
+
+      // Backgrounds & Trackers
+      gnosisRage: 'Gnose & Fúria',
+      gnosisDesc: 'Conexão espiritual do Garou',
+      rageDesc: 'Fúria interior do Garou',
+
+      // Session
+      werewolfSession: 'Sessão de Lobisomem',
+      gnosisDepleted: 'Gnose Esgotada!',
+      rageDepleted: 'Fúria Esgotada!',
+      rageOverflow: 'Fúria Máxima!',
+      trackerGnosisChange: 'Gnose',
+      trackerRageChange: 'Fúria',
+      trackerFormChange: 'Forma',
+
+      // Tests
+      gnosisOnly: 'Gnose',
+      rageOnly: 'Fúria',
+
+      // Edit Modal
+      editCharacter: 'Editar Personagem',
+      editWerewolfInfo: 'Edite as informações do seu Garou',
+      tabBasic: 'Básico',
+      tabAttributes: 'Atributos',
+      tabAbilities: 'Habilidades',
+      tabGifts: 'Dons',
+      tabBackgrounds: 'Antecedentes',
+    },
   },
 
   en: {
@@ -2086,6 +2182,91 @@ export const translations = {
       onlyMarks: 'Marks',
       filterByCost: 'Filter by points',
       allCosts: 'All points',
+    },
+
+    // Lobisomem
+    lobisomem: {
+      tribe: 'Tribe',
+      auspice: 'Auspice',
+      rank: 'Rank',
+      breed: 'Breed',
+      pack: 'Pack',
+      totem: 'Totem',
+      gnosis: 'Gnosis',
+      rage: 'Rage',
+      gifts: 'Gifts',
+      giftLevel: 'Level {level}',
+      addGift: 'Add Gift',
+      giftPlaceholder: 'Gift name...',
+      noGifts: 'No gifts',
+      form: 'Form',
+      currentForm: 'Current Form',
+
+      tribe_blackFuries: 'Black Furies',
+      tribe_boneGnawers: 'Bone Gnawers',
+      tribe_childrenOfGaia: 'Children of Gaia',
+      tribe_fianna: 'Fianna',
+      tribe_getOfFenris: 'Get of Fenris',
+      tribe_glassWalkers: 'Glass Walkers',
+      tribe_redTalons: 'Red Talons',
+      tribe_shadowLords: 'Shadow Lords',
+      tribe_silentStriders: 'Silent Striders',
+      tribe_silverFangs: 'Silver Fangs',
+      tribe_stargazers: 'Stargazers',
+      tribe_uktena: 'Uktena',
+      tribe_wendigo: 'Wendigo',
+
+      auspice_ragabash: 'Ragabash',
+      auspice_theurge: 'Theurge',
+      auspice_philodox: 'Philodox',
+      auspice_galliard: 'Galliard',
+      auspice_ahroun: 'Ahroun',
+
+      breed_homid: 'Homid',
+      breed_metis: 'Metis',
+      breed_lupus: 'Lupus',
+
+      form_hominid: 'Hominid',
+      form_glabro: 'Glabro',
+      form_crinos: 'Crinos',
+      form_hispo: 'Hispo',
+      form_lupus: 'Lupus',
+
+      rank_cliath: 'Cliath',
+      rank_fostern: 'Fostern',
+      rank_adren: 'Adren',
+      rank_athro: 'Athro',
+      rank_elder: 'Elder',
+
+      defineIdentity: 'Define your Garou\'s identity',
+      basicInfo: 'Basic Information',
+      selectTribe: 'Select tribe',
+      selectAuspice: 'Select auspice',
+      selectBreed: 'Select breed',
+      selectRank: 'Select rank',
+
+      gnosisRage: 'Gnosis & Rage',
+      gnosisDesc: 'Spiritual connection of the Garou',
+      rageDesc: 'Inner fury of the Garou',
+
+      werewolfSession: 'Werewolf Session',
+      gnosisDepleted: 'Gnosis Depleted!',
+      rageDepleted: 'Rage Depleted!',
+      rageOverflow: 'Maximum Rage!',
+      trackerGnosisChange: 'Gnosis',
+      trackerRageChange: 'Rage',
+      trackerFormChange: 'Form',
+
+      gnosisOnly: 'Gnosis',
+      rageOnly: 'Rage',
+
+      editCharacter: 'Edit Character',
+      editWerewolfInfo: 'Edit your Garou\'s information',
+      tabBasic: 'Basic',
+      tabAttributes: 'Attributes',
+      tabAbilities: 'Abilities',
+      tabGifts: 'Gifts',
+      tabBackgrounds: 'Backgrounds',
     },
   },
 } as const;

@@ -356,8 +356,11 @@ export type Database = {
           id: string
           joined_at: string
           session_blood_pool: number | null
+          session_form: string | null
+          session_gnosis: number | null
           session_health_damage: Json | null
           session_id: string
+          session_rage: number | null
           session_willpower_current: number | null
           sheet_locked: boolean
           user_id: string
@@ -368,8 +371,11 @@ export type Database = {
           id?: string
           joined_at?: string
           session_blood_pool?: number | null
+          session_form?: string | null
+          session_gnosis?: number | null
           session_health_damage?: Json | null
           session_id: string
+          session_rage?: number | null
           session_willpower_current?: number | null
           sheet_locked?: boolean
           user_id: string
@@ -380,8 +386,11 @@ export type Database = {
           id?: string
           joined_at?: string
           session_blood_pool?: number | null
+          session_form?: string | null
+          session_gnosis?: number | null
           session_health_damage?: Json | null
           session_id?: string
+          session_rage?: number | null
           session_willpower_current?: number | null
           sheet_locked?: boolean
           user_id?: string
