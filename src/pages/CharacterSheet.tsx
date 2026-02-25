@@ -37,7 +37,9 @@ import {
 } from 'lucide-react';
 import { EditCharacterModal } from '@/components/character/EditCharacterModal';
 import { EditVampiroCharacterModal } from '@/components/character/vampiro/EditVampiroCharacterModal';
+import { EditLobisomemCharacterModal } from '@/components/character/lobisomem/EditLobisomemCharacterModal';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
+import LobisomemCharacterSheet from '@/components/character/lobisomem/LobisomemCharacterSheet';
 import type { Json } from '@/integrations/supabase/types';
 
 interface MajorMark {
@@ -115,6 +117,7 @@ export default function CharacterSheet() {
   const [loading, setLoading] = useState(true);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showVampiroEditModal, setShowVampiroEditModal] = useState(false);
+  const [showLobisomemEditModal, setShowLobisomemEditModal] = useState(false);
   const isOwner = character && user && character.id && user.id;
 
   useEffect(() => {
@@ -239,6 +242,8 @@ export default function CharacterSheet() {
 
                 if (character.game_system === 'vampiro_v3') {
                   setShowVampiroEditModal(true);
+                } else if (character.game_system === 'lobisomem_w20') {
+                  setShowLobisomemEditModal(true);
                 } else {
                   setShowEditModal(true);
                 }
@@ -262,6 +267,15 @@ export default function CharacterSheet() {
                 concept: character.concept,
                 vampiro_data: character.vampiro_data as any,
               }} 
+            />
+          ) : character.game_system === 'lobisomem_w20' ? (
+            <LobisomemCharacterSheet
+              character={{
+                id: character.id,
+                name: character.name,
+                concept: character.concept,
+                vampiro_data: character.vampiro_data as any,
+              }}
             />
           ) : (
           <div className="space-y-6 pb-8">
@@ -675,6 +689,28 @@ export default function CharacterSheet() {
         <EditVampiroCharacterModal
           open={showVampiroEditModal}
           onOpenChange={setShowVampiroEditModal}
+          character={{
+            id: character.id,
+            name: character.name,
+            concept: character.concept,
+            vampiro_data: character.vampiro_data as any,
+          }}
+          onSave={(updated) => {
+            setCharacter(prev => prev ? { 
+              ...prev, 
+              name: updated.name, 
+              concept: updated.concept,
+              vampiro_data: updated.vampiro_data as any 
+            } : prev);
+          }}
+        />
+      )}
+
+      {/* Edit Character Modal - Lobisomem */}
+      {character && character.game_system === 'lobisomem_w20' && (
+        <EditLobisomemCharacterModal
+          open={showLobisomemEditModal}
+          onOpenChange={setShowLobisomemEditModal}
           character={{
             id: character.id,
             name: character.name,
