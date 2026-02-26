@@ -414,7 +414,9 @@ export default function JoinSession() {
   }
 
   const getSystemLabel = (gameSystem: string) => 
-    gameSystem === 'vampiro_v3' ? 'Vampiro: A Máscara' : 'Heróis Marcados';
+    gameSystem === 'vampiro_v3' ? 'Vampiro: A Máscara' 
+    : gameSystem === 'lobisomem_w20' ? 'Lobisomem: O Apocalipse' 
+    : 'Heróis Marcados';
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
