@@ -30,6 +30,7 @@ export interface LobisomemCharacterData {
   willpower?: number;
   gifts?: Record<number, string[]>;
   backgrounds?: Record<string, number>;
+  renown?: { glory: number; honor: number; wisdom: number };
   merits_flaws?: { id: string; name: string; cost: number; category: string }[];
 }
 

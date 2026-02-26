@@ -68,13 +68,54 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData }: S
           </div>
           <div className="flex items-center justify-between gap-4">
             <span className="font-body text-sm min-w-[140px]">
-              {language === 'pt-BR' ? 'Força de Vontade' : 'Willpower'}
+              {t.lobisomem.willpowerLabel}
             </span>
             <DotRating
               value={formData.willpower}
               onChange={(value) => updateFormData({ willpower: value })}
               maxValue={10}
               minValue={1}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Renown */}
+      <Card className="medieval-card">
+        <CardHeader className="text-center pb-4">
+          <CardTitle className="font-medieval text-2xl">
+            {t.lobisomem.renown}
+          </CardTitle>
+          <CardDescription className="font-body">
+            {t.lobisomem.renownDesc}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-body text-sm min-w-[140px]">{t.lobisomem.glory}</span>
+            <DotRating
+              value={formData.renown?.glory || 0}
+              onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), glory: value } })}
+              maxValue={10}
+              minValue={0}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-body text-sm min-w-[140px]">{t.lobisomem.honor}</span>
+            <DotRating
+              value={formData.renown?.honor || 0}
+              onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), honor: value } })}
+              maxValue={10}
+              minValue={0}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <span className="font-body text-sm min-w-[140px]">{t.lobisomem.wisdom}</span>
+            <DotRating
+              value={formData.renown?.wisdom || 0}
+              onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), wisdom: value } })}
+              maxValue={10}
+              minValue={0}
             />
           </div>
         </CardContent>

@@ -11,7 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Dog, User, Shield, Brain, Sparkles, Users, Flame, Star, Award } from 'lucide-react';
+import { Dog, User, Shield, Brain, Sparkles, Users, Flame, Star, Award, Heart, Crown } from 'lucide-react';
 import { toTitleCase } from '@/lib/textUtils';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 
@@ -214,6 +214,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
   const rage = data.rage || 1;
   const willpower = data.willpower || 1;
   const gifts = data.gifts || {};
+  const renown = data.renown || { glory: 0, honor: 0, wisdom: 0 };
 
   const getTranslatedName = (value: string, keyMap: Record<string, string>) => {
     const key = keyMap[value];
@@ -224,18 +225,6 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
   };
 
   const getBackgroundName = (key: string) => BACKGROUND_DISPLAY[key]?.[lang] || key;
-
-  const toggleGnosisPoint = (index: number) => {
-    setCurrentGnosis(index < currentGnosis ? index : index + 1);
-  };
-
-  const toggleRagePoint = (index: number) => {
-    setCurrentRage(index < currentRage ? index : index + 1);
-  };
-
-  const toggleWillpowerPoint = (index: number) => {
-    setCurrentWillpower(index < currentWillpower ? index : index + 1);
-  };
 
   const toggleHealthDamage = (index: number) => {
     const newDamage = [...healthDamage];
@@ -628,17 +617,17 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
         );
       })()}
 
-      {/* Gnosis, Rage, Willpower & Health */}
+      {/* Salvatérios: Gnose, Fúria, Vitalidade, Força de Vontade */}
       <Card className="medieval-card border-emerald-500/20">
         <CardHeader className="pb-3">
           <CardTitle className="font-medieval flex items-center gap-2 text-emerald-500">
             <Flame className="w-5 h-5" />
-            {t.lobisomem.gnosisRage} & {t.vampiro.willpower}
+            {t.lobisomem.salvaterios}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Gnosis & Rage as dot displays */}
+            {/* Left column: Gnose, Fúria, Força de Vontade */}
             <div className="space-y-4">
               <div>
                 <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.lobisomem.gnosis}</h4>
@@ -655,7 +644,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
                 <p className="text-center text-xs text-muted-foreground mt-1">{rage}/10</p>
               </div>
               <div>
-                <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.willpower}</h4>
+                <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.lobisomem.willpowerLabel}</h4>
                 <div className="flex justify-center">
                   <DotDisplay value={willpower} maxValue={10} />
                 </div>
@@ -663,9 +652,9 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
               </div>
             </div>
 
-            {/* Health */}
+            {/* Right column: Vitalidade */}
             <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.vampiro.vitality}</h4>
+              <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.lobisomem.vitality}</h4>
               <div className="space-y-1 text-sm font-body">
                 {HEALTH_LEVELS.map((level, index) => {
                   const isDamaged = healthDamage[index];
@@ -692,6 +681,32 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
                   );
                 })}
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Renome: Glória, Honra, Sabedoria */}
+      <Card className="medieval-card border-emerald-500/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="font-medieval flex items-center gap-2 text-emerald-500">
+            <Crown className="w-5 h-5" />
+            {t.lobisomem.renown}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="font-body text-sm">{t.lobisomem.glory}</span>
+              <DotDisplay value={renown.glory} maxValue={10} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-body text-sm">{t.lobisomem.honor}</span>
+              <DotDisplay value={renown.honor} maxValue={10} />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-body text-sm">{t.lobisomem.wisdom}</span>
+              <DotDisplay value={renown.wisdom} maxValue={10} />
             </div>
           </div>
         </CardContent>

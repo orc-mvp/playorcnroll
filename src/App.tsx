@@ -17,6 +17,7 @@ import Session from "./pages/Session";
 import JoinSession from "./pages/JoinSession";
 import MySessions from "./pages/MySessions";
 import VampireSession from "./pages/VampireSession";
+import WerewolfSession from "./pages/WerewolfSession";
 import Profile from "./pages/Profile";
 import GameCalendar from "./pages/GameCalendar";
 import NotFound from "./pages/NotFound";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/session/:sessionId/lobby" element={<SessionLobby />} />
             <Route path="/session/:sessionId" element={<Session />} />
             <Route path="/session/vampire/:sessionId" element={<VampireSession />} />
+            <Route path="/session/werewolf/:sessionId" element={<WerewolfSession />} />
             <Route path="/join" element={<JoinSession />} />
             <Route path="/join/:code" element={<JoinSession />} />
             <Route path="/sessions" element={<MySessions />} />

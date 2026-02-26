@@ -36,11 +36,12 @@ export interface LobisomemFormData {
   // Step 3 - Gifts
   gifts: Record<number, string[]>;
 
-  // Step 4 - Backgrounds, Gnosis, Rage, Willpower
+  // Step 4 - Backgrounds, Gnosis, Rage, Willpower, Renown
   backgrounds: Record<string, number>;
   gnosis: number;
   rage: number;
   willpower: number;
+  renown: { glory: number; honor: number; wisdom: number };
 
   // Step 5 - Merits & Flaws
   merits_flaws: { id: string; name: string; cost: number; category: string }[];

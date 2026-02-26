@@ -1130,6 +1130,18 @@ export const translations = {
       gnosisOnly: 'Gnose',
       rageOnly: 'Fúria',
 
+      // Renown
+      renown: 'Renome',
+      glory: 'Glória',
+      honor: 'Honra',
+      wisdom: 'Sabedoria',
+      renownDesc: 'A reputação do Garou entre os Garou',
+
+      // Vitality / Trackers on sheet
+      salvaterios: 'Salvatérios',
+      vitality: 'Vitalidade',
+      willpowerLabel: 'Força de Vontade',
+
       // Edit Modal
       editCharacter: 'Editar Personagem',
       editWerewolfInfo: 'Edite as informações do seu Garou',
@@ -2259,6 +2271,16 @@ export const translations = {
 
       gnosisOnly: 'Gnosis',
       rageOnly: 'Rage',
+
+      renown: 'Renown',
+      glory: 'Glory',
+      honor: 'Honor',
+      wisdom: 'Wisdom',
+      renownDesc: 'The Garou\'s reputation among the Garou',
+
+      salvaterios: 'Trackers',
+      vitality: 'Vitality',
+      willpowerLabel: 'Willpower',
 
       editCharacter: 'Edit Character',
       editWerewolfInfo: 'Edit your Garou\'s information',
