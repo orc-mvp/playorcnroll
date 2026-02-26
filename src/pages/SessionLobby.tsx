@@ -152,6 +152,8 @@ export default function SessionLobby() {
           if (newSession.status === 'active') {
             const route = newSession.game_system === 'vampiro_v3' 
               ? `/session/vampire/${sessionId}` 
+              : newSession.game_system === 'lobisomem_w20'
+              ? `/session/werewolf/${sessionId}`
               : `/session/${sessionId}`;
             navigate(route);
           }
@@ -194,6 +196,8 @@ export default function SessionLobby() {
 
       const route = session.game_system === 'vampiro_v3' 
         ? `/session/vampire/${session.id}` 
+        : session.game_system === 'lobisomem_w20'
+        ? `/session/werewolf/${session.id}`
         : `/session/${session.id}`;
       navigate(route);
     } catch (error: any) {

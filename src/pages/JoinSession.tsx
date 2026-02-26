@@ -273,6 +273,8 @@ export default function JoinSession() {
         if (sessionData.status === 'active') {
           const route = sessionData.game_system === 'vampiro_v3' 
             ? `/session/vampire/${sessionData.id}` 
+            : sessionData.game_system === 'lobisomem_w20'
+            ? `/session/werewolf/${sessionData.id}`
             : `/session/${sessionData.id}`;
           navigate(route);
         } else {
@@ -337,6 +339,8 @@ export default function JoinSession() {
       if (sessionData.status === 'active') {
         const route = sessionData.game_system === 'vampiro_v3' 
           ? `/session/vampire/${sessionData.id}` 
+          : sessionData.game_system === 'lobisomem_w20'
+          ? `/session/werewolf/${sessionData.id}`
           : `/session/${sessionData.id}`;
         navigate(route);
       } else {
@@ -358,6 +362,8 @@ export default function JoinSession() {
     if (session.status === 'active') {
       const route = session.game_system === 'vampiro_v3' 
         ? `/session/vampire/${session.id}` 
+        : session.game_system === 'lobisomem_w20'
+        ? `/session/werewolf/${session.id}`
         : `/session/${session.id}`;
       navigate(route);
     } else {
