@@ -36,6 +36,7 @@ import {
   Flame,
   Sparkles,
   Moon,
+  Dog,
   Trash2,
 } from 'lucide-react';
 import { getGameSystem, GameSystemId } from '@/lib/gameSystems';
@@ -68,6 +69,7 @@ const attributeIcons: Record<string, React.ElementType> = {
 const systemIcons: Record<string, React.ElementType> = {
   herois_marcados: Sword,
   vampiro_v3: Moon,
+  lobisomem_w20: Dog,
 };
 
 export default function MyCharacters() {
@@ -172,7 +174,7 @@ export default function MyCharacters() {
   const getSystemInfo = (systemId: string) => {
     const system = getGameSystem(systemId as GameSystemId);
     const Icon = systemIcons[systemId] || Sword;
-    const color = systemId === 'vampiro_v3' ? 'text-red-500' : 'text-primary';
+    const color = systemId === 'vampiro_v3' ? 'text-red-500' : systemId === 'lobisomem_w20' ? 'text-emerald-500' : 'text-primary';
     return { system, Icon, color };
   };
 
