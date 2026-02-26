@@ -443,7 +443,7 @@ export default function WerewolfSession() {
                   onEventCreated={handleLocalEvent}
                 />
               ) : (
-                <WerewolfPlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} participants={participants} currentUserId={user?.id} />
+                <WerewolfPlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ gnosis: myParticipant?.session_gnosis ?? 0, rage: myParticipant?.session_rage ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage || Array(7).fill(false), form: myParticipant?.session_form || 'hominid' }} sheetLocked={myParticipant?.sheet_locked ?? true} participants={participants} currentUserId={user?.id} />
               )}
             </div>
           </TabsContent>
@@ -481,7 +481,7 @@ export default function WerewolfSession() {
                       onTestComplete={() => {}}
                     />
                   )}
-                  <WerewolfPlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} participants={participants} currentUserId={user?.id} />
+                  <WerewolfPlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ gnosis: myParticipant?.session_gnosis ?? 0, rage: myParticipant?.session_rage ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage || Array(7).fill(false), form: myParticipant?.session_form || 'hominid' }} sheetLocked={myParticipant?.sheet_locked ?? true} participants={participants} currentUserId={user?.id} />
                 </div>
               )}
             </ScrollArea>
@@ -695,8 +695,13 @@ function WerewolfScenePanel({ sessionId, currentScene, scenes, isNarrator, onSce
 }
 
 // Player Panel
-function WerewolfPlayerPanel({ character, experiencePoints, participants = [], currentUserId }: {
-  character: Participant['character']; experiencePoints?: number; participants?: Participant[]; currentUserId?: string;
+function WerewolfPlayerPanel({ character, experiencePoints, sessionTrackers, sheetLocked = true, participants = [], currentUserId }: {
+  character: Participant['character'];
+  experiencePoints?: number;
+  sessionTrackers?: { gnosis?: number; rage?: number; willpower?: number; healthDamage?: boolean[]; form?: string };
+  sheetLocked?: boolean;
+  participants?: Participant[];
+  currentUserId?: string;
 }) {
   const { t, language } = useI18n();
   const lobData = character?.vampiro_data as LobisomemCharacterData | null;
@@ -716,6 +721,7 @@ function WerewolfPlayerPanel({ character, experiencePoints, participants = [], c
   return (
     <>
       <div className="space-y-4">
+        {/* Character Header */}
         <Card className="medieval-card border-emerald-500/20">
           <CardContent className="pt-4">
             <div className="flex items-center gap-3">
@@ -731,6 +737,9 @@ function WerewolfPlayerPanel({ character, experiencePoints, participants = [], c
                 </div>
                 {lobData?.tribe && (
                   <Badge variant="outline" className="border-emerald-500/30 text-emerald-500 text-xs">{lobData.tribe}</Badge>
+                )}
+                {lobData?.auspice && (
+                  <Badge variant="outline" className="border-emerald-500/20 text-muted-foreground text-xs ml-1">{lobData.auspice}</Badge>
                 )}
               </div>
             </div>
@@ -756,9 +765,63 @@ function WerewolfPlayerPanel({ character, experiencePoints, participants = [], c
                   const gifts = lobData.gifts?.[level] || [];
                   if (gifts.length === 0) return null;
                   return gifts.map((gift, i) => (
-                    <div key={`${level}-${i}`} className="text-sm font-body pl-2 border-l-2 border-emerald-500/30 py-0.5">{gift}</div>
+                    <div key={`${level}-${i}`} className="text-sm font-body pl-2 border-l-2 border-emerald-500/30 py-0.5">
+                      <span className="text-xs text-muted-foreground mr-1">{level}.</span>{gift}
+                    </div>
                   ));
                 })}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Renown inline */}
+        {lobData?.renown && (lobData.renown.glory > 0 || lobData.renown.honor > 0 || lobData.renown.wisdom > 0) && (
+          <Card className="medieval-card border-emerald-500/20">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-medieval text-sm flex items-center gap-2">
+                <Crown className="w-4 h-4 text-emerald-500" />
+                {t.lobisomem?.renown || 'Renome'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-1.5">
+                {[
+                  { key: 'glory', label: t.lobisomem?.glory || 'Glória', value: lobData.renown.glory },
+                  { key: 'honor', label: t.lobisomem?.honor || 'Honra', value: lobData.renown.honor },
+                  { key: 'wisdom', label: t.lobisomem?.wisdom || 'Sabedoria', value: lobData.renown.wisdom },
+                ].map(({ key, label, value }) => (
+                  <div key={key} className="flex items-center justify-between text-sm">
+                    <span className="font-body">{label}</span>
+                    <div className="flex gap-0.5">
+                      {Array.from({ length: 10 }, (_, i) => (
+                        <div
+                          key={i}
+                          className={`w-2 h-2 rounded-full ${
+                            i < value ? 'bg-emerald-500' : 'bg-muted-foreground/20'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Experience Points */}
+        {(experiencePoints ?? 0) > 0 && (
+          <Card className="medieval-card border-emerald-500/20">
+            <CardContent className="py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="font-medieval text-sm">{t.managePlayers.experience}</span>
+                </div>
+                <Badge variant="outline" className="font-mono text-sm px-2">
+                  {experiencePoints} XP
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -773,7 +836,7 @@ function WerewolfPlayerPanel({ character, experiencePoints, participants = [], c
               <CardHeader className="pb-2">
                 <CardTitle className="font-medieval text-sm flex items-center gap-2">
                   <Users className="w-4 h-4 text-emerald-500" />
-                  {lobData?.pack || (language === 'pt-BR' ? 'Matilha' : 'Pack')}
+                  {language === 'pt-BR' ? 'Matilha' : 'Pack'}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -785,6 +848,9 @@ function WerewolfPlayerPanel({ character, experiencePoints, participants = [], c
                       </div>
                       <div className="min-w-0">
                         <p className="font-medieval text-sm truncate">{p.character?.name || p.profile?.display_name || t.vampireSession.noCharacter}</p>
+                        {p.character?.name && p.profile?.display_name && (
+                          <p className="text-xs text-muted-foreground font-body truncate">{p.profile.display_name}</p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -795,6 +861,7 @@ function WerewolfPlayerPanel({ character, experiencePoints, participants = [], c
         })()}
       </div>
 
+      {/* Character Sheet Modal */}
       <Dialog open={showSheet} onOpenChange={setShowSheet}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
           <DialogHeader>
@@ -807,7 +874,9 @@ function WerewolfPlayerPanel({ character, experiencePoints, participants = [], c
             {character && character.vampiro_data && (
               <LobisomemCharacterSheet
                 character={{ id: character.id, name: character.name, concept: character.concept, vampiro_data: character.vampiro_data }}
-                readOnly={true}
+                sessionTrackers={sessionTrackers}
+                experiencePoints={experiencePoints}
+                readOnly={sheetLocked}
               />
             )}
           </div>
