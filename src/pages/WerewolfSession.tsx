@@ -13,10 +13,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import VampireTestRequestModal, { TestConfig } from '@/components/session/vampire/VampireTestRequestModal';
+import WerewolfTestRequestModal, { WerewolfTestConfig } from '@/components/session/werewolf/WerewolfTestRequestModal';
 import NarratorRollModal from '@/components/session/vampire/NarratorRollModal';
-import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
-import { VampireEventFeed } from '@/components/session/vampire/VampireEventFeed';
+import { WerewolfNarratorSidebar } from '@/components/session/werewolf/WerewolfNarratorSidebar';
+import { WerewolfEventFeed } from '@/components/session/werewolf/WerewolfEventFeed';
 import { VampirePendingTest } from '@/components/session/vampire/VampirePendingTest';
 import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { WerewolfTrackers } from '@/components/session/werewolf/WerewolfTrackers';
@@ -321,7 +321,7 @@ export default function WerewolfSession() {
 
   const pendingTestEvent = events.find((e) => {
     if (e.event_type !== 'vampire_test_requested') return false;
-    const config = e.event_data as unknown as TestConfig;
+    const config = e.event_data as unknown as WerewolfTestConfig;
     return myCharacter && config.targetCharacterIds?.includes(myCharacter.id);
   });
 
@@ -343,7 +343,7 @@ export default function WerewolfSession() {
     }
   }, [pendingTestEvent, hasRolledForPendingTest, isMobile]);
 
-  const handleRequestTest = async (config: TestConfig) => {
+  const handleRequestTest = async (config: WerewolfTestConfig) => {
     if (!sessionId) return;
     await supabase.from('session_events').insert([{
       session_id: sessionId,
@@ -406,7 +406,7 @@ export default function WerewolfSession() {
           </TabsList>
 
           <TabsContent value="feed" className="flex-1 p-4 overflow-auto">
-            <VampireEventFeed events={events} />
+            <WerewolfEventFeed events={events} />
           </TabsContent>
 
           <TabsContent value="scenes" className="flex-1 p-4 overflow-auto">
@@ -432,7 +432,7 @@ export default function WerewolfSession() {
           <TabsContent value="info" className="flex-1 p-4 overflow-auto">
             <div className="space-y-4">
               {isNarrator ? (
-                <VampireNarratorSidebar
+                <WerewolfNarratorSidebar
                   sessionId={sessionId!}
                   participants={participants}
                   scenes={scenes}
@@ -454,7 +454,7 @@ export default function WerewolfSession() {
           <aside className="w-80 border-r border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-background overflow-auto">
             <ScrollArea className="h-full p-4">
               {isNarrator ? (
-                <VampireNarratorSidebar
+                <WerewolfNarratorSidebar
                   sessionId={sessionId!}
                   participants={participants}
                   scenes={scenes}
@@ -475,7 +475,7 @@ export default function WerewolfSession() {
                       vampiroData={myLobData}
                       testEvent={{
                         id: pendingTestEvent.id,
-                        event_data: pendingTestEvent.event_data as unknown as TestConfig,
+                        event_data: pendingTestEvent.event_data as any,
                         created_at: pendingTestEvent.created_at,
                       }}
                       onTestComplete={() => {}}
@@ -494,7 +494,7 @@ export default function WerewolfSession() {
                 <WerewolfScenePanel sessionId={sessionId!} currentScene={currentScene} scenes={scenes} isNarrator={isNarrator} onSceneChange={setCurrentScene} />
               </div>
               <div className="overflow-auto min-h-0">
-                <VampireEventFeed events={events} />
+                <WerewolfEventFeed events={events} />
               </div>
             </div>
           </main>
@@ -523,7 +523,7 @@ export default function WerewolfSession() {
       )}
 
       {/* Test Request Modal */}
-      <VampireTestRequestModal
+      <WerewolfTestRequestModal
         open={testModalOpen}
         onOpenChange={setTestModalOpen}
         participants={participants}
@@ -572,7 +572,7 @@ export default function WerewolfSession() {
           vampiroData={myLobData}
           testEvent={{
             id: pendingTestEvent.id,
-            event_data: pendingTestEvent.event_data as unknown as TestConfig,
+            event_data: pendingTestEvent.event_data as any,
             created_at: pendingTestEvent.created_at,
           }}
         />
