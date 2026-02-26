@@ -80,6 +80,7 @@ const initialLobisomemFormData: LobisomemFormData = {
   gifts: {},
   backgrounds: {},
   gnosis: 1, rage: 1, willpower: 1,
+  renown: { glory: 0, honor: 0, wisdom: 0 },
   merits_flaws: [],
 };
 
@@ -233,6 +234,7 @@ export default function CreateCharacter() {
             willpower: lobisomemFormData.willpower,
             gifts: lobisomemFormData.gifts,
             backgrounds: lobisomemFormData.backgrounds,
+            renown: lobisomemFormData.renown,
             merits_flaws: lobisomemFormData.merits_flaws || [],
           },
         });
