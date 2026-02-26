@@ -59,6 +59,8 @@ export function RecentActivity({ userId }: RecentActivityProps) {
               if (s.status === 'active') {
                 return s.game_system === 'vampiro_v3' 
                   ? `/session/vampire/${s.id}` 
+                  : s.game_system === 'lobisomem_w20'
+                  ? `/session/werewolf/${s.id}`
                   : `/session/${s.id}`;
               }
               return `/session/${s.id}/lobby`;
@@ -140,6 +142,8 @@ export function RecentActivity({ userId }: RecentActivityProps) {
               const link = session.status === 'active' 
                 ? (session.game_system === 'vampiro_v3' 
                   ? `/session/vampire/${session.id}` 
+                  : session.game_system === 'lobisomem_w20'
+                  ? `/session/werewolf/${session.id}`
                   : `/session/${session.id}`)
                 : `/session/${session.id}/lobby`;
               

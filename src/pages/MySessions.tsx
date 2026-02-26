@@ -18,7 +18,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Sword, Moon, Trash2, Crown, Users as UsersIcon } from 'lucide-react';
+import { Sword, Moon, Dog, Trash2, Crown, Users as UsersIcon } from 'lucide-react';
 import { 
   ArrowLeft, 
   Plus, 
@@ -118,6 +118,8 @@ export default function MySessions() {
     if (session.status === 'active') {
       const route = session.game_system === 'vampiro_v3' 
         ? `/session/vampire/${session.id}` 
+        : session.game_system === 'lobisomem_w20'
+        ? `/session/werewolf/${session.id}`
         : `/session/${session.id}`;
       navigate(route);
     } else {
@@ -252,11 +254,13 @@ export default function MySessions() {
                         <div className="flex items-center gap-2 mb-1">
                           {session.game_system === 'vampiro_v3' ? (
                             <Moon className="w-4 h-4 text-destructive shrink-0" />
+                          ) : session.game_system === 'lobisomem_w20' ? (
+                            <Dog className="w-4 h-4 text-emerald-500 shrink-0" />
                           ) : (
                             <Sword className="w-4 h-4 text-primary shrink-0" />
                           )}
                           <span className="text-xs text-muted-foreground font-body">
-                            {session.game_system === 'vampiro_v3' ? 'Vampiro 3ª Ed.' : 'Heróis Marcados'}
+                            {session.game_system === 'vampiro_v3' ? 'Vampiro 3ª Ed.' : session.game_system === 'lobisomem_w20' ? 'Lobisomem W20' : 'Heróis Marcados'}
                           </span>
                           <Badge variant="outline" className="text-xs">
                             {isNarrator ? (
