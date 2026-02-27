@@ -410,7 +410,10 @@ export function EditLobisomemCharacterModal({
               <TabsContent value="attributes" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
                 <div className="space-y-6">
                   <div>
-                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.physical}</h4>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">
+                      {t.vampiro.physical}{' '}
+                      <span className="text-muted-foreground/60">({Object.values(attributes.physical).reduce((s, v) => s + (Number(v) || 0), 0) - 3})</span>
+                    </h4>
                     <div className="space-y-2">
                       {[
                         { key: 'strength', label: t.vampiro.strength },
@@ -425,7 +428,10 @@ export function EditLobisomemCharacterModal({
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.social}</h4>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">
+                      {t.vampiro.social}{' '}
+                      <span className="text-muted-foreground/60">({Object.values(attributes.social).reduce((s, v) => s + (Number(v) || 0), 0) - 3})</span>
+                    </h4>
                     <div className="space-y-2">
                       {[
                         { key: 'charisma', label: t.vampiro.charisma },
@@ -440,7 +446,10 @@ export function EditLobisomemCharacterModal({
                     </div>
                   </div>
                   <div>
-                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.mental}</h4>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">
+                      {t.vampiro.mental}{' '}
+                      <span className="text-muted-foreground/60">({Object.values(attributes.mental).reduce((s, v) => s + (Number(v) || 0), 0) - 3})</span>
+                    </h4>
                     <div className="space-y-2">
                       {[
                         { key: 'perception', label: t.vampiro.perception },
@@ -460,11 +469,13 @@ export function EditLobisomemCharacterModal({
               {/* Abilities */}
               <TabsContent value="abilities" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
                 <div className="space-y-6">
-                  {(['talents', 'skills', 'knowledges'] as const).map((cat) => (
+               {(['talents', 'skills', 'knowledges'] as const).map((cat) => {
+                    const catTotal = Object.entries(ABILITY_NAMES[cat]).reduce((s, [key]) => s + (Number((abilities[cat] as Record<string, number>)?.[key]) || 0), 0);
+                    return (
                     <div key={cat}>
                       <h4 className="font-medieval text-sm text-muted-foreground mb-3">
                         {t.vampiro[cat]}{' '}
-                        <span className="text-muted-foreground/60">({Object.values(abilities[cat] || {}).reduce((s: number, v: number) => s + (v || 0), 0)})</span>
+                        <span className="text-muted-foreground/60">({catTotal})</span>
                       </h4>
                       <div className="space-y-2">
                         {Object.entries(ABILITY_NAMES[cat]).map(([key, label]) => (
@@ -475,7 +486,8 @@ export function EditLobisomemCharacterModal({
                         ))}
                       </div>
                     </div>
-                  ))}
+                  );
+                  })}
                 </div>
               </TabsContent>
 
