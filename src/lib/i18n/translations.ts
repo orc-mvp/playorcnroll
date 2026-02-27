@@ -432,6 +432,9 @@ export const translations = {
       politics: 'Política',
       science: 'Ciência',
       linguistics: 'Linguística',
+      primalUrge: 'Instinto Primitivo',
+      enigmas: 'Enigmas',
+      rituals: 'Rituais',
       
       // Disciplines
       disciplines: 'Disciplinas',
@@ -1584,6 +1587,9 @@ export const translations = {
       politics: 'Politics',
       science: 'Science',
       linguistics: 'Linguistics',
+      primalUrge: 'Primal-Urge',
+      enigmas: 'Enigmas',
+      rituals: 'Rituals',
       
       // Disciplines
       disciplines: 'Disciplines',
