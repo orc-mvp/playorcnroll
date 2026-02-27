@@ -147,7 +147,7 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData }: S
                   <DotRating
                     value={backgrounds[bg.key] || 0}
                     onChange={(value) => updateBackground(bg.key, value)}
-                    maxValue={5}
+                    maxValue={10}
                     minValue={0}
                   />
                 </div>

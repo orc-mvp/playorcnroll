@@ -926,7 +926,7 @@ export function EditVampiroCharacterModal({
                             <DotRating
                               value={backgrounds[bg.key] || 0}
                               onChange={(val) => updateBackground(bg.key, val)}
-                              maxValue={5}
+                              maxValue={10}
                               minValue={0}
                             />
                           </div>

@@ -534,7 +534,7 @@ export function EditLobisomemCharacterModal({
                   {BACKGROUNDS.map((bg) => (
                     <div key={bg.key} className="flex items-center justify-between">
                       <span className="font-body text-sm">{language === 'pt-BR' ? bg.labelPt : bg.labelEn}</span>
-                      <DotRating value={backgrounds[bg.key] || 0} onChange={(val) => updateBackground(bg.key, val)} maxValue={5} minValue={0} />
+                      <DotRating value={backgrounds[bg.key] || 0} onChange={(val) => updateBackground(bg.key, val)} maxValue={10} minValue={0} />
                     </div>
                   ))}
                 </div>
