@@ -179,6 +179,21 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
   const [xpLog, setXpLog] = useState<{ id: string; amount: number; narrator_name: string; note: string | null; created_at: string }[]>([]);
   const [expandedMeritFlaw, setExpandedMeritFlaw] = useState<string | null>(null);
   const [meritFlawDescriptions, setMeritFlawDescriptions] = useState<Record<string, { description: string; prerequisites: string | null }>>({});
+  const [liveMeritsFlaws, setLiveMeritsFlaws] = useState<{ id: string; name: string; cost: number; category: string }[] | null>(null);
+
+  // Fetch live merits/flaws data from DB to keep category/name/cost up to date
+  useEffect(() => {
+    const ids = (data.merits_flaws || []).map((m: any) => m.id);
+    if (ids.length === 0) return;
+    supabase
+      .from('merits_flaws')
+      .select('id, name, cost, category')
+      .in('id', ids)
+      .then(({ data: fresh }) => {
+        if (fresh) setLiveMeritsFlaws(fresh as any);
+      });
+  }, [data.merits_flaws]);
+
 
   // Fetch XP log with realtime
   useEffect(() => {
@@ -482,7 +497,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
 
       {/* Merits & Flaws */}
       {(() => {
-        const meritsFlaws = data.merits_flaws || [];
+        const meritsFlaws = liveMeritsFlaws || data.merits_flaws || [];
         if (meritsFlaws.length === 0) return null;
 
         const merits = meritsFlaws.filter((m) => m.cost > 0);
