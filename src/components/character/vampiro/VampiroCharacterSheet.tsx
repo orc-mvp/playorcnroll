@@ -672,7 +672,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
               <CardHeader className="pb-3">
                 <CardTitle className="font-medieval flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-green-500" />
-                  {t.meritsFlaws.merit}{lang === 'pt' ? 's' : 's'}
+                  {t.meritsFlaws.merits}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -700,7 +700,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
               <CardHeader className="pb-3">
                 <CardTitle className="font-medieval flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-red-500" />
-                  {t.meritsFlaws.flaw}{lang === 'pt' ? 's' : 's'}
+                  {t.meritsFlaws.flaws}
                 </CardTitle>
               </CardHeader>
               <CardContent>
