@@ -62,10 +62,13 @@ const BACKGROUND_DISPLAY: Record<string, { pt: string; en: string }> = {
   fetish: { pt: 'Fetiche', en: 'Fetish' },
   kinfolk: { pt: 'Parentes', en: 'Kinfolk' },
   mentor: { pt: 'Mentor', en: 'Mentor' },
+  numen: { pt: 'Numen', en: 'Numen' },
+  prophecy: { pt: 'Profecia', en: 'Prophecy' },
   pureBreed: { pt: 'Raça Pura', en: 'Pure Breed' },
   resources: { pt: 'Recursos', en: 'Resources' },
   rites: { pt: 'Rituais', en: 'Rites' },
   spiritHeritage: { pt: 'Herança Espiritual', en: 'Spirit Heritage' },
+  touched: { pt: 'Tocado', en: 'Touched' },
   totemPersonal: { pt: 'Totem (Pessoal)', en: 'Totem (Personal)' },
 };
 

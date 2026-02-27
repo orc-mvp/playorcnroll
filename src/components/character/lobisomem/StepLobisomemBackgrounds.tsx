@@ -17,10 +17,13 @@ const BACKGROUNDS = [
   { key: 'fetish', labelPt: 'Fetiche', labelEn: 'Fetish' },
   { key: 'kinfolk', labelPt: 'Parentes', labelEn: 'Kinfolk' },
   { key: 'mentor', labelPt: 'Mentor', labelEn: 'Mentor' },
+  { key: 'numen', labelPt: 'Numen', labelEn: 'Numen' },
+  { key: 'prophecy', labelPt: 'Profecia', labelEn: 'Prophecy' },
   { key: 'pureBreed', labelPt: 'Raça Pura', labelEn: 'Pure Breed' },
   { key: 'resources', labelPt: 'Recursos', labelEn: 'Resources' },
   { key: 'rites', labelPt: 'Rituais', labelEn: 'Rites' },
   { key: 'spiritHeritage', labelPt: 'Herança Espiritual', labelEn: 'Spirit Heritage' },
+  { key: 'touched', labelPt: 'Tocado', labelEn: 'Touched' },
   { key: 'totemPersonal', labelPt: 'Totem (Pessoal)', labelEn: 'Totem (Personal)' },
 ];
 
