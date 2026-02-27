@@ -44,9 +44,9 @@ interface EditLobisomemCharacterModalProps {
 
 const ABILITY_NAMES: Record<string, Record<string, string>> = {
   talents: {
-    alertness: 'Prontidão', athletics: 'Esportes', brawl: 'Briga', dodge: 'Esquiva',
+    alertness: 'Prontidão', athletics: 'Esportes', brawl: 'Briga', dodge: 'Esquiva', primalUrge: 'Instinto Primitivo',
     empathy: 'Empatia', expression: 'Expressão', intimidation: 'Intimidação',
-    leadership: 'Liderança', streetwise: 'Manha', subterfuge: 'Lábia',
+    leadership: 'Liderança', subterfuge: 'Lábia',
   },
   skills: {
     animalKen: 'Empatia c/ Animais', crafts: 'Ofícios', drive: 'Condução',
@@ -55,9 +55,9 @@ const ABILITY_NAMES: Record<string, Record<string, string>> = {
     survival: 'Sobrevivência',
   },
   knowledges: {
-    academics: 'Acadêmicos', computer: 'Computador', finance: 'Finanças',
+    academics: 'Acadêmicos', computer: 'Computador', enigmas: 'Enigmas',
     investigation: 'Investigação', law: 'Direito', linguistics: 'Linguística',
-    medicine: 'Medicina', occult: 'Ocultismo', politics: 'Política', science: 'Ciência',
+    medicine: 'Medicina', occult: 'Ocultismo', politics: 'Política', rituals: 'Rituais', science: 'Ciência',
   },
 };
 

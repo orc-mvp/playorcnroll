@@ -158,9 +158,9 @@ function AbilityRow({ name, value, specialization }: { name: string; value: numb
 }
 
 const ABILITY_KEYS = {
-  talents: ['alertness', 'athletics', 'brawl', 'dodge', 'empathy', 'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge'] as const,
+  talents: ['alertness', 'athletics', 'brawl', 'dodge', 'empathy', 'expression', 'intimidation', 'leadership', 'primalUrge', 'subterfuge'] as const,
   skills: ['animalKen', 'crafts', 'drive', 'etiquette', 'firearms', 'melee', 'performance', 'security', 'stealth', 'survival'] as const,
-  knowledges: ['academics', 'computer', 'finance', 'investigation', 'law', 'linguistics', 'medicine', 'occult', 'politics', 'science'] as const,
+  knowledges: ['academics', 'computer', 'enigmas', 'investigation', 'law', 'linguistics', 'medicine', 'occult', 'politics', 'rituals', 'science'] as const,
 };
 
 export default function LobisomemCharacterSheet({ character, sessionTrackers, experiencePoints, readOnly = false }: LobisomemCharacterSheetProps) {
