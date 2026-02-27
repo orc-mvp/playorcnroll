@@ -560,7 +560,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
                   value > 0 && (
                     <div key={key} className="flex items-center justify-between">
                       <span className="text-sm font-body">{getBackgroundName(key)}</span>
-                      <DotDisplay value={value} />
+                      <DotDisplay value={value} maxValue={value} />
                     </div>
                   )
                 ))}
