@@ -105,6 +105,7 @@ const attributeIcons: Record<string, React.ElementType> = {
 const categoryIcons: Record<string, React.ElementType> = {
   physical: Zap,
   social: Star,
+  other: Star,
   mental: Shield,
   supernatural: Star,
 };
@@ -792,6 +793,7 @@ export default function Customization() {
                   <SelectItem value="social">{t.meritsFlaws.social}</SelectItem>
                   <SelectItem value="mental">{t.meritsFlaws.mental}</SelectItem>
                   <SelectItem value="supernatural">{t.meritsFlaws.supernatural}</SelectItem>
+                  <SelectItem value="other">{t.meritsFlaws.other}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

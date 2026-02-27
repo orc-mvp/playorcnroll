@@ -67,6 +67,7 @@ const categoryIcons: Record<string, React.ElementType> = {
   social: Star,
   mental: Shield,
   supernatural: Star,
+  other: Star,
 };
 
 export default function MeritsFlaws() {
@@ -336,6 +337,7 @@ export default function MeritsFlaws() {
                 <SelectItem value="social">{t.meritsFlaws.social}</SelectItem>
                 <SelectItem value="mental">{t.meritsFlaws.mental}</SelectItem>
                 <SelectItem value="supernatural">{t.meritsFlaws.supernatural}</SelectItem>
+                <SelectItem value="other">{t.meritsFlaws.other}</SelectItem>
               </SelectContent>
             </Select>
 
@@ -507,6 +509,7 @@ export default function MeritsFlaws() {
                   <SelectItem value="social">{t.meritsFlaws.social}</SelectItem>
                   <SelectItem value="mental">{t.meritsFlaws.mental}</SelectItem>
                   <SelectItem value="supernatural">{t.meritsFlaws.supernatural}</SelectItem>
+                  <SelectItem value="other">{t.meritsFlaws.other}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
