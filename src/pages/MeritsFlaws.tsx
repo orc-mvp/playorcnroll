@@ -95,7 +95,7 @@ export default function MeritsFlaws() {
   const [formCategory, setFormCategory] = useState('physical');
   const [formPrerequisites, setFormPrerequisites] = useState('');
   const [formSourcebook, setFormSourcebook] = useState('');
-  const [formGameSystems, setFormGameSystems] = useState<string[]>(['vampiro_v3']);
+  const [formGameSystems, setFormGameSystems] = useState<string[]>(['vampiro_v3', 'lobisomem_w20']);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -130,7 +130,7 @@ export default function MeritsFlaws() {
     setFormCategory('physical');
     setFormPrerequisites('');
     setFormSourcebook('');
-    setFormGameSystems(['vampiro_v3']);
+    setFormGameSystems(['vampiro_v3', 'lobisomem_w20']);
     setEditingItem(null);
   };
 
@@ -554,7 +554,7 @@ export default function MeritsFlaws() {
             <div className="space-y-2">
               <Label className="font-medieval">{t.meritsFlaws.gameSystems} *</Label>
               <div className="space-y-2">
-                {GAME_SYSTEMS.filter((s) => s.available).map((sys) => (
+                {GAME_SYSTEMS.filter((s) => s.available && s.id !== 'herois_marcados').map((sys) => (
                   <div key={sys.id} className="flex items-center gap-2">
                     <Checkbox
                       id={`system-${sys.id}`}
