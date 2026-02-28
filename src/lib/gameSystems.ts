@@ -41,7 +41,7 @@ export const GAME_SYSTEMS: GameSystem[] = [
   {
     id: 'lobisomem_w20',
     name: 'Lobisomem: O Apocalipse',
-    shortName: 'W20',
+    shortName: 'V3',
     description: {
       'pt-BR': 'Fúria e honra na luta contra a Wyrm.',
       'en': 'Rage and honor in the fight against the Wyrm.'
