@@ -37,7 +37,6 @@ export default function StepVampiroMeritsFlaws({ formData, updateFormData }: Ste
       const { data, error } = await supabase
         .from('merits_flaws')
         .select('*')
-        .contains('game_systems', ['vampiro_v3'])
         .order('category')
         .order('cost', { ascending: false })
         .order('name');
