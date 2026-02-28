@@ -149,7 +149,7 @@ export default function Customization() {
   const [formCategory, setFormCategory] = useState('physical');
   const [formPrerequisites, setFormPrerequisites] = useState('');
   const [formSourcebook, setFormSourcebook] = useState('');
-  const [formGameSystems, setFormGameSystems] = useState<string[]>(['vampiro_v3']);
+  const [formGameSystems, setFormGameSystems] = useState<string[]>(['vampiro_v3', 'lobisomem_w20']);
 
   // ---- Shared state ----
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -333,7 +333,7 @@ export default function Customization() {
   const resetMfForm = () => {
     setFormName(''); setFormDescription(''); setFormCost(0);
     setFormCategory('physical'); setFormPrerequisites('');
-    setFormSourcebook(''); setFormGameSystems(['vampiro_v3']);
+    setFormSourcebook(''); setFormGameSystems(['vampiro_v3', 'lobisomem_w20']);
     setEditingItem(null);
   };
 
@@ -814,7 +814,7 @@ export default function Customization() {
             <div className="space-y-2">
               <Label className="font-medieval">{t.meritsFlaws.gameSystems} *</Label>
               <div className="space-y-2">
-                {GAME_SYSTEMS.filter((s) => s.available).map((sys) => (
+                {GAME_SYSTEMS.filter((s) => s.available && s.id !== 'herois_marcados').map((sys) => (
                   <div key={sys.id} className="flex items-center gap-2">
                     <Checkbox id={`system-${sys.id}`} checked={formGameSystems.includes(sys.id)} onCheckedChange={() => toggleGameSystem(sys.id)} />
                     <Label htmlFor={`system-${sys.id}`} className="font-body cursor-pointer">{sys.name}</Label>
