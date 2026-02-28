@@ -418,14 +418,14 @@ export default function MeritsFlaws() {
                           </p>
                         )}
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {item.game_systems?.map((sys) => {
+                          {[...new Set(item.game_systems?.map((sys) => {
                             const system = GAME_SYSTEMS.find((s) => s.id === sys);
-                            return (
-                              <Badge key={sys} variant="outline" className="text-xs">
-                                {system?.shortName || sys}
-                              </Badge>
-                            );
-                          })}
+                            return system?.shortName || sys;
+                          }) || [])].map((label) => (
+                            <Badge key={label} variant="outline" className="text-xs">
+                              {label}
+                            </Badge>
+                          ))}
                           {item.sourcebook && (
                             <Badge variant="outline" className="text-xs text-muted-foreground">
                               {item.sourcebook}

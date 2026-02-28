@@ -37,7 +37,6 @@ export default function StepLobisomemMeritsFlaws({ formData, updateFormData }: S
       const { data, error } = await supabase
         .from('merits_flaws')
         .select('*')
-        .contains('game_systems', ['lobisomem_w20'])
         .order('category')
         .order('cost', { ascending: false })
         .order('name');
