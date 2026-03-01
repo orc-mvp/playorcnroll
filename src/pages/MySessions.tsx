@@ -260,7 +260,7 @@ export default function MySessions() {
                             <Sword className="w-4 h-4 text-primary shrink-0" />
                           )}
                           <span className="text-xs text-muted-foreground font-body">
-                            {session.game_system === 'vampiro_v3' ? 'Vampiro 3ª Ed.' : session.game_system === 'lobisomem_w20' ? 'Lobisomem W20' : 'Heróis Marcados'}
+                            {session.game_system === 'vampiro_v3' ? 'Vampiro 3ª Ed.' : session.game_system === 'lobisomem_w20' ? 'Lobisomem' : 'Heróis Marcados'}
                           </span>
                           <Badge variant="outline" className="text-xs">
                             {isNarrator ? (

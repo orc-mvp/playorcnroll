@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { UserMenu, type UserMenuExtraItem } from '@/components/UserMenu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ChevronLeft, LogOut, Sword, Moon, Users, Link } from 'lucide-react';
+import { ChevronLeft, LogOut, Sword, Moon, Dog, Users, Link } from 'lucide-react';
 import { EndSessionModal } from './EndSessionModal';
 import { SessionInfoModal } from './SessionInfoModal';
 import type { SessionData, Participant } from '@/pages/Session';
@@ -32,6 +32,16 @@ function getSystemConfig(gameSystem?: string) {
       gradientClass: 'from-destructive/10',
       badgeBorderClass: 'border-destructive/30 text-destructive',
       decorationClass: 'decoration-destructive/30',
+    };
+  }
+  if (gameSystem === 'lobisomem_w20') {
+    return {
+      icon: <Dog className="w-6 h-6 text-emerald-500" />,
+      badgeLabel: 'Lobisomem: O Apocalipse',
+      accentClass: 'border-emerald-500/20',
+      gradientClass: 'from-emerald-500/10',
+      badgeBorderClass: 'border-emerald-500/30 text-emerald-500',
+      decorationClass: 'decoration-emerald-500/30',
     };
   }
   return {
