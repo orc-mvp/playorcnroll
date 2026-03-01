@@ -1071,6 +1071,7 @@ export const translations = {
 
       // Tribes
       tribe_blackFuries: 'Fúrias Negras',
+      tribe_blackSpiralDancers: 'Dançarinos da Espiral Negra',
       tribe_boneGnawers: 'Roedores de Ossos',
       tribe_childrenOfGaia: 'Filhos de Gaia',
       tribe_fianna: 'Fianna',
@@ -2227,6 +2228,7 @@ export const translations = {
       currentForm: 'Current Form',
 
       tribe_blackFuries: 'Black Furies',
+      tribe_blackSpiralDancers: 'Black Spiral Dancers',
       tribe_boneGnawers: 'Bone Gnawers',
       tribe_childrenOfGaia: 'Children of Gaia',
       tribe_fianna: 'Fianna',
