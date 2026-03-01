@@ -2,6 +2,7 @@
 
 export const TRIBES = [
   'Black Furies',
+  'Black Spiral Dancers',
   'Bone Gnawers',
   'Children of Gaia',
   'Fianna',

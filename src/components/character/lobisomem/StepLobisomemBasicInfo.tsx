@@ -64,6 +64,7 @@ const ARCHETYPES = [
 // Map tribe names to i18n keys
 const TRIBE_I18N_MAP: Record<string, string> = {
   'Black Furies': 'tribe_blackFuries',
+  'Black Spiral Dancers': 'tribe_blackSpiralDancers',
   'Bone Gnawers': 'tribe_boneGnawers',
   'Children of Gaia': 'tribe_childrenOfGaia',
   'Fianna': 'tribe_fianna',
