@@ -449,10 +449,10 @@ export default function WerewolfSession() {
           </TabsContent>
         </Tabs>
       ) : (
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex overflow-hidden min-h-0">
           {/* Left Sidebar */}
-          <aside className="w-80 border-r border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-background overflow-auto">
-            <ScrollArea className="h-full p-4">
+          <aside className="w-80 shrink-0 border-r border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-background overflow-hidden flex flex-col">
+            <ScrollArea className="flex-1 p-4">
               {isNarrator ? (
                 <WerewolfNarratorSidebar
                   sessionId={sessionId!}
@@ -500,8 +500,8 @@ export default function WerewolfSession() {
           </main>
 
           {/* Right Sidebar - Trackers */}
-          <aside className="w-72 border-l border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-background overflow-auto">
-            <ScrollArea className="h-full p-4">
+          <aside className="w-72 shrink-0 border-l border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-background overflow-hidden flex flex-col">
+            <ScrollArea className="flex-1 p-4">
               {myParticipant && myCharacter ? (
                 <WerewolfTrackers
                   participantId={myParticipant.id}
