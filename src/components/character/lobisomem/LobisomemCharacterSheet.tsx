@@ -18,6 +18,7 @@ import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 // Tribe key mapping
 const TRIBE_KEYS: Record<string, string> = {
   'Black Furies': 'tribe_blackFuries',
+  'Black Spiral Dancers': 'tribe_blackSpiralDancers',
   'Bone Gnawers': 'tribe_boneGnawers',
   'Children of Gaia': 'tribe_childrenOfGaia',
   'Fianna': 'tribe_fianna',

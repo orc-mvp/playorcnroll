@@ -80,7 +80,7 @@ const BACKGROUNDS = [
 
 // Tribe key mapping for i18n
 const TRIBE_I18N: Record<string, string> = {
-  'Black Furies': 'tribe_blackFuries', 'Bone Gnawers': 'tribe_boneGnawers',
+  'Black Furies': 'tribe_blackFuries', 'Black Spiral Dancers': 'tribe_blackSpiralDancers', 'Bone Gnawers': 'tribe_boneGnawers',
   'Children of Gaia': 'tribe_childrenOfGaia', 'Fianna': 'tribe_fianna',
   'Get of Fenris': 'tribe_getOfFenris', 'Glass Walkers': 'tribe_glassWalkers',
   'Red Talons': 'tribe_redTalons', 'Shadow Lords': 'tribe_shadowLords',
