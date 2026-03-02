@@ -358,13 +358,13 @@ export function WerewolfTrackers({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-5 gap-1">
+          <div className="flex flex-wrap gap-1">
             {FORMS.map((form) => (
               <button
                 key={form}
                 type="button"
                 onClick={() => handleFormChange(form)}
-                className={`px-1 py-2 rounded text-xs font-medieval text-center transition-colors ${
+                className={`flex-1 min-w-[3.5rem] px-1.5 py-2 rounded text-[11px] font-medieval text-center transition-colors ${
                   currentForm === form
                     ? 'bg-emerald-500 text-emerald-50 border border-emerald-500'
                     : 'bg-muted/30 hover:bg-muted/50 border border-border'
