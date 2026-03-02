@@ -6,14 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Flame, Sparkles, Heart, AlertTriangle, Dog, Zap } from 'lucide-react';
 import { TrackerChangeConfirmModal, TrackerType } from '../vampire/TrackerChangeConfirmModal';
+import { FormChangeModal } from './FormChangeModal';
+import { Button } from '@/components/ui/button';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 
 // Extend TrackerType for werewolf-specific trackers
 type WerewolfTrackerType = TrackerType | 'gnosis' | 'rage' | 'form';
 
 const HEALTH_LEVELS = ['bruised', 'hurt', 'injured', 'wounded', 'mauled', 'crippled', 'incapacitated'] as const;
-
-const FORMS = ['hominid', 'glabro', 'crinos', 'hispo', 'lupus'] as const;
 
 interface WerewolfTrackersProps {
   participantId: string;
@@ -61,6 +61,7 @@ export function WerewolfTrackers({
   const [currentWillpower, setCurrentWillpower] = useState(initialWillpower);
   const [healthDamage, setHealthDamage] = useState<boolean[]>(initialHealthDamage);
   const [currentForm, setCurrentForm] = useState(initialForm);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Confirmation modal state
@@ -358,24 +359,33 @@ export function WerewolfTrackers({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-1">
-            {FORMS.map((form) => (
-              <button
-                key={form}
-                type="button"
-                onClick={() => handleFormChange(form)}
-                className={`flex-1 min-w-[3.5rem] px-1.5 py-2 rounded text-[11px] font-medieval text-center transition-colors ${
-                  currentForm === form
-                    ? 'bg-emerald-500 text-emerald-50 border border-emerald-500'
-                    : 'bg-muted/30 hover:bg-muted/50 border border-border'
-                }`}
-              >
-                {getFormLabel(form)}
-              </button>
-            ))}
+          <div className="flex items-center justify-between">
+            <Badge variant="outline" className="border-emerald-500/30 text-emerald-500 font-medieval">
+              {getFormLabel(currentForm)}
+            </Badge>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setIsFormModalOpen(true)}
+              className="border-emerald-500/30 hover:bg-emerald-500/10 text-xs"
+            >
+              <Dog className="w-3 h-3 mr-1" />
+              {t.lobisomem?.changeForm || 'Mudar Forma'}
+            </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Form Change Modal */}
+      <FormChangeModal
+        open={isFormModalOpen}
+        currentForm={currentForm}
+        onConfirm={(form) => {
+          setIsFormModalOpen(false);
+          handleFormChange(form);
+        }}
+        onCancel={() => setIsFormModalOpen(false)}
+      />
 
 
       {/* Confirmation Modal */}
