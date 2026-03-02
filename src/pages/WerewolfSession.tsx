@@ -452,7 +452,8 @@ export default function WerewolfSession() {
         <div className="flex-1 flex overflow-hidden min-h-0">
           {/* Left Sidebar */}
           <aside className="w-80 shrink-0 border-r border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-background overflow-hidden flex flex-col">
-            <ScrollArea className="flex-1 p-4">
+            <ScrollArea className="flex-1">
+              <div className="p-4 w-full max-w-full overflow-hidden">
               {isNarrator ? (
                 <WerewolfNarratorSidebar
                   sessionId={sessionId!}
@@ -484,6 +485,7 @@ export default function WerewolfSession() {
                   <WerewolfPlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ gnosis: myParticipant?.session_gnosis ?? 0, rage: myParticipant?.session_rage ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage || Array(7).fill(false), form: myParticipant?.session_form || 'hominid' }} sheetLocked={myParticipant?.sheet_locked ?? true} participants={participants} currentUserId={user?.id} />
                 </div>
               )}
+              </div>
             </ScrollArea>
           </aside>
 
@@ -501,7 +503,8 @@ export default function WerewolfSession() {
 
           {/* Right Sidebar - Trackers */}
           <aside className="w-72 shrink-0 border-l border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-background overflow-hidden flex flex-col">
-            <ScrollArea className="flex-1 p-4">
+            <ScrollArea className="flex-1">
+              <div className="p-4 w-full max-w-full overflow-hidden">
               {myParticipant && myCharacter ? (
                 <WerewolfTrackers
                   participantId={myParticipant.id}
@@ -517,6 +520,7 @@ export default function WerewolfSession() {
               ) : !isNarrator && myParticipant && !myCharacter ? (
                 <NoCharacterCard inviteCode={session?.invite_code} />
               ) : null}
+              </div>
             </ScrollArea>
           </aside>
         </div>
