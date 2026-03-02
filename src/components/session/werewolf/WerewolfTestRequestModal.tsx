@@ -18,8 +18,8 @@ import { Dices, Lock, Heart, Star, Users, ChevronRight, MessageSquare, Minus, Pl
 import { cn } from '@/lib/utils';
 import {
   ALL_ATTRIBUTES,
-  ALL_ABILITIES,
 } from '@/lib/vampiro/diceUtils';
+import { WEREWOLF_ALL_ABILITIES } from '@/lib/lobisomem/diceUtils';
 import type { WerewolfTestType } from '@/lib/lobisomem/diceUtils';
 
 interface Participant {
@@ -260,7 +260,7 @@ export default function WerewolfTestRequestModal({
                 <div className="space-y-1.5">
                   <Label className="text-xs text-muted-foreground">{t.vampiroTests.selectAbility}</Label>
                   <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1">
-                    {ALL_ABILITIES.map(ab => (
+                    {WEREWOLF_ALL_ABILITIES.map(ab => (
                       <Button
                         key={ab}
                         type="button"

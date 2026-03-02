@@ -480,6 +480,8 @@ export default function WerewolfSession() {
                         created_at: pendingTestEvent.created_at,
                       }}
                       onTestComplete={() => {}}
+                      currentForm={myParticipant?.session_form || 'hominid'}
+                      gameSystem="lobisomem_w20"
                     />
                   )}
                   <WerewolfPlayerPanel character={myCharacter} experiencePoints={myParticipant?.experience_points} sessionTrackers={{ gnosis: myParticipant?.session_gnosis ?? 0, rage: myParticipant?.session_rage ?? 0, willpower: myParticipant?.session_willpower_current ?? 0, healthDamage: myParticipant?.session_health_damage || Array(7).fill(false), form: myParticipant?.session_form || 'hominid' }} sheetLocked={myParticipant?.sheet_locked ?? true} participants={participants} currentUserId={user?.id} />
@@ -579,6 +581,8 @@ export default function WerewolfSession() {
             event_data: pendingTestEvent.event_data as any,
             created_at: pendingTestEvent.created_at,
           }}
+          currentForm={myParticipant?.session_form || 'hominid'}
+          gameSystem="lobisomem_w20"
         />
       )}
 

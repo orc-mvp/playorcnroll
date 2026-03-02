@@ -15,6 +15,8 @@ import {
   getVirtueValue,
   calculateHealthPenalty,
 } from '@/lib/vampiro/diceUtils';
+import { getFormAttributeModifier } from '@/lib/lobisomem/diceUtils';
+import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 
 interface TestConfig {
   testType: TestType;
@@ -41,6 +43,10 @@ interface VampirePendingTestProps {
     created_at: string;
   };
   onTestComplete: () => void;
+  /** Werewolf: current form for attribute modifiers */
+  currentForm?: string;
+  /** Game system identifier */
+  gameSystem?: string;
 }
 
 export function VampirePendingTest({
@@ -51,6 +57,8 @@ export function VampirePendingTest({
   vampiroData,
   testEvent,
   onTestComplete,
+  currentForm,
+  gameSystem,
 }: VampirePendingTestProps) {
   const t = useTranslation();
   const { toast } = useToast();
@@ -72,36 +80,52 @@ export function VampirePendingTest({
   // Calculate dice pool
   const calculatePool = (): number => {
     let pool = 0;
+    const isWerewolf = gameSystem === 'lobisomem_w20';
+    const lobData = isWerewolf ? (vampiroData as unknown as LobisomemCharacterData) : null;
 
     switch (config.testType) {
       case 'attribute_ability':
         if (config.attribute && config.ability) {
-          pool =
-            getAttributeValue(vampiroData, config.attribute) +
-            getAbilityValue(vampiroData, config.ability);
+          let attrVal = getAttributeValue(vampiroData, config.attribute);
+          if (isWerewolf && currentForm) {
+            attrVal += getFormAttributeModifier(currentForm, config.attribute);
+            attrVal = Math.max(attrVal, 0);
+          }
+          pool = attrVal + getAbilityValue(vampiroData, config.ability);
         }
         break;
       case 'attribute_only':
         if (config.attribute) {
-          pool = getAttributeValue(vampiroData, config.attribute);
+          let attrVal = getAttributeValue(vampiroData, config.attribute);
+          if (isWerewolf && currentForm) {
+            attrVal += getFormAttributeModifier(currentForm, config.attribute);
+          }
+          pool = Math.max(attrVal, 0);
         }
         break;
       case 'willpower':
-        pool = vampiroData.willpower || 1;
+        pool = (isWerewolf ? lobData?.willpower : vampiroData.willpower) || 1;
         break;
       case 'humanity':
-        pool = vampiroData.humanity || 1;
+        pool = (vampiroData as VampiroCharacterData).humanity || 1;
         break;
       case 'virtue':
         if (config.virtue) {
           pool = getVirtueValue(vampiroData, config.virtue);
         }
         break;
+      default:
+        // Werewolf-specific test types
+        if ((config.testType as string) === 'gnosis') {
+          pool = lobData?.gnosis ?? 1;
+        } else if ((config.testType as string) === 'rage') {
+          pool = lobData?.rage ?? 1;
+        }
+        break;
     }
 
     // Apply health penalty if enabled
     // TODO: Get actual health damage from character state
-    // For now we skip health penalty calculation
 
     return Math.max(pool, 1);
   };
