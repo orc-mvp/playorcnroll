@@ -9,10 +9,10 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useTranslation } from '@/lib/i18n';
-import { Droplets, Sparkles, Heart, AlertTriangle, Users, Crown, Moon, Zap } from 'lucide-react';
+import { Droplets, Sparkles, Heart, AlertTriangle, Users, Crown, Moon, Zap, Flame } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-export type TrackerType = 'blood' | 'willpower' | 'health' | 'humanity';
+export type TrackerType = 'blood' | 'willpower' | 'health' | 'humanity' | 'gnosis' | 'rage';
 
 interface TrackerChangeConfirmModalProps {
   open: boolean;
@@ -61,6 +61,10 @@ export function TrackerChangeConfirmModal({
         return <Heart className="w-5 h-5 text-destructive" />;
       case 'humanity':
         return <Moon className="w-5 h-5 text-foreground" />;
+      case 'gnosis':
+        return <Sparkles className="w-5 h-5 text-emerald-500" />;
+      case 'rage':
+        return <Flame className="w-5 h-5 text-destructive" />;
     }
   };
 
@@ -74,6 +78,10 @@ export function TrackerChangeConfirmModal({
         return t.vampiro?.trackerHealthChange || 'Vitalidade';
       case 'humanity':
         return t.vampiro?.trackerHumanityChange || 'Humanidade';
+      case 'gnosis':
+        return t.lobisomem?.gnosis || 'Gnose';
+      case 'rage':
+        return t.lobisomem?.rage || 'Fúria';
     }
   };
 
