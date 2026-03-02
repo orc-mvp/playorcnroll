@@ -156,13 +156,13 @@ export function WerewolfTrackers({
 
   const requestGnosisChange = (index: number) => {
     const newValue = index < currentGnosis ? index : index + 1;
-    setPendingChange({ type: 'blood' as TrackerType, currentValue: currentGnosis, newValue });
+    setPendingChange({ type: 'gnosis' as TrackerType, currentValue: currentGnosis, newValue });
     setIsConfirmOpen(true);
   };
 
   const requestRageChange = (index: number) => {
     const newValue = index < currentRage ? index : index + 1;
-    setPendingChange({ type: 'willpower' as TrackerType, currentValue: currentRage, newValue });
+    setPendingChange({ type: 'rage' as TrackerType, currentValue: currentRage, newValue });
     setIsConfirmOpen(true);
   };
 
@@ -190,14 +190,11 @@ export function WerewolfTrackers({
   const confirmChange = async () => {
     if (!pendingChange) return;
 
-    // Map back from the generic tracker type to actual werewolf tracker
-    if (pendingChange.type === 'blood') {
-      // This was gnosis
+    if (pendingChange.type === 'gnosis') {
       await emitTrackerChangeEvent('gnosis', pendingChange.currentValue, pendingChange.newValue);
       setCurrentGnosis(pendingChange.newValue);
       saveTrackers(pendingChange.newValue, currentRage, currentWillpower, healthDamage, currentForm);
-    } else if (pendingChange.type === 'willpower' && pendingChange.currentValue === currentRage) {
-      // This was rage
+    } else if (pendingChange.type === 'rage') {
       await emitTrackerChangeEvent('rage', pendingChange.currentValue, pendingChange.newValue);
       setCurrentRage(pendingChange.newValue);
       saveTrackers(currentGnosis, pendingChange.newValue, currentWillpower, healthDamage, currentForm);
