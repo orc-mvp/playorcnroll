@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast as sonnerToast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Flame, Sparkles, Heart, AlertTriangle, Dog, Zap, Crown } from 'lucide-react';
+import { Flame, Sparkles, Heart, AlertTriangle, Dog, Zap } from 'lucide-react';
 import { TrackerChangeConfirmModal, TrackerType } from '../vampire/TrackerChangeConfirmModal';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 
@@ -377,42 +377,6 @@ export function WerewolfTrackers({
         </CardContent>
       </Card>
 
-      {/* Renown display */}
-      {lobData?.renown && (
-        <Card className="medieval-card border-emerald-500/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="font-medieval text-sm flex items-center gap-2 text-emerald-500">
-              <Crown className="w-4 h-4" />
-              {t.lobisomem?.renown || 'Renome'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-1.5">
-              {[
-                { key: 'glory', label: t.lobisomem?.glory || 'Glória' },
-                { key: 'honor', label: t.lobisomem?.honor || 'Honra' },
-                { key: 'wisdom', label: t.lobisomem?.wisdom || 'Sabedoria' },
-              ].map(({ key, label }) => (
-                <div key={key} className="flex items-center justify-between text-sm">
-                  <span className="font-body">{label}</span>
-                  <div className="flex gap-0.5">
-                    {Array.from({ length: 10 }, (_, i) => (
-                      <div
-                        key={i}
-                        className={`w-2.5 h-2.5 rounded-full border ${
-                          i < ((lobData.renown as any)?.[key] || 0)
-                            ? 'bg-emerald-500 border-emerald-500'
-                            : 'border-muted-foreground/30 bg-transparent'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Confirmation Modal */}
       {pendingChange && (
