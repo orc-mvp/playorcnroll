@@ -17,7 +17,7 @@ interface TestConfig {
   targetCharacterIds: string[];
 }
 
-interface MobilePendingTestDrawerProps {
+export interface MobilePendingTestDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   sessionId: string;
@@ -30,6 +30,8 @@ interface MobilePendingTestDrawerProps {
     event_data: TestConfig;
     created_at: string;
   };
+  currentForm?: string;
+  gameSystem?: string;
 }
 
 export function MobilePendingTestDrawer({
@@ -41,6 +43,8 @@ export function MobilePendingTestDrawer({
   characterName,
   vampiroData,
   testEvent,
+  currentForm,
+  gameSystem,
 }: MobilePendingTestDrawerProps) {
   const t = useTranslation();
 
@@ -62,6 +66,8 @@ export function MobilePendingTestDrawer({
             vampiroData={vampiroData}
             testEvent={testEvent}
             onTestComplete={() => onOpenChange(false)}
+            currentForm={currentForm}
+            gameSystem={gameSystem}
           />
         </div>
       </DrawerContent>

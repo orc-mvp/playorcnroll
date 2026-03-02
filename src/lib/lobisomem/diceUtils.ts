@@ -45,19 +45,48 @@ export {
   calculateSuccesses,
   performRoll,
   ALL_ATTRIBUTES,
-  ALL_ABILITIES,
-  TALENTS,
-  SKILLS,
-  KNOWLEDGES,
   PHYSICAL_ATTRIBUTES,
   SOCIAL_ATTRIBUTES,
   MENTAL_ATTRIBUTES,
 } from '@/lib/vampiro/diceUtils';
 
-import { getAttributeValue, getAbilityValue } from '@/lib/vampiro/diceUtils';
+import { getAttributeValue, getAbilityValue, calculateHealthPenalty } from '@/lib/vampiro/diceUtils';
+
+// Werewolf-specific ability lists (differ from Vampire)
+export const WEREWOLF_TALENTS = ['alertness', 'athletics', 'brawl', 'dodge', 'empathy', 'expression', 'intimidation', 'leadership', 'primalUrge', 'subterfuge'] as const;
+export const WEREWOLF_SKILLS = ['animalKen', 'crafts', 'drive', 'etiquette', 'firearms', 'melee', 'performance', 'security', 'stealth', 'survival'] as const;
+export const WEREWOLF_KNOWLEDGES = ['academics', 'computer', 'enigmas', 'investigation', 'law', 'linguistics', 'medicine', 'occult', 'politics', 'rituals', 'science'] as const;
+export const WEREWOLF_ALL_ABILITIES = [...WEREWOLF_TALENTS, ...WEREWOLF_SKILLS, ...WEREWOLF_KNOWLEDGES];
+
+// Form attribute modifiers
+export interface FormModifiers {
+  strength?: number;
+  dexterity?: number;
+  stamina?: number;
+  appearance?: number;
+  manipulation?: number;
+  difficulty: number;
+}
+
+export const FORM_MODIFIERS: Record<string, FormModifiers> = {
+  hominid: { difficulty: 6 },
+  glabro: { strength: 2, stamina: 2, appearance: -1, manipulation: -1, difficulty: 7 },
+  crinos: { strength: 4, dexterity: 1, stamina: 3, appearance: -4, manipulation: -3, difficulty: 6 },
+  hispo: { strength: 3, dexterity: 2, stamina: 3, manipulation: -3, difficulty: 7 },
+  lupus: { strength: 1, dexterity: 2, stamina: 2, manipulation: -3, difficulty: 6 },
+};
 
 /**
- * Calculate dice pool for a werewolf test
+ * Get the form modifier for a specific attribute
+ */
+export function getFormAttributeModifier(form: string, attribute: string): number {
+  const mods = FORM_MODIFIERS[form];
+  if (!mods) return 0;
+  return (mods as any)[attribute] ?? 0;
+}
+
+/**
+ * Calculate dice pool for a werewolf test, including form modifiers
  */
 export function calculateWerewolfDicePool(
   data: LobisomemCharacterData,
@@ -65,19 +94,25 @@ export function calculateWerewolfDicePool(
   attribute?: string,
   ability?: string,
   applyHealthPenalty?: boolean,
-  healthDamage?: boolean[]
+  healthDamage?: boolean[],
+  currentForm?: string
 ): number {
   let pool = 0;
 
   switch (testType) {
     case 'attribute_ability':
       if (attribute && ability) {
-        pool = getAttributeValue(data as any, attribute) + getAbilityValue(data as any, ability);
+        let attrVal = getAttributeValue(data as any, attribute);
+        if (currentForm) attrVal += getFormAttributeModifier(currentForm, attribute);
+        attrVal = Math.max(attrVal, 0);
+        pool = attrVal + getAbilityValue(data as any, ability);
       }
       break;
     case 'attribute_only':
       if (attribute) {
-        pool = getAttributeValue(data as any, attribute);
+        let attrVal = getAttributeValue(data as any, attribute);
+        if (currentForm) attrVal += getFormAttributeModifier(currentForm, attribute);
+        pool = Math.max(attrVal, 0);
       }
       break;
     case 'willpower':
@@ -92,7 +127,6 @@ export function calculateWerewolfDicePool(
   }
 
   if (applyHealthPenalty && healthDamage) {
-    const { calculateHealthPenalty } = require('@/lib/vampiro/diceUtils');
     const penalty = calculateHealthPenalty(healthDamage);
     pool += penalty;
   }
