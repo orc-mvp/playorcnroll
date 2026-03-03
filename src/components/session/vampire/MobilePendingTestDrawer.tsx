@@ -9,6 +9,7 @@ interface TestConfig {
   attribute?: string;
   ability?: string;
   virtue?: string;
+  diceCount?: number;
   difficulty: number;
   context: string;
   isPrivate: boolean;

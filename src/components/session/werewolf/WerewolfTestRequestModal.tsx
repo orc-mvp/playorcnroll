@@ -43,6 +43,7 @@ export interface WerewolfTestConfig {
   testType: WerewolfTestType;
   attribute?: string;
   ability?: string;
+  diceCount?: number;
   difficulty: number;
   context: string;
   isPrivate: boolean;
@@ -58,6 +59,7 @@ const TEST_TYPES: { value: WerewolfTestType; labelKey: string }[] = [
   { value: 'willpower', labelKey: 'willpowerOnly' },
   { value: 'gnosis', labelKey: 'gnosisOnly' },
   { value: 'rage', labelKey: 'rageOnly' },
+  { value: 'raw_dice', labelKey: 'rawDice' },
 ];
 
 export default function WerewolfTestRequestModal({
@@ -76,6 +78,7 @@ export default function WerewolfTestRequestModal({
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
   const [applyHealthPenalty, setApplyHealthPenalty] = useState<boolean>(false);
   const [isSpecialized, setIsSpecialized] = useState<boolean>(false);
+  const [diceCount, setDiceCount] = useState<number>(1);
   const [selectedPlayers, setSelectedPlayers] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [contextOpen, setContextOpen] = useState<boolean>(false);
@@ -93,6 +96,7 @@ export default function WerewolfTestRequestModal({
       testType,
       attribute: (testType === 'attribute_ability' || testType === 'attribute_only') ? attribute : undefined,
       ability: testType === 'attribute_ability' ? ability : undefined,
+      diceCount: testType === 'raw_dice' ? diceCount : undefined,
       difficulty,
       context,
       isPrivate,
@@ -111,6 +115,7 @@ export default function WerewolfTestRequestModal({
     setAttribute('');
     setAbility('');
     setDifficulty(6);
+    setDiceCount(1);
     setContext('');
     setIsPrivate(false);
     setApplyHealthPenalty(false);
@@ -142,6 +147,7 @@ export default function WerewolfTestRequestModal({
   const isValid = () => {
     if (testType === 'attribute_ability' && (!attribute || !ability)) return false;
     if (testType === 'attribute_only' && !attribute) return false;
+    // raw_dice, willpower, gnosis, rage only need players selected
     const targetCount = selectAll ? playersWithCharacters.length : selectedPlayers.length;
     return targetCount > 0;
   };
@@ -169,6 +175,8 @@ export default function WerewolfTestRequestModal({
           return t.lobisomem?.gnosis || 'Gnose';
         case 'rage':
           return t.lobisomem?.rage || 'Fúria';
+        case 'raw_dice':
+          return `${diceCount} ${t.vampiroTests.rawDice}`;
         default:
           return '';
       }
@@ -194,7 +202,7 @@ export default function WerewolfTestRequestModal({
     return language === 'pt-BR'
       ? `${targetNames.join(', ')} testem ${testLabel}`
       : `${targetNames.join(', ')} test ${testLabel}`;
-  }, [testType, attribute, ability, selectAll, selectedPlayers, playersWithCharacters, language, t]);
+  }, [testType, attribute, ability, diceCount, selectAll, selectedPlayers, playersWithCharacters, language, t]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -278,6 +286,34 @@ export default function WerewolfTestRequestModal({
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Raw Dice Selector */}
+          {testType === 'raw_dice' && (
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">{t.vampiroTests.rawDicePool}</Label>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 shrink-0"
+                  onClick={() => setDiceCount(Math.max(1, diceCount - 1))}
+                  disabled={diceCount <= 1}
+                >
+                  <Minus className="w-5 h-5" />
+                </Button>
+                <span className="text-2xl font-bold w-10 text-center font-medieval">{diceCount}</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 shrink-0"
+                  onClick={() => setDiceCount(Math.min(20, diceCount + 1))}
+                  disabled={diceCount >= 20}
+                >
+                  <Plus className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
           )}
 

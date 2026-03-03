@@ -23,6 +23,7 @@ interface TestConfig {
   attribute?: string;
   ability?: string;
   virtue?: string;
+  diceCount?: number;
   difficulty: number;
   context: string;
   isPrivate: boolean;
@@ -84,6 +85,9 @@ export function VampirePendingTest({
     const lobData = isWerewolf ? (vampiroData as unknown as LobisomemCharacterData) : null;
 
     switch (config.testType) {
+      case 'raw_dice':
+        pool = config.diceCount || 1;
+        break;
       case 'attribute_ability':
         if (config.attribute && config.ability) {
           let attrVal = getAttributeValue(vampiroData, config.attribute);
@@ -196,6 +200,9 @@ export function VampirePendingTest({
     if (config.testType === 'humanity') return t.vampiro.humanity;
     if (config.testType === 'virtue') {
       return t.vampiro[config.virtue as keyof typeof t.vampiro] || config.virtue;
+    }
+    if (config.testType === 'raw_dice') {
+      return `${config.diceCount || 1} ${t.vampiroTests.rawDice}`;
     }
     return '';
   };
