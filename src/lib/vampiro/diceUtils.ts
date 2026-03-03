@@ -42,7 +42,7 @@ export const HEALTH_PENALTIES: Record<string, number> = {
   incapacitated: -999, // Can't act
 };
 
-export type TestType = 'attribute_ability' | 'attribute_only' | 'willpower' | 'humanity' | 'virtue';
+export type TestType = 'attribute_ability' | 'attribute_only' | 'willpower' | 'humanity' | 'virtue' | 'raw_dice';
 
 export type AttributeKey = 
   | 'strength' | 'dexterity' | 'stamina'

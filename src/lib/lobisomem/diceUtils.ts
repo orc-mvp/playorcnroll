@@ -1,7 +1,7 @@
 // Werewolf dice utilities - extends vampire dice system
 // Werewolf uses the same d10 pool system as Vampire
 
-export type WerewolfTestType = 'attribute_ability' | 'attribute_only' | 'willpower' | 'gnosis' | 'rage';
+export type WerewolfTestType = 'attribute_ability' | 'attribute_only' | 'willpower' | 'gnosis' | 'rage' | 'raw_dice';
 
 export interface LobisomemCharacterData {
   player?: string;
