@@ -61,6 +61,8 @@ export interface Participant {
     major_marks?: unknown[] | null;
     epic_marks?: unknown[] | null;
     negative_marks?: unknown[] | null;
+    mark_progress?: Record<string, number> | null;
+    extended_narratives?: unknown[] | null;
   } | null;
   profile?: {
     display_name: string | null;
@@ -175,7 +177,9 @@ export default function Session() {
             minor_marks,
             major_marks,
             epic_marks,
-            negative_marks
+            negative_marks,
+            mark_progress,
+            extended_narratives
           )
         `)
         .eq('session_id', sessionId);
