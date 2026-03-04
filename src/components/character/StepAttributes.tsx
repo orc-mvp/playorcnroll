@@ -1,6 +1,7 @@
 import { useI18n } from '@/lib/i18n';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { 
   Sword, 
@@ -8,9 +9,8 @@ import {
   Heart, 
   Eye, 
   Sparkles,
-  ChevronUp,
-  Minus,
-  ChevronDown
+  ArrowUp,
+  ArrowDown,
 } from 'lucide-react';
 import type { CharacterFormData, AttributeType } from '@/pages/CreateCharacter';
 
@@ -27,57 +27,68 @@ const attributeConfig = {
   faith: { icon: Sparkles, color: 'text-blue-500' },
 };
 
-const typeOrder: AttributeType[] = ['strong', 'neutral', 'weak'];
+type AttrKey = keyof typeof attributeConfig;
+
+// Position → type mapping: positions 0,1 = strong; 2 = neutral; 3,4 = weak
+const positionToType = (pos: number): AttributeType => {
+  if (pos <= 1) return 'strong';
+  if (pos === 2) return 'neutral';
+  return 'weak';
+};
+
+const positionLabel = (pos: number, t: any): string => {
+  if (pos <= 1) return t.attributes.strong;
+  if (pos === 2) return t.attributes.neutral;
+  return t.attributes.weak;
+};
+
+const positionStyle = (pos: number): string => {
+  if (pos <= 1) return 'bg-primary/20 border-primary/50';
+  if (pos === 2) return 'bg-muted border-muted-foreground/30';
+  return 'bg-destructive/10 border-destructive/40';
+};
+
+const positionBadgeStyle = (pos: number): string => {
+  if (pos <= 1) return 'bg-primary/20 border-primary text-primary';
+  if (pos === 2) return 'bg-muted border-muted-foreground/50 text-muted-foreground';
+  return 'bg-destructive/20 border-destructive text-destructive';
+};
 
 export default function StepAttributes({ formData, updateFormData }: StepAttributesProps) {
   const { t } = useI18n();
 
-  const getTypeCounts = () => {
-    const types = Object.values(formData.attributes);
-    return {
-      strong: types.filter(t => t === 'strong').length,
-      neutral: types.filter(t => t === 'neutral').length,
-      weak: types.filter(t => t === 'weak').length,
-    };
+  // Derive ordered list from current attribute types
+  // We need to maintain a consistent ordering, so we store order as state derived from types
+  const getOrderFromAttributes = (): AttrKey[] => {
+    const attrs = Object.entries(formData.attributes) as [AttrKey, AttributeType][];
+    const strong = attrs.filter(([, type]) => type === 'strong').map(([k]) => k);
+    const neutral = attrs.filter(([, type]) => type === 'neutral').map(([k]) => k);
+    const weak = attrs.filter(([, type]) => type === 'weak').map(([k]) => k);
+    return [...strong, ...neutral, ...weak];
   };
 
-  const counts = getTypeCounts();
-  const isValid = counts.strong === 2 && counts.neutral === 1 && counts.weak === 2;
+  const orderedAttrs = getOrderFromAttributes();
 
-  const cycleAttribute = (attr: keyof typeof formData.attributes) => {
-    const current = formData.attributes[attr];
-    const currentIndex = typeOrder.indexOf(current);
-    const nextIndex = (currentIndex + 1) % typeOrder.length;
-    const nextType = typeOrder[nextIndex];
+  const moveUp = (index: number) => {
+    if (index === 0) return;
+    const newOrder = [...orderedAttrs];
+    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+    applyOrder(newOrder);
+  };
 
-    updateFormData({
-      attributes: {
-        ...formData.attributes,
-        [attr]: nextType,
-      },
+  const moveDown = (index: number) => {
+    if (index === orderedAttrs.length - 1) return;
+    const newOrder = [...orderedAttrs];
+    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+    applyOrder(newOrder);
+  };
+
+  const applyOrder = (order: AttrKey[]) => {
+    const newAttributes: Record<AttrKey, AttributeType> = {} as any;
+    order.forEach((attr, pos) => {
+      newAttributes[attr] = positionToType(pos);
     });
-  };
-
-  const getTypeStyle = (type: AttributeType) => {
-    switch (type) {
-      case 'strong':
-        return 'bg-primary/20 border-primary text-primary';
-      case 'neutral':
-        return 'bg-muted border-muted-foreground/30 text-muted-foreground';
-      case 'weak':
-        return 'bg-destructive/20 border-destructive text-destructive';
-    }
-  };
-
-  const getTypeIcon = (type: AttributeType) => {
-    switch (type) {
-      case 'strong':
-        return <ChevronUp className="w-4 h-4" />;
-      case 'neutral':
-        return <Minus className="w-4 h-4" />;
-      case 'weak':
-        return <ChevronDown className="w-4 h-4" />;
-    }
+    updateFormData({ attributes: newAttributes });
   };
 
   return (
@@ -95,99 +106,84 @@ export default function StepAttributes({ formData, updateFormData }: StepAttribu
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Distribution Summary */}
-        <div className="flex justify-center gap-4 flex-wrap">
-          <Badge 
-            variant="outline" 
-            className={cn(
-              "px-3 py-1",
-              counts.strong === 2 ? "bg-primary/20 border-primary" : "bg-muted"
-            )}
-          >
-            {t.attributes.strong}: {counts.strong}/2
-          </Badge>
-          <Badge 
-            variant="outline" 
-            className={cn(
-              "px-3 py-1",
-              counts.neutral === 1 ? "bg-muted border-muted-foreground" : "bg-muted"
-            )}
-          >
-            {t.attributes.neutral}: {counts.neutral}/1
-          </Badge>
-          <Badge 
-            variant="outline" 
-            className={cn(
-              "px-3 py-1",
-              counts.weak === 2 ? "bg-destructive/20 border-destructive" : "bg-muted"
-            )}
-          >
-            {t.attributes.weak}: {counts.weak}/2
-          </Badge>
-        </div>
-
         {/* Hint */}
         <p className="text-center text-sm text-muted-foreground font-body">
           {t.character.distributeHint}
         </p>
 
-        {/* Attributes */}
-        <div className="space-y-3">
-          {(Object.keys(attributeConfig) as (keyof typeof attributeConfig)[]).map((attr) => {
+        {/* Zone labels */}
+        <div className="space-y-1">
+          {orderedAttrs.map((attr, index) => {
             const config = attributeConfig[attr];
             const Icon = config.icon;
-            const type = formData.attributes[attr];
+            const isFirst = index === 0;
+            const isLast = index === orderedAttrs.length - 1;
+
+            // Show zone divider labels
+            const showZoneLabel = index === 0 || positionToType(index) !== positionToType(index - 1);
 
             return (
-              <button
-                key={attr}
-                type="button"
-                onClick={() => cycleAttribute(attr)}
-                className={cn(
-                  "w-full p-4 rounded-lg border-2 transition-all duration-200",
-                  "flex items-center justify-between",
-                  "hover:scale-[1.02] active:scale-[0.98]",
-                  getTypeStyle(type)
+              <div key={attr}>
+                {showZoneLabel && (
+                  <div className="flex items-center gap-2 py-1.5">
+                    <div className="h-px flex-1 bg-border" />
+                    <Badge variant="outline" className={cn("text-xs px-2", positionBadgeStyle(index))}>
+                      {positionLabel(index, t)}
+                      {positionToType(index) === 'strong' && ' (×2)'}
+                      {positionToType(index) === 'weak' && ' (×2)'}
+                    </Badge>
+                    <div className="h-px flex-1 bg-border" />
+                  </div>
                 )}
-              >
-                <div className="flex items-center gap-3">
-                  <Icon className={cn("w-6 h-6", config.color)} />
-                  <span className="font-medieval text-lg">
-                    {t.attributes[attr as keyof typeof t.attributes]}
-                  </span>
-                </div>
 
-                <div className="flex items-center gap-2">
-                  {getTypeIcon(type)}
-                  <span className="font-body text-sm min-w-[60px] text-right">
-                    {t.attributes[type]}
-                  </span>
+                <div
+                  className={cn(
+                    "flex items-center gap-2 p-3 rounded-lg border-2 transition-all duration-200",
+                    positionStyle(index)
+                  )}
+                >
+                  {/* Move Up */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-12 w-12 shrink-0 touch-manipulation"
+                    onClick={() => moveUp(index)}
+                    disabled={isFirst}
+                  >
+                    <ArrowUp className="w-6 h-6" />
+                  </Button>
+
+                  {/* Attribute info */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Icon className={cn("w-6 h-6 shrink-0", config.color)} />
+                    <span className="font-medieval text-lg truncate">
+                      {t.attributes[attr as keyof typeof t.attributes]}
+                    </span>
+                  </div>
+
+                  {/* Move Down */}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-12 w-12 shrink-0 touch-manipulation"
+                    onClick={() => moveDown(index)}
+                    disabled={isLast}
+                  >
+                    <ArrowDown className="w-6 h-6" />
+                  </Button>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
 
-        {/* Validation Message */}
-        {!isValid && (
-          <p className="text-center text-sm text-amber-500 font-body">
-            Clique nos atributos para alternar entre Forte, Neutro e Fraco
-          </p>
-        )}
-
-        {isValid && (
-          <p className="text-center text-sm text-primary font-body">
-            ✓ Distribuição válida! Você pode prosseguir.
-          </p>
-        )}
-
         {/* Tips */}
         <div className="bg-muted/50 rounded-lg p-4 border border-border">
-          <h4 className="font-medieval text-sm mb-2 text-primary">Como funciona</h4>
+          <h4 className="font-medieval text-sm mb-2 text-primary">{t.character.howItWorks}</h4>
           <ul className="text-xs text-muted-foreground space-y-1 font-body">
-            <li>• <strong>Forte:</strong> Bônus nos testes e maior chance de Extremo Positivo</li>
-            <li>• <strong>Neutro:</strong> Sem bônus ou penalidade</li>
-            <li>• <strong>Fraco:</strong> Penalidade nos testes e maior chance de Extremo Negativo</li>
+            <li>• <strong>{t.attributes.strong}:</strong> {t.character.strongDescription}</li>
+            <li>• <strong>{t.attributes.neutral}:</strong> {t.character.neutralDescription}</li>
+            <li>• <strong>{t.attributes.weak}:</strong> {t.character.weakDescription}</li>
           </ul>
         </div>
       </CardContent>
