@@ -69,17 +69,33 @@ export default function StepAttributes({ formData, updateFormData }: StepAttribu
 
   const orderedAttrs = getOrderFromAttributes();
 
+  // Move to the first position of the next group up
   const moveUp = (index: number) => {
     if (index === 0) return;
+    const currentGroup = positionToType(index);
+    // Find the first index of the current group
+    let targetIndex = index - 1;
+    while (targetIndex > 0 && positionToType(targetIndex) === currentGroup) {
+      targetIndex--;
+    }
     const newOrder = [...orderedAttrs];
-    [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+    const [item] = newOrder.splice(index, 1);
+    newOrder.splice(targetIndex, 0, item);
     applyOrder(newOrder);
   };
 
+  // Move to the first position of the next group down
   const moveDown = (index: number) => {
     if (index === orderedAttrs.length - 1) return;
+    const currentGroup = positionToType(index);
+    // Find the first index past the current group
+    let targetIndex = index + 1;
+    while (targetIndex < orderedAttrs.length - 1 && positionToType(targetIndex) === currentGroup) {
+      targetIndex++;
+    }
     const newOrder = [...orderedAttrs];
-    [newOrder[index], newOrder[index + 1]] = [newOrder[index + 1], newOrder[index]];
+    const [item] = newOrder.splice(index, 1);
+    newOrder.splice(targetIndex, 0, item);
     applyOrder(newOrder);
   };
 
