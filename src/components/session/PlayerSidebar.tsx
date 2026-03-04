@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { 
   User, 
   Sword,
@@ -16,7 +18,9 @@ import {
   Crown,
   Star,
   AlertTriangle,
-  Eye
+  Eye,
+  ScrollText,
+  Users,
 } from 'lucide-react';
 import { ComplicationsPlayerPanel } from '@/components/complications/ComplicationsPlayerPanel';
 import { MarksModal } from '@/components/character/MarksModal';
@@ -44,20 +48,48 @@ const typeColors: Record<string, string> = {
   weak: 'bg-red-500/20 text-red-500 border-red-500/30',
 };
 
+interface MinorMarkData {
+  id: string;
+  name: string;
+  attribute: string;
+  description: string;
+  effect: string;
+}
+
+interface ExtendedNarrative {
+  type: 'npc' | 'reputation' | 'resource' | 'promise';
+  name: string;
+  description: string;
+}
+
 export function PlayerSidebar({ session, participants, userId }: PlayerSidebarProps) {
   const { t } = useI18n();
   const [showMarksModal, setShowMarksModal] = useState(false);
+  const [minorMarksData, setMinorMarksData] = useState<MinorMarkData[]>([]);
 
-  // Find current player's participant data
   const myParticipant = participants.find((p) => p.user_id === userId);
   const character = myParticipant?.character;
+
+  // Fetch minor marks details
+  useEffect(() => {
+    if (!character?.minor_marks || character.minor_marks.length === 0) return;
+    
+    const fetchMinorMarks = async () => {
+      const { data } = await supabase
+        .from('minor_marks')
+        .select('*')
+        .in('id', character.minor_marks!);
+      if (data) setMinorMarksData(data);
+    };
+    fetchMinorMarks();
+  }, [character?.minor_marks]);
 
   if (!character) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center text-muted-foreground">
           <AlertCircle className="w-10 h-10 mx-auto mb-2 opacity-50" />
-          <p className="font-body">Personagem não encontrado</p>
+          <p className="font-body">{t.narrator?.noCharacterSelected || 'Personagem não encontrado'}</p>
         </div>
       </div>
     );
@@ -68,11 +100,12 @@ export function PlayerSidebar({ session, participants, userId }: PlayerSidebarPr
     return (character[key] as string) || 'neutral';
   };
 
-  // Parse marks from character data
   const minorMarkIds = character.minor_marks || [];
   const majorMarks = (character.major_marks as any[]) || [];
   const epicMarks = ((character as any).epic_marks as any[]) || [];
   const negativeMarks = ((character as any).negative_marks as any[]) || [];
+  const markProgress = (character.mark_progress as Record<string, number>) || {};
+  const extendedNarratives = (character.extended_narratives as ExtendedNarrative[]) || [];
 
   return (
     <div className="space-y-4">
@@ -142,20 +175,48 @@ export function PlayerSidebar({ session, participants, userId }: PlayerSidebarPr
               {t.character.heroicMovesStored}
             </span>
           </div>
-          {character.heroic_moves_stored > 0 && (
-            <p className="text-xs text-center text-muted-foreground">
-              Use em um teste para ativar poderes especiais!
-            </p>
-          )}
         </CardContent>
       </Card>
+
+      {/* Minor Marks Details */}
+      {minorMarksData.length > 0 && (
+        <Card className="medieval-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-medieval text-base flex items-center gap-2">
+              <Star className="w-4 h-4 text-primary" />
+              {t.character.minorMarks}
+              <Badge variant="outline" className="ml-auto text-xs">
+                {minorMarksData.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {minorMarksData.map((mark) => {
+              const Icon = attributeIcons[mark.attribute] || Star;
+              return (
+                <div key={mark.id} className="p-2 rounded-lg bg-muted/30 border border-border">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Icon className="w-3 h-3 text-primary" />
+                    <span className="font-medieval text-sm">{mark.name}</span>
+                    <Badge variant="outline" className="text-xs ml-auto">
+                      {t.attributes[mark.attribute as keyof typeof t.attributes] || mark.attribute}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-body">{mark.description}</p>
+                  <p className="text-xs text-primary font-body mt-1 italic">{mark.effect}</p>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Marks Summary Card */}
       <Card className="medieval-card">
         <CardHeader className="pb-2">
           <CardTitle className="font-medieval text-base flex items-center gap-2">
             <Scroll className="w-4 h-4 text-primary" />
-            Marcas
+            {t.marks?.tabMarks || 'Marcas'}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -197,7 +258,7 @@ export function PlayerSidebar({ session, participants, userId }: PlayerSidebarPr
               <div className="flex items-center justify-center gap-1 mb-1">
                 <AlertTriangle className="w-3 h-3 text-red-500" />
                 <p className="text-xs text-muted-foreground font-body">
-                  Negativas
+                  {t.character.negativeMarks}
                 </p>
               </div>
               <p className="font-medieval text-lg text-red-500">
@@ -212,10 +273,82 @@ export function PlayerSidebar({ session, participants, userId }: PlayerSidebarPr
             onClick={() => setShowMarksModal(true)}
           >
             <Eye className="w-4 h-4 mr-2" />
-            Ver Todas as Marcas
+            {t.character.viewDetails || 'Ver Todas as Marcas'}
           </Button>
         </CardContent>
       </Card>
+
+      {/* Mark Progress */}
+      {Object.keys(markProgress).length > 0 && (
+        <Card className="medieval-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-medieval text-base flex items-center gap-2">
+              <ScrollText className="w-4 h-4 text-primary" />
+              {t.character.markProgress}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {Object.entries(markProgress).map(([theme, points]) => (
+                <div key={theme} className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medieval text-sm">{theme}</span>
+                    <span className="text-xs text-muted-foreground">{points}/3</span>
+                  </div>
+                  <Progress value={(points / 3) * 100} className="h-2" />
+                  <div className="flex gap-1">
+                    {[1, 2, 3].map((i) => (
+                      <div
+                        key={i}
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          i <= points ? 'bg-primary' : 'bg-muted border border-border'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Extended Narratives */}
+      {extendedNarratives.length > 0 && (
+        <Card className="medieval-card">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-medieval text-base flex items-center gap-2">
+              <Users className="w-4 h-4 text-primary" />
+              {t.character.extendedNarratives}
+              <Badge variant="outline" className="ml-auto text-xs">
+                {extendedNarratives.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {extendedNarratives.map((narrative, index) => {
+              const typeLabels: Record<string, string> = {
+                npc: t.heroicMoves.npcAlly,
+                reputation: t.heroicMoves.reputation,
+                resource: t.heroicMoves.resource,
+                promise: t.heroicMoves.promiseFulfilled,
+              };
+
+              return (
+                <div key={index} className="p-2 rounded-lg bg-muted/30 border border-border">
+                  <Badge variant="outline" className="text-xs mb-1">
+                    {typeLabels[narrative.type] || narrative.type}
+                  </Badge>
+                  <p className="font-medieval text-sm">{narrative.name}</p>
+                  <p className="text-xs text-muted-foreground font-body mt-1">
+                    {narrative.description}
+                  </p>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Complications Panel */}
       <ComplicationsPlayerPanel 
