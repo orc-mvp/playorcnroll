@@ -32,8 +32,7 @@ import {
 } from 'lucide-react';
 import { GroupTestPanel } from '@/components/dice/GroupTestPanel';
 import { ComplicationsNarratorPanel } from '@/components/complications/ComplicationsNarratorPanel';
-import { MarksModal } from '@/components/character/MarksModal';
-import { NarratorPlayerSheet } from '@/components/session/NarratorPlayerSheet';
+import { CharacterSheetModal } from '@/components/character/CharacterSheetModal';
 import type { SessionData, Participant, Scene } from '@/pages/Session';
 
 interface NarratorSidebarProps {
@@ -76,7 +75,8 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
     attribute: string;
     players: string[];
   } | null>(null);
-  
+
+  const [viewingCharacterFor, setViewingCharacterFor] = useState<Participant | null>(null);
 
   // Check for active group tests
   useEffect(() => {
@@ -364,26 +364,38 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
           ) : (
             <div className="space-y-2">
               {participants.map((p) => {
-                if (!p.character) {
-                  return (
-                    <div
-                      key={p.id}
-                      className="flex items-center gap-2 p-2 rounded-lg bg-muted/50"
-                    >
-                      <User className="w-4 h-4 text-primary shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medieval text-sm truncate">
-                          {t.session.noCharacter}
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {p.profile?.display_name || t.session.playerLabel}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                }
+                const minorMarksCount = p.character?.minor_marks?.length || 0;
+                const majorMarksCount = (p.character?.major_marks as any[])?.length || 0;
+                const epicMarksCount = ((p.character as any)?.epic_marks as any[])?.length || 0;
+                const totalMarks = minorMarksCount + majorMarksCount + epicMarksCount;
+
                 return (
-                  <NarratorPlayerSheet key={p.id} participant={p} />
+                  <div
+                    key={p.id}
+                    className="flex items-center gap-2 p-2 rounded-lg bg-muted/50"
+                  >
+                    <User className="w-4 h-4 text-primary shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medieval text-sm truncate">
+                        {p.character?.name || t.session.noCharacter}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {p.profile?.display_name || t.session.playerLabel}
+                      </p>
+                    </div>
+                    {p.character && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 px-2 gap-1 shrink-0"
+                        onClick={() => setViewingCharacterFor(p)}
+                        title={t.narrator.viewPlayerMarks}
+                      >
+                        <Scroll className="w-3 h-3" />
+                        <span className="text-xs">{totalMarks}</span>
+                      </Button>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -395,6 +407,13 @@ export function NarratorSidebar({ session, participants, currentScene }: Narrato
       <ComplicationsNarratorPanel 
         sessionId={session.id}
         participants={participants}
+      />
+
+      {/* Character Sheet Modal */}
+      <CharacterSheetModal
+        open={!!viewingCharacterFor}
+        onOpenChange={(open) => !open && setViewingCharacterFor(null)}
+        participant={viewingCharacterFor}
       />
     </div>
   );
