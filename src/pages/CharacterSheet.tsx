@@ -38,6 +38,7 @@ import {
 import { EditCharacterModal } from '@/components/character/EditCharacterModal';
 import { EditVampiroCharacterModal } from '@/components/character/vampiro/EditVampiroCharacterModal';
 import { EditLobisomemCharacterModal } from '@/components/character/lobisomem/EditLobisomemCharacterModal';
+import { CharacterNotes } from '@/components/character/CharacterNotes';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import LobisomemCharacterSheet from '@/components/character/lobisomem/LobisomemCharacterSheet';
 import type { Json } from '@/integrations/supabase/types';
