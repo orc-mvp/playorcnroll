@@ -371,6 +371,13 @@ export function CharacterSheetModal({ open, onOpenChange, participant }: Charact
                 </TabsContent>
               </Tabs>
             </div>
+
+            {/* Notes */}
+            <CharacterNotes
+              characterId={character.id}
+              initialNotes={(character as any).notes || ''}
+              readOnly={participant?.user_id !== user?.id}
+            />
           </div>
         </ScrollArea>
       </DialogContent>
