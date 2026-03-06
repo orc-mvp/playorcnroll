@@ -775,6 +775,13 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
           )}
         </CardContent>
       </Card>
+
+      {/* Notes */}
+      <CharacterNotes
+        characterId={character.id}
+        initialNotes={(character as any).notes || ''}
+        readOnly={readOnly}
+      />
     </div>
   );
 }
