@@ -65,6 +65,7 @@ export type Database = {
           minor_marks: string[] | null
           name: string
           negative_marks: Json | null
+          notes: string | null
           seduction_type: string
           updated_at: string
           user_id: string
@@ -87,6 +88,7 @@ export type Database = {
           minor_marks?: string[] | null
           name: string
           negative_marks?: Json | null
+          notes?: string | null
           seduction_type?: string
           updated_at?: string
           user_id: string
@@ -109,6 +111,7 @@ export type Database = {
           minor_marks?: string[] | null
           name?: string
           negative_marks?: Json | null
+          notes?: string | null
           seduction_type?: string
           updated_at?: string
           user_id?: string

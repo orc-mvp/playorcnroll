@@ -903,6 +903,9 @@ export const translations = {
         epic: 'Nenhuma marca épica',
         negative: 'Nenhuma marca negativa',
       },
+      notes: 'Anotações',
+      notesPlaceholder: 'Escreva suas anotações aqui...',
+      notesSaved: 'Salvo',
     },
 
     // Narrator
@@ -2082,6 +2085,9 @@ export const translations = {
         epic: 'No epic marks',
         negative: 'No negative marks',
       },
+      notes: 'Notes',
+      notesPlaceholder: 'Write your notes here...',
+      notesSaved: 'Saved',
     },
 
     // Narrator

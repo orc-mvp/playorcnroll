@@ -24,6 +24,7 @@ import {
   Award,
 } from 'lucide-react';
 import { toTitleCase } from '@/lib/textUtils';
+import { CharacterNotes } from '../CharacterNotes';
 
 interface VampiroData {
   player?: string;
@@ -933,6 +934,13 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
           )}
         </CardContent>
       </Card>
+
+      {/* Notes */}
+      <CharacterNotes
+        characterId={character.id}
+        initialNotes={(character as any).notes || ''}
+        readOnly={readOnly}
+      />
     </div>
   );
 }

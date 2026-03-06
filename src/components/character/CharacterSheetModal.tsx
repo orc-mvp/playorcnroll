@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
@@ -29,6 +30,7 @@ import {
   Users,
 } from 'lucide-react';
 import type { Participant } from '@/pages/Session';
+import { CharacterNotes } from './CharacterNotes';
 
 interface CharacterSheetModalProps {
   open: boolean;
@@ -85,6 +87,7 @@ interface ExtendedNarrative {
 
 export function CharacterSheetModal({ open, onOpenChange, participant }: CharacterSheetModalProps) {
   const { t } = useI18n();
+  const { user } = useAuth();
   const [minorMarksData, setMinorMarksData] = useState<MinorMarkData[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterAttribute, setFilterAttribute] = useState<string | null>(null);
@@ -369,6 +372,13 @@ export function CharacterSheetModal({ open, onOpenChange, participant }: Charact
                 </TabsContent>
               </Tabs>
             </div>
+
+            {/* Notes */}
+            <CharacterNotes
+              characterId={character.id}
+              initialNotes={(character as any).notes || ''}
+              readOnly={participant?.user_id !== user?.id}
+            />
           </div>
         </ScrollArea>
       </DialogContent>

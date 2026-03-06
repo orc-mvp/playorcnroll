@@ -14,6 +14,7 @@ import {
 import { Dog, User, Shield, Brain, Sparkles, Users, Flame, Star, Award, Heart, Crown } from 'lucide-react';
 import { toTitleCase } from '@/lib/textUtils';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import { CharacterNotes } from '../CharacterNotes';
 
 // Tribe key mapping
 const TRIBE_KEYS: Record<string, string> = {
@@ -775,6 +776,13 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
           )}
         </CardContent>
       </Card>
+
+      {/* Notes */}
+      <CharacterNotes
+        characterId={character.id}
+        initialNotes={(character as any).notes || ''}
+        readOnly={readOnly}
+      />
     </div>
   );
 }
