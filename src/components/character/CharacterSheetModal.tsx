@@ -86,6 +86,7 @@ interface ExtendedNarrative {
 
 export function CharacterSheetModal({ open, onOpenChange, participant }: CharacterSheetModalProps) {
   const { t } = useI18n();
+  const { user } = useAuth();
   const [minorMarksData, setMinorMarksData] = useState<MinorMarkData[]>([]);
   const [loading, setLoading] = useState(false);
   const [filterAttribute, setFilterAttribute] = useState<string | null>(null);
