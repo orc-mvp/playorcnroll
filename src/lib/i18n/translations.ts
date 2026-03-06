@@ -1166,6 +1166,9 @@ export const translations = {
       honor: 'Honra',
       wisdom: 'Sabedoria',
       renownDesc: 'A reputação do Garou entre os Garou',
+      bsd_glory: 'Astúcia',
+      bsd_honor: 'Poder',
+      bsd_wisdom: 'Infâmia',
 
       // Vitality / Trackers on sheet
       salvaterios: 'Salvatérios',
