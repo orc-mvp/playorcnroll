@@ -94,33 +94,43 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData }: S
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
-            <span className="font-body text-sm min-w-[140px]">{t.lobisomem.glory}</span>
-            <DotRating
-              value={formData.renown?.glory || 0}
-              onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), glory: value } })}
-              maxValue={10}
-              minValue={0}
-            />
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="font-body text-sm min-w-[140px]">{t.lobisomem.honor}</span>
-            <DotRating
-              value={formData.renown?.honor || 0}
-              onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), honor: value } })}
-              maxValue={10}
-              minValue={0}
-            />
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            <span className="font-body text-sm min-w-[140px]">{t.lobisomem.wisdom}</span>
-            <DotRating
-              value={formData.renown?.wisdom || 0}
-              onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), wisdom: value } })}
-              maxValue={10}
-              minValue={0}
-            />
-          </div>
+          {(() => {
+            const isBSD = formData.tribe === 'Black Spiral Dancers';
+            const gloryLabel = isBSD ? t.lobisomem.bsd_glory : t.lobisomem.glory;
+            const honorLabel = isBSD ? t.lobisomem.bsd_honor : t.lobisomem.honor;
+            const wisdomLabel = isBSD ? t.lobisomem.bsd_wisdom : t.lobisomem.wisdom;
+            return (
+              <>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-body text-sm min-w-[140px]">{gloryLabel}</span>
+                  <DotRating
+                    value={formData.renown?.glory || 0}
+                    onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), glory: value } })}
+                    maxValue={10}
+                    minValue={0}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-body text-sm min-w-[140px]">{honorLabel}</span>
+                  <DotRating
+                    value={formData.renown?.honor || 0}
+                    onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), honor: value } })}
+                    maxValue={10}
+                    minValue={0}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-4">
+                  <span className="font-body text-sm min-w-[140px]">{wisdomLabel}</span>
+                  <DotRating
+                    value={formData.renown?.wisdom || 0}
+                    onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), wisdom: value } })}
+                    maxValue={10}
+                    minValue={0}
+                  />
+                </div>
+              </>
+            );
+          })()}
         </CardContent>
       </Card>
 

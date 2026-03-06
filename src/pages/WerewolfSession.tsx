@@ -794,11 +794,14 @@ function WerewolfPlayerPanel({ character, experiencePoints, sessionTrackers, she
             </CardHeader>
             <CardContent>
               <div className="space-y-1.5">
-                {[
-                  { key: 'glory', label: t.lobisomem?.glory || 'Glória', value: lobData.renown.glory },
-                  { key: 'honor', label: t.lobisomem?.honor || 'Honra', value: lobData.renown.honor },
-                  { key: 'wisdom', label: t.lobisomem?.wisdom || 'Sabedoria', value: lobData.renown.wisdom },
-                ].map(({ key, label, value }) => (
+                {(() => {
+                  const isBSD = lobData?.tribe === 'Black Spiral Dancers';
+                  return [
+                    { key: 'glory', label: isBSD ? (t.lobisomem?.bsd_glory || 'Astúcia') : (t.lobisomem?.glory || 'Glória'), value: lobData.renown.glory },
+                    { key: 'honor', label: isBSD ? (t.lobisomem?.bsd_honor || 'Poder') : (t.lobisomem?.honor || 'Honra'), value: lobData.renown.honor },
+                    { key: 'wisdom', label: isBSD ? (t.lobisomem?.bsd_wisdom || 'Infâmia') : (t.lobisomem?.wisdom || 'Sabedoria'), value: lobData.renown.wisdom },
+                  ];
+                })().map(({ key, label, value }) => (
                   <div key={key} className="flex items-center justify-between text-sm">
                     <span className="font-body">{label}</span>
                     <div className="flex gap-0.5">

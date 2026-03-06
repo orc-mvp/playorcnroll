@@ -716,18 +716,28 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="font-body text-sm">{t.lobisomem.glory}</span>
-              <DotDisplay value={renown.glory} maxValue={10} />
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-body text-sm">{t.lobisomem.honor}</span>
-              <DotDisplay value={renown.honor} maxValue={10} />
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="font-body text-sm">{t.lobisomem.wisdom}</span>
-              <DotDisplay value={renown.wisdom} maxValue={10} />
-            </div>
+            {(() => {
+              const isBSD = data.tribe === 'Black Spiral Dancers';
+              const gloryLabel = isBSD ? t.lobisomem.bsd_glory : t.lobisomem.glory;
+              const honorLabel = isBSD ? t.lobisomem.bsd_honor : t.lobisomem.honor;
+              const wisdomLabel = isBSD ? t.lobisomem.bsd_wisdom : t.lobisomem.wisdom;
+              return (
+                <>
+                  <div className="flex items-center justify-between">
+                    <span className="font-body text-sm">{gloryLabel}</span>
+                    <DotDisplay value={renown.glory} maxValue={10} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-body text-sm">{honorLabel}</span>
+                    <DotDisplay value={renown.honor} maxValue={10} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="font-body text-sm">{wisdomLabel}</span>
+                    <DotDisplay value={renown.wisdom} maxValue={10} />
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </CardContent>
       </Card>

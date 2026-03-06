@@ -2340,6 +2340,9 @@ export const translations = {
       honor: 'Honor',
       wisdom: 'Wisdom',
       renownDesc: 'The Garou\'s reputation among the Garou',
+      bsd_glory: 'Cunning',
+      bsd_honor: 'Power',
+      bsd_wisdom: 'Infamy',
 
       salvaterios: 'Trackers',
       vitality: 'Vitality',
