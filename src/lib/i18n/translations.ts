@@ -2085,6 +2085,9 @@ export const translations = {
         epic: 'No epic marks',
         negative: 'No negative marks',
       },
+      notes: 'Notes',
+      notesPlaceholder: 'Write your notes here...',
+      notesSaved: 'Saved',
     },
 
     // Narrator
