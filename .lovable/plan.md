@@ -1,33 +1,50 @@
 
 
-## Plan: Add "Dados" (Raw Dice) Test Type to Both Vampire and Werewolf Test Modals
+## Plano: Adicionar área de anotações em todas as fichas de personagem
 
-### Overview
-Add a new "Dados" test type to **both** `VampireTestRequestModal` and `WerewolfTestRequestModal`. When selected, the narrator specifies a fixed number of dice and difficulty — no attribute/ability selection needed. The player receives the exact dice count specified.
+### Resumo
+Adicionar um campo de texto editável "Anotações" no final de todas as fichas de personagem dos 3 sistemas (Heróis Marcados, Vampiro e Lobisomem), com persistência no banco de dados e atualização em tempo real.
 
-### Changes
+### 1. Migração de banco de dados
+Adicionar coluna `notes` (text, nullable) na tabela `characters`:
+```sql
+ALTER TABLE public.characters ADD COLUMN notes text DEFAULT '';
+```
 
-**1. Types (`src/lib/vampiro/diceUtils.ts` + `src/lib/lobisomem/diceUtils.ts`)**
-- Add `'raw_dice'` to `TestType` (vampire) and `WerewolfTestType` (werewolf)
+### 2. i18n (translations.ts)
+Adicionar chaves para ambos os idiomas:
+- `characterSheet.notes` → "Anotações" / "Notes"
+- `characterSheet.notesPlaceholder` → "Escreva suas anotações aqui..." / "Write your notes here..."
+- `characterSheet.notesSaved` → "Anotações salvas" / "Notes saved"
 
-**2. i18n (`src/lib/i18n/translations.ts`)**
-- Add keys: `rawDice` ("Dados" / "Dice"), `rawDicePool` ("Quantidade de dados" / "Dice count")
+### 3. Componente reutilizável `CharacterNotes`
+Criar `src/components/character/CharacterNotes.tsx`:
+- Recebe `characterId`, `initialNotes`, `readOnly`
+- Textarea com auto-save (debounce ~1s) ao digitar
+- Salva via `supabase.update` na tabela `characters`
+- Toast de confirmação ao salvar
+- Ícone `StickyNote` + título i18n
+- Realtime: subscribe a mudanças na coluna `notes` do personagem
 
-**3. `VampireTestRequestModal.tsx`**
-- Add `'raw_dice'` to `TEST_TYPES` array
-- Add `diceCount` state (default 1, range 1–20)
-- Add `diceCount` to `TestConfig` interface (optional)
-- When `testType === 'raw_dice'`: hide attribute/ability/virtue grids, show dice count selector with +/- buttons (same pattern as difficulty)
-- Difficulty selector remains visible
-- Validation: only needs players selected
+### 4. Integração em cada ficha
 
-**4. `WerewolfTestRequestModal.tsx`**
-- Same changes as vampire modal, adapted to `WerewolfTestConfig`
+**Heróis Marcados** — `CharacterSheetModal.tsx`:
+- Adicionar `<CharacterNotes>` após a seção de Marcas (Tabs), antes do fechamento do ScrollArea
+- `readOnly` quando visualizado pelo narrador (não é dono do personagem)
 
-**5. `VampirePendingTest.tsx`**
-- In `calculatePool()`: for `raw_dice`, return `config.diceCount` directly
-- In `getTestLabel()`: return localized "X Dados" label
+**Vampiro** — `VampiroCharacterSheet.tsx`:
+- Adicionar `<CharacterNotes>` após o Card de XP Log
+- Usar prop `readOnly` existente
 
-**6. `MobilePendingTestDrawer.tsx`**
-- Update `TestConfig` interface to include optional `diceCount`
+**Lobisomem** — `LobisomemCharacterSheet.tsx`:
+- Adicionar `<CharacterNotes>` após o Card de XP Log
+- Usar prop `readOnly` existente
+
+**Página de ficha** — `CharacterSheet.tsx`:
+- Adicionar `<CharacterNotes>` no final da ficha do sistema Heróis Marcados (seção standalone)
+
+### 5. Detalhes técnicos
+- O narrador pode ver as anotações mas não editá-las (readOnly baseado em `character.user_id !== auth.uid()`)
+- Auto-save com debounce para evitar chamadas excessivas
+- Realtime subscription para sincronizar entre abas/dispositivos
 
