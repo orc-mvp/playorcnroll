@@ -669,6 +669,12 @@ export default function CharacterSheet() {
                 </Accordion>
               </CardContent>
             </Card>
+
+            {/* Notes */}
+            <CharacterNotes
+              characterId={character.id}
+              initialNotes={(character as any).notes || ''}
+            />
           </div>
           )}
         </ScrollArea>

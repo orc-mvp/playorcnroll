@@ -30,6 +30,7 @@ import {
   Users,
 } from 'lucide-react';
 import type { Participant } from '@/pages/Session';
+import { CharacterNotes } from './CharacterNotes';
 
 interface CharacterSheetModalProps {
   open: boolean;

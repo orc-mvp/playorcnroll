@@ -24,6 +24,7 @@ import {
   Award,
 } from 'lucide-react';
 import { toTitleCase } from '@/lib/textUtils';
+import { CharacterNotes } from '../CharacterNotes';
 
 interface VampiroData {
   player?: string;
