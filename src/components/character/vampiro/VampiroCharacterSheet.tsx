@@ -933,6 +933,13 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
           )}
         </CardContent>
       </Card>
+
+      {/* Notes */}
+      <CharacterNotes
+        characterId={character.id}
+        initialNotes={(character as any).notes || ''}
+        readOnly={readOnly}
+      />
     </div>
   );
 }
