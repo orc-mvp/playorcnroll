@@ -393,18 +393,28 @@ export function EditLobisomemCharacterModal({
                   {/* Renown */}
                   <div className="space-y-2 pt-2 border-t border-border">
                     <h4 className="font-medieval text-sm text-muted-foreground">{t.lobisomem.renown}</h4>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">{t.lobisomem.glory}</span>
-                      <DotRating value={lobData.renown?.glory || 0} onChange={(val) => updateField('renown', { ...(lobData.renown || { glory: 0, honor: 0, wisdom: 0 }), glory: val })} maxValue={10} minValue={0} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">{t.lobisomem.honor}</span>
-                      <DotRating value={lobData.renown?.honor || 0} onChange={(val) => updateField('renown', { ...(lobData.renown || { glory: 0, honor: 0, wisdom: 0 }), honor: val })} maxValue={10} minValue={0} />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">{t.lobisomem.wisdom}</span>
-                      <DotRating value={lobData.renown?.wisdom || 0} onChange={(val) => updateField('renown', { ...(lobData.renown || { glory: 0, honor: 0, wisdom: 0 }), wisdom: val })} maxValue={10} minValue={0} />
-                    </div>
+                    {(() => {
+                      const isBSD = lobData.tribe === 'Black Spiral Dancers';
+                      const gloryLabel = isBSD ? t.lobisomem.bsd_glory : t.lobisomem.glory;
+                      const honorLabel = isBSD ? t.lobisomem.bsd_honor : t.lobisomem.honor;
+                      const wisdomLabel = isBSD ? t.lobisomem.bsd_wisdom : t.lobisomem.wisdom;
+                      return (
+                        <>
+                          <div className="flex items-center justify-between">
+                            <span className="font-body text-sm">{gloryLabel}</span>
+                            <DotRating value={lobData.renown?.glory || 0} onChange={(val) => updateField('renown', { ...(lobData.renown || { glory: 0, honor: 0, wisdom: 0 }), glory: val })} maxValue={10} minValue={0} />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="font-body text-sm">{honorLabel}</span>
+                            <DotRating value={lobData.renown?.honor || 0} onChange={(val) => updateField('renown', { ...(lobData.renown || { glory: 0, honor: 0, wisdom: 0 }), honor: val })} maxValue={10} minValue={0} />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="font-body text-sm">{wisdomLabel}</span>
+                            <DotRating value={lobData.renown?.wisdom || 0} onChange={(val) => updateField('renown', { ...(lobData.renown || { glory: 0, honor: 0, wisdom: 0 }), wisdom: val })} maxValue={10} minValue={0} />
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
                 </div>
               </TabsContent>
