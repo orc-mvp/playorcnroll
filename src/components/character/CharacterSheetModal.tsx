@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
