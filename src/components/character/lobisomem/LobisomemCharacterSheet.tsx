@@ -791,7 +791,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
       {/* Notes */}
       <CharacterNotes
         characterId={character.id}
-        initialNotes={(character as any).notes || ''}
+        initialNotes={character.notes || ''}
         readOnly={readOnly}
       />
     </div>
