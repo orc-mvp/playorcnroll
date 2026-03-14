@@ -67,6 +67,7 @@ interface VampiroCharacterSheetProps {
     name: string;
     concept: string | null;
     vampiro_data: VampiroData | null;
+    notes?: string | null;
   };
   sessionTrackers?: {
     bloodPool?: number;

@@ -90,6 +90,7 @@ interface LobisomemCharacterSheetProps {
     name: string;
     concept: string | null;
     vampiro_data: LobisomemCharacterData | null;
+    notes?: string | null;
   };
   sessionTrackers?: {
     gnosis?: number;
