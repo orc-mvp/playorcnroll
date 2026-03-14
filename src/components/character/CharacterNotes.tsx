@@ -58,7 +58,7 @@ export function CharacterNotes({ characterId, initialNotes = '' }: CharacterNote
     setSaving(true);
     const { error } = await supabase
       .from('characters')
-      .update({ notes: value } as any)
+      .update({ notes: value })
       .eq('id', characterId);
 
     setSaving(false);
