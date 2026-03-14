@@ -278,6 +278,7 @@ export default function CharacterSheet() {
                 name: character.name,
                 concept: character.concept,
                 vampiro_data: character.vampiro_data as any,
+                notes: character.notes,
               }}
             />
           ) : (
