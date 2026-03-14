@@ -3,7 +3,8 @@ import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
-import { StickyNote, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { StickyNote, Check, Save } from 'lucide-react';
 
 interface CharacterNotesProps {
   characterId: string;
@@ -11,16 +12,19 @@ interface CharacterNotesProps {
   readOnly?: boolean;
 }
 
-export function CharacterNotes({ characterId, initialNotes = '', readOnly = false }: CharacterNotesProps) {
+export function CharacterNotes({ characterId, initialNotes = '' }: CharacterNotesProps) {
   const { t } = useI18n();
   const { toast } = useToast();
   const [notes, setNotes] = useState(initialNotes);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Sync with external changes (e.g. realtime)
   useEffect(() => {
     setNotes(initialNotes);
+    setDirty(false);
   }, [initialNotes]);
 
   // Realtime subscription
@@ -39,6 +43,7 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
           const newNotes = (payload.new as any).notes;
           if (typeof newNotes === 'string') {
             setNotes(newNotes);
+            setDirty(false);
           }
         }
       )
@@ -50,17 +55,20 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
   }, [characterId]);
 
   const saveNotes = useCallback(async (value: string) => {
+    setSaving(true);
     const { error } = await supabase
       .from('characters')
       .update({ notes: value } as any)
       .eq('id', characterId);
 
+    setSaving(false);
     if (error) {
       toast({
         title: t.common.errorSaving,
         variant: 'destructive',
       });
     } else {
+      setDirty(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     }
@@ -68,8 +76,14 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
 
   const handleChange = (value: string) => {
     setNotes(value);
+    setDirty(true);
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => saveNotes(value), 1000);
+  };
+
+  const handleManualSave = () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    saveNotes(notes);
   };
 
   useEffect(() => {
@@ -85,18 +99,29 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
           <StickyNote className="w-4 h-4" />
           {t.characterSheet.notes}
         </h4>
-        {saved && (
-          <span className="text-xs text-green-500 flex items-center gap-1">
-            <Check className="w-3 h-3" />
-            {t.characterSheet.notesSaved}
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {saved && (
+            <span className="text-xs text-green-500 flex items-center gap-1">
+              <Check className="w-3 h-3" />
+              {t.characterSheet.notesSaved}
+            </span>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleManualSave}
+            disabled={!dirty || saving}
+            className="h-7 px-2 text-xs gap-1"
+          >
+            <Save className="w-3 h-3" />
+            {t.common.save}
+          </Button>
+        </div>
       </div>
       <Textarea
         value={notes}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={t.characterSheet.notesPlaceholder}
-        readOnly={readOnly}
         className="min-h-[100px] resize-y bg-muted/30 border-border font-body text-sm"
       />
     </div>
