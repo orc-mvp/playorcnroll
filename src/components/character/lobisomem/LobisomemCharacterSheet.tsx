@@ -90,6 +90,7 @@ interface LobisomemCharacterSheetProps {
     name: string;
     concept: string | null;
     vampiro_data: LobisomemCharacterData | null;
+    notes?: string | null;
   };
   sessionTrackers?: {
     gnosis?: number;
@@ -790,7 +791,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
       {/* Notes */}
       <CharacterNotes
         characterId={character.id}
-        initialNotes={(character as any).notes || ''}
+        initialNotes={character.notes || ''}
         readOnly={readOnly}
       />
     </div>

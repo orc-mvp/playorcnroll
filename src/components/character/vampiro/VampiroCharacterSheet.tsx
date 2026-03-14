@@ -67,6 +67,7 @@ interface VampiroCharacterSheetProps {
     name: string;
     concept: string | null;
     vampiro_data: VampiroData | null;
+    notes?: string | null;
   };
   sessionTrackers?: {
     bloodPool?: number;
@@ -938,7 +939,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
       {/* Notes */}
       <CharacterNotes
         characterId={character.id}
-        initialNotes={(character as any).notes || ''}
+        initialNotes={character.notes || ''}
         readOnly={readOnly}
       />
     </div>
