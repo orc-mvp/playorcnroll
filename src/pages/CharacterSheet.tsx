@@ -85,6 +85,7 @@ interface Character {
   mark_progress: Json | null;
   game_system: string;
   vampiro_data: Json | null;
+  notes: string | null;
   created_at: string;
   updated_at: string;
 }
