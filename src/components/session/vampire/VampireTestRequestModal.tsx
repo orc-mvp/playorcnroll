@@ -21,7 +21,9 @@ import { cn } from '@/lib/utils';
 import {
   TestType,
   ALL_ATTRIBUTES,
-  ALL_ABILITIES,
+  TALENTS,
+  SKILLS,
+  KNOWLEDGES,
   VIRTUES,
 } from '@/lib/vampiro/diceUtils';
 
