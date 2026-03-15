@@ -185,6 +185,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
   const [liveMeritsFlaws, setLiveMeritsFlaws] = useState<{ id: string; name: string; cost: number; category: string }[] | null>(null);
 
   // Fetch live merits/flaws data from DB to keep category/name/cost up to date
+  const meritsFlawsKey = JSON.stringify((data.merits_flaws || []).map((m: any) => m.id).sort());
   useEffect(() => {
     const ids = (data.merits_flaws || []).map((m: any) => m.id);
     if (ids.length === 0) return;
@@ -195,7 +196,8 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
       .then(({ data: fresh }) => {
         if (fresh) setLiveMeritsFlaws(fresh as any);
       });
-  }, [data.merits_flaws]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meritsFlawsKey]);
 
 
   // Fetch XP log with realtime
