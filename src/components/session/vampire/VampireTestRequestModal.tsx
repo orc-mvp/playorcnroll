@@ -284,23 +284,32 @@ export default function VampireTestRequestModal({
               {testType === 'attribute_ability' && (
               <div className="space-y-1.5">
                 <Label className="text-xs text-muted-foreground">{t.vampiroTests.selectAbility}</Label>
-                <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-1">
-                  {ALL_ABILITIES.map(ab => (
-                    <Button
-                      key={ab}
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setAbility(ab)}
-                      className={cn(
-                        "min-h-[44px] md:min-h-[36px] text-[10px] md:text-xs font-medium px-1.5",
-                        ability === ab && "bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30"
-                      )}
-                    >
-                      {t.vampiro[ab as keyof typeof t.vampiro]}
-                    </Button>
-                  ))}
-                </div>
+                {([
+                  { label: t.vampiro.talents, abilities: TALENTS },
+                  { label: t.vampiro.skills, abilities: SKILLS },
+                  { label: t.vampiro.knowledges, abilities: KNOWLEDGES },
+                ] as const).map(({ label, abilities }) => (
+                  <div key={label}>
+                    <span className="text-[10px] font-medieval text-muted-foreground/70 uppercase tracking-wider">{label}</span>
+                    <div className="grid grid-cols-3 md:grid-cols-5 gap-1 mt-0.5">
+                      {abilities.map(ab => (
+                        <Button
+                          key={ab}
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setAbility(ab)}
+                          className={cn(
+                            "min-h-[44px] md:min-h-[36px] text-[10px] md:text-xs font-medium px-1.5",
+                            ability === ab && "bg-destructive/20 border-destructive text-destructive hover:bg-destructive/30"
+                          )}
+                        >
+                          {t.vampiro[ab as keyof typeof t.vampiro]}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
               )}
             </div>
