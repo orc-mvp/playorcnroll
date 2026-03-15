@@ -603,7 +603,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
             }));
         };
 
-        const MeritFlawItem = ({ m, isMerit }: { m: any; isMerit: boolean }) => {
+        const renderMeritFlawItem = (m: any, isMerit: boolean) => {
           const isExpanded = expandedMeritFlaw === m.id;
           const desc = meritFlawDescriptions[m.id];
           
@@ -685,7 +685,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
                       <div key={category}>
                         <h5 className="font-medieval text-xs text-muted-foreground/70 mb-1">{categoryLabel(category)}</h5>
                         <div className="space-y-0.5">
-                          {items.map((m: any) => <MeritFlawItem key={m.id} m={m} isMerit={true} />)}
+                          {items.map((m: any) => renderMeritFlawItem(m, true))}
                         </div>
                       </div>
                     ))}
@@ -713,7 +713,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
                       <div key={category}>
                         <h5 className="font-medieval text-xs text-muted-foreground/70 mb-1">{categoryLabel(category)}</h5>
                         <div className="space-y-0.5">
-                          {items.map((m: any) => <MeritFlawItem key={m.id} m={m} isMerit={false} />)}
+                          {items.map((m: any) => renderMeritFlawItem(m, false))}
                         </div>
                       </div>
                     ))}
