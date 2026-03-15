@@ -1,73 +1,81 @@
-# Welcome to your Lovable project
+# 🎲 Orc'n'Roll
 
-## Project info
+**Orc'n'Roll** é uma plataforma web para gerenciamento de sessões de RPG de mesa, com suporte a múltiplos sistemas de jogo — atualmente **Vampiro: A Máscara** e **Lobisomem: O Apocalipse** (Mundo das Trevas).
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+🌐 **Acesse agora:** [playorcnroll.lovable.app](https://playorcnroll.lovable.app)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ Funcionalidades
 
-**Use Lovable**
+### 🧛 Vampiro: A Máscara
+- Criação completa de personagens (atributos, habilidades, disciplinas, virtudes, qualidades e defeitos)
+- Ficha de personagem interativa
+- Sistema de rolagem de dados com pool de d10
+- Trackers de sessão (Vitalidade, Força de Vontade, Pontos de Sangue)
+- Suporte a sucesso excepcional, falha crítica e extremos
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### 🐺 Lobisomem: O Apocalipse
+- Criação de personagens com tribos, augúrios e dons
+- Ficha de personagem completa
+- Sistema de rolagem de dados d10
+- Trackers de sessão (Vitalidade, Fúria, Gnose, Força de Vontade)
+- Sistema de mudança de forma (Hominídeo → Crinos → Lupino)
 
-Changes made via Lovable will be committed automatically to this repo.
+### 🎮 Sessões em Tempo Real
+- Criação e gerenciamento de sessões com código de convite
+- Painel do Narrador com controles de cena e testes
+- Feed de eventos em tempo real
+- Sistema de complicações narrativas
+- Testes individuais e em grupo
+- Jogadas heroicas
+- Distribuição de XP
 
-**Use your preferred IDE**
+### 📋 Gerenciamento
+- Dashboard com visão geral de personagens e sessões
+- Calendário de eventos
+- Perfil de usuário com preferências de idioma
+- Marcas menores, maiores e épicas personalizáveis
+- Qualidades e Defeitos customizáveis
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 🌍 Internacionalização
+- Suporte completo a **Português (BR)** e **Inglês**
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🛠️ Tecnologias
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
+- **Frontend:** React + TypeScript + Vite
+- **Estilização:** Tailwind CSS + shadcn/ui
+- **Backend:** Lovable Cloud (Supabase)
+- **Realtime:** WebSockets para atualizações em tempo real
+- **3D:** Three.js + React Three Fiber (dados 3D)
+- **Animações:** Framer Motion
+
+---
+
+## 🚀 Rodando localmente
+
+```bash
+# Clone o repositório
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Entre no diretório
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Instale as dependências
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📄 Licença
 
-**Use GitHub Codespaces**
+Este projeto é proprietário. Todos os direitos reservados.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Feito com ❤️ usando [Lovable](https://lovable.dev)
