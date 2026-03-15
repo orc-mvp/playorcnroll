@@ -524,7 +524,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
             }));
         };
 
-        const MeritFlawItem = ({ m, isMerit }: { m: typeof meritsFlaws[0]; isMerit: boolean }) => {
+        const renderMeritFlawItem = (m: typeof meritsFlaws[0], isMerit: boolean) => {
           const isExpanded = expandedMeritFlaw === m.id;
           const desc = meritFlawDescriptions[m.id];
 

@@ -603,7 +603,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
             }));
         };
 
-        const MeritFlawItem = ({ m, isMerit }: { m: any; isMerit: boolean }) => {
+        const renderMeritFlawItem = (m: any, isMerit: boolean) => {
           const isExpanded = expandedMeritFlaw === m.id;
           const desc = meritFlawDescriptions[m.id];
           
