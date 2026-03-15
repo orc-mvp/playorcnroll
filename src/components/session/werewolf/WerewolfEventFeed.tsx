@@ -316,7 +316,7 @@ export function WerewolfEventFeed({ events, currentUserId, isNarrator = false }:
         </div>
         <div className="flex items-center gap-2">
           {isBotch ? <Badge variant="destructive" className="text-xs">{t.vampiroTests?.botch || 'Falha Crítica'}</Badge>
-            : isExceptional ? <Badge className="bg-yellow-500 text-xs">{t.vampiroTests?.exceptional || 'Sucesso Excepcional'}</Badge>
+            : isExceptional ? <Badge className="bg-yellow-500 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'} — {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}</Badge>
             : finalSuccesses > 0 ? <Badge variant="default" className="bg-green-600 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'}</Badge>
             : <Badge variant="secondary" className="text-xs">{t.vampiroTests?.failure || 'Falha'}</Badge>}
         </div>

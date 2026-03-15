@@ -188,7 +188,7 @@ export default function NarratorRollModal({ open, onOpenChange, onRollComplete }
                 </Badge>
               ) : rollResult.isExceptional ? (
                 <Badge className="bg-yellow-500 text-sm px-4 py-1">
-                  {t.vampiroTests.exceptional}
+                  {rollResult.finalSuccesses} {t.vampiroTests.successes} — {t.vampiroTests.exceptional}
                 </Badge>
               ) : rollResult.finalSuccesses > 0 ? (
                 <Badge variant="default" className="bg-green-600 text-sm px-4 py-1">
