@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import {
   ALL_ATTRIBUTES,
 } from '@/lib/vampiro/diceUtils';
-import { WEREWOLF_ALL_ABILITIES } from '@/lib/lobisomem/diceUtils';
+import { WEREWOLF_TALENTS, WEREWOLF_SKILLS, WEREWOLF_KNOWLEDGES } from '@/lib/lobisomem/diceUtils';
 import type { WerewolfTestType } from '@/lib/lobisomem/diceUtils';
 
 interface Participant {
