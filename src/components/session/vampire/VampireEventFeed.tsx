@@ -287,7 +287,7 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
             </Badge>
           ) : isExceptional ? (
             <Badge className="bg-yellow-500 text-xs">
-              {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}
+              {finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'} — {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}
             </Badge>
           ) : finalSuccesses > 0 ? (
             <Badge variant="default" className="bg-green-600 text-xs">
