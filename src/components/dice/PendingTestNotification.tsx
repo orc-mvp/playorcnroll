@@ -133,7 +133,7 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [sessionId]); // REMOVIDO rolledTestIds das dependências
+  }, [sessionId, characterId]);
 
   const getAttributeType = (attribute: string): AttributeType => {
     const key = `${attribute}_type` as keyof typeof character;
