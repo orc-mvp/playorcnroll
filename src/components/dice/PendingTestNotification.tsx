@@ -55,7 +55,34 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
         .eq('session_id', sessionId)
         .eq('status', 'pending');
 
-      if (!tests) return;
+      if (!tests || tests.length === 0) {
+        setPendingTests([]);
+        return;
+      }
+
+      // Get test_requested events to find which characters each test targets
+      const { data: testEvents } = await supabase
+        .from('session_events')
+        .select('event_data')
+        .eq('session_id', sessionId)
+        .eq('event_type', 'test_requested');
+
+      // Build a map of test_id -> targeted character IDs
+      const testTargetMap = new Map<string, string[]>();
+      (testEvents || []).forEach(e => {
+        const data = e.event_data as any;
+        if (data?.test_id && data?.players) {
+          testTargetMap.set(data.test_id, data.players);
+        }
+      });
+
+      // Filter tests that target this character
+      const myTests = tests.filter(test => {
+        const targets = testTargetMap.get(test.id);
+        // If no target info found, show to all (backwards compat)
+        if (!targets) return true;
+        return targets.includes(characterId);
+      });
 
       // Check which tests the user has already rolled
       const { data: rolls } = await supabase
@@ -71,7 +98,7 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
       setRolledTestIds(rolledIds);
 
       // Filter tests that haven't been rolled yet
-      const pending = tests.filter(test => !rolledIds.has(test.id));
+      const pending = myTests.filter(test => !rolledIds.has(test.id));
       setPendingTests(pending);
     };
 
