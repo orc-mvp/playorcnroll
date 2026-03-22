@@ -69,18 +69,18 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
 
       // Build a map of test_id -> targeted character IDs
       const testTargetMap = new Map<string, string[]>();
-      (testEvents || []).forEach(e => {
+      (testEvents || []).forEach((e) => {
         const data = e.event_data as any;
-        if (data?.test_id && data?.players) {
-          testTargetMap.set(data.test_id, data.players);
+        if (data?.test_id && Array.isArray(data?.players)) {
+          testTargetMap.set(data.test_id, data.players.filter((p: unknown) => typeof p === 'string'));
         }
       });
 
-      // Filter tests that target this character
-      const myTests = tests.filter(test => {
+      // Filter tests that target only this character
+      const myTests = tests.filter((test) => {
         const targets = testTargetMap.get(test.id);
-        // If no target info found, show to all (backwards compat)
-        if (!targets) return true;
+        // Segurança: sem alvo explícito, não exibe para ninguém
+        if (!targets || targets.length === 0) return false;
         return targets.includes(characterId);
       });
 
@@ -90,31 +90,38 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
         .select('test_id')
         .eq('user_id', user.user.id);
 
-      const rolledIds = new Set((rolls || []).map(r => r.test_id));
-      
+      const rolledIds = new Set((rolls || []).map((r) => r.test_id));
+
       // Merge com IDs marcados localmente
-      rolledTestIdsRef.current.forEach(id => rolledIds.add(id));
+      rolledTestIdsRef.current.forEach((id) => rolledIds.add(id));
       rolledTestIdsRef.current = rolledIds;
       setRolledTestIds(rolledIds);
 
       // Filter tests that haven't been rolled yet
-      const pending = myTests.filter(test => !rolledIds.has(test.id));
+      const pending = myTests.filter((test) => !rolledIds.has(test.id));
       setPendingTests(pending);
     };
 
     fetchPendingTests();
 
-    // Subscribe to new tests
+    // Subscribe to new tests and test request events
     const channel = supabase
       .channel(`pending-tests-${sessionId}`)
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'tests', filter: `session_id=eq.${sessionId}` },
-        (payload) => {
-          // Ignorar se modal estiver aberto
+        () => {
           if (isModalOpenRef.current) return;
-          
-          // Re-fetch to properly filter by character targets
+          fetchPendingTests();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'session_events', filter: `session_id=eq.${sessionId}` },
+        (payload) => {
+          const eventType = (payload.new as { event_type?: string })?.event_type;
+          if (eventType !== 'test_requested') return;
+          if (isModalOpenRef.current) return;
           fetchPendingTests();
         }
       )
@@ -124,7 +131,7 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
         (payload) => {
           const updated = payload.new as PendingTest & { status: string };
           if (updated.status === 'completed') {
-            setPendingTests(prev => prev.filter(t => t.id !== updated.id));
+            setPendingTests((prev) => prev.filter((t) => t.id !== updated.id));
           }
         }
       )
