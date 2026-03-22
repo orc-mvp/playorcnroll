@@ -114,10 +114,8 @@ export function PendingTestNotification({ sessionId, characterId, sceneId, scene
           // Ignorar se modal estiver aberto
           if (isModalOpenRef.current) return;
           
-          const newTest = payload.new as PendingTest;
-          if (!rolledTestIdsRef.current.has(newTest.id)) {
-            setPendingTests(prev => [...prev, newTest]);
-          }
+          // Re-fetch to properly filter by character targets
+          fetchPendingTests();
         }
       )
       .on(
