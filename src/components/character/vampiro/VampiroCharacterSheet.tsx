@@ -174,6 +174,7 @@ const DISCIPLINE_DISPLAY: Record<string, { pt: string; en: string }> = {
 
 // Background display names
 const BACKGROUND_DISPLAY: Record<string, { pt: string; en: string }> = {
+  // Vampiro: A Máscara (Revised / 3ª edição)
   allies: { pt: 'Aliados', en: 'Allies' },
   contacts: { pt: 'Contatos', en: 'Contacts' },
   fame: { pt: 'Fama', en: 'Fame' },
@@ -184,6 +185,35 @@ const BACKGROUND_DISPLAY: Record<string, { pt: string; en: string }> = {
   retainers: { pt: 'Lacaios', en: 'Retainers' },
   herd: { pt: 'Rebanho', en: 'Herd' },
   status: { pt: 'Status', en: 'Status' },
+  // Vampire Storytellers Handbook (Revised)
+  vsh_age: { pt: 'Idade', en: 'Age' },
+  arcane: { pt: 'Arcano', en: 'Arcane' },
+  // Dirty Secrets of the Black Hand
+  dsbh_age: { pt: 'Idade', en: 'Age' },
+  // Guide to the Sabbat
+  alternate_identity: { pt: 'Identidade Alternativa', en: 'Alternate Identity' },
+  black_hand_membership: { pt: 'Filiação à Mão Negra', en: 'Black Hand Membership' },
+  rituals: { pt: 'Rituais', en: 'Rituals' },
+  sabbat_status: { pt: 'Status no Sabbat', en: 'Sabbat Status' },
+  // The Players Guide to the Sabbat
+  pgs_alternate_identity: { pt: 'Identidade Alternativa', en: 'Alternate Identity' },
+  pgs_black_hand: { pt: 'Filiação à Mão Negra', en: 'Black Hand Membership' },
+  pack_recognition: { pt: 'Reconhecimento de Bando', en: 'Pack Recognition' },
+  // Ghouls: Fatal Addiction
+  domitor: { pt: 'Domitor', en: 'Domitor' },
+  // Clanbook: Nosferatu (Revised)
+  information_network: { pt: 'Rede de Informações', en: 'Information Network' },
+  // Time of Thin Blood
+  insight: { pt: 'Insight', en: 'Insight' },
+  // Inquisition
+  mob: { pt: 'Turba', en: 'Mob' },
+  relic: { pt: 'Relíquia', en: 'Relic' },
+  // Blood Magic: Secrets of Thaumaturgy
+  occult_library: { pt: 'Biblioteca Oculta', en: 'Occult Library' },
+  // The Hunters Hunted
+  reputation: { pt: 'Reputação', en: 'Reputation' },
+  // Clanbook: Giovanni (Revised)
+  spirit_slaves: { pt: 'Escravos Espirituais', en: 'Spirit Slaves' },
 };
 
 // Health level definitions
