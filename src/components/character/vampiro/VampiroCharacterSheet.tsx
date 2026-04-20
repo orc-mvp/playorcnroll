@@ -706,6 +706,9 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
                 <CardTitle className="font-medieval flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-green-500" />
                   {t.meritsFlaws.merits}
+                  <Badge variant="outline" className="ml-auto text-xs border-green-500/50 text-green-500">
+                    {merits.reduce((sum, m) => sum + m.cost, 0)} {t.meritsFlaws.points}
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -734,6 +737,9 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
                 <CardTitle className="font-medieval flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-red-500" />
                   {t.meritsFlaws.flaws}
+                  <Badge variant="outline" className="ml-auto text-xs border-red-500/50 text-red-500">
+                    {flaws.reduce((sum, m) => sum + Math.abs(m.cost), 0)} {t.meritsFlaws.points}
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
