@@ -17,6 +17,10 @@ import {
 } from '@/lib/vampiro/diceUtils';
 import { getFormAttributeModifier } from '@/lib/lobisomem/diceUtils';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import {
+  getMetamorphForm,
+  applyMetamorphAttribute,
+} from '@/lib/metamorfos/formUtils';
 
 interface TestConfig {
   testType: TestType;
