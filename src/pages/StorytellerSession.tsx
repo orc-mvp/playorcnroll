@@ -466,7 +466,7 @@ export default function StorytellerSession() {
         (myParticipant.session_health_damage as boolean[]) ||
         [false, false, false, false, false, false, false],
     };
-    if (myCharacter.game_system === 'lobisomem_w20') {
+    if (myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20') {
       return {
         ...base,
         initialGnosis: myParticipant.session_gnosis || 0,
@@ -486,7 +486,7 @@ export default function StorytellerSession() {
     character: myCharacter,
     experiencePoints: myParticipant?.experience_points,
     sessionTrackers:
-      myCharacter?.game_system === 'lobisomem_w20'
+      (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
         ? {
             gnosis: myParticipant?.session_gnosis ?? 0,
             rage: myParticipant?.session_rage ?? 0,
@@ -522,10 +522,10 @@ export default function StorytellerSession() {
             created_at: pendingTestEvent.created_at,
           },
           onTestComplete: () => {},
-          ...(myCharacter.game_system === 'lobisomem_w20'
+          ...((myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20')
             ? {
                 currentForm: myParticipant?.session_form || 'hominid',
-                gameSystem: 'lobisomem_w20' as const,
+                gameSystem: myCharacter.game_system as 'lobisomem_w20' | 'metamorfos_w20',
               }
             : {}),
         }

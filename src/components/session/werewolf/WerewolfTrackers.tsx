@@ -9,6 +9,7 @@ import { TrackerChangeConfirmModal, TrackerType } from '../vampire/TrackerChange
 import { FormChangeModal } from './FormChangeModal';
 import { Button } from '@/components/ui/button';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import { HOMINID_FORM_ID } from '@/lib/metamorfos/formUtils';
 
 // Extend TrackerType for werewolf-specific trackers
 type WerewolfTrackerType = TrackerType | 'gnosis' | 'rage' | 'form';
@@ -22,6 +23,9 @@ interface WerewolfTrackersProps {
   character: {
     id: string;
     name: string;
+    /** game_system do personagem — usado para distinguir Lobisomem (formas fixas)
+     *  de Metamorfos (formas customizadas configuradas na ficha). */
+    game_system?: string;
     vampiro_data: LobisomemCharacterData | null;
   } | null;
   initialGnosis?: number;
@@ -232,7 +236,35 @@ export function WerewolfTrackers({
     );
   }
 
+  const isMetamorph = character?.game_system === 'metamorfos_w20';
+  const customForms = isMetamorph ? (lobData?.metamorph_forms || []) : undefined;
+  // Static Tailwind classes (purger-safe) por sistema
+  const themeClasses = isMetamorph
+    ? {
+        cardBorder: 'border-amber-500/20',
+        titleText: 'text-amber-500',
+        badgeBorder: 'border-amber-500/30',
+        badgeText: 'text-amber-500',
+        btnBorder: 'border-amber-500/30',
+        btnHover: 'hover:bg-amber-500/10',
+      }
+    : {
+        cardBorder: 'border-emerald-500/20',
+        titleText: 'text-emerald-500',
+        badgeBorder: 'border-emerald-500/30',
+        badgeText: 'text-emerald-500',
+        btnBorder: 'border-emerald-500/30',
+        btnHover: 'hover:bg-emerald-500/10',
+      };
+
   const getFormLabel = (form: string) => {
+    if (isMetamorph) {
+      if (form === HOMINID_FORM_ID) {
+        return (t.metamorfos as any)?.hominidName || 'Hominídeo';
+      }
+      const cf = customForms?.find((f) => f.id === form);
+      return cf?.name || form;
+    }
     const key = `form_${form}` as keyof typeof t.lobisomem;
     return (t.lobisomem as any)?.[key] || form;
   };
@@ -348,23 +380,23 @@ export function WerewolfTrackers({
       </Card>
 
       {/* CURRENT FORM */}
-      <Card className="medieval-card border-emerald-500/20">
+      <Card className={`medieval-card ${themeClasses.cardBorder}`}>
         <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2 text-emerald-500">
+          <CardTitle className={`font-medieval text-sm flex items-center gap-2 ${themeClasses.titleText}`}>
             <Dog className="w-4 h-4" />
             {t.lobisomem?.currentForm || 'Forma Atual'}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
-            <Badge variant="outline" className="border-emerald-500/30 text-emerald-500 font-medieval">
+            <Badge variant="outline" className={`${themeClasses.badgeBorder} ${themeClasses.badgeText} font-medieval`}>
               {getFormLabel(currentForm)}
             </Badge>
             <Button
               size="sm"
               variant="outline"
               onClick={() => setIsFormModalOpen(true)}
-              className="border-emerald-500/30 hover:bg-emerald-500/10 text-xs"
+              className={`${themeClasses.btnBorder} ${themeClasses.btnHover} text-xs`}
             >
               <Dog className="w-3 h-3 mr-1" />
               {t.lobisomem?.changeForm || 'Mudar Forma'}
@@ -377,6 +409,7 @@ export function WerewolfTrackers({
       <FormChangeModal
         open={isFormModalOpen}
         currentForm={currentForm}
+        customForms={customForms}
         onConfirm={(form) => {
           setIsFormModalOpen(false);
           handleFormChange(form);
