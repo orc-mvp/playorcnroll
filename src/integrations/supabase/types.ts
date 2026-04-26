@@ -55,6 +55,7 @@ export type Database = {
           cunning_type: string
           determination_type: string
           epic_marks: Json | null
+          experience_points: number
           extended_narratives: Json | null
           faith_type: string
           game_system: string
@@ -78,6 +79,7 @@ export type Database = {
           cunning_type?: string
           determination_type?: string
           epic_marks?: Json | null
+          experience_points?: number
           extended_narratives?: Json | null
           faith_type?: string
           game_system?: string
@@ -101,6 +103,7 @@ export type Database = {
           cunning_type?: string
           determination_type?: string
           epic_marks?: Json | null
+          experience_points?: number
           extended_narratives?: Json | null
           faith_type?: string
           game_system?: string
@@ -355,7 +358,6 @@ export type Database = {
       session_participants: {
         Row: {
           character_id: string | null
-          experience_points: number
           id: string
           joined_at: string
           session_arete: number | null
@@ -373,7 +375,6 @@ export type Database = {
         }
         Insert: {
           character_id?: string | null
-          experience_points?: number
           id?: string
           joined_at?: string
           session_arete?: number | null
@@ -391,7 +392,6 @@ export type Database = {
         }
         Update: {
           character_id?: string | null
-          experience_points?: number
           id?: string
           joined_at?: string
           session_arete?: number | null
