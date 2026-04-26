@@ -194,7 +194,7 @@ export default function CreateSession() {
               <Button
                 type="submit"
                 className="w-full font-medieval text-lg h-12"
-                disabled={isSubmitting || !name.trim() || !gameSystem || !getGameSystem(gameSystem)?.available}
+                disabled={isSubmitting || !name.trim() || !family}
               >
                 {isSubmitting ? t.common.loading : t.session.create}
               </Button>
