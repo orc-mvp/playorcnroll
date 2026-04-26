@@ -47,8 +47,10 @@ const App = () => (
             <Route path="/features" element={<Customization />} />
             <Route path="/session/:sessionId/lobby" element={<SessionLobby />} />
             <Route path="/session/:sessionId" element={<Session />} />
-            <Route path="/session/vampire/:sessionId" element={<VampireSession />} />
-            <Route path="/session/werewolf/:sessionId" element={<WerewolfSession />} />
+            <Route path="/session/storyteller/:sessionId" element={<StorytellerSession />} />
+            {/* Legacy routes — redirecionam para a sala unificada */}
+            <Route path="/session/vampire/:sessionId" element={<StorytellerSession />} />
+            <Route path="/session/werewolf/:sessionId" element={<StorytellerSession />} />
             <Route path="/join" element={<JoinSession />} />
             <Route path="/join/:code" element={<JoinSession />} />
             <Route path="/sessions" element={<MySessions />} />
