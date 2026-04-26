@@ -227,10 +227,11 @@ const HEALTH_LEVELS = [
   { key: 'incapacitated', penalty: '' },
 ] as const;
 
-export default function VampiroCharacterSheet({ character, sessionTrackers, experiencePoints, participantId, readOnly = false }: VampiroCharacterSheetProps) {
+export default function VampiroCharacterSheet({ character, sessionTrackers, readOnly = false }: VampiroCharacterSheetProps) {
   const { t, language } = useI18n();
   const data = character.vampiro_data || {};
   const lang = language === 'pt-BR' ? 'pt' : 'en';
+  const experiencePoints = character.experience_points ?? 0;
   
   // Interactive state for trackers - use session values if provided
   const [bloodPool, setBloodPool] = useState(sessionTrackers?.bloodPool ?? 0);
