@@ -50,6 +50,12 @@ interface StorytellerThemeBundle {
   asideBg: string;
   fabBg: string;
   fabText: string;
+  // Pedido de teste compartilhado
+  cardBorder: string;
+  cardIconText: string;
+  cardPrimaryBg: string;
+  cardOutlineBorder: string;
+  cardOutlineHover: string;
 }
 
 function getThemeBundle(
@@ -64,6 +70,41 @@ function getThemeBundle(
       asideBg: 'from-emerald-500/5 to-background',
       fabBg: 'bg-emerald-500 hover:bg-emerald-600',
       fabText: 'text-white',
+      cardBorder: 'border-emerald-500/20',
+      cardIconText: 'text-emerald-500',
+      cardPrimaryBg: 'bg-emerald-500 hover:bg-emerald-600',
+      cardOutlineBorder: 'border-emerald-500/30',
+      cardOutlineHover: 'hover:bg-emerald-500/10',
+    };
+  }
+  if (systemId === 'metamorfos_w20') {
+    return {
+      loadingIcon: <AdapterIcon className="w-8 h-8" />,
+      loadingText: 'text-amber-500',
+      asideBorder: 'border-amber-500/20',
+      asideBg: 'from-amber-500/5 to-background',
+      fabBg: 'bg-amber-500 hover:bg-amber-600',
+      fabText: 'text-white',
+      cardBorder: 'border-amber-500/20',
+      cardIconText: 'text-amber-500',
+      cardPrimaryBg: 'bg-amber-500 hover:bg-amber-600',
+      cardOutlineBorder: 'border-amber-500/30',
+      cardOutlineHover: 'hover:bg-amber-500/10',
+    };
+  }
+  if (systemId === 'mago_m20') {
+    return {
+      loadingIcon: <AdapterIcon className="w-8 h-8" />,
+      loadingText: 'text-purple-500',
+      asideBorder: 'border-purple-500/20',
+      asideBg: 'from-purple-500/5 to-background',
+      fabBg: 'bg-purple-500 hover:bg-purple-600',
+      fabText: 'text-white',
+      cardBorder: 'border-purple-500/20',
+      cardIconText: 'text-purple-500',
+      cardPrimaryBg: 'bg-purple-500 hover:bg-purple-600',
+      cardOutlineBorder: 'border-purple-500/30',
+      cardOutlineHover: 'hover:bg-purple-500/10',
     };
   }
   // default vampire
@@ -74,6 +115,11 @@ function getThemeBundle(
     asideBg: 'from-destructive/5 to-background',
     fabBg: 'bg-destructive hover:bg-destructive/90',
     fabText: 'text-destructive-foreground',
+    cardBorder: 'border-destructive/20',
+    cardIconText: 'text-destructive',
+    cardPrimaryBg: 'bg-destructive hover:bg-destructive/90',
+    cardOutlineBorder: 'border-destructive/30',
+    cardOutlineHover: 'hover:bg-destructive/10',
   };
 }
 
