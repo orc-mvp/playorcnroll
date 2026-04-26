@@ -1243,6 +1243,30 @@ export const translations = {
       tabBackgrounds: 'Antecedentes',
       tabMeritsFlaws: 'Vantagens & Desvantagens',
     },
+
+    // Metamorfos (W20) — reusa quase tudo do Lobisomem; strings exclusivas das Formas customizadas
+    metamorfos: {
+      systemName: 'Metamorfos',
+      species: 'Espécie',
+      speciesPlaceholder: 'Ex: Bastet, Corax, Mokolé...',
+      editCharacter: 'Editar Metamorfo',
+      editInfo: 'Edite as informações do seu Metamorfo',
+      tabForms: 'Formas',
+      formsTitle: 'Formas de Guerra',
+      formsDesc: 'Hominídeo é a forma natural (sem modificadores). Adicione até 4 formas adicionais com seus modificadores de atributo. Deixe em branco para "sem alteração". Digite 0 para zerar o atributo enquanto a forma estiver ativa.',
+      formNamePlaceholder: 'Nome da Forma (ex: Crinos)',
+      addForm: 'Adicionar Forma',
+      removeForm: 'Remover Forma',
+      maxFormsReached: 'Limite de 4 formas adicionais atingido.',
+      hominidName: 'Hominídeo',
+      hominidLockedDesc: 'Forma natural — sem modificadores.',
+      modifierTooltip: 'Vazio = sem alteração. 0 = zera o atributo enquanto esta forma estiver ativa.',
+      formAttrCharisma: 'Carisma',
+      formAttrPerception: 'Percepção',
+      formAttrIntelligence: 'Inteligência',
+      formAttrWits: 'Esperteza',
+      noCustomFormsHint: 'Nenhuma forma adicional configurada. O personagem só usará Hominídeo.',
+    },
   },
 
   en: {
