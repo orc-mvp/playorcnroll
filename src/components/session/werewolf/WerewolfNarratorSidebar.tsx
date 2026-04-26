@@ -217,25 +217,7 @@ export function WerewolfNarratorSidebar({
         <span className="font-medieval">{t.roles.narrator}</span>
       </div>
 
-      {/* Request Test Card */}
-      <Card className="medieval-card border-emerald-500/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="font-medieval text-base flex items-center gap-2">
-            <Dices className="w-4 h-4 text-emerald-500" />
-            {t.vampiroTests.requestTest}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Button onClick={onRequestTest} className="w-full bg-emerald-500 hover:bg-emerald-600">
-            <Dices className="w-4 h-4 mr-2" />
-            {t.vampiroTests.test}
-          </Button>
-          <Button onClick={onRequestRoll} variant="outline" className="w-full border-emerald-500/30 hover:bg-emerald-500/10">
-            <Dices className="w-4 h-4 mr-2" />
-            {t.vampiroTests.roll}
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Request Test Card removido — agora é único, renderizado pelo StorytellerSession */}
 
       {/* Pack (Players) */}
       <Card className="medieval-card border-emerald-500/20">
