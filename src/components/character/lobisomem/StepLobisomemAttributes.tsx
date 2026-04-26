@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import DotRating from '@/components/character/vampiro/DotRating';
 import { LobisomemFormData } from './StepLobisomemBasicInfo';
+import { STORYTELLER_ATTRIBUTES as ATTRIBUTES, STORYTELLER_ABILITIES as ABILITIES } from '@/lib/storyteller/traits';
 
 interface StepLobisomemAttributesProps {
   formData: LobisomemFormData;
