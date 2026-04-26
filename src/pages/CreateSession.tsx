@@ -11,7 +11,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Wand2 } from 'lucide-react';
 import SessionFamilySelector from '@/components/SessionFamilySelector';
+import AllowedSystemsSelector from '@/components/AllowedSystemsSelector';
 import type { GameSystemFamily } from '@/lib/gameSystems';
+import { getAvailableStorytellerSystemIds } from '@/lib/storyteller/systemRegistry';
+import type { StorytellerSystemId } from '@/lib/storyteller/types';
 
 
 function generateInviteCode(): string {
@@ -30,6 +33,7 @@ export default function CreateSession() {
   const { toast } = useToast();
 
   const [family, setFamily] = useState<GameSystemFamily | null>(null);
+  const [allowedSystems, setAllowedSystems] = useState<StorytellerSystemId[]>([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
