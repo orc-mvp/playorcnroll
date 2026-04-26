@@ -241,23 +241,15 @@ export const SCENE_PANEL_THEMES: Record<string, ThemeClasses> = {
     hoverBg: 'hover:bg-purple-500/10',
     buttonBg: 'bg-purple-500 hover:bg-purple-600',
   },
-  wraith: {
-    border: 'border-slate-400/20',
-    text: 'text-slate-400',
-    borderHover: 'border-slate-400/30',
-    hoverBg: 'hover:bg-slate-400/10',
-    buttonBg: 'bg-slate-500 hover:bg-slate-600',
-  },
 };
 
 export function getSceneThemeForSystem(systemId: string): ThemeClasses {
   switch (systemId) {
     case 'lobisomem_w20':
+    case 'metamorfos_w20':
       return SCENE_PANEL_THEMES.werewolf;
     case 'mago_m20':
       return SCENE_PANEL_THEMES.mage;
-    case 'mortos_vivos_w20':
-      return SCENE_PANEL_THEMES.wraith;
     default:
       return SCENE_PANEL_THEMES.vampire;
   }

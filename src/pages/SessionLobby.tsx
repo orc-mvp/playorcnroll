@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RichTextDisplay } from '@/components/ui/rich-text-display';
 import { SimpleEditor } from '@/components/ui/simple-editor';
-import { 
-  ArrowLeft, 
-  Copy, 
-  Link as LinkIcon, 
-  Users, 
+import { getSessionRoute } from '@/lib/sessionRoutes';
+import {
+  ArrowLeft,
+  Copy,
+  Link as LinkIcon,
+  Users,
   Play,
   Crown,
   User,
@@ -150,12 +151,7 @@ export default function SessionLobby() {
           setSession(newSession);
           
           if (newSession.status === 'active') {
-            const route = newSession.game_system === 'vampiro_v3' 
-              ? `/session/vampire/${sessionId}` 
-              : newSession.game_system === 'lobisomem_w20'
-              ? `/session/werewolf/${sessionId}`
-              : `/session/${sessionId}`;
-            navigate(route);
+            navigate(getSessionRoute(sessionId!, newSession.game_system));
           }
         }
       )
@@ -194,12 +190,7 @@ export default function SessionLobby() {
 
       if (error) throw error;
 
-      const route = session.game_system === 'vampiro_v3' 
-        ? `/session/vampire/${session.id}` 
-        : session.game_system === 'lobisomem_w20'
-        ? `/session/werewolf/${session.id}`
-        : `/session/${session.id}`;
-      navigate(route);
+      navigate(getSessionRoute(session.id, session.game_system));
     } catch (error: any) {
       toast({
         title: t.session.errorStartingSession,

@@ -406,11 +406,48 @@ export default function StorytellerSession() {
   const noCharThemeKey: 'vampire' | 'werewolf' =
     session.game_system === 'lobisomem_w20' ? 'werewolf' : 'vampire';
 
-  // Sidebar do narrador específica do sistema da sessão
-  const NarratorSidebar =
-    session.game_system === 'lobisomem_w20' ? WerewolfNarratorSidebar : VampireNarratorSidebar;
+  // Sidebars do narrador agora são CONTEXTUAIS POR PERSONAGEM:
+  // separamos os participantes por sistema do personagem e renderizamos a
+  // sidebar correspondente para cada grupo. Assim, numa sessão mista o
+  // narrador vê cards de Vampiro com trackers de Sangue/Humanidade e cards
+  // de Lobisomem com Gnose/Fúria/Forma — cada um na ficha correta.
+  const vampireParticipants = participants.filter(
+    (p) => !p.character || p.character.game_system === 'vampiro_v3',
+  );
+  const werewolfParticipants = participants.filter(
+    (p) => p.character?.game_system === 'lobisomem_w20' ||
+           p.character?.game_system === 'metamorfos_w20',
+  );
 
-  const TrackersComponent = myAdapter.PlayerTrackersComponent;
+  const renderNarratorSidebar = () => (
+    <div className="space-y-6">
+      {vampireParticipants.length > 0 && (
+        <VampireNarratorSidebar
+          sessionId={sessionId!}
+          participants={vampireParticipants as any}
+          scenes={scenes as any}
+          currentScene={currentScene as any}
+          onRequestTest={() => setTestModalOpen(true)}
+          onRequestRoll={() => setRollModalOpen(true)}
+          onSceneChange={setCurrentScene as any}
+          onEventCreated={handleLocalEvent}
+        />
+      )}
+      {werewolfParticipants.length > 0 && (
+        <WerewolfNarratorSidebar
+          sessionId={sessionId!}
+          participants={werewolfParticipants as any}
+          scenes={scenes as any}
+          currentScene={currentScene as any}
+          onRequestTest={() => setTestModalOpen(true)}
+          onRequestRoll={() => setRollModalOpen(true)}
+          onSceneChange={setCurrentScene as any}
+          onEventCreated={handleLocalEvent}
+        />
+      )}
+    </div>
+  );
+
   const PlayerSidePanel = myAdapter.PlayerSidePanel;
   const PendingTestComponent = myAdapter.PendingTestComponent;
   const TestRequestModalComponent = sessionAdapter.TestRequestModalComponent;
@@ -565,16 +602,7 @@ export default function StorytellerSession() {
             <TabsContent value="info" className="flex-1 p-4 overflow-auto">
               <div className="space-y-4">
                 {isNarrator ? (
-                  <NarratorSidebar
-                    sessionId={sessionId!}
-                    participants={participants as any}
-                    scenes={scenes as any}
-                    currentScene={currentScene as any}
-                    onRequestTest={() => setTestModalOpen(true)}
-                    onRequestRoll={() => setRollModalOpen(true)}
-                    onSceneChange={setCurrentScene as any}
-                    onEventCreated={handleLocalEvent}
-                  />
+                  renderNarratorSidebar()
                 ) : (
                   <PlayerSidePanel {...(sidePanelProps as any)} />
                 )}
@@ -616,16 +644,7 @@ export default function StorytellerSession() {
             <ScrollArea className="flex-1">
               <div className="p-4">
                 {isNarrator ? (
-                  <NarratorSidebar
-                    sessionId={sessionId!}
-                    participants={participants as any}
-                    scenes={scenes as any}
-                    currentScene={currentScene as any}
-                    onRequestTest={() => setTestModalOpen(true)}
-                    onRequestRoll={() => setRollModalOpen(true)}
-                    onSceneChange={setCurrentScene as any}
-                    onEventCreated={handleLocalEvent}
-                  />
+                  renderNarratorSidebar()
                 ) : (
                   <div className="space-y-4">
                     {pendingTestSharedProps && !hasRolledForPendingTest && (
