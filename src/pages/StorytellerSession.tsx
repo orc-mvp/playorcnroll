@@ -22,7 +22,8 @@ import { cn } from '@/lib/utils';
 
 import { SessionHeader } from '@/components/session/SessionHeader';
 import { ManagePlayersModal } from '@/components/session/vampire/ManagePlayersModal';
-import NarratorRollModal from '@/components/session/vampire/NarratorRollModal';
+import { StorytellerNarratorRollModal } from '@/components/session/storyteller/StorytellerNarratorRollModal';
+import StorytellerTestRequestModal from '@/components/session/storyteller/StorytellerTestRequestModal';
 import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { WerewolfNarratorSidebar } from '@/components/session/werewolf/WerewolfNarratorSidebar';
@@ -451,7 +452,6 @@ export default function StorytellerSession() {
   const PlayerSidePanel = myAdapter.PlayerSidePanel;
   const PendingTestComponent = myAdapter.PendingTestComponent;
   const TrackersComponent = myAdapter.PlayerTrackersComponent;
-  const TestRequestModalComponent = sessionAdapter.TestRequestModalComponent;
 
   // Props para trackers (variam por sistema)
   const buildTrackerProps = () => {
@@ -706,18 +706,19 @@ export default function StorytellerSession() {
         </div>
       )}
 
-      {/* Test Request Modal — sistema da sessão */}
-      <TestRequestModalComponent
+      {/* Test Request Modal — unificado, mostra categorias por sistema dos alvos */}
+      <StorytellerTestRequestModal
         open={testModalOpen}
         onOpenChange={setTestModalOpen}
         participants={participants as any}
         onRequestTest={handleRequestTest}
       />
 
-      {/* Narrator Roll Modal */}
-      <NarratorRollModal
+      {/* Narrator Roll Modal — unificado, lê narratorRollConfig do adapter */}
+      <StorytellerNarratorRollModal
         open={rollModalOpen}
         onOpenChange={setRollModalOpen}
+        gameSystem={session.game_system}
         onRollComplete={async (result) => {
           if (!sessionId) return;
           await supabase.from('session_events').insert([
@@ -729,12 +730,15 @@ export default function StorytellerSession() {
                 dice_count: result.diceCount,
                 difficulty: result.difficulty,
                 results: result.results,
+                extra_results: result.extraResults,
                 successes: result.successes,
                 ones_count: result.onesCount,
                 final_successes: result.finalSuccesses,
                 is_botch: result.isBotch,
                 is_exceptional: result.isExceptional,
                 context: result.context,
+                pool_id: result.poolId,
+                exploded: result.exploded,
                 scene_name: currentScene?.name || null,
               },
             },
