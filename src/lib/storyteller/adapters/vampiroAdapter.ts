@@ -62,6 +62,7 @@ export const vampiroAdapter: SystemAdapter = {
       getMax: () => 7,
       getCurrent: (p) =>
         7 - ((p.session_health_damage as boolean[] | null)?.filter(Boolean).length ?? 0),
+      kind: 'health',
       isHealth: true,
     },
   ],
