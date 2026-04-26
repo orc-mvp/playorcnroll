@@ -24,7 +24,6 @@ export interface StorytellerParticipant {
   user_id: string;
   character_id: string | null;
   sheet_locked?: boolean;
-  experience_points?: number;
   /** Pool de sangue (Vampiro) */
   session_blood_pool?: number;
   /** Willpower atual (todos os sistemas WoD) */
@@ -42,6 +41,8 @@ export interface StorytellerParticipant {
     name: string;
     concept: string | null;
     game_system: string;
+    /** Pool global de XP do personagem (compartilhado entre sessões) */
+    experience_points?: number;
     // Mantido como `vampiro_data` no banco — historicamente usado para qualquer
     // sistema WoD. Cada adapter sabe interpretar este blob.
     vampiro_data: any;
