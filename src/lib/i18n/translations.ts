@@ -2498,6 +2498,30 @@ export const translations = {
       tabBackgrounds: 'Backgrounds',
       tabMeritsFlaws: 'Merits & Flaws',
     },
+
+    // Metamorfos (W20)
+    metamorfos: {
+      systemName: 'Shifters',
+      species: 'Species',
+      speciesPlaceholder: 'Ex: Bastet, Corax, Mokolé...',
+      editCharacter: 'Edit Shifter',
+      editInfo: 'Edit your Shifter information',
+      tabForms: 'Forms',
+      formsTitle: 'War Forms',
+      formsDesc: 'Hominid is the natural form (no modifiers). Add up to 4 additional forms with their attribute modifiers. Leave blank for "no change". Type 0 to set the attribute to zero while the form is active.',
+      formNamePlaceholder: 'Form Name (e.g. Crinos)',
+      addForm: 'Add Form',
+      removeForm: 'Remove Form',
+      maxFormsReached: 'Limit of 4 additional forms reached.',
+      hominidName: 'Hominid',
+      hominidLockedDesc: 'Natural form — no modifiers.',
+      modifierTooltip: 'Empty = no change. 0 = zeroes the attribute while this form is active.',
+      formAttrCharisma: 'Charisma',
+      formAttrPerception: 'Perception',
+      formAttrIntelligence: 'Intelligence',
+      formAttrWits: 'Wits',
+      noCustomFormsHint: 'No additional forms configured. The character will only use Hominid.',
+    },
   },
 } as const;
 
