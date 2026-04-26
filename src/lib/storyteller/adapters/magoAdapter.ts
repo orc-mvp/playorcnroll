@@ -94,8 +94,8 @@ export const magoAdapter: SystemAdapter = {
 
   CharacterSheet: MagoCharacterSheet as any,
   PlayerTrackersComponent: MagoTrackers as any,
-  // Mago reusa o WerewolfTestRequestModal (estrutura cross-system semelhante)
-  TestRequestModalComponent: WerewolfTestRequestModal as any,
+  // Mago tem modal próprio (cor roxa, tipos `arete` e `quintessence`)
+  TestRequestModalComponent: MagoTestRequestModal as any,
   // Mago reusa o VampirePendingTest passando gameSystem='mago_m20'
   PendingTestComponent: VampirePendingTest as any,
   PlayerSidePanel: MagoPlayerSidePanel,
