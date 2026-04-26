@@ -118,7 +118,7 @@ export default function CreateCharacter() {
   const preSelectedSystem = searchParams.get('system');
   
   // Initialize state based on URL param
-  const VALID_PRE = ['vampiro_v3', 'herois_marcados', 'lobisomem_w20', 'mago_m20'];
+  const VALID_PRE = ['vampiro_v3', 'herois_marcados', 'lobisomem_w20', 'mago_m20', 'metamorfos_w20'];
 
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(() => {
     if (preSelectedSystem && VALID_PRE.includes(preSelectedSystem)) {
