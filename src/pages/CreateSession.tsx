@@ -10,7 +10,8 @@ import { SimpleEditor } from '@/components/ui/simple-editor';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Wand2 } from 'lucide-react';
-import GameSystemSelector from '@/components/GameSystemSelector';
+import SessionFamilySelector from '@/components/SessionFamilySelector';
+import type { GameSystemFamily } from '@/lib/gameSystems';
 import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
 
 function generateInviteCode(): string {
