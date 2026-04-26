@@ -72,6 +72,8 @@ const systemIcons: Record<string, React.ElementType> = {
   herois_marcados: Sword,
   vampiro_v3: Moon,
   lobisomem_w20: Dog,
+  mago_m20: Star,
+  metamorfos_w20: PawPrint,
 };
 
 export default function MyCharacters() {
