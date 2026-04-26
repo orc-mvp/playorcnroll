@@ -236,7 +236,18 @@ export function WerewolfTrackers({
     );
   }
 
+  const isMetamorph = character?.game_system === 'metamorfos_w20';
+  const customForms = isMetamorph ? (lobData?.metamorph_forms || []) : undefined;
+  const themeAccent = isMetamorph ? 'amber-500' : 'emerald-500';
+
   const getFormLabel = (form: string) => {
+    if (isMetamorph) {
+      if (form === HOMINID_FORM_ID) {
+        return (t.metamorfos as any)?.hominidName || 'Hominídeo';
+      }
+      const cf = customForms?.find((f) => f.id === form);
+      return cf?.name || form;
+    }
     const key = `form_${form}` as keyof typeof t.lobisomem;
     return (t.lobisomem as any)?.[key] || form;
   };
