@@ -1,6 +1,6 @@
 /**
  * NoCharacterCard — cartão exibido a jogadores que entraram sem personagem.
- * Genérico via `themeColor`.
+ * Tema é passado como classes tailwind completas para evitar quebra do JIT.
  */
 
 import { useNavigate } from 'react-router-dom';
@@ -10,24 +10,47 @@ import { Button } from '@/components/ui/button';
 import { AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface Props {
-  inviteCode?: string;
-  themeColor?: string;
+interface ThemeClasses {
+  cardBorder: string; // ex: 'border-destructive/30'
+  cardBg: string;     // ex: 'bg-destructive/5'
+  iconText: string;   // ex: 'text-destructive'
+  buttonBorder: string; // 'border-destructive/30 text-destructive hover:bg-destructive/10'
 }
 
-export function NoCharacterCard({ inviteCode, themeColor = 'destructive' }: Props) {
+const THEMES: Record<string, ThemeClasses> = {
+  vampire: {
+    cardBorder: 'border-destructive/30',
+    cardBg: 'bg-destructive/5',
+    iconText: 'text-destructive',
+    buttonBorder: 'border-destructive/30 text-destructive hover:bg-destructive/10',
+  },
+  werewolf: {
+    cardBorder: 'border-emerald-500/30',
+    cardBg: 'bg-emerald-500/5',
+    iconText: 'text-emerald-500',
+    buttonBorder: 'border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/10',
+  },
+};
+
+interface Props {
+  inviteCode?: string;
+  themeKey?: 'vampire' | 'werewolf';
+}
+
+export function NoCharacterCard({ inviteCode, themeKey = 'vampire' }: Props) {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const theme = THEMES[themeKey];
   return (
-    <Card className={cn('border', `border-${themeColor}/30`, `bg-${themeColor}/5`)}>
+    <Card className={cn('border', theme.cardBorder, theme.cardBg)}>
       <CardContent className="flex flex-col items-center text-center py-8 gap-4">
-        <AlertTriangle className={cn('w-10 h-10', `text-${themeColor}`)} />
+        <AlertTriangle className={cn('w-10 h-10', theme.iconText)} />
         <p className="text-sm text-muted-foreground">
           {t.sessionRejoin.noCharacterInSession}
         </p>
         <Button
           variant="outline"
-          className={cn(`border-${themeColor}/30 text-${themeColor} hover:bg-${themeColor}/10`)}
+          className={cn(theme.buttonBorder)}
           onClick={() => navigate(inviteCode ? `/join/${inviteCode}` : '/join')}
         >
           {t.sessionRejoin.rejoinWithCharacter}

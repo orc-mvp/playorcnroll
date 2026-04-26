@@ -1,9 +1,9 @@
 /**
  * StorytellerScenePanel — painel de cena unificado.
  *
- * Substitui os duplicados `VampireScenePanel` e `WerewolfScenePanel` (eram
- * praticamente idênticos, só mudava a cor temática). A cor é injetada via
- * adapter (`adapter.color`, `adapter.borderColor`).
+ * Substitui os duplicados `VampireScenePanel` e `WerewolfScenePanel`. As cores
+ * são passadas como classes tailwind COMPLETAS (não interpoladas) para que o
+ * JIT do Tailwind as detecte em build.
  */
 
 import { useState } from 'react';
@@ -23,14 +23,21 @@ import { BookOpen, Plus, History, ChevronDown, Eye } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { StorytellerScene } from '@/lib/storyteller/types';
 
+interface ThemeClasses {
+  border: string;       // ex: 'border-destructive/20'
+  text: string;         // ex: 'text-destructive'
+  borderHover: string;  // ex: 'border-destructive/30'
+  hoverBg: string;      // ex: 'hover:bg-destructive/10'
+  buttonBg: string;     // ex: 'bg-destructive hover:bg-destructive/90'
+}
+
 interface Props {
   sessionId: string;
   currentScene: StorytellerScene | null;
   scenes: StorytellerScene[];
   isNarrator: boolean;
   onSceneChange: (scene: StorytellerScene) => void;
-  /** Cor do tema do sistema (ex: 'destructive', 'emerald-500'). */
-  themeColor: string;
+  theme: ThemeClasses;
 }
 
 export function StorytellerScenePanel({
@@ -39,7 +46,7 @@ export function StorytellerScenePanel({
   scenes,
   isNarrator,
   onSceneChange,
-  themeColor,
+  theme,
 }: Props) {
   const { t } = useI18n();
   const { toast } = useToast();
@@ -51,12 +58,6 @@ export function StorytellerScenePanel({
   const [expandedSceneId, setExpandedSceneId] = useState<string | null>(null);
 
   const previousScenes = scenes.filter((s) => s.id !== currentScene?.id);
-
-  const borderClass = `border-${themeColor}/20`;
-  const textClass = `text-${themeColor}`;
-  const hoverBgClass = `hover:bg-${themeColor}/10`;
-  const borderHoverClass = `border-${themeColor}/30`;
-  const buttonBgClass = `bg-${themeColor} hover:bg-${themeColor}/90`;
 
   const handleCreateScene = async () => {
     if (!newSceneName.trim()) return;
@@ -102,10 +103,10 @@ export function StorytellerScenePanel({
   };
 
   return (
-    <Card className={cn('medieval-card', borderClass)}>
+    <Card className={cn('medieval-card', theme.border)}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className={cn('font-medieval flex items-center gap-2', textClass)}>
+          <CardTitle className={cn('font-medieval flex items-center gap-2', theme.text)}>
             <BookOpen className="w-5 h-5" />
             {t.vampireSession.currentScene}
           </CardTitle>
@@ -113,7 +114,7 @@ export function StorytellerScenePanel({
             <Button
               size="sm"
               variant="outline"
-              className={cn(borderHoverClass, hoverBgClass)}
+              className={cn(theme.borderHover, theme.hoverBg)}
               onClick={() => setShowNewScene(true)}
             >
               <Plus className="w-3 h-3 mr-1" />
@@ -158,7 +159,7 @@ export function StorytellerScenePanel({
                 size="sm"
                 onClick={handleCreateScene}
                 disabled={!newSceneName.trim() || isCreating}
-                className={cn('flex-1', buttonBgClass)}
+                className={cn('flex-1', theme.buttonBg)}
               >
                 {t.common.create}
               </Button>
@@ -215,4 +216,49 @@ export function StorytellerScenePanel({
       </CardContent>
     </Card>
   );
+}
+
+/** Temas pré-definidos para evitar interpolação dinâmica de classes Tailwind. */
+export const SCENE_PANEL_THEMES: Record<string, ThemeClasses> = {
+  vampire: {
+    border: 'border-destructive/20',
+    text: 'text-destructive',
+    borderHover: 'border-destructive/30',
+    hoverBg: 'hover:bg-destructive/10',
+    buttonBg: 'bg-destructive hover:bg-destructive/90',
+  },
+  werewolf: {
+    border: 'border-emerald-500/20',
+    text: 'text-emerald-500',
+    borderHover: 'border-emerald-500/30',
+    hoverBg: 'hover:bg-emerald-500/10',
+    buttonBg: 'bg-emerald-500 hover:bg-emerald-600',
+  },
+  mage: {
+    border: 'border-purple-500/20',
+    text: 'text-purple-500',
+    borderHover: 'border-purple-500/30',
+    hoverBg: 'hover:bg-purple-500/10',
+    buttonBg: 'bg-purple-500 hover:bg-purple-600',
+  },
+  wraith: {
+    border: 'border-slate-400/20',
+    text: 'text-slate-400',
+    borderHover: 'border-slate-400/30',
+    hoverBg: 'hover:bg-slate-400/10',
+    buttonBg: 'bg-slate-500 hover:bg-slate-600',
+  },
+};
+
+export function getSceneThemeForSystem(systemId: string): ThemeClasses {
+  switch (systemId) {
+    case 'lobisomem_w20':
+      return SCENE_PANEL_THEMES.werewolf;
+    case 'mago_m20':
+      return SCENE_PANEL_THEMES.mage;
+    case 'mortos_vivos_w20':
+      return SCENE_PANEL_THEMES.wraith;
+    default:
+      return SCENE_PANEL_THEMES.vampire;
+  }
 }
