@@ -63,6 +63,7 @@ export const magoAdapter: SystemAdapter = {
       getMax: () => 7,
       getCurrent: (p) =>
         7 - ((p.session_health_damage as boolean[] | null)?.filter(Boolean).length ?? 0),
+      kind: 'health',
       isHealth: true,
     },
   ],
@@ -74,4 +75,50 @@ export const magoAdapter: SystemAdapter = {
   TestRequestModalComponent: ComingSoonComponent as any,
   PendingTestComponent: ComingSoonComponent as any,
   PlayerSidePanel: ComingSoonComponent as any,
+
+  testCategories: [
+    {
+      id: 'attribute_ability',
+      label: 'Atributo + Habilidade',
+      crossSystem: true,
+      testType: 'attribute_ability',
+      requiresAttribute: true,
+      requiresAbility: true,
+    },
+    {
+      id: 'attribute_only',
+      label: 'Atributo Puro',
+      crossSystem: true,
+      testType: 'attribute_only',
+      requiresAttribute: true,
+    },
+    {
+      id: 'willpower',
+      label: 'Vontade',
+      crossSystem: true,
+      testType: 'willpower',
+    },
+    {
+      id: 'arete',
+      label: 'Arete',
+      crossSystem: false,
+      testType: 'arete',
+    },
+    {
+      id: 'raw_dice',
+      label: 'Pool Avulso',
+      crossSystem: true,
+      testType: 'raw_dice',
+      requiresDiceCount: true,
+    },
+  ],
+
+  narratorRollConfig: {
+    defaultDifficulty: 6,
+    allowExploding10s: false,
+    extraPools: [
+      { id: 'arete', label: 'Arete', defaultDifficulty: 6 },
+      { id: 'quintessence', label: 'Quintessência', defaultDifficulty: 6 },
+    ],
+  },
 };

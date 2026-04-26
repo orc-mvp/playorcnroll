@@ -84,6 +84,14 @@ export interface StorytellerSessionData {
 }
 
 /**
+ * Tipo de tracker — define renderização e comportamento.
+ *  - `pool`: pontos consumíveis (Sangue, Vontade, Gnose, Fúria, Quintessência…).
+ *  - `health`: vitalidade dos 7 níveis WoD.
+ *  - `state`: valor categórico (Forma de Lobisomem). Não tem max numérico.
+ */
+export type TrackerKind = 'pool' | 'health' | 'state';
+
+/**
  * Definição de um tracker exibido no card do personagem na sidebar do narrador.
  * Cada sistema declara seus trackers no adapter.
  */
@@ -100,7 +108,9 @@ export interface TrackerDef {
   getMax: (charData: any) => number;
   /** Lê valor atual no participante */
   getCurrent: (participant: StorytellerParticipant) => number;
-  /** Renderização especial: vitalidade (7 níveis) */
+  /** Tipo de renderização. Default: 'pool'. */
+  kind?: TrackerKind;
+  /** @deprecated use `kind: 'health'`. Mantido para compatibilidade. */
   isHealth?: boolean;
 }
 
@@ -112,6 +122,62 @@ export interface TrackerDef {
 export type TrackerInitializer = (
   participant: StorytellerParticipant,
 ) => Partial<StorytellerParticipant> | null;
+
+// ============================================================
+// Categorias de teste pedidas pelo narrador
+// ============================================================
+
+/**
+ * Define um tipo de teste que o narrador pode pedir aos jogadores.
+ * Cada sistema declara suas categorias; o `StorytellerTestRequestModal`
+ * agrega todas e filtra pelas que cabem nos alvos selecionados.
+ */
+export interface TestCategoryDef {
+  /** ID interno (ex: 'attribute_ability', 'gnosis', 'rage', 'humanity'). */
+  id: string;
+  /** Label em pt-BR exibido no botão de seleção. */
+  label: string;
+  /** Habilita o teste em sessões com alvos de sistemas diferentes. */
+  crossSystem: boolean;
+  /**
+   * Tipo do teste no payload enviado para os jogadores. Reusa os IDs já
+   * suportados pelo `VampirePendingTest` (`attribute_ability`, `attribute_only`,
+   * `willpower`, `humanity`, `virtue`, `raw_dice`, `gnosis`, `rage`).
+   */
+  testType: string;
+  /** Requer escolha de Atributo. */
+  requiresAttribute?: boolean;
+  /** Requer escolha de Habilidade. */
+  requiresAbility?: boolean;
+  /** Requer escolha de Virtude (Vampiro). */
+  requiresVirtue?: boolean;
+  /** Requer escolha do número de dados (raw_dice). */
+  requiresDiceCount?: boolean;
+}
+
+// ============================================================
+// Configuração da rolagem direta do narrador
+// ============================================================
+
+/**
+ * Pool extra que o narrador pode usar como base de rolagem ao escolher
+ * este sistema (ex.: Lobisomem oferece "Fúria" e "Gnose" como atalhos).
+ */
+export interface ExtraNarratorPool {
+  id: string;
+  label: string;
+  /** Dificuldade default ao escolher este pool. */
+  defaultDifficulty?: number;
+}
+
+export interface NarratorRollConfig {
+  /** Dificuldade default da rolagem livre (Vampiro=6, Lobisomem=6). */
+  defaultDifficulty: number;
+  /** Permite 10s explosivos (Lobisomem com surto). */
+  allowExploding10s: boolean;
+  /** Pools sistema-específicos (atalhos pra Fúria, Gnose, etc). */
+  extraPools: ExtraNarratorPool[];
+}
 
 /**
  * Adapter completo de um sistema WoD.
@@ -196,6 +262,16 @@ export interface SystemAdapter {
 
   /** Renderiza um evento do feed específico deste sistema (opcional — fallback genérico se ausente) */
   renderEventFeedItem?: (event: StorytellerEvent) => ReactNode;
+
+  /**
+   * Categorias de teste que o narrador pode pedir aos jogadores deste sistema.
+   * Consumido pelo `StorytellerTestRequestModal` para montar o catálogo
+   * agregado por sessão.
+   */
+  testCategories: TestCategoryDef[];
+
+  /** Configuração da rolagem direta do narrador (`StorytellerNarratorRollModal`). */
+  narratorRollConfig: NarratorRollConfig;
 
   /** Indica se o sistema está disponível para uso (false para stubs Mago/Metamorfos) */
   available: boolean;

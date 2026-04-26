@@ -62,6 +62,7 @@ export const vampiroAdapter: SystemAdapter = {
       getMax: () => 7,
       getCurrent: (p) =>
         7 - ((p.session_health_damage as boolean[] | null)?.filter(Boolean).length ?? 0),
+      kind: 'health',
       isHealth: true,
     },
   ],
@@ -90,4 +91,54 @@ export const vampiroAdapter: SystemAdapter = {
   TestRequestModalComponent: VampireTestRequestModal as any,
   PendingTestComponent: VampirePendingTest as any,
   PlayerSidePanel: VampirePlayerSidePanel,
+
+  testCategories: [
+    {
+      id: 'attribute_ability',
+      label: 'Atributo + Habilidade',
+      crossSystem: true,
+      testType: 'attribute_ability',
+      requiresAttribute: true,
+      requiresAbility: true,
+    },
+    {
+      id: 'attribute_only',
+      label: 'Atributo Puro',
+      crossSystem: true,
+      testType: 'attribute_only',
+      requiresAttribute: true,
+    },
+    {
+      id: 'willpower',
+      label: 'Vontade',
+      crossSystem: true,
+      testType: 'willpower',
+    },
+    {
+      id: 'humanity',
+      label: 'Humanidade',
+      crossSystem: false,
+      testType: 'humanity',
+    },
+    {
+      id: 'virtue',
+      label: 'Virtude',
+      crossSystem: false,
+      testType: 'virtue',
+      requiresVirtue: true,
+    },
+    {
+      id: 'raw_dice',
+      label: 'Pool Avulso',
+      crossSystem: true,
+      testType: 'raw_dice',
+      requiresDiceCount: true,
+    },
+  ],
+
+  narratorRollConfig: {
+    defaultDifficulty: 6,
+    allowExploding10s: false,
+    extraPools: [],
+  },
 };
