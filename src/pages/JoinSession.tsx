@@ -56,9 +56,10 @@ interface JoinedSession {
 /** Label legível do sistema/família. */
 function getSystemLabel(gameSystem: string): string {
   if (gameSystem === 'herois_marcados') return 'Heróis Marcados';
+  // Família genérica criada pelo seletor de sessão — aceita qualquer ficha WoD.
+  if (gameSystem === 'storyteller') return 'Storyteller (WoD)';
   if (isStorytellerSystem(gameSystem)) {
-    // Sessões Storyteller exibem "Storyteller (X)" para deixar claro que aceitam
-    // qualquer ficha da família.
+    // Sessões antigas amarradas a um sistema único.
     return `Storyteller (${getSystemAdapter(gameSystem).shortLabel})`;
   }
   return gameSystem;
