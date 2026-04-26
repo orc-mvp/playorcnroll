@@ -263,6 +263,16 @@ export interface SystemAdapter {
   /** Renderiza um evento do feed específico deste sistema (opcional — fallback genérico se ausente) */
   renderEventFeedItem?: (event: StorytellerEvent) => ReactNode;
 
+  /**
+   * Categorias de teste que o narrador pode pedir aos jogadores deste sistema.
+   * Consumido pelo `StorytellerTestRequestModal` para montar o catálogo
+   * agregado por sessão.
+   */
+  testCategories: TestCategoryDef[];
+
+  /** Configuração da rolagem direta do narrador (`StorytellerNarratorRollModal`). */
+  narratorRollConfig: NarratorRollConfig;
+
   /** Indica se o sistema está disponível para uso (false para stubs Mago/Metamorfos) */
   available: boolean;
 }
