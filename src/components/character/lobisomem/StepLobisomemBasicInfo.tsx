@@ -50,7 +50,25 @@ export interface LobisomemFormData {
 interface StepLobisomemBasicInfoProps {
   formData: LobisomemFormData;
   updateFormData: (updates: Partial<LobisomemFormData>) => void;
+  gameSystem?: 'lobisomem_w20' | 'metamorfos_w20';
 }
+
+const SHIFTERS = [
+  'Ajaba',
+  'Ananasi',
+  'Bastet',
+  'Corax',
+  'Gurahl',
+  'Kitsune',
+  'Mokolé',
+  'Nagah',
+  'Nuwisha',
+  'Ratkin',
+  'Rokea',
+  'Apis',
+  'Camazotz',
+  'Grondr',
+];
 
 const ARCHETYPES = [
   'Arquiteto', 'Autocrata', 'Bombástico', 'Bon Vivant', 'Bravo',
