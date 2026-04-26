@@ -180,10 +180,37 @@ export default function CreateSession() {
                 </Label>
                 <SessionFamilySelector
                   value={family}
-                  onChange={setFamily}
+                  onChange={(f) => {
+                    setFamily(f);
+                    // Ao trocar para Storyteller, pré-preenche com todos os
+                    // sistemas disponíveis para conveniência (narrador pode
+                    // desmarcar os indesejados). Ao trocar para Heróis Marcados,
+                    // limpa, pois a coluna não se aplica.
+                    if (f === 'storyteller') {
+                      setAllowedSystems(getAvailableStorytellerSystemIds());
+                    } else {
+                      setAllowedSystems([]);
+                    }
+                  }}
                   disabled={isSubmitting}
                 />
               </div>
+
+              {family === 'storyteller' && (
+                <div className="space-y-2">
+                  <Label className="font-medieval">
+                    {t.session.allowedSystemsLabel} *
+                  </Label>
+                  <p className="text-xs text-muted-foreground font-body">
+                    {t.session.allowedSystemsHelp}
+                  </p>
+                  <AllowedSystemsSelector
+                    value={allowedSystems}
+                    onChange={setAllowedSystems}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="name" className="font-medieval">
