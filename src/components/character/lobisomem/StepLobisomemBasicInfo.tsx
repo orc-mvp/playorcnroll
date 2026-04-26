@@ -50,7 +50,25 @@ export interface LobisomemFormData {
 interface StepLobisomemBasicInfoProps {
   formData: LobisomemFormData;
   updateFormData: (updates: Partial<LobisomemFormData>) => void;
+  gameSystem?: 'lobisomem_w20' | 'metamorfos_w20';
 }
+
+const SHIFTERS = [
+  'Ajaba',
+  'Ananasi',
+  'Bastet',
+  'Corax',
+  'Gurahl',
+  'Kitsune',
+  'Mokolé',
+  'Nagah',
+  'Nuwisha',
+  'Ratkin',
+  'Rokea',
+  'Apis',
+  'Camazotz',
+  'Grondr',
+];
 
 const ARCHETYPES = [
   'Arquiteto', 'Autocrata', 'Bombástico', 'Bon Vivant', 'Bravo',
@@ -101,8 +119,9 @@ const RANK_I18N_MAP: Record<string, string> = {
   'Elder': 'rank_elder',
 };
 
-export default function StepLobisomemBasicInfo({ formData, updateFormData }: StepLobisomemBasicInfoProps) {
+export default function StepLobisomemBasicInfo({ formData, updateFormData, gameSystem = 'lobisomem_w20' }: StepLobisomemBasicInfoProps) {
   const { t, language } = useI18n();
+  const isShifter = gameSystem === 'metamorfos_w20';
 
   const getLabel = (map: Record<string, string>, key: string) => {
     const i18nKey = map[key];
@@ -140,16 +159,16 @@ export default function StepLobisomemBasicInfo({ formData, updateFormData }: Ste
 
             <div className="space-y-2">
               <Label className="font-medieval text-sm">
-                {t.lobisomem.tribe} *
+                {isShifter ? t.lobisomem.shifter : t.lobisomem.tribe} {!isShifter && '*'}
               </Label>
               <Select value={formData.tribe} onValueChange={(v) => updateFormData({ tribe: v })}>
                 <SelectTrigger className="font-body bg-input border-border">
-                  <SelectValue placeholder={t.lobisomem.selectTribe} />
+                  <SelectValue placeholder={isShifter ? t.lobisomem.selectShifter : t.lobisomem.selectTribe} />
                 </SelectTrigger>
                 <SelectContent>
-                  {TRIBES.map((tribe) => (
-                    <SelectItem key={tribe} value={tribe}>
-                      {getLabel(TRIBE_I18N_MAP, tribe)}
+                  {(isShifter ? SHIFTERS : TRIBES).map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {isShifter ? item : getLabel(TRIBE_I18N_MAP, item)}
                     </SelectItem>
                   ))}
                 </SelectContent>
