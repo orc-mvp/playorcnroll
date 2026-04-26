@@ -214,7 +214,7 @@ export default function MeritsFlawsSelector({
             }`}
           >
             {remaining} {t.meritsFlaws.freebieRemaining} (
-            {t.meritsFlaws.freebieTotal} {freebiePoints ?? freebieBudget})
+            {t.meritsFlaws.freebieTotal} {freebieBudget})
           </Badge>
         </div>
       )}
@@ -243,5 +243,3 @@ export default function MeritsFlawsSelector({
   );
 }
 
-// Used internally so we can reference `freebieBudget` cleanly in the badge text
-const freebiePoints: number | undefined = undefined;
