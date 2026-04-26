@@ -39,6 +39,7 @@ import { EditCharacterModal } from '@/components/character/EditCharacterModal';
 import { EditVampiroCharacterModal } from '@/components/character/vampiro/EditVampiroCharacterModal';
 import { EditLobisomemCharacterModal } from '@/components/character/lobisomem/EditLobisomemCharacterModal';
 import { EditMagoCharacterModal } from '@/components/character/mago/EditMagoCharacterModal';
+import { EditMetamorfosCharacterModal } from '@/components/character/metamorfos/EditMetamorfosCharacterModal';
 import { CharacterNotes } from '@/components/character/CharacterNotes';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import LobisomemCharacterSheet from '@/components/character/lobisomem/LobisomemCharacterSheet';
