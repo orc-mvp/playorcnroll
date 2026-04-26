@@ -1,12 +1,13 @@
+import { isStorytellerSystem } from './storyteller/systemRegistry';
+
 /**
- * Get the correct session route based on game system
+ * Get the correct session route based on game system.
+ * - Sistemas WoD (Vampiro, Lobisomem, Mago, Mortos-Vivos) → sala unificada Storyteller
+ * - Demais sistemas (Heróis Marcados) → sala genérica
  */
 export function getSessionRoute(sessionId: string, gameSystem: string): string {
-  if (gameSystem === 'vampiro_v3') {
-    return `/session/vampire/${sessionId}`;
-  }
-  if (gameSystem === 'lobisomem_w20') {
-    return `/session/werewolf/${sessionId}`;
+  if (isStorytellerSystem(gameSystem)) {
+    return `/session/storyteller/${sessionId}`;
   }
   return `/session/${sessionId}`;
 }
