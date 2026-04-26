@@ -1,135 +1,127 @@
-# Sala Storyteller — Modais unificados, contexto por personagem e catálogo único
+## Objetivo
 
-## Escopo definitivo
-
-A sala Storyteller (`/session/storyteller/:id`) suporta **APENAS** quatro sistemas WoD:
-
-1. **Vampiro: A Máscara (V3)** — `vampiro_v3` ✅ ativo
-2. **Lobisomem: O Apocalipse (W20)** — `lobisomem_w20` ✅ ativo
-3. **Mago: A Ascensão (M20)** — `mago_m20` 🔜 stub (entra com Quintessência/Paradoxo nos pools)
-4. **Metamorfos (W20)** — `metamorfos_w20` 🔜 stub (reusa 100% Lobisomem)
-
-**Heróis Marcados** continua isolado em `/session/:id`. **Mortos-Vivos / Wraith não existe** — referências serão purgadas das memórias.
+1. **Habilitar Mago em /customization** com UX explícita.
+2. **Renomear o seletor "Lobisomem" → "Lobisomem / Metamorfo"** (compartilham o mesmo `lobisomem_w20` no banco).
+3. **Bloquear/filtrar por sistema** na criação **e** edição de personagens — Mago só vê M&F com `mago_m20`, Vampiro só com `vampiro_v3`, etc. Hoje os Steps de criação não filtram (mostram tudo); os Edit modais já filtram.
+4. **Auto-limpeza** de M&F inválidas em fichas existentes na próxima abertura.
+5. **Consolidar UI duplicada** entre Steps (criação) e Edit modais: extrair componentes compartilhados de **M&F**, **Atributos** e **Habilidades**.
 
 ---
 
-## Já feito (não mexer)
+## 1. Customization (`/customization`)
 
-- Registry e adapters de Vampiro/Lobisomem/Mago(stub)/Metamorfos(stub).
-- Página `StorytellerSession.tsx` substituiu Vampire/Werewolf Session.
-- Rotas redirecionam para `/session/storyteller/:id`.
-- Criação de sala e entrada de personagem já aceitam qualquer sistema da família Storyteller.
-- Build estável (`TrackersComponent` restaurado).
+### 1.1 Default do form de M&F
 
----
+- Estado inicial `formGameSystems` é `['vampiro_v3', 'lobisomem_w20']`. Mudar para `[]` (vazio) — o usuário escolhe explicitamente para qual(is) sistema(s) vai cadastrar. Validação `formGameSystems.length === 0` já existe e continuará rejeitando.
+- Mesmo ajuste em `src/pages/MeritsFlaws.tsx` (rota legada `/merits-flaws` que reusa `Customization`, mas o arquivo `MeritsFlaws.tsx` tem o mesmo defeito; será atualizado em paralelo para manter consistência).
 
-## O que falta — esta passagem
+### 1.2 Renomear "Lobisomem" → "Lobisomem / Metamorfo"
 
-### 1. Modal de pedir teste unificado (`StorytellerTestRequestModal`)
+- Como `lobisomem_w20` e `metamorfos_w20` são IDs separados em `GAME_SYSTEMS`, mas **ambos os personagens leem M&F com `lobisomem_w20**` (verificado em `EditMetamorfosCharacterModal.tsx:163` e `EditLobisomemCharacterModal.tsx:129`), a abordagem será:
+  - **Esconder** `metamorfos_w20` do filtro e do form de M&F em `/customization` (ele não tem M&F próprias — usa as de Lobisomem).
+  - **Renomear** o label de `lobisomem_w20` para `"Lobisomem / Metamorfo"` somente nos contextos de M&F (filtro de sistema e checkbox no modal).
+- Resultado: criar uma M&F marcada como "Lobisomem / Metamorfo" disponibiliza para ambos os tipos de personagem automaticamente (sem mudança de schema).
 
-Substitui `VampireTestRequestModal` e `WerewolfTestRequestModal` no fluxo do narrador.
+### 1.3 Mago como opção visível
 
-- Cria `src/components/session/storyteller/StorytellerTestRequestModal.tsx`.
-- Adapters expõem `testCategories: TestCategoryDef[]` (já previsto em `types.ts` — adicionar campo).
-- Comportamento ao escolher alvo(s):
-  - **Mesmo sistema** → mostra todas as categorias daquele adapter (Vampiro: Atributo+Perícia, Vontade, Atributo Puro; Lobisomem: idem + Gnose, Fúria).
-  - **Sistemas mistos** → mostra apenas categorias marcadas `crossSystem: true` no adapter (Atributo+Atributo, Vontade). Categorias específicas (Gnose, Fúria, Disciplina) ficam ocultas.
-  - Opcional: botão "dividir por sistema" que dispara um evento por sistema com a categoria escolhida.
-- Realtime: continua escrevendo em `session_events` (`event_type: 'test_request'`) — sem mudança de schema.
-
-### 2. Modal de rolagem direta do narrador unificado (`StorytellerNarratorRollModal`)
-
-Substitui `NarratorRollModal` (hoje hardcoded para Vampiro).
-
-- Cria `src/components/session/storyteller/StorytellerNarratorRollModal.tsx`.
-- Tabs: **Vampiro** | **Lobisomem** | **Mago** (disabled) | **Metamorfos** (disabled).
-- Cada tab usa as regras do adapter:
-  - Vampiro: pool d10 base 6, sem 10s explosivos.
-  - Lobisomem: pool d10 base variável + opção de 10s explosivos + Fúria/Gnose como pools alternativos.
-- Adapter ganha `narratorRollConfig: { defaultDifficulty, allowExploding10s, extraPools[] }`.
-- Resultado é gravado em `session_events` (`event_type: 'narrator_roll'`) já existente.
-
-### 3. Trackers contextuais por personagem
-
-- `StorytellerSession` (lado narrador): para cada participante, lê `getSystemAdapter(participant.character.game_system)` e renderiza `adapter.trackers` no card. Hoje a sidebar inteira é por sistema da sala — passa a ser por sistema do personagem.
-- `StorytellerSession` (lado jogador): renderiza `myAdapter.PlayerTrackersComponent` (já restaurado no build fix).
-- **"Conjunto de pools"** = abstração que cobre Sangue (Vampiro), Gnose+Fúria (Lobisomem/Metamorfos) e futura **Quintessência+Paradoxo (Mago)**. O componente genérico `WoDPoolTracker` (ver §6) itera sobre `adapter.trackers` filtrando por `kind: 'pool'` vs `kind: 'health'` vs `kind: 'form'`.
-- `NarratorTrackerAdjustModal` recebe o `adapter` do alvo e renderiza apenas seus trackers (não mais hardcode Vampiro).
-- **Realtime garantido**: subscriptions em `session_participants` já existem; só a renderização vira dinâmica.
-
-### 4. Ficha contextual aberta pelo narrador
-
-A sidebar do narrador mostra apenas trackers + botão "Ver ficha". Esse botão já abre uma ficha — o objetivo é garantir que ela seja **a ficha do sistema do personagem**, não a do sistema da sala.
-
-- `StorytellerSession`: ao clicar em "Ver ficha", abre `<adapter.CharacterSheet character={participant.character} readOnly />` — onde `adapter = getSystemAdapter(participant.character.game_system)`.
-- Vampiro abre `VampiroCharacterSheet`, Lobisomem abre `LobisomemCharacterSheet`, Metamorfos (quando ativo) reusa o de Lobisomem.
-- Remove qualquer hardcode em `VampireNarratorSidebar`/`WerewolfNarratorSidebar` que assuma o sistema da sessão.
-
-### 5. Catálogo único de habilidades — `STORYTELLER_ABILITIES_BASE`
-
-**Decisão sua**: vamos **somar tudo** num catálogo único na criação/edição. Sem filtragem por sistema na hora de criar a ficha. O importante é não faltar nada que impeça o jogador de montar.
-
-- Cria `src/lib/storyteller/traits.ts` com:
-  - `STORYTELLER_ATTRIBUTES` (9 atributos — já são iguais entre Vampiro e Lobisomem).
-  - `STORYTELLER_ABILITIES_BASE`: união de Talentos/Perícias/Conhecimentos de Vampiro **e** Lobisomem (Manha + Instinto Primitivo + Briga + Esquiva + ...). Valor 0 default.
-  - Quando Mago entrar, suas habilidades únicas (Cosmologia, Ocultismo expandido, etc.) são apenas **somadas** ao mesmo objeto.
-- Componentes de criação (`StepVampiroAttributes`, `StepLobisomemAttributes`) passam a importar do catálogo único — eliminam ~150 linhas duplicadas cada.
-- **Na sala de jogo**: `WoDCharacterSheet` (ver §6) e `PlayerSidePanel` exibem **apenas habilidades com graduação ≥ 1** para não virar lista gigante. Isso resolve o "lista enorme" sem prejudicar criação.
-
-### 6. Componentização compartilhada (refactor de redução)
-
-Cria `src/components/storyteller/`:
-
-- `TraitGroupEditor.tsx` — usado em Atributos, Habilidades e Antecedentes (Vampiro e Lobisomem hoje têm 3 cópias quase idênticas).
-- `WoDPoolTracker.tsx` — tracker genérico de pool (Sangue, Gnose, Fúria, futuro Quintessência/Paradoxo). Iterado a partir de `adapter.trackers`.
-- `WoDHealthTracker.tsx` — 7 níveis de vitalidade (idêntico entre os 4 sistemas).
-- `WoDCharacterSheet.tsx` — ficha modular com slots `<PowersSection>` (Disciplinas/Dons/Esferas) injetado pelo adapter. Lobisomem e Vampiro passam a ser ~80% reuso.
-
-A refatoração das fichas em si fica numa **passagem 2** (ver "Faseamento" abaixo) para não inflar o diff desta.
-
-### 7. Limpeza de memórias
-
-- Atualizar `mem://index.md` removendo qualquer linha com "Mortos-Vivos" / `mortos_vivos_w20`.
-- Criar `mem://constraints/storyteller-systems-scope` fixando os 4 sistemas reais.
-- Atualizar `mem://architecture/storyteller-system-adapter`, `mem://features/storyteller-unified-session`, `mem://logic/session-routing-logic`, `mem://features/wod-test-request-system`, `mem://features/wod-narrator-dice-rolls` refletindo modais unificados e catálogo único.
-
-### 8. i18n na camada de sessão — **NÃO mexer**
-
-Decisão: i18n é acabamento, não obrigatório. Mantemos como está nos componentes da sessão. Se um arquivo for tocado por outro motivo desta passagem e a remoção for trivial, removo; caso contrário, fica. **Nada de esforço dedicado a i18n.**
+- Já presente como `mago_m20` em `GAME_SYSTEMS`. Após o ajuste do default vazio (1.1), o usuário sempre escolhe explicitamente. Adicionar tooltip/hint "Selecione ao menos um sistema" se nada estiver marcado, com i18n.
 
 ---
 
-## Faseamento da execução
+## 2. Filtrar M&F por sistema na criação de personagem (Steps)
 
-**Passagem A (esta) — modais e contexto, baixo risco:**
-1. Adicionar `testCategories` e `narratorRollConfig` em `types.ts` e nos adapters Vampiro/Lobisomem.
-2. Criar `StorytellerTestRequestModal` e `StorytellerNarratorRollModal`.
-3. Trocar uso em `StorytellerSession.tsx`.
-4. Tornar `NarratorTrackerAdjustModal` e o card da sidebar do narrador dinâmicos por adapter do personagem.
-5. Garantir botão "Ver ficha" abre `adapter.CharacterSheet` do personagem clicado.
-6. Criar `src/lib/storyteller/traits.ts` com `STORYTELLER_ABILITIES_BASE` (união) e refatorar `StepVampiroAttributes`/`StepLobisomemAttributes` para consumir.
-7. Em `WoDCharacterSheet`/`PlayerSidePanel`/sheets existentes, filtrar exibição para habilidades com graduação ≥ 1.
-8. Limpeza de memórias (passo 7 acima).
+Os Steps `StepVampiroMeritsFlaws.tsx`, `StepLobisomemMeritsFlaws.tsx`, `StepMagoMeritsFlaws.tsx` hoje fazem `select('*')` sem filtro — mostram TODAS as M&F. Adicionar `.contains('game_systems', [<systemId>])` em cada:
 
-**Passagem B (futura, sob aprovação) — componentização pesada das fichas:**
-- Extrair `TraitGroupEditor`, `WoDPoolTracker`, `WoDHealthTracker`, `WoDCharacterSheet` modular.
-- Migrar `VampiroCharacterSheet` e `LobisomemCharacterSheet` para o shell comum.
+- Vampiro: `['vampiro_v3']`
+- Lobisomem: `['lobisomem_w20']`
+- Mago: `['mago_m20']`
+- Metamorfo (criação reusa Step de Lobisomem): `['lobisomem_w20']` — passar via prop opcional, ou manter `lobisomem_w20` por padrão.
 
-Estimativa Passagem A: ~12 arquivos editados, ~3 criados, **~−400 linhas líquidas**.
+Ficará alinhado com os Edit modais que já filtram dessa forma.
 
 ---
 
-## Garantias
+## 3. Auto-limpeza de M&F inválidas em fichas Mago existentes
 
-- ✅ Toda mudança em `session_participants`/`session_events` continua via Supabase Realtime + fallback 4s.
-- ✅ Schema do banco **não muda** (sem migration).
-- ✅ Sessões abertas não quebram — adapters resolvem rotas/IDs antigos.
-- ✅ Heróis Marcados intocado.
-- ✅ Mago/Metamorfos seguem stubs (`available: false`) — visíveis no registry, escondidos no `GameSystemSelector`.
+No load do `MagoCharacterSheet.tsx` e `EditMagoCharacterModal.tsx`:
 
-## Pós-aprovação imediato
+- Após carregar `availableMeritsFlaws` (já filtradas por `mago_m20`) e o `magoData.merits_flaws` da ficha, comparar IDs.
+- Se houver entradas em `magoData.merits_flaws` cujo ID **não** consta em `availableMeritsFlaws`, removê-las localmente E disparar um `update` no Supabase (`characters.vampiro_data.merits_flaws`) — silenciosamente, sem toast, mas com um console.info em DEV.
+- Conforme requisito do projeto: essa atualização gera evento realtime automático via Supabase Realtime para `characters` (já em uso para outras edições da ficha).
 
-1. Executar Passagem A inteira numa mensagem.
-2. Validar build (`tsc --noEmit`) ao final.
-3. Atualizar memórias afetadas.
-4. Apresentar diff e aguardar aprovação para Passagem B (componentização das fichas).
+---
+
+## 4. Consolidação de componentes compartilhados (M&F + Atributos + Habilidades)
+
+Criar novo diretório `src/components/character/storyteller/shared/` com:
+
+### 4.1 `MeritsFlawsSelector.tsx`
+
+- Props: `gameSystem: 'vampiro_v3' | 'lobisomem_w20' | 'mago_m20'`, `selected: SelectedMF[]`, `onChange: (next: SelectedMF[]) => void`, `freebieBudget?: number` (mostra contador de pontos quando informado), `compact?: boolean` (variante usada em modal de edição).
+- Faz o fetch interno com `.contains('game_systems', [gameSystem])`, ordena, agrupa por categoria, render do mesmo padrão visual atual (cards com checkbox + badges).
+- **Substitui** a UI duplicada em:
+  - `StepVampiroMeritsFlaws.tsx`
+  - `StepLobisomemMeritsFlaws.tsx`
+  - `StepMagoMeritsFlaws.tsx`
+  - Bloco de M&F dentro de `EditVampiroCharacterModal.tsx`, `EditLobisomemCharacterModal.tsx`, `EditMagoCharacterModal.tsx`, `EditMetamorfosCharacterModal.tsx`.
+
+### 4.2 `AttributesEditor.tsx`
+
+- Props: `value: { physical, social, mental }`, `onChange`, `mode: 'creation' | 'edit'`, `prioritiesOverride?` (Vampiro tem priorização 7/5/3 na criação; passar pontos disponíveis quando `mode === 'creation'`).
+- Renderiza as 3 categorias × 3 atributos usando `STORYTELLER_ATTRIBUTES` do catálogo único.
+- **Substitui** os blocos manuais em `StepVampiroAttributes`, `StepLobisomemAttributes`, `StepMagoAttributes`, e nas abas "Atributos" dos 4 modais de edição.
+
+### 4.3 `AbilitiesEditor.tsx`
+
+- Props: `value: { talents, skills, knowledges }`, `onChange`, `specializations?`, `onSpecializationsChange?`, `mode: 'creation' | 'edit'`, `pointsPerCategory?` (criação Vampiro usa 13/9/5).
+- Usa `STORYTELLER_ABILITIES` do catálogo único.
+- **Substitui** os blocos análogos em todos os Steps e Edit modais WoD.
+
+### 4.4 Estimativa de ganho
+
+- Vampiro Edit modal: ~1086 → ~700 linhas
+- Lobisomem Edit: ~628 → ~430
+- Mago Edit: ~652 → ~440
+- Metamorfo Edit: ~743 → ~530
+- Steps M&F (3 arquivos): ~500 linhas eliminadas em favor de `<MeritsFlawsSelector />`
+- Steps Atributos/Habilidades: redução semelhante
+
+Total: ~1500 linhas eliminadas, sem mudar nenhum comportamento do usuário.
+
+---
+
+---
+
+## 6. Arquivos afetados (resumo)
+
+**Editados:**
+
+- `src/pages/Customization.tsx` — default vazio, label "Lobisomem / Metamorfo", esconder `metamorfos_w20`
+- `src/pages/MeritsFlaws.tsx` — mesmos ajustes (consistência)
+- `src/components/character/vampiro/StepVampiroMeritsFlaws.tsx` — usa `<MeritsFlawsSelector />`
+- `src/components/character/lobisomem/StepLobisomemMeritsFlaws.tsx` — idem
+- `src/components/character/mago/StepMagoMeritsFlaws.tsx` — idem
+- `src/components/character/vampiro/StepVampiroAttributes.tsx` — usa `<AttributesEditor />`
+- `src/components/character/lobisomem/StepLobisomemAttributes.tsx` — idem
+- `src/components/character/mago/StepMagoAttributes.tsx` — idem
+- `src/components/character/vampiro/EditVampiroCharacterModal.tsx` — usa os 3 componentes compartilhados nas abas equivalentes
+- `src/components/character/lobisomem/EditLobisomemCharacterModal.tsx` — idem
+- `src/components/character/mago/EditMagoCharacterModal.tsx` — idem + auto-limpeza
+- `src/components/character/metamorfos/EditMetamorfosCharacterModal.tsx` — idem
+- `src/components/character/mago/MagoCharacterSheet.tsx` — auto-limpeza no load
+
+**Criados:**
+
+- `src/components/character/storyteller/shared/MeritsFlawsSelector.tsx`
+- `src/components/character/storyteller/shared/AttributesEditor.tsx`
+- `src/components/character/storyteller/shared/AbilitiesEditor.tsx`
+
+**Não tocados:** schema do banco (zero migração), RLS, edge functions, fluxo de Heróis Marcados.
+
+---
+
+## 7. Fora de escopo (esclarecer se quiser incluir)
+
+- Steps de Habilidades dos Steps de criação são bem variados em layout (tabs, especializações, etc.). Vou usar `<AbilitiesEditor />` onde a estrutura bate; onde houver divergência forte, mantenho o Step com TODO claro para iteração futura.
+- Não vou consolidar Steps de Backgrounds, Disciplinas, Esferas, Dons, Virtudes, Renome, Formas — esses são específicos de cada sistema e não duplicados.
+- Não vou refazer o fluxo de criação para reusar Edit modais (opção 3 da pergunta) — descartado conforme sua escolha.
