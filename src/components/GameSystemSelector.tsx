@@ -12,11 +12,11 @@ interface GameSystemSelectorProps {
 }
 
 const systemIcons: Record<GameSystemId, React.ReactNode> = {
-  herois_marcados: <Sword className="w-8 h-8" />,
-  vampiro_v3: <Moon className="w-8 h-8" />,
-  lobisomem_w20: <Dog className="w-8 h-8" />,
-  mago_m20: <Star className="w-8 h-8" />,
-  metamorfos_w20: <PawPrint className="w-8 h-8" />,
+  herois_marcados: <Sword className="w-6 h-6" />,
+  vampiro_v3: <Moon className="w-6 h-6" />,
+  lobisomem_w20: <Dog className="w-6 h-6" />,
+  mago_m20: <Star className="w-6 h-6" />,
+  metamorfos_w20: <PawPrint className="w-6 h-6" />,
 };
 
 export default function GameSystemSelector({
