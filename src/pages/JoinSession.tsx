@@ -9,8 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -18,6 +17,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ArrowLeft, Users, Loader2, History, Play, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { getSessionRoute } from '@/lib/sessionRoutes';
+import {
+  getSystemAdapter,
+  isStorytellerSystem,
+} from '@/lib/storyteller/systemRegistry';
+import {
+  filterCompatibleCharacters,
+  buildInitialTrackerPatch,
+} from '@/lib/storyteller/joinHelpers';
 
 interface Character {
   id: string;
@@ -43,6 +51,17 @@ interface JoinedSession {
   game_system: string;
   characterName: string;
   joinedAt: string;
+}
+
+/** Label legível do sistema/família. */
+function getSystemLabel(gameSystem: string): string {
+  if (gameSystem === 'herois_marcados') return 'Heróis Marcados';
+  if (isStorytellerSystem(gameSystem)) {
+    // Sessões Storyteller exibem "Storyteller (X)" para deixar claro que aceitam
+    // qualquer ficha da família.
+    return `Storyteller (${getSystemAdapter(gameSystem).shortLabel})`;
+  }
+  return gameSystem;
 }
 
 export default function JoinSession() {
@@ -94,7 +113,7 @@ export default function JoinSession() {
 
     const fetchJoinedSessions = async () => {
       setLoadingSessions(true);
-      
+
       const { data: participations, error } = await supabase
         .from('session_participants')
         .select(`
@@ -129,18 +148,12 @@ export default function JoinSession() {
           }));
         setJoinedSessions(sessions);
       }
-      
+
       setLoadingSessions(false);
     };
 
     fetchJoinedSessions();
-  }, [user]);
-
-  useEffect(() => {
-    if (code && user && !authLoading && characters.length > 0 && selectedCharacterId) {
-      // Don't auto-join, let user select character first
-    }
-  }, [code, user, authLoading, characters, selectedCharacterId]);
+  }, [user, t.session.noCharacter]);
 
   const handleValidateCode = async () => {
     const codeToUse = inviteCode.trim().toUpperCase();
@@ -168,7 +181,7 @@ export default function JoinSession() {
 
       setValidatedSession(validateData.session);
       setSelectedCharacterId('');
-      
+
       toast({
         title: t.session.sessionFound,
         description: validateData.session.name,
@@ -212,8 +225,7 @@ export default function JoinSession() {
     try {
       const sessionData = validatedSession;
 
-      // Check if session is locked for new players
-      // First check if user is already a participant (they can rejoin)
+      // Existing participant?
       const { data: existingParticipant } = await supabase
         .from('session_participants')
         .select('id, character_id, sheet_locked')
@@ -222,9 +234,7 @@ export default function JoinSession() {
         .single();
 
       if (existingParticipant) {
-        // If participant exists but selected a new character, update it
         if (selectedCharacterId && existingParticipant.character_id !== selectedCharacterId) {
-          // Check if sheet is locked by narrator
           if (existingParticipant.sheet_locked) {
             toast({
               title: t.sessionRejoin.sheetLockedByNarrator,
@@ -234,35 +244,21 @@ export default function JoinSession() {
             return;
           }
 
-          // Fetch new character data for initial values
           const { data: newCharData } = await supabase
             .from('characters')
             .select('game_system, vampiro_data')
             .eq('id', selectedCharacterId)
             .single();
 
-          let newBloodPool = 0;
-          let newWillpower = 0;
-
-          if (newCharData?.game_system === 'vampiro_v3' && newCharData.vampiro_data) {
-            const vampData = newCharData.vampiro_data as { generation?: string; willpower?: number };
-            const gen = parseInt(vampData.generation || '13', 10);
-            if (gen <= 7) newBloodPool = 20;
-            else if (gen === 8) newBloodPool = 15;
-            else if (gen <= 10) newBloodPool = 13;
-            else if (gen <= 12) newBloodPool = 11;
-            else newBloodPool = 10;
-            newWillpower = vampData.willpower || 1;
-          }
+          // Patch via adapter (Vampiro: Sangue+Vontade; Lobisomem: Gnose+Fúria+Vontade+Forma; etc.)
+          const patch = buildInitialTrackerPatch(
+            newCharData?.game_system || sessionData.game_system,
+            newCharData?.vampiro_data,
+          );
 
           const { error: updateError } = await supabase
             .from('session_participants')
-            .update({
-              character_id: selectedCharacterId,
-              session_blood_pool: newBloodPool,
-              session_willpower_current: newWillpower,
-              session_health_damage: [false, false, false, false, false, false, false],
-            })
+            .update({ character_id: selectedCharacterId, ...patch })
             .eq('id', existingParticipant.id);
 
           if (updateError) throw updateError;
@@ -271,19 +267,14 @@ export default function JoinSession() {
         }
 
         if (sessionData.status === 'active') {
-          const route = sessionData.game_system === 'vampiro_v3' 
-            ? `/session/vampire/${sessionData.id}` 
-            : sessionData.game_system === 'lobisomem_w20'
-            ? `/session/werewolf/${sessionData.id}`
-            : `/session/${sessionData.id}`;
-          navigate(route);
+          navigate(getSessionRoute(sessionData.id, sessionData.game_system));
         } else {
           navigate(`/session/${sessionData.id}/lobby`);
         }
         return;
       }
 
-      // Block new players if join is locked
+      // New player
       if (sessionData.join_locked) {
         toast({
           title: t.managePlayers.joinLockedByNarrator,
@@ -299,24 +290,10 @@ export default function JoinSession() {
         .eq('id', selectedCharacterId)
         .single();
 
-      let initialBloodPool = 0;
-      let initialWillpower = 0;
-      let initialHealthDamage = [false, false, false, false, false, false, false];
-
-      if (characterData?.game_system === 'vampiro_v3' && characterData.vampiro_data) {
-        const vampiroData = characterData.vampiro_data as { 
-          generation?: string; 
-          willpower?: number;
-        };
-        const generation = parseInt(vampiroData.generation || '13', 10);
-        if (generation <= 7) initialBloodPool = 20;
-        else if (generation === 8) initialBloodPool = 15;
-        else if (generation <= 10) initialBloodPool = 13;
-        else if (generation <= 12) initialBloodPool = 11;
-        else initialBloodPool = 10;
-        
-        initialWillpower = vampiroData.willpower || 1;
-      }
+      const patch = buildInitialTrackerPatch(
+        characterData?.game_system || sessionData.game_system,
+        characterData?.vampiro_data,
+      );
 
       const { error: joinError } = await supabase
         .from('session_participants')
@@ -324,9 +301,7 @@ export default function JoinSession() {
           session_id: sessionData.id,
           user_id: user.id,
           character_id: selectedCharacterId,
-          session_blood_pool: initialBloodPool,
-          session_willpower_current: initialWillpower,
-          session_health_damage: initialHealthDamage,
+          ...patch,
         });
 
       if (joinError) throw joinError;
@@ -337,12 +312,7 @@ export default function JoinSession() {
       });
 
       if (sessionData.status === 'active') {
-        const route = sessionData.game_system === 'vampiro_v3' 
-          ? `/session/vampire/${sessionData.id}` 
-          : sessionData.game_system === 'lobisomem_w20'
-          ? `/session/werewolf/${sessionData.id}`
-          : `/session/${sessionData.id}`;
-        navigate(route);
+        navigate(getSessionRoute(sessionData.id, sessionData.game_system));
       } else {
         navigate(`/session/${sessionData.id}/lobby`);
       }
@@ -360,12 +330,7 @@ export default function JoinSession() {
 
   const handleRejoinSession = (session: JoinedSession) => {
     if (session.status === 'active') {
-      const route = session.game_system === 'vampiro_v3' 
-        ? `/session/vampire/${session.id}` 
-        : session.game_system === 'lobisomem_w20'
-        ? `/session/werewolf/${session.id}`
-        : `/session/${session.id}`;
-      navigate(route);
+      navigate(getSessionRoute(session.id, session.game_system));
     } else {
       navigate(`/session/${session.id}/lobby`);
     }
@@ -412,11 +377,6 @@ export default function JoinSession() {
       </div>
     );
   }
-
-  const getSystemLabel = (gameSystem: string) => 
-    gameSystem === 'vampiro_v3' ? 'Vampiro: A Máscara' 
-    : gameSystem === 'lobisomem_w20' ? 'Lobisomem: O Apocalipse' 
-    : 'Heróis Marcados';
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
@@ -521,7 +481,6 @@ export default function JoinSession() {
 
               <CardContent>
                 <form onSubmit={handleJoin} className="space-y-6">
-                  {/* Invite Code with Verify Button */}
                   <div className="space-y-2">
                     <Label htmlFor="code" className="font-medieval">
                       {t.session.inviteCode}
@@ -565,7 +524,6 @@ export default function JoinSession() {
                     )}
                   </div>
 
-                  {/* Character Selection */}
                   {validatedSession && (
                     <div className="space-y-2">
                       <Label htmlFor="character" className="font-medieval">
@@ -576,10 +534,11 @@ export default function JoinSession() {
                           <Loader2 className="w-5 h-5 animate-spin text-primary" />
                         </div>
                       ) : (() => {
-                        const compatibleCharacters = characters.filter(
-                          c => c.game_system === validatedSession.game_system
+                        const compatibleCharacters = filterCompatibleCharacters(
+                          characters,
+                          validatedSession.game_system,
                         );
-                        
+
                         if (compatibleCharacters.length === 0) {
                           return (
                             <div className="text-center py-4 bg-muted/30 rounded-lg">
@@ -599,7 +558,7 @@ export default function JoinSession() {
                             </div>
                           );
                         }
-                        
+
                         return (
                           <Select
                             value={selectedCharacterId}
@@ -610,16 +569,26 @@ export default function JoinSession() {
                               <SelectValue placeholder={t.session.selectCharacterPlaceholder} />
                             </SelectTrigger>
                             <SelectContent>
-                              {compatibleCharacters.map((char) => (
-                                <SelectItem key={char.id} value={char.id}>
-                                  <span className="font-medieval">{char.name}</span>
-                                  {char.concept && (
-                                    <span className="text-muted-foreground ml-2 text-sm">
-                                      - {char.concept}
-                                    </span>
-                                  )}
-                                </SelectItem>
-                              ))}
+                              {compatibleCharacters.map((char) => {
+                                const adapter = isStorytellerSystem(char.game_system)
+                                  ? getSystemAdapter(char.game_system)
+                                  : null;
+                                return (
+                                  <SelectItem key={char.id} value={char.id}>
+                                    <span className="font-medieval">{char.name}</span>
+                                    {adapter && (
+                                      <span className="text-muted-foreground ml-2 text-xs">
+                                        [{adapter.shortLabel}]
+                                      </span>
+                                    )}
+                                    {char.concept && (
+                                      <span className="text-muted-foreground ml-2 text-sm">
+                                        - {char.concept}
+                                      </span>
+                                    )}
+                                  </SelectItem>
+                                );
+                              })}
                             </SelectContent>
                           </Select>
                         );
@@ -627,7 +596,6 @@ export default function JoinSession() {
                     </div>
                   )}
 
-                  {/* Submit Button */}
                   <Button
                     type="submit"
                     className="w-full font-medieval text-lg h-12"
