@@ -92,6 +92,7 @@ interface LobisomemCharacterSheetProps {
     concept: string | null;
     vampiro_data: LobisomemCharacterData | null;
     notes?: string | null;
+    experience_points?: number;
   };
   sessionTrackers?: {
     gnosis?: number;
@@ -100,9 +101,6 @@ interface LobisomemCharacterSheetProps {
     healthDamage?: boolean[];
     form?: string;
   };
-  experiencePoints?: number;
-  /** ID do session_participant — quando presente e !readOnly, o jogador pode reduzir XP */
-  participantId?: string;
   readOnly?: boolean;
 }
 
