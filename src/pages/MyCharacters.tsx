@@ -37,6 +37,8 @@ import {
   Sparkles,
   Moon,
   Dog,
+  Star,
+  PawPrint,
   Trash2,
 } from 'lucide-react';
 import { getGameSystem, GameSystemId } from '@/lib/gameSystems';
