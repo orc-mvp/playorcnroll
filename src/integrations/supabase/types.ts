@@ -417,6 +417,7 @@ export type Database = {
       }
       sessions: {
         Row: {
+          allowed_systems: string[]
           created_at: string
           current_scene_id: string | null
           description: string | null
@@ -430,6 +431,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          allowed_systems?: string[]
           created_at?: string
           current_scene_id?: string | null
           description?: string | null
@@ -443,6 +445,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          allowed_systems?: string[]
           created_at?: string
           current_scene_id?: string | null
           description?: string | null

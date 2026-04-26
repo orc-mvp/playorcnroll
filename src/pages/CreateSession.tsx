@@ -11,7 +11,10 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Wand2 } from 'lucide-react';
 import SessionFamilySelector from '@/components/SessionFamilySelector';
+import AllowedSystemsSelector from '@/components/AllowedSystemsSelector';
 import type { GameSystemFamily } from '@/lib/gameSystems';
+import { getAvailableStorytellerSystemIds } from '@/lib/storyteller/systemRegistry';
+import type { StorytellerSystemId } from '@/lib/storyteller/types';
 
 
 function generateInviteCode(): string {
@@ -30,6 +33,7 @@ export default function CreateSession() {
   const { toast } = useToast();
 
   const [family, setFamily] = useState<GameSystemFamily | null>(null);
+  const [allowedSystems, setAllowedSystems] = useState<StorytellerSystemId[]>([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,6 +65,16 @@ export default function CreateSession() {
       return;
     }
 
+    // Sala Storyteller exige escolher pelo menos 1 sistema permitido.
+    if (family === 'storyteller' && allowedSystems.length === 0) {
+      toast({
+        title: t.session.error,
+        description: t.session.selectAtLeastOneSystem,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!name.trim()) {
       toast({
         title: t.session.error,
@@ -77,6 +91,11 @@ export default function CreateSession() {
     try {
       const inviteCode = generateInviteCode();
 
+      // Para Heróis Marcados, allowed_systems espelha o próprio sistema.
+      // Para Storyteller, usa a lista escolhida pelo narrador.
+      const allowed =
+        family === 'storyteller' ? allowedSystems : ['herois_marcados'];
+
       const { data, error } = await supabase
         .from('sessions')
         .insert({
@@ -86,6 +105,7 @@ export default function CreateSession() {
           invite_code: inviteCode,
           status: 'lobby',
           game_system: familyToGameSystem(family),
+          allowed_systems: allowed,
         })
         .select()
         .single();
@@ -160,10 +180,37 @@ export default function CreateSession() {
                 </Label>
                 <SessionFamilySelector
                   value={family}
-                  onChange={setFamily}
+                  onChange={(f) => {
+                    setFamily(f);
+                    // Ao trocar para Storyteller, pré-preenche com todos os
+                    // sistemas disponíveis para conveniência (narrador pode
+                    // desmarcar os indesejados). Ao trocar para Heróis Marcados,
+                    // limpa, pois a coluna não se aplica.
+                    if (f === 'storyteller') {
+                      setAllowedSystems(getAvailableStorytellerSystemIds());
+                    } else {
+                      setAllowedSystems([]);
+                    }
+                  }}
                   disabled={isSubmitting}
                 />
               </div>
+
+              {family === 'storyteller' && (
+                <div className="space-y-2">
+                  <Label className="font-medieval">
+                    {t.session.allowedSystemsLabel} *
+                  </Label>
+                  <p className="text-xs text-muted-foreground font-body">
+                    {t.session.allowedSystemsHelp}
+                  </p>
+                  <AllowedSystemsSelector
+                    value={allowedSystems}
+                    onChange={setAllowedSystems}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="name" className="font-medieval">
@@ -194,7 +241,12 @@ export default function CreateSession() {
               <Button
                 type="submit"
                 className="w-full font-medieval text-lg h-12"
-                disabled={isSubmitting || !name.trim() || !family}
+                disabled={
+                  isSubmitting ||
+                  !name.trim() ||
+                  !family ||
+                  (family === 'storyteller' && allowedSystems.length === 0)
+                }
               >
                 {isSubmitting ? t.common.loading : t.session.create}
               </Button>

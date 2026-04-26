@@ -41,6 +41,8 @@ interface ValidatedSession {
   status: string;
   game_system: string;
   join_locked?: boolean;
+  /** Lista de sistemas WoD aceitos pela sala. Vazio = sem restrição. */
+  allowed_systems?: string[] | null;
 }
 
 interface JoinedSession {
@@ -538,6 +540,7 @@ export default function JoinSession() {
                         const compatibleCharacters = filterCompatibleCharacters(
                           characters,
                           validatedSession.game_system,
+                          validatedSession.allowed_systems,
                         );
 
                         if (compatibleCharacters.length === 0) {
