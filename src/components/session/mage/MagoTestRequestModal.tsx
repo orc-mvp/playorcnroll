@@ -292,9 +292,9 @@ export default function MagoTestRequestModal({
                   </Label>
                   {(
                     [
-                      { label: t.vampiro.talents, abilities: WOD_TALENTS },
-                      { label: t.vampiro.skills, abilities: WOD_SKILLS },
-                      { label: t.vampiro.knowledges, abilities: WOD_KNOWLEDGES },
+                      { label: t.vampiro.talents, abilities: TALENTS },
+                      { label: t.vampiro.skills, abilities: SKILLS },
+                      { label: t.vampiro.knowledges, abilities: KNOWLEDGES },
                     ] as const
                   ).map(({ label, abilities }) => (
                     <div key={label}>
