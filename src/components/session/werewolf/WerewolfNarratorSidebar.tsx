@@ -211,11 +211,7 @@ export function WerewolfNarratorSidebar({
 
   return (
     <div className="space-y-4">
-      {/* Narrator Badge */}
-      <div className="flex items-center gap-2 text-emerald-500">
-        <Crown className="w-5 h-5" />
-        <span className="font-medieval">{t.roles.narrator}</span>
-      </div>
+      {/* Badge "Narrador" removido — já há indicação no header da sessão */}
 
       {/* Request Test Card removido — agora é único, renderizado pelo StorytellerSession */}
 
