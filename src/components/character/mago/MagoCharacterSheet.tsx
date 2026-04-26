@@ -126,10 +126,31 @@ export default function MagoCharacterSheet({ character, sessionTrackers, experie
     if (ids.length === 0) return;
     supabase
       .from('merits_flaws')
-      .select('id, name, cost, category')
+      .select('id, name, cost, category, game_systems')
       .in('id', ids)
-      .then(({ data: fresh }) => {
-        if (fresh) setLiveMeritsFlaws(fresh as any);
+      .then(async ({ data: fresh }) => {
+        if (!fresh) return;
+        // Auto-cleanup: remove M&F that are no longer tagged for mago_m20
+        const validIds = new Set(
+          fresh
+            .filter((mf: any) => Array.isArray(mf.game_systems) && mf.game_systems.includes('mago_m20'))
+            .map((mf: any) => mf.id)
+        );
+        const currentMF = data.merits_flaws || [];
+        const cleaned = currentMF.filter((m) => validIds.has(m.id));
+        if (cleaned.length !== currentMF.length && !readOnly) {
+          if (import.meta.env.DEV) {
+            console.info('[MagoCharacterSheet] Auto-cleaning invalid merits/flaws', {
+              before: currentMF.length,
+              after: cleaned.length,
+            });
+          }
+          await supabase
+            .from('characters')
+            .update({ vampiro_data: { ...data, merits_flaws: cleaned } as any })
+            .eq('id', character.id);
+        }
+        setLiveMeritsFlaws(fresh.filter((mf: any) => validIds.has(mf.id)) as any);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meritsFlawsKey]);
