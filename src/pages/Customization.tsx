@@ -493,8 +493,10 @@ export default function Customization() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">{t.meritsFlaws.allSystems}</SelectItem>
-                {GAME_SYSTEMS.filter((s) => s.available).map((sys) => (
-                  <SelectItem key={sys.id} value={sys.id}>{sys.name}</SelectItem>
+                {getMfSystems().map((sys) => (
+                  <SelectItem key={sys.id} value={sys.id}>
+                    {getMfSystemLabel(sys.id, t.meritsFlaws.lobisomemOrShifter)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -669,7 +671,8 @@ export default function Customization() {
                               </p>
                             )}
                             <div className="flex flex-wrap gap-1 mt-2">
-                              {[...new Set(item.game_systems?.map((sys) => {
+                              {[...new Set(item.game_systems?.filter((sys) => sys !== 'metamorfos_w20').map((sys) => {
+                                if (sys === 'lobisomem_w20') return t.meritsFlaws.lobisomemOrShifter;
                                 const system = GAME_SYSTEMS.find((s) => s.id === sys);
                                 return system?.shortName || sys;
                               }) || [])].map((label) => (
@@ -827,13 +830,20 @@ export default function Customization() {
             <div className="space-y-2">
               <Label className="font-medieval">{t.meritsFlaws.gameSystems} *</Label>
               <div className="space-y-2">
-                {GAME_SYSTEMS.filter((s) => s.available).map((sys) => (
+                {getMfSystems().map((sys) => (
                   <div key={sys.id} className="flex items-center gap-2">
                     <Checkbox id={`system-${sys.id}`} checked={formGameSystems.includes(sys.id)} onCheckedChange={() => toggleGameSystem(sys.id)} />
-                    <Label htmlFor={`system-${sys.id}`} className="font-body cursor-pointer">{sys.name}</Label>
+                    <Label htmlFor={`system-${sys.id}`} className="font-body cursor-pointer">
+                      {getMfSystemLabel(sys.id, t.meritsFlaws.lobisomemOrShifter)}
+                    </Label>
                   </div>
                 ))}
               </div>
+              {formGameSystems.length === 0 && (
+                <p className="text-xs text-muted-foreground italic">
+                  {t.meritsFlaws.selectAtLeastOneSystem}
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter>
