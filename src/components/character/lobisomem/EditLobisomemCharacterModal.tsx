@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Dog, User, Shield, Brain, Star, BookOpen, Sparkles, Plus, X } from 'lucide-react';
 import DotRating from '@/components/character/vampiro/DotRating';
+import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
 import { TRIBES, AUSPICES, BREEDS, RANKS } from '@/lib/lobisomem/tribes';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 

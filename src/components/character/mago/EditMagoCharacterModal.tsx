@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select';
 import { Star, User, Shield, Brain, BookOpen, Sparkles, Plus, X, Users, Zap } from 'lucide-react';
 import DotRating from '@/components/character/vampiro/DotRating';
+import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
 import { MAGO_SPHERES, MAGO_BACKGROUNDS, MAGO_TRADITIONS, type MagoCharacterData } from '@/lib/mago/spheres';
 import {
   STORYTELLER_ATTRIBUTES as ATTRIBUTES,

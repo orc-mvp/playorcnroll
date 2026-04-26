@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/tooltip';
 import { PawPrint, User, Shield, Brain, Star, BookOpen, Sparkles, Plus, X, Info } from 'lucide-react';
 import DotRating from '@/components/character/vampiro/DotRating';
+import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
 import type { LobisomemCharacterData, MetamorphForm } from '@/lib/lobisomem/diceUtils';
 
 interface Character {
