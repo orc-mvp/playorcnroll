@@ -707,7 +707,8 @@ export default function CharacterSheet() {
       {character &&
         character.game_system !== 'vampiro_v3' &&
         character.game_system !== 'lobisomem_w20' &&
-        character.game_system !== 'mago_m20' && (
+        character.game_system !== 'mago_m20' &&
+        character.game_system !== 'metamorfos_w20' && (
           <EditCharacterModal
             open={showEditModal}
             onOpenChange={setShowEditModal}
@@ -715,6 +716,28 @@ export default function CharacterSheet() {
             onSave={handleCharacterUpdate}
           />
         )}
+
+      {/* Edit Character Modal - Metamorfos */}
+      {character && character.game_system === 'metamorfos_w20' && (
+        <EditMetamorfosCharacterModal
+          open={showMetamorfosEditModal}
+          onOpenChange={setShowMetamorfosEditModal}
+          character={{
+            id: character.id,
+            name: character.name,
+            concept: character.concept,
+            vampiro_data: character.vampiro_data as any,
+          }}
+          onSave={(updated) => {
+            setCharacter(prev => prev ? {
+              ...prev,
+              name: updated.name,
+              concept: updated.concept,
+              vampiro_data: updated.vampiro_data as any,
+            } : prev);
+          }}
+        />
+      )}
 
       {/* Edit Character Modal - Mago */}
       {character && character.game_system === 'mago_m20' && (
