@@ -9,6 +9,7 @@ import { TrackerChangeConfirmModal, TrackerType } from '../vampire/TrackerChange
 import { FormChangeModal } from './FormChangeModal';
 import { Button } from '@/components/ui/button';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import { HOMINID_FORM_ID } from '@/lib/metamorfos/formUtils';
 
 // Extend TrackerType for werewolf-specific trackers
 type WerewolfTrackerType = TrackerType | 'gnosis' | 'rage' | 'form';
