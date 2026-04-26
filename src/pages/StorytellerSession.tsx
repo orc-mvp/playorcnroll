@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils';
 import { SessionHeader } from '@/components/session/SessionHeader';
 import { ManagePlayersModal } from '@/components/session/vampire/ManagePlayersModal';
 import { StorytellerNarratorRollModal } from '@/components/session/storyteller/StorytellerNarratorRollModal';
-import { StorytellerTestRequestModal } from '@/components/session/storyteller/StorytellerTestRequestModal';
+import StorytellerTestRequestModal from '@/components/session/storyteller/StorytellerTestRequestModal';
 import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { WerewolfNarratorSidebar } from '@/components/session/werewolf/WerewolfNarratorSidebar';
