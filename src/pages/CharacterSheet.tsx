@@ -280,7 +280,7 @@ export default function CharacterSheet() {
                 notes: character.notes,
               }} 
             />
-          ) : character.game_system === 'lobisomem_w20' ? (
+          ) : (character.game_system === 'lobisomem_w20' || character.game_system === 'metamorfos_w20') ? (
             <LobisomemCharacterSheet
               character={{
                 id: character.id,
