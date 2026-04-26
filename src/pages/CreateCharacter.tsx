@@ -452,32 +452,32 @@ export default function CreateCharacter() {
           <StepMinorMarks formData={formData} updateFormData={updateFormData} />
         )}
 
-        {/* Lobisomem Steps */}
-        {step === 1 && gameSystem === 'lobisomem_w20' && (
+        {/* Lobisomem & Metamorfos Steps (compartilham os mesmos componentes) */}
+        {step === 1 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
           <StepLobisomemBasicInfo
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 2 && gameSystem === 'lobisomem_w20' && (
+        {step === 2 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
           <StepLobisomemAttributes
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 3 && gameSystem === 'lobisomem_w20' && (
+        {step === 3 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
           <StepLobisomemGifts
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 4 && gameSystem === 'lobisomem_w20' && (
+        {step === 4 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
           <StepLobisomemBackgrounds
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 5 && gameSystem === 'lobisomem_w20' && (
+        {step === 5 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
           <StepLobisomemMeritsFlaws
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
