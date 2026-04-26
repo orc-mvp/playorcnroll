@@ -1,8 +1,8 @@
-export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20' | 'mago_m20';
+export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20' | 'mago_m20' | 'metamorfos_w20';
 
 /**
  * "Família" do sistema — usada para agrupar sistemas que rodam na mesma sala
- * de jogo. Família `storyteller` cobre Vampiro/Lobisomem (e futuro Mago/Metamorfos),
+ * de jogo. Família `storyteller` cobre Vampiro/Lobisomem/Mago/Metamorfos,
  * todos rodando na sala unificada `/session/storyteller/:id`.
  */
 export type GameSystemFamily = 'storyteller' | 'herois_marcados';
@@ -73,6 +73,19 @@ export const GAME_SYSTEMS: GameSystem[] = [
     color: 'purple',
     available: true,
     features: ['Pool de d10', 'Esferas', 'Arête', 'Quintessência']
+  },
+  {
+    id: 'metamorfos_w20',
+    name: 'Metamorfos',
+    shortName: 'Storyteller',
+    family: 'storyteller',
+    description: {
+      'pt-BR': 'Ferozes mudadores além dos lobos. Sala Storyteller — formas de guerra customizáveis.',
+      'en': 'Fierce shifters beyond the wolves. Storyteller room — customizable war forms.'
+    },
+    color: 'amber',
+    available: true,
+    features: ['Pool de d10', 'Fúria', 'Gnose', 'Formas Customizáveis']
   }
 ];
 
@@ -83,4 +96,3 @@ export function getGameSystem(id: GameSystemId): GameSystem | undefined {
 export function getAvailableSystems(): GameSystem[] {
   return GAME_SYSTEMS.filter(system => system.available);
 }
-
