@@ -358,11 +358,14 @@ export type Database = {
           experience_points: number
           id: string
           joined_at: string
+          session_arete: number | null
           session_blood_pool: number | null
           session_form: string | null
           session_gnosis: number | null
           session_health_damage: Json | null
           session_id: string
+          session_paradox: number | null
+          session_quintessence: number | null
           session_rage: number | null
           session_willpower_current: number | null
           sheet_locked: boolean
@@ -373,11 +376,14 @@ export type Database = {
           experience_points?: number
           id?: string
           joined_at?: string
+          session_arete?: number | null
           session_blood_pool?: number | null
           session_form?: string | null
           session_gnosis?: number | null
           session_health_damage?: Json | null
           session_id: string
+          session_paradox?: number | null
+          session_quintessence?: number | null
           session_rage?: number | null
           session_willpower_current?: number | null
           sheet_locked?: boolean
@@ -388,11 +394,14 @@ export type Database = {
           experience_points?: number
           id?: string
           joined_at?: string
+          session_arete?: number | null
           session_blood_pool?: number | null
           session_form?: string | null
           session_gnosis?: number | null
           session_health_damage?: Json | null
           session_id?: string
+          session_paradox?: number | null
+          session_quintessence?: number | null
           session_rage?: number | null
           session_willpower_current?: number | null
           sheet_locked?: boolean

@@ -1187,6 +1187,62 @@ export const translations = {
       tabGifts: 'Dons',
       tabBackgrounds: 'Antecedentes',
     },
+
+    // Mago: A Ascensão (M20)
+    mago: {
+      tradition: 'Tradição',
+      selectTradition: 'Selecione a tradição',
+      essence: 'Essência',
+      selectEssence: 'Selecione a essência',
+      essence_dynamic: 'Dinâmica',
+      essence_pattern: 'Padrão',
+      essence_primordial: 'Primordial',
+      essence_questing: 'Inquisidora',
+      cabal: 'Cabala',
+      cabalPlaceholder: 'Nome da cabala',
+      basicInfo: 'Informações Básicas',
+      defineIdentity: 'Defina a identidade do seu Mago',
+
+      spheres: 'Esferas',
+      spheresDesc: 'Os domínios da magia que seu Mago pode manipular (0-5)',
+
+      rotes: 'Rotinas',
+      rotesDesc: 'Adicione as Rotinas do seu Mago por nível (texto livre)',
+      rotePlaceholder: 'Nome da rotina...',
+      noRotes: 'Nenhuma rotina',
+      addRote: 'Adicionar Rotina',
+
+      arete: 'Arête',
+      areteDesc: 'A maestria mágica do Mago (1-10)',
+      quintessence: 'Quintessência',
+      paradox: 'Paradoxo',
+      willpowerLabel: 'Força de Vontade',
+      pools: 'Energias Místicas',
+      poolsDesc: 'Defina os valores iniciais de Arête, Vontade, Quintessência e Paradoxo',
+
+      mageSession: 'Sessão de Mago',
+      quintessenceDepleted: 'Quintessência Esgotada!',
+      paradoxOverflow: 'Paradoxo Crítico!',
+      trackerQuintessenceChange: 'Quintessência',
+      trackerParadoxChange: 'Paradoxo',
+      trackerAreteChange: 'Arête',
+
+      areteOnly: 'Arête',
+      quintessenceOnly: 'Quintessência',
+
+      vitality: 'Vitalidade',
+      salvaterios: 'Salvatérios',
+
+      editCharacter: 'Editar Personagem',
+      editMageInfo: 'Edite as informações do seu Mago',
+      tabBasic: 'Básico',
+      tabAttributes: 'Atributos',
+      tabAbilities: 'Habilidades',
+      tabSpheres: 'Esferas',
+      tabRotes: 'Rotinas',
+      tabBackgrounds: 'Antecedentes',
+      tabMeritsFlaws: 'Vantagens & Desvantagens',
+    },
   },
 
   en: {
@@ -2361,6 +2417,62 @@ export const translations = {
       tabAbilities: 'Abilities',
       tabGifts: 'Gifts',
       tabBackgrounds: 'Backgrounds',
+    },
+
+    // Mago: The Ascension (M20)
+    mago: {
+      tradition: 'Tradition',
+      selectTradition: 'Select tradition',
+      essence: 'Essence',
+      selectEssence: 'Select essence',
+      essence_dynamic: 'Dynamic',
+      essence_pattern: 'Pattern',
+      essence_primordial: 'Primordial',
+      essence_questing: 'Questing',
+      cabal: 'Cabal',
+      cabalPlaceholder: 'Cabal name',
+      basicInfo: 'Basic Information',
+      defineIdentity: 'Define your Mage\'s identity',
+
+      spheres: 'Spheres',
+      spheresDesc: 'The domains of magic your Mage can wield (0-5)',
+
+      rotes: 'Rotes',
+      rotesDesc: 'Add your Mage\'s Rotes by level (free text)',
+      rotePlaceholder: 'Rote name...',
+      noRotes: 'No rotes',
+      addRote: 'Add Rote',
+
+      arete: 'Arete',
+      areteDesc: 'Your Mage\'s magical mastery (1-10)',
+      quintessence: 'Quintessence',
+      paradox: 'Paradox',
+      willpowerLabel: 'Willpower',
+      pools: 'Mystic Pools',
+      poolsDesc: 'Set initial values for Arete, Willpower, Quintessence and Paradox',
+
+      mageSession: 'Mage Session',
+      quintessenceDepleted: 'Quintessence Depleted!',
+      paradoxOverflow: 'Critical Paradox!',
+      trackerQuintessenceChange: 'Quintessence',
+      trackerParadoxChange: 'Paradox',
+      trackerAreteChange: 'Arete',
+
+      areteOnly: 'Arete',
+      quintessenceOnly: 'Quintessence',
+
+      vitality: 'Vitality',
+      salvaterios: 'Trackers',
+
+      editCharacter: 'Edit Character',
+      editMageInfo: 'Edit your Mage\'s information',
+      tabBasic: 'Basic',
+      tabAttributes: 'Attributes',
+      tabAbilities: 'Abilities',
+      tabSpheres: 'Spheres',
+      tabRotes: 'Rotes',
+      tabBackgrounds: 'Backgrounds',
+      tabMeritsFlaws: 'Merits & Flaws',
     },
   },
 } as const;

@@ -23,6 +23,12 @@ import StepLobisomemAttributes from '@/components/character/lobisomem/StepLobiso
 import StepLobisomemGifts from '@/components/character/lobisomem/StepLobisomemGifts';
 import StepLobisomemBackgrounds from '@/components/character/lobisomem/StepLobisomemBackgrounds';
 import StepLobisomemMeritsFlaws from '@/components/character/lobisomem/StepLobisomemMeritsFlaws';
+import StepMagoBasicInfo, { MagoFormData } from '@/components/character/mago/StepMagoBasicInfo';
+import StepMagoAttributes from '@/components/character/mago/StepMagoAttributes';
+import StepMagoSpheres from '@/components/character/mago/StepMagoSpheres';
+import StepMagoRotes from '@/components/character/mago/StepMagoRotes';
+import StepMagoBackgrounds from '@/components/character/mago/StepMagoBackgrounds';
+import StepMagoMeritsFlaws from '@/components/character/mago/StepMagoMeritsFlaws';
 
 export type AttributeType = 'strong' | 'neutral' | 'weak';
 
@@ -84,6 +90,23 @@ const initialLobisomemFormData: LobisomemFormData = {
   merits_flaws: [],
 };
 
+const initialMagoFormData: MagoFormData = {
+  name: '', player: '', chronicle: '', nature: '', demeanor: '',
+  tradition: '', essence: '', cabal: '', concept: '',
+  attributes: {
+    physical: { strength: 1, dexterity: 1, stamina: 1 },
+    social: { charisma: 1, manipulation: 1, appearance: 1 },
+    mental: { perception: 1, intelligence: 1, wits: 1 },
+  },
+  abilities: { talents: {}, skills: {}, knowledges: {} },
+  specializations: {},
+  spheres: {},
+  rotes: {},
+  backgrounds: {},
+  arete: 1, willpower: 1, quintessence: 0, paradox: 0,
+  merits_flaws: [],
+};
+
 export default function CreateCharacter() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -95,14 +118,16 @@ export default function CreateCharacter() {
   const preSelectedSystem = searchParams.get('system');
   
   // Initialize state based on URL param
+  const VALID_PRE = ['vampiro_v3', 'herois_marcados', 'lobisomem_w20', 'mago_m20'];
+
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(() => {
-    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados' || preSelectedSystem === 'lobisomem_w20') {
+    if (preSelectedSystem && VALID_PRE.includes(preSelectedSystem)) {
       return preSelectedSystem as GameSystemId;
     }
     return null;
   });
   const [step, setStep] = useState(() => {
-    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados' || preSelectedSystem === 'lobisomem_w20') {
+    if (preSelectedSystem && VALID_PRE.includes(preSelectedSystem)) {
       return 1;
     }
     return 0;
@@ -110,9 +135,14 @@ export default function CreateCharacter() {
   const [formData, setFormData] = useState<CharacterFormData>(initialFormData);
   const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
   const [lobisomemFormData, setLobisomemFormData] = useState<LobisomemFormData>(initialLobisomemFormData);
+  const [magoFormData, setMagoFormData] = useState<MagoFormData>(initialMagoFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalSteps = gameSystem === 'vampiro_v3' ? 6 : gameSystem === 'lobisomem_w20' ? 6 : 4;
+  const totalSteps =
+    gameSystem === 'vampiro_v3' ? 6 :
+    gameSystem === 'lobisomem_w20' ? 6 :
+    gameSystem === 'mago_m20' ? 7 :
+    4;
   const progress = ((step + 1) / totalSteps) * 100;
 
   const validateStep = (currentStep: number): boolean => {
