@@ -124,6 +124,7 @@ export default function CharacterSheet() {
   const [showVampiroEditModal, setShowVampiroEditModal] = useState(false);
   const [showLobisomemEditModal, setShowLobisomemEditModal] = useState(false);
   const [showMagoEditModal, setShowMagoEditModal] = useState(false);
+  const [showMetamorfosEditModal, setShowMetamorfosEditModal] = useState(false);
   const isOwner = character && user && character.id && user.id;
 
   useEffect(() => {
