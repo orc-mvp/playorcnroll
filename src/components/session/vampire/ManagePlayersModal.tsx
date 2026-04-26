@@ -154,7 +154,7 @@ export function ManagePlayersModal({
     }
   };
 
-  const handleXpChange = async (participantId: string, currentXp: number, delta: number, characterId: string | null) => {
+  const handleXpChange = async (participantId: string, currentXp: number, delta: number, _characterId: string | null) => {
     const newXp = Math.max(0, currentXp + delta);
     // Optimistic update
     setLocalOverrides((prev) => ({
@@ -169,26 +169,6 @@ export function ManagePlayersModal({
         .eq('id', participantId);
 
       if (error) throw error;
-
-      // Log XP change if positive delta and character exists
-      if (delta > 0 && characterId) {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('display_name')
-            .eq('user_id', user.id)
-            .single();
-          
-          await supabase.from('xp_log').insert({
-            character_id: characterId,
-            session_id: sessionId,
-            amount: delta,
-            narrator_id: user.id,
-            narrator_name: profile?.display_name || user.email || 'Narrator',
-          });
-        }
-      }
     } catch (error) {
       console.error('Error updating XP:', error);
       // Revert optimistic update
