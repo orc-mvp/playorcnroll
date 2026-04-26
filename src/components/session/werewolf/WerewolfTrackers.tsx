@@ -23,6 +23,9 @@ interface WerewolfTrackersProps {
   character: {
     id: string;
     name: string;
+    /** game_system do personagem — usado para distinguir Lobisomem (formas fixas)
+     *  de Metamorfos (formas customizadas configuradas na ficha). */
+    game_system?: string;
     vampiro_data: LobisomemCharacterData | null;
   } | null;
   initialGnosis?: number;
