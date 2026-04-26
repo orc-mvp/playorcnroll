@@ -165,10 +165,13 @@ export default function CreateCharacter() {
         case 2: case 3: case 4: case 5: return true;
         default: return false;
       }
-    } else if (gameSystem === 'lobisomem_w20') {
+    } else if (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') {
       switch (currentStep) {
         case 0: return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
-        case 1: return lobisomemFormData.name.trim().length >= 2 && lobisomemFormData.tribe.length > 0 && lobisomemFormData.auspice.length > 0;
+        case 1:
+          // Para Metamorfos, tribo/auspício são opcionais (espécie é livre, editada depois).
+          if (gameSystem === 'metamorfos_w20') return lobisomemFormData.name.trim().length >= 2;
+          return lobisomemFormData.name.trim().length >= 2 && lobisomemFormData.tribe.length > 0 && lobisomemFormData.auspice.length > 0;
         case 2: case 3: case 4: case 5: return true;
         default: return false;
       }
