@@ -70,6 +70,44 @@ const SHIFTERS = [
   'Grondr',
 ];
 
+const SHIFTER_BREEDS = [
+  'Hominídeo',
+  'Impuro',
+  'Hiena',
+  'Aranha',
+  'Felino',
+  'Corvo',
+  'Urso',
+  'Raposa',
+  'Lagarto',
+  'Serpente',
+  'Coiote',
+  'Rato',
+  'Tubarão',
+  'Touro',
+  'Morcego',
+  'Javali',
+];
+
+const SHIFTER_BREED_I18N_MAP: Record<string, string> = {
+  'Hominídeo': 'breed_hominideo',
+  'Impuro': 'breed_impuro',
+  'Hiena': 'breed_hiena',
+  'Aranha': 'breed_aranha',
+  'Felino': 'breed_felino',
+  'Corvo': 'breed_corvo',
+  'Urso': 'breed_urso',
+  'Raposa': 'breed_raposa',
+  'Lagarto': 'breed_lagarto',
+  'Serpente': 'breed_serpente',
+  'Coiote': 'breed_coiote',
+  'Rato': 'breed_rato',
+  'Tubarão': 'breed_tubarao',
+  'Touro': 'breed_touro',
+  'Morcego': 'breed_morcego',
+  'Javali': 'breed_javali',
+};
+
 const ARCHETYPES = [
   'Arquiteto', 'Autocrata', 'Bombástico', 'Bon Vivant', 'Bravo',
   'Capitalista', 'Celebridade', 'Conformista', 'Criança', 'Competidor',
