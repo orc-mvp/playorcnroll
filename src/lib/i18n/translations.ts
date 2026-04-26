@@ -1039,13 +1039,18 @@ export const translations = {
     },
 
     // XP Log
-    xpLog: {
-      title: 'Experiência',
-      totalXp: 'XP Total',
-      noEntries: 'Nenhum ponto de experiência recebido ainda.',
-      pointsAwarded: 'pontos concedidos',
-      by: 'por',
-      session: 'Sessão',
+    xpReducer: {
+      spendXp: 'Gastar XP',
+      title: 'Gastar Experiência',
+      description: 'Esta ação reduz seu pool de XP permanentemente. Confirme com cuidado.',
+      currentXp: 'XP atual',
+      amountLabel: 'Quantos pontos gastar?',
+      invalidAmount: 'Valor inválido. Deve ser entre 1 e {max}.',
+      resultPreview: 'XP restante: {n}',
+      confirmCheckbox: 'Confirmo que desejo gastar este XP. Esta ação não pode ser desfeita pelo jogador.',
+      confirm: 'Gastar XP',
+      successTitle: 'XP atualizado',
+      successDescription: 'Foram gastos {n} XP.',
     },
 
     // Customization unified
@@ -2328,13 +2333,18 @@ export const translations = {
     },
 
     // XP Log
-    xpLog: {
-      title: 'Experience',
-      totalXp: 'Total XP',
-      noEntries: 'No experience points received yet.',
-      pointsAwarded: 'points awarded',
-      by: 'by',
-      session: 'Session',
+    xpReducer: {
+      spendXp: 'Spend XP',
+      title: 'Spend Experience',
+      description: 'This action permanently reduces your XP pool. Confirm carefully.',
+      currentXp: 'Current XP',
+      amountLabel: 'How many points to spend?',
+      invalidAmount: 'Invalid value. Must be between 1 and {max}.',
+      resultPreview: 'Remaining XP: {n}',
+      confirmCheckbox: 'I confirm I want to spend this XP. The player cannot undo this.',
+      confirm: 'Spend XP',
+      successTitle: 'XP updated',
+      successDescription: 'Spent {n} XP.',
     },
 
     // Customization unified

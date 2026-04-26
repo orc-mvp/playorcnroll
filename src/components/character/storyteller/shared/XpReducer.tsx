@@ -100,7 +100,7 @@ export function XpReducer({ participantId, currentXp }: XpReducerProps) {
         <DialogContent className="w-[95vw] max-w-md">
           <DialogHeader>
             <DialogTitle className="font-medieval flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              <AlertTriangle className="w-5 h-5 text-warning" />
               {t.xpReducer?.title || 'Gastar Experiência'}
             </DialogTitle>
             <DialogDescription className="font-body">
@@ -150,7 +150,7 @@ export function XpReducer({ participantId, currentXp }: XpReducerProps) {
               )}
             </div>
 
-            <div className="flex items-start gap-2 rounded-md border border-amber-500/40 bg-amber-500/10 p-3">
+            <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3">
               <Checkbox
                 id="xp-confirm"
                 checked={confirmed}
