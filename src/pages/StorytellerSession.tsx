@@ -812,11 +812,17 @@ export default function StorytellerSession() {
         </div>
       )}
 
-      {/* Test Request Modal — unificado, mostra categorias por sistema dos alvos */}
+      {/* Test Request Modal — unificado.
+          - Narrador vê todos os participantes como alvos possíveis.
+          - Jogador só pode pedir teste para o próprio personagem. */}
       <StorytellerTestRequestModal
         open={testModalOpen}
         onOpenChange={setTestModalOpen}
-        participants={participants as any}
+        participants={
+          (testRequester === 'player' && myParticipant
+            ? [myParticipant]
+            : participants) as any
+        }
         onRequestTest={handleRequestTest}
       />
 
