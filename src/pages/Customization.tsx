@@ -149,7 +149,7 @@ export default function Customization() {
   const [formCategory, setFormCategory] = useState('physical');
   const [formPrerequisites, setFormPrerequisites] = useState('');
   const [formSourcebook, setFormSourcebook] = useState('');
-  const [formGameSystems, setFormGameSystems] = useState<string[]>(['vampiro_v3', 'lobisomem_w20']);
+  const [formGameSystems, setFormGameSystems] = useState<string[]>([]);
 
   // ---- Shared state ----
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -333,7 +333,7 @@ export default function Customization() {
   const resetMfForm = () => {
     setFormName(''); setFormDescription(''); setFormCost(0);
     setFormCategory('physical'); setFormPrerequisites('');
-    setFormSourcebook(''); setFormGameSystems(['vampiro_v3', 'lobisomem_w20']);
+    setFormSourcebook(''); setFormGameSystems([]);
     setEditingItem(null);
   };
 
