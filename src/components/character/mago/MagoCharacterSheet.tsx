@@ -111,9 +111,10 @@ const ABILITY_KEYS = {
   knowledges: ['academics', 'computer', 'cosmology', 'enigmas', 'esoterica', 'investigation', 'law', 'medicine', 'occult', 'politics', 'science'] as const,
 };
 
-export default function MagoCharacterSheet({ character, sessionTrackers, experiencePoints, participantId, readOnly = false }: MagoCharacterSheetProps) {
+export default function MagoCharacterSheet({ character, sessionTrackers, readOnly = false }: MagoCharacterSheetProps) {
   const { t, language } = useI18n();
   const data: MagoCharacterData = (character.vampiro_data as MagoCharacterData) || ({} as MagoCharacterData);
+  const experiencePoints = character.experience_points ?? 0;
 
   const [healthDamage, setHealthDamage] = useState<boolean[]>(sessionTrackers?.healthDamage ?? Array(7).fill(false));
   const [expandedMeritFlaw, setExpandedMeritFlaw] = useState<string | null>(null);
