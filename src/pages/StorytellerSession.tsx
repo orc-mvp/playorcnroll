@@ -452,6 +452,12 @@ export default function StorytellerSession() {
   }
 
   const theme = getThemeBundle(session.game_system, sessionAdapter.icon);
+  // Tema do bloco de "Pedir Teste" para o jogador — baseado no sistema do
+  // próprio personagem (mantém a identidade visual da ficha dele).
+  const playerTheme = getThemeBundle(
+    myCharacter?.game_system || session.game_system,
+    myAdapter.icon,
+  );
   const sceneTheme = getSceneThemeForSystem(session.game_system);
   const noCharThemeKey: 'vampire' | 'werewolf' =
     session.game_system === 'lobisomem_w20' ? 'werewolf' : 'vampire';
