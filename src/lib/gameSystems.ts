@@ -1,4 +1,4 @@
-export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20';
+export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20' | 'mago_m20';
 
 /**
  * "Família" do sistema — usada para agrupar sistemas que rodam na mesma sala
@@ -60,6 +60,19 @@ export const GAME_SYSTEMS: GameSystem[] = [
     color: 'emerald',
     available: true,
     features: ['Pool de d10', 'Fúria', 'Gnose', 'Dons']
+  },
+  {
+    id: 'mago_m20',
+    name: 'Mago: A Ascensão',
+    shortName: 'Storyteller',
+    family: 'storyteller',
+    description: {
+      'pt-BR': 'Realidade moldada pela Vontade. Sala Storyteller — aceita também outros personagens do Mundo das Trevas.',
+      'en': 'Reality shaped by Will. Storyteller room — also accepts other World of Darkness characters.'
+    },
+    color: 'purple',
+    available: true,
+    features: ['Pool de d10', 'Esferas', 'Arête', 'Quintessência']
   }
 ];
 
