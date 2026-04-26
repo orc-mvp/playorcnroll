@@ -1034,6 +1034,8 @@ export const translations = {
       freebieRemaining: 'restantes',
       freebieTotal: 'de',
       freebieExceeded: 'Pontos insuficientes',
+      lobisomemOrShifter: 'Lobisomem / Metamorfo',
+      selectAtLeastOneSystem: 'Selecione ao menos um sistema',
     },
 
     // XP Log
@@ -2321,6 +2323,8 @@ export const translations = {
       freebieRemaining: 'remaining',
       freebieTotal: 'of',
       freebieExceeded: 'Insufficient points',
+      lobisomemOrShifter: 'Werewolf / Shifter',
+      selectAtLeastOneSystem: 'Select at least one system',
     },
 
     // XP Log

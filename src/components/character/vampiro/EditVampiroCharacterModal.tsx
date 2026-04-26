@@ -28,6 +28,7 @@ import {
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { User, Shield, Brain, Heart, Moon, Star, BookOpen, Sparkles } from 'lucide-react';
 import DotRating from './DotRating';
+import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
 
 // Types
 interface VampiroData {
@@ -360,7 +361,6 @@ export function EditVampiroCharacterModal({
   const [vampiroData, setVampiroData] = useState<VampiroData>(character.vampiro_data || {});
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
-  const [availableMeritsFlaws, setAvailableMeritsFlaws] = useState<{ id: string; name: string; description: string; cost: number; category: string; prerequisites: string | null }[]>([]);
 
   // Reset form when character changes
   useEffect(() => {
@@ -368,21 +368,6 @@ export function EditVampiroCharacterModal({
     setConcept(character.concept || '');
     setVampiroData(character.vampiro_data || {});
   }, [character]);
-
-  // Fetch available merits/flaws
-  useEffect(() => {
-    const fetch = async () => {
-      const { data } = await supabase
-        .from('merits_flaws')
-        .select('id, name, description, cost, category, prerequisites')
-        .contains('game_systems', ['vampiro_v3'])
-        .order('category')
-        .order('cost', { ascending: false })
-        .order('name');
-      if (data) setAvailableMeritsFlaws(data);
-    };
-    if (open) fetch();
-  }, [open]);
 
   const updateVampiroField = <K extends keyof VampiroData>(key: K, value: VampiroData[K]) => {
     setVampiroData(prev => ({ ...prev, [key]: value }));
@@ -939,64 +924,13 @@ export function EditVampiroCharacterModal({
 
               {/* Merits & Flaws Tab */}
               <TabsContent value="meritsflaws" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
-                <div className="space-y-3">
-                  {(() => {
-                    const selectedMF = (vampiroData.merits_flaws || []) as { id: string; name: string; cost: number; category: string }[];
-                    const totalCost = selectedMF.reduce((s, m) => s + m.cost, 0);
-                    const freebiePoints = 15;
-                    const remaining = freebiePoints - totalCost;
-                    const categoryLabelFn = (cat: string) =>
-                      (t.meritsFlaws[cat as keyof typeof t.meritsFlaws] as string) || cat;
-
-                    const toggleMeritFlaw = (item: typeof availableMeritsFlaws[0]) => {
-                      const isSelected = selectedMF.some((s) => s.id === item.id);
-                      const updated = isSelected
-                        ? selectedMF.filter((s) => s.id !== item.id)
-                        : [...selectedMF, { id: item.id, name: item.name, cost: item.cost, category: item.category }];
-                      setVampiroData(prev => ({ ...prev, merits_flaws: updated }));
-                    };
-
-                    return (
-                      <>
-                        <div className="flex items-center justify-center gap-3 p-2 rounded-lg bg-muted/30 border border-border">
-                          <span className="font-medieval text-xs">{t.meritsFlaws.freebiePoints}:</span>
-                          <Badge variant="outline" className={`text-xs ${remaining >= 0 ? 'border-green-500/50 text-green-500' : 'border-red-500/50 text-red-500'}`}>
-                            {remaining} {t.meritsFlaws.freebieRemaining} ({t.meritsFlaws.freebieTotal} {freebiePoints})
-                          </Badge>
-                        </div>
-                        {availableMeritsFlaws.length === 0 ? (
-                          <div className="text-center py-6 text-muted-foreground font-body text-sm">
-                            {language === 'pt-BR' ? 'Nenhuma disponível.' : 'None available.'}
-                          </div>
-                        ) : (
-                          availableMeritsFlaws.map((item) => {
-                            const isChecked = selectedMF.some((s) => s.id === item.id);
-                            const isMerit = item.cost > 0;
-                            return (
-                              <div
-                                key={item.id}
-                                className={`flex items-start gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${isChecked ? 'border-primary/50 bg-primary/5' : 'border-border hover:bg-muted/30'}`}
-                                onClick={() => toggleMeritFlaw(item)}
-                              >
-                                <Checkbox checked={isChecked} onCheckedChange={() => toggleMeritFlaw(item)} className="mt-0.5" />
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1 flex-wrap">
-                                    <span className="font-medieval text-xs">{item.name}</span>
-                                    <Badge variant="outline" className={`text-[10px] ${isMerit ? 'border-green-500/50 text-green-500' : 'border-red-500/50 text-red-500'}`}>
-                                      {isMerit ? '+' : ''}{item.cost}
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-[10px]">{categoryLabelFn(item.category)}</Badge>
-                                  </div>
-                                  <p className="text-[11px] text-muted-foreground font-body mt-0.5 line-clamp-1">{item.description}</p>
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
+                <MeritsFlawsSelector
+                  gameSystem="vampiro_v3"
+                  selected={(vampiroData.merits_flaws || []) as SelectedMeritFlaw[]}
+                  onChange={(next) => setVampiroData((prev) => ({ ...prev, merits_flaws: next }))}
+                  freebieBudget={15}
+                  variant="edit"
+                />
               </TabsContent>
 
               {/* Virtues Tab */}

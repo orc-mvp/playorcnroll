@@ -47,6 +47,7 @@ import {
 } from '@/components/ui/tooltip';
 import { PawPrint, User, Shield, Brain, Star, BookOpen, Sparkles, Plus, X, Info } from 'lucide-react';
 import DotRating from '@/components/character/vampiro/DotRating';
+import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
 import type { LobisomemCharacterData, MetamorphForm } from '@/lib/lobisomem/diceUtils';
 
 interface Character {
@@ -146,28 +147,13 @@ export function EditMetamorfosCharacterModal({
   const [data, setData] = useState<LobisomemCharacterData>(character.vampiro_data || {});
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
-  const [availableMeritsFlaws, setAvailableMeritsFlaws] = useState<{ id: string; name: string; description: string; cost: number; category: string; prerequisites: string | null }[]>([]);
+
 
   useEffect(() => {
     setName(character.name);
     setConcept(character.concept || '');
     setData(character.vampiro_data || {});
   }, [character]);
-
-  useEffect(() => {
-    const fetchMF = async () => {
-      // Metamorfos compartilham vantagens/desvantagens com Lobisomem.
-      const { data: rows } = await supabase
-        .from('merits_flaws')
-        .select('id, name, description, cost, category, prerequisites')
-        .contains('game_systems', ['lobisomem_w20'])
-        .order('category')
-        .order('cost', { ascending: false })
-        .order('name');
-      if (rows) setAvailableMeritsFlaws(rows);
-    };
-    if (open) fetchMF();
-  }, [open]);
 
   const updateField = <K extends keyof LobisomemCharacterData>(key: K, value: LobisomemCharacterData[K]) => {
     setData(prev => ({ ...prev, [key]: value }));
@@ -667,63 +653,14 @@ export function EditMetamorfosCharacterModal({
 
               {/* Merits & Flaws */}
               <TabsContent value="meritsflaws" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
-                <div className="space-y-3">
-                  {(() => {
-                    const selectedMF = (data.merits_flaws || []) as { id: string; name: string; cost: number; category: string }[];
-                    const totalCost = selectedMF.reduce((s, m) => s + m.cost, 0);
-                    const freebiePoints = 15;
-                    const remaining = freebiePoints - totalCost;
-                    const categoryLabelFn = (cat: string) => (t.meritsFlaws[cat as keyof typeof t.meritsFlaws] as string) || cat;
-
-                    const toggleMeritFlaw = (item: typeof availableMeritsFlaws[0]) => {
-                      const isSelected = selectedMF.some((s) => s.id === item.id);
-                      const updated = isSelected
-                        ? selectedMF.filter((s) => s.id !== item.id)
-                        : [...selectedMF, { id: item.id, name: item.name, cost: item.cost, category: item.category }];
-                      setData(prev => ({ ...prev, merits_flaws: updated }));
-                    };
-
-                    return (
-                      <>
-                        <div className="flex items-center justify-center gap-3 p-2 rounded-lg bg-muted/30 border border-border">
-                          <span className="font-medieval text-xs">{t.meritsFlaws.freebiePoints}:</span>
-                          <Badge variant="outline" className={`text-xs ${remaining >= 0 ? 'border-green-500/50 text-green-500' : 'border-red-500/50 text-red-500'}`}>
-                            {remaining} {t.meritsFlaws.freebieRemaining} ({t.meritsFlaws.freebieTotal} {freebiePoints})
-                          </Badge>
-                        </div>
-                        {availableMeritsFlaws.length === 0 ? (
-                          <div className="text-center py-6 text-muted-foreground font-body text-sm">
-                            {language === 'pt-BR' ? 'Nenhuma disponível.' : 'None available.'}
-                          </div>
-                        ) : (
-                          availableMeritsFlaws.map((item) => {
-                            const isChecked = selectedMF.some((s) => s.id === item.id);
-                            const isMerit = item.cost > 0;
-                            return (
-                              <div
-                                key={item.id}
-                                className={`flex items-start gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${isChecked ? 'border-amber-500/50 bg-amber-500/5' : 'border-border hover:bg-muted/30'}`}
-                                onClick={() => toggleMeritFlaw(item)}
-                              >
-                                <Checkbox checked={isChecked} onCheckedChange={() => toggleMeritFlaw(item)} className="mt-0.5" />
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-1 flex-wrap">
-                                    <span className="font-medieval text-xs">{item.name}</span>
-                                    <Badge variant="outline" className={`text-[10px] ${isMerit ? 'border-green-500/50 text-green-500' : 'border-red-500/50 text-red-500'}`}>
-                                      {isMerit ? '+' : ''}{item.cost}
-                                    </Badge>
-                                    <Badge variant="secondary" className="text-[10px]">{categoryLabelFn(item.category)}</Badge>
-                                  </div>
-                                  <p className="text-[11px] text-muted-foreground font-body mt-0.5 line-clamp-1">{item.description}</p>
-                                </div>
-                              </div>
-                            );
-                          })
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
+                <MeritsFlawsSelector
+                  gameSystem="lobisomem_w20"
+                  selected={(data.merits_flaws || []) as SelectedMeritFlaw[]}
+                  onChange={(next) => setData((prev) => ({ ...prev, merits_flaws: next }))}
+                  freebieBudget={15}
+                  variant="edit"
+                  accent="amber"
+                />
               </TabsContent>
             </div>
           </Tabs>
