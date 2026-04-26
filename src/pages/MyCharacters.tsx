@@ -92,13 +92,16 @@ export default function MyCharacters() {
     if (!user) return;
 
     const fetchCharacters = async () => {
+      // Select only fields used by the cards — avoid fetching heavy jsonb (vampiro_data, marks, narratives, notes)
       const { data } = await supabase
         .from('characters')
-        .select('*')
+        .select(
+          'id, name, concept, game_system, aggression_type, determination_type, seduction_type, cunning_type, faith_type, heroic_moves_stored, minor_marks, created_at'
+        )
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
-      setCharacters(data || []);
+      setCharacters((data as Character[]) || []);
       setLoading(false);
     };
 
