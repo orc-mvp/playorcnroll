@@ -378,9 +378,9 @@ export default function CreateCharacter() {
       <main className="container mx-auto px-4 py-6">
         {/* Step 0: System Selection */}
         {step === 0 && (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <Card className="medieval-card">
-              <CardHeader className="text-center">
+              <CardHeader className="text-center pb-4">
                 <CardTitle className="font-medieval text-2xl">
                   {language === 'pt-BR' ? 'Escolha o Sistema' : 'Choose the System'}
                 </CardTitle>
