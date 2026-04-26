@@ -1187,6 +1187,62 @@ export const translations = {
       tabGifts: 'Dons',
       tabBackgrounds: 'Antecedentes',
     },
+
+    // Mago: A Ascensão (M20)
+    mago: {
+      tradition: 'Tradição',
+      selectTradition: 'Selecione a tradição',
+      essence: 'Essência',
+      selectEssence: 'Selecione a essência',
+      essence_dynamic: 'Dinâmica',
+      essence_pattern: 'Padrão',
+      essence_primordial: 'Primordial',
+      essence_questing: 'Inquisidora',
+      cabal: 'Cabala',
+      cabalPlaceholder: 'Nome da cabala',
+      basicInfo: 'Informações Básicas',
+      defineIdentity: 'Defina a identidade do seu Mago',
+
+      spheres: 'Esferas',
+      spheresDesc: 'Os domínios da magia que seu Mago pode manipular (0-5)',
+
+      rotes: 'Rotinas',
+      rotesDesc: 'Adicione as Rotinas do seu Mago por nível (texto livre)',
+      rotePlaceholder: 'Nome da rotina...',
+      noRotes: 'Nenhuma rotina',
+      addRote: 'Adicionar Rotina',
+
+      arete: 'Arête',
+      areteDesc: 'A maestria mágica do Mago (1-10)',
+      quintessence: 'Quintessência',
+      paradox: 'Paradoxo',
+      willpowerLabel: 'Força de Vontade',
+      pools: 'Energias Místicas',
+      poolsDesc: 'Defina os valores iniciais de Arête, Vontade, Quintessência e Paradoxo',
+
+      mageSession: 'Sessão de Mago',
+      quintessenceDepleted: 'Quintessência Esgotada!',
+      paradoxOverflow: 'Paradoxo Crítico!',
+      trackerQuintessenceChange: 'Quintessência',
+      trackerParadoxChange: 'Paradoxo',
+      trackerAreteChange: 'Arête',
+
+      areteOnly: 'Arête',
+      quintessenceOnly: 'Quintessência',
+
+      vitality: 'Vitalidade',
+      salvaterios: 'Salvatérios',
+
+      editCharacter: 'Editar Personagem',
+      editMageInfo: 'Edite as informações do seu Mago',
+      tabBasic: 'Básico',
+      tabAttributes: 'Atributos',
+      tabAbilities: 'Habilidades',
+      tabSpheres: 'Esferas',
+      tabRotes: 'Rotinas',
+      tabBackgrounds: 'Antecedentes',
+      tabMeritsFlaws: 'Vantagens & Desvantagens',
+    },
   },
 
   en: {
