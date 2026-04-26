@@ -140,6 +140,8 @@ export default function StorytellerSession() {
   const [loading, setLoading] = useState(true);
   const [showManagePlayersModal, setShowManagePlayersModal] = useState(false);
   const [testModalOpen, setTestModalOpen] = useState(false);
+  /** Quem abriu o modal de teste — define o escopo de alvos disponíveis. */
+  const [testRequester, setTestRequester] = useState<'narrator' | 'player'>('narrator');
   const [rollModalOpen, setRollModalOpen] = useState(false);
   const [showPendingTestDrawer, setShowPendingTestDrawer] = useState(false);
 
