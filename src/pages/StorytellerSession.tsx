@@ -683,7 +683,22 @@ export default function StorytellerSession() {
                 {isNarrator ? (
                   renderNarratorSidebar()
                 ) : (
-                  <PlayerSidePanel {...(sidePanelProps as any)} />
+                  <>
+                    {myCharacter && (
+                      <StorytellerRequestTestCard
+                        isNarrator={false}
+                        theme={{
+                          border: playerTheme.cardBorder,
+                          iconText: playerTheme.cardIconText,
+                          primaryBg: playerTheme.cardPrimaryBg,
+                          outlineBorder: playerTheme.cardOutlineBorder,
+                          outlineHover: playerTheme.cardOutlineHover,
+                        }}
+                        onRequestTest={openTestAsPlayer}
+                      />
+                    )}
+                    <PlayerSidePanel {...(sidePanelProps as any)} />
+                  </>
                 )}
               </div>
             </TabsContent>
