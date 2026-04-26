@@ -466,7 +466,7 @@ export default function StorytellerSession() {
         (myParticipant.session_health_damage as boolean[]) ||
         [false, false, false, false, false, false, false],
     };
-    if (myCharacter.game_system === 'lobisomem_w20') {
+    if (myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20') {
       return {
         ...base,
         initialGnosis: myParticipant.session_gnosis || 0,
