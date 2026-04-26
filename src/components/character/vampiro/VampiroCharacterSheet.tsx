@@ -68,15 +68,13 @@ interface VampiroCharacterSheetProps {
     concept: string | null;
     vampiro_data: VampiroData | null;
     notes?: string | null;
+    experience_points?: number;
   };
   sessionTrackers?: {
     bloodPool?: number;
     willpower?: number;
     healthDamage?: boolean[];
   };
-  experiencePoints?: number;
-  /** ID do session_participant — quando presente e !readOnly, o jogador pode reduzir XP */
-  participantId?: string;
   readOnly?: boolean;
 }
 
