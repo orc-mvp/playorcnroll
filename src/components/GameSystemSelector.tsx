@@ -28,7 +28,7 @@ export default function GameSystemSelector({
   const { language } = useI18n();
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
       {GAME_SYSTEMS.map((system) => {
         const isSelected = value === system.id;
         const isDisabled = disabled || (!allowUnavailable && !system.available);
@@ -41,7 +41,7 @@ export default function GameSystemSelector({
             onClick={() => !isDisabled && onChange(system.id)}
             disabled={isDisabled}
             className={cn(
-              'relative flex flex-col items-center gap-3 p-6 rounded-lg border-2 transition-all text-left',
+              'relative flex items-start gap-3 p-3 rounded-lg border-2 transition-all text-left',
               isSelected
                 ? system.color === 'primary'
                   ? 'border-primary bg-primary/10'
@@ -58,17 +58,17 @@ export default function GameSystemSelector({
             )}
           >
             {!system.available && (
-              <Badge 
-                variant="secondary" 
-                className="absolute top-2 right-2 text-xs"
+              <Badge
+                variant="secondary"
+                className="absolute top-1.5 right-1.5 text-[10px] px-1.5 py-0"
               >
-                Em breve
+                {language === 'pt-BR' ? 'Em breve' : 'Soon'}
               </Badge>
             )}
-            
+
             <div
               className={cn(
-                'p-3 rounded-full',
+                'shrink-0 p-2 rounded-md',
                 system.color === 'primary'
                   ? 'bg-primary/20 text-primary'
                   : system.color === 'emerald'
@@ -83,29 +83,13 @@ export default function GameSystemSelector({
               {systemIcons[system.id]}
             </div>
 
-            <div className="text-center">
-              <h3 className="font-medieval text-lg font-semibold">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-medieval text-sm font-semibold leading-tight truncate pr-12">
                 {system.name}
               </h3>
-              <p className="text-xs text-muted-foreground font-body mt-1">
-                {system.shortName}
+              <p className="text-[11px] text-muted-foreground font-body mt-0.5 line-clamp-2">
+                {description}
               </p>
-            </div>
-
-            <p className="text-sm text-muted-foreground font-body text-center">
-              {description}
-            </p>
-
-            <div className="flex flex-wrap justify-center gap-1 mt-2">
-              {system.features.slice(0, 3).map((feature) => (
-                <Badge
-                  key={feature}
-                  variant="outline"
-                  className="text-xs"
-                >
-                  {feature}
-                </Badge>
-              ))}
             </div>
           </button>
         );
