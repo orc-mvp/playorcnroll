@@ -14,23 +14,30 @@ import type { StorytellerParticipant } from './types';
 
 /**
  * Filtra a lista de personagens do usuário deixando apenas os compatíveis com
- * o sistema (ou família) da sessão.
+ * a sessão.
  *
  * Regras:
- *  - Sessões Storyteller (Vampiro/Lobisomem/Mago/Metamorfos) aceitam **qualquer**
- *    personagem cujo `game_system` esteja na família Storyteller (e o adapter
- *    correspondente esteja `available`).
+ *  - Sessões Storyteller (Vampiro/Lobisomem/Mago/Metamorfos) aceitam personagens
+ *    cujo `game_system` esteja na família Storyteller, com adapter `available`,
+ *    E que estejam na lista `allowedSystems` (configurada pelo narrador na
+ *    criação da sala). Se `allowedSystems` for vazio/undefined, faz fallback
+ *    para "todos os sistemas Storyteller disponíveis" (compatibilidade com
+ *    sessões antigas, antes da feature existir).
  *  - Sessões fora da família (Heróis Marcados) exigem match exato de
- *    `game_system`.
+ *    `game_system` e ignoram `allowedSystems`.
  */
 export function filterCompatibleCharacters<T extends { game_system: string }>(
   characters: T[],
   sessionGameSystem: string,
+  allowedSystems?: string[] | null,
 ): T[] {
   if (isStorytellerSystem(sessionGameSystem)) {
+    const allowList = allowedSystems && allowedSystems.length > 0 ? allowedSystems : null;
     return characters.filter((c) => {
       if (!isStorytellerSystem(c.game_system)) return false;
-      return getSystemAdapter(c.game_system).available;
+      if (!getSystemAdapter(c.game_system).available) return false;
+      if (allowList && !allowList.includes(c.game_system)) return false;
+      return true;
     });
   }
   return characters.filter((c) => c.game_system === sessionGameSystem);
