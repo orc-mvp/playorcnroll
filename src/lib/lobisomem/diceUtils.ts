@@ -32,6 +32,41 @@ export interface LobisomemCharacterData {
   backgrounds?: Record<string, number>;
   renown?: { glory: number; honor: number; wisdom: number };
   merits_flaws?: { id: string; name: string; cost: number; category: string }[];
+  /**
+   * Metamorfos (W20) — formas de guerra customizáveis pelo jogador.
+   * Hominídeo é implícita e não aparece nesta lista (é a forma "neutra" sem modificadores).
+   * Cada delta é interpretado como:
+   *  - `undefined`/ausente: sem modificação no atributo
+   *  - número positivo/negativo: soma/subtrai do atributo base
+   *  - `0` (literal, definido): zera o atributo enquanto a forma estiver ativa
+   * Limitado a até 4 formas adicionais.
+   */
+  metamorph_forms?: MetamorphForm[];
+  /** Espécie do metamorfo (texto livre — Bastet, Corax, etc.) */
+  metamorph_species?: string;
+}
+
+/**
+ * Modificadores de uma forma de guerra customizada (Metamorfos).
+ * Os deltas são opcionais por atributo: ausente = sem mudança, valor = delta numérico,
+ * sentinela `0` = zera o atributo. O `id` é estável entre saves para preservar a forma ativa.
+ */
+export interface MetamorphForm {
+  id: string;
+  name: string;
+  /** Modificador de dificuldade da forma (somado à dificuldade base do teste). Default 0. */
+  difficulty?: number;
+  modifiers?: {
+    strength?: number;
+    dexterity?: number;
+    stamina?: number;
+    charisma?: number;
+    manipulation?: number;
+    appearance?: number;
+    perception?: number;
+    intelligence?: number;
+    wits?: number;
+  };
 }
 
 // Re-export shared functions from vampiro diceUtils
