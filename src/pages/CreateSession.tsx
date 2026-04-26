@@ -65,6 +65,16 @@ export default function CreateSession() {
       return;
     }
 
+    // Sala Storyteller exige escolher pelo menos 1 sistema permitido.
+    if (family === 'storyteller' && allowedSystems.length === 0) {
+      toast({
+        title: t.session.error,
+        description: t.session.selectAtLeastOneSystem,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!name.trim()) {
       toast({
         title: t.session.error,
@@ -81,6 +91,11 @@ export default function CreateSession() {
     try {
       const inviteCode = generateInviteCode();
 
+      // Para Heróis Marcados, allowed_systems espelha o próprio sistema.
+      // Para Storyteller, usa a lista escolhida pelo narrador.
+      const allowed =
+        family === 'storyteller' ? allowedSystems : ['herois_marcados'];
+
       const { data, error } = await supabase
         .from('sessions')
         .insert({
@@ -90,6 +105,7 @@ export default function CreateSession() {
           invite_code: inviteCode,
           status: 'lobby',
           game_system: familyToGameSystem(family),
+          allowed_systems: allowed,
         })
         .select()
         .single();
