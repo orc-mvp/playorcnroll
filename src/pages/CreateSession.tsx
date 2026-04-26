@@ -29,7 +29,7 @@ export default function CreateSession() {
   const { t } = useI18n();
   const { toast } = useToast();
 
-  const [gameSystem, setGameSystem] = useState<GameSystemId | null>(null);
+  const [family, setFamily] = useState<GameSystemFamily | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,23 +39,23 @@ export default function CreateSession() {
     return null;
   }
 
+  /**
+   * Mapeia a família escolhida para o `game_system` que será gravado em
+   * `sessions.game_system`. Famílias unificadas usam o ID da família.
+   * - `herois_marcados` → sala dedicada de Heróis Marcados.
+   * - `storyteller`     → sala unificada WoD; aceita personagens de
+   *   Vampiro/Lobisomem/Mago/Metamorfos sem amarrar a sessão a um
+   *   sistema único (o sistema de cada personagem é definido na ficha).
+   */
+  const familyToGameSystem = (f: GameSystemFamily): string => f;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!gameSystem) {
+    if (!family) {
       toast({
         title: t.session.error,
         description: t.session.selectGameSystem,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const system = getGameSystem(gameSystem);
-    if (!system?.available) {
-      toast({
-        title: t.session.error,
-        description: t.session.systemNotAvailable,
         variant: 'destructive',
       });
       return;
