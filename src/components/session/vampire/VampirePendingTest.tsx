@@ -124,6 +124,12 @@ export function VampirePendingTest({
           pool = lobData?.gnosis ?? 1;
         } else if ((config.testType as string) === 'rage') {
           pool = lobData?.rage ?? 1;
+        } else if ((config.testType as string) === 'arete') {
+          // Mago: pool = Arête (1-10)
+          pool = (vampiroData as any).arete ?? 1;
+        } else if ((config.testType as string) === 'quintessence') {
+          // Mago: pool = Quintessência (0-20)
+          pool = (vampiroData as any).quintessence ?? 1;
         }
         break;
     }
