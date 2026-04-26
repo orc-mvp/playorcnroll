@@ -574,16 +574,7 @@ export default function StorytellerSession() {
             <TabsContent value="info" className="flex-1 p-4 overflow-auto">
               <div className="space-y-4">
                 {isNarrator ? (
-                  <NarratorSidebar
-                    sessionId={sessionId!}
-                    participants={participants as any}
-                    scenes={scenes as any}
-                    currentScene={currentScene as any}
-                    onRequestTest={() => setTestModalOpen(true)}
-                    onRequestRoll={() => setRollModalOpen(true)}
-                    onSceneChange={setCurrentScene as any}
-                    onEventCreated={handleLocalEvent}
-                  />
+                  renderNarratorSidebar()
                 ) : (
                   <PlayerSidePanel {...(sidePanelProps as any)} />
                 )}
@@ -625,16 +616,7 @@ export default function StorytellerSession() {
             <ScrollArea className="flex-1">
               <div className="p-4">
                 {isNarrator ? (
-                  <NarratorSidebar
-                    sessionId={sessionId!}
-                    participants={participants as any}
-                    scenes={scenes as any}
-                    currentScene={currentScene as any}
-                    onRequestTest={() => setTestModalOpen(true)}
-                    onRequestRoll={() => setRollModalOpen(true)}
-                    onSceneChange={setCurrentScene as any}
-                    onEventCreated={handleLocalEvent}
-                  />
+                  renderNarratorSidebar()
                 ) : (
                   <div className="space-y-4">
                     {pendingTestSharedProps && !hasRolledForPendingTest && (
