@@ -23,6 +23,12 @@ import StepLobisomemAttributes from '@/components/character/lobisomem/StepLobiso
 import StepLobisomemGifts from '@/components/character/lobisomem/StepLobisomemGifts';
 import StepLobisomemBackgrounds from '@/components/character/lobisomem/StepLobisomemBackgrounds';
 import StepLobisomemMeritsFlaws from '@/components/character/lobisomem/StepLobisomemMeritsFlaws';
+import StepMagoBasicInfo, { MagoFormData } from '@/components/character/mago/StepMagoBasicInfo';
+import StepMagoAttributes from '@/components/character/mago/StepMagoAttributes';
+import StepMagoSpheres from '@/components/character/mago/StepMagoSpheres';
+import StepMagoRotes from '@/components/character/mago/StepMagoRotes';
+import StepMagoBackgrounds from '@/components/character/mago/StepMagoBackgrounds';
+import StepMagoMeritsFlaws from '@/components/character/mago/StepMagoMeritsFlaws';
 
 export type AttributeType = 'strong' | 'neutral' | 'weak';
 
@@ -81,6 +87,23 @@ const initialLobisomemFormData: LobisomemFormData = {
   backgrounds: {},
   gnosis: 1, rage: 1, willpower: 1,
   renown: { glory: 0, honor: 0, wisdom: 0 },
+  merits_flaws: [],
+};
+
+const initialMagoFormData: MagoFormData = {
+  name: '', player: '', chronicle: '', nature: '', demeanor: '',
+  tradition: '', essence: '', cabal: '', concept: '',
+  attributes: {
+    physical: { strength: 1, dexterity: 1, stamina: 1 },
+    social: { charisma: 1, manipulation: 1, appearance: 1 },
+    mental: { perception: 1, intelligence: 1, wits: 1 },
+  },
+  abilities: { talents: {}, skills: {}, knowledges: {} },
+  specializations: {},
+  spheres: {},
+  rotes: {},
+  backgrounds: {},
+  arete: 1, willpower: 1, quintessence: 0, paradox: 0,
   merits_flaws: [],
 };
 
