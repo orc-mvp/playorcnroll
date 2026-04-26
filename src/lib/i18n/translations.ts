@@ -2404,6 +2404,8 @@ export const translations = {
       defineIdentity: 'Define your Garou\'s identity',
       basicInfo: 'Basic Information',
       selectTribe: 'Select tribe',
+      shifter: 'Shifter',
+      selectShifter: 'Select shifter',
       selectAuspice: 'Select auspice',
       selectBreed: 'Select breed',
       selectRank: 'Select rank',
