@@ -38,6 +38,7 @@ import {
 import { EditCharacterModal } from '@/components/character/EditCharacterModal';
 import { EditVampiroCharacterModal } from '@/components/character/vampiro/EditVampiroCharacterModal';
 import { EditLobisomemCharacterModal } from '@/components/character/lobisomem/EditLobisomemCharacterModal';
+import { EditMagoCharacterModal } from '@/components/character/mago/EditMagoCharacterModal';
 import { CharacterNotes } from '@/components/character/CharacterNotes';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import LobisomemCharacterSheet from '@/components/character/lobisomem/LobisomemCharacterSheet';
@@ -121,6 +122,7 @@ export default function CharacterSheet() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showVampiroEditModal, setShowVampiroEditModal] = useState(false);
   const [showLobisomemEditModal, setShowLobisomemEditModal] = useState(false);
+  const [showMagoEditModal, setShowMagoEditModal] = useState(false);
   const isOwner = character && user && character.id && user.id;
 
   useEffect(() => {
@@ -247,6 +249,8 @@ export default function CharacterSheet() {
                   setShowVampiroEditModal(true);
                 } else if (character.game_system === 'lobisomem_w20') {
                   setShowLobisomemEditModal(true);
+                } else if (character.game_system === 'mago_m20') {
+                  setShowMagoEditModal(true);
                 } else {
                   setShowEditModal(true);
                 }
@@ -696,12 +700,41 @@ export default function CharacterSheet() {
       </main>
 
       {/* Edit Character Modal - Heróis Marcados */}
-      {character && character.game_system !== 'vampiro_v3' && (
-        <EditCharacterModal
-          open={showEditModal}
-          onOpenChange={setShowEditModal}
-          character={character}
-          onSave={handleCharacterUpdate}
+      {character &&
+        character.game_system !== 'vampiro_v3' &&
+        character.game_system !== 'lobisomem_w20' &&
+        character.game_system !== 'mago_m20' && (
+          <EditCharacterModal
+            open={showEditModal}
+            onOpenChange={setShowEditModal}
+            character={character}
+            onSave={handleCharacterUpdate}
+          />
+        )}
+
+      {/* Edit Character Modal - Mago */}
+      {character && character.game_system === 'mago_m20' && (
+        <EditMagoCharacterModal
+          open={showMagoEditModal}
+          onOpenChange={setShowMagoEditModal}
+          character={{
+            id: character.id,
+            name: character.name,
+            concept: character.concept,
+            vampiro_data: character.vampiro_data as any,
+          }}
+          onSave={(updated) => {
+            setCharacter((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    name: updated.name,
+                    concept: updated.concept,
+                    vampiro_data: updated.vampiro_data as any,
+                  }
+                : prev,
+            );
+          }}
         />
       )}
 
