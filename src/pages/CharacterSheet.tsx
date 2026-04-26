@@ -282,6 +282,16 @@ export default function CharacterSheet() {
                 notes: character.notes,
               }}
             />
+          ) : character.game_system === 'mago_m20' ? (
+            <MagoCharacterSheet
+              character={{
+                id: character.id,
+                name: character.name,
+                concept: character.concept,
+                vampiro_data: character.vampiro_data as any,
+                notes: character.notes,
+              }}
+            />
           ) : (
           <div className="space-y-6 pb-8">
             {/* Character Header */}
