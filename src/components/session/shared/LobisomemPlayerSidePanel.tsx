@@ -234,6 +234,7 @@ export function LobisomemPlayerSidePanel({
                 }}
                 sessionTrackers={sessionTrackers as any}
                 experiencePoints={experiencePoints}
+                participantId={participants.find((p) => p.user_id === currentUserId)?.id}
                 readOnly={sheetLocked}
               />
             )}
