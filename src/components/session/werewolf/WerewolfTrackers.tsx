@@ -380,23 +380,23 @@ export function WerewolfTrackers({
       </Card>
 
       {/* CURRENT FORM */}
-      <Card className={`medieval-card border-${themeAccent}/20`}>
+      <Card className={`medieval-card ${themeClasses.cardBorder}`}>
         <CardHeader className="pb-2">
-          <CardTitle className={`font-medieval text-sm flex items-center gap-2 text-${themeAccent}`}>
+          <CardTitle className={`font-medieval text-sm flex items-center gap-2 ${themeClasses.titleText}`}>
             <Dog className="w-4 h-4" />
             {t.lobisomem?.currentForm || 'Forma Atual'}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
-            <Badge variant="outline" className={`border-${themeAccent}/30 text-${themeAccent} font-medieval`}>
+            <Badge variant="outline" className={`${themeClasses.badgeBorder} ${themeClasses.badgeText} font-medieval`}>
               {getFormLabel(currentForm)}
             </Badge>
             <Button
               size="sm"
               variant="outline"
               onClick={() => setIsFormModalOpen(true)}
-              className={`border-${themeAccent}/30 hover:bg-${themeAccent}/10 text-xs`}
+              className={`${themeClasses.btnBorder} ${themeClasses.btnHover} text-xs`}
             >
               <Dog className="w-3 h-3 mr-1" />
               {t.lobisomem?.changeForm || 'Mudar Forma'}
