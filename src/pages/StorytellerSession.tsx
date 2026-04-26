@@ -522,10 +522,10 @@ export default function StorytellerSession() {
             created_at: pendingTestEvent.created_at,
           },
           onTestComplete: () => {},
-          ...(myCharacter.game_system === 'lobisomem_w20'
+          ...((myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20')
             ? {
                 currentForm: myParticipant?.session_form || 'hominid',
-                gameSystem: 'lobisomem_w20' as const,
+                gameSystem: myCharacter.game_system as 'lobisomem_w20' | 'metamorfos_w20',
               }
             : {}),
         }
