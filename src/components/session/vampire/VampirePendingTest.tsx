@@ -86,7 +86,11 @@ export function VampirePendingTest({
   const calculatePool = (): number => {
     let pool = 0;
     const isWerewolf = gameSystem === 'lobisomem_w20';
-    const lobData = isWerewolf ? (vampiroData as unknown as LobisomemCharacterData) : null;
+    const isMetamorph = gameSystem === 'metamorfos_w20';
+    const lobData = (isWerewolf || isMetamorph)
+      ? (vampiroData as unknown as LobisomemCharacterData)
+      : null;
+    const metamorphForm = isMetamorph ? getMetamorphForm(lobData, currentForm) : null;
 
     switch (config.testType) {
       case 'raw_dice':
@@ -98,6 +102,8 @@ export function VampirePendingTest({
           if (isWerewolf && currentForm) {
             attrVal += getFormAttributeModifier(currentForm, config.attribute);
             attrVal = Math.max(attrVal, 0);
+          } else if (isMetamorph) {
+            attrVal = applyMetamorphAttribute(metamorphForm, config.attribute, attrVal);
           }
           pool = attrVal + getAbilityValue(vampiroData, config.ability);
         }
@@ -107,12 +113,15 @@ export function VampirePendingTest({
           let attrVal = getAttributeValue(vampiroData, config.attribute);
           if (isWerewolf && currentForm) {
             attrVal += getFormAttributeModifier(currentForm, config.attribute);
+            attrVal = Math.max(attrVal, 0);
+          } else if (isMetamorph) {
+            attrVal = applyMetamorphAttribute(metamorphForm, config.attribute, attrVal);
           }
           pool = Math.max(attrVal, 0);
         }
         break;
       case 'willpower':
-        pool = (isWerewolf ? lobData?.willpower : vampiroData.willpower) || 1;
+        pool = ((isWerewolf || isMetamorph) ? lobData?.willpower : vampiroData.willpower) || 1;
         break;
       case 'humanity':
         pool = (vampiroData as VampiroCharacterData).humanity || 1;
@@ -123,7 +132,7 @@ export function VampirePendingTest({
         }
         break;
       default:
-        // Werewolf-specific test types
+        // Werewolf/Metamorph-specific test types
         if ((config.testType as string) === 'gnosis') {
           pool = lobData?.gnosis ?? 1;
         } else if ((config.testType as string) === 'rage') {
