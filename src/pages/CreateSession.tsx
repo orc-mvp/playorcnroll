@@ -158,9 +158,9 @@ export default function CreateSession() {
                 <Label className="font-medieval">
                   {t.session.gameSystem} *
                 </Label>
-                <GameSystemSelector
-                  value={gameSystem}
-                  onChange={setGameSystem}
+                <SessionFamilySelector
+                  value={family}
+                  onChange={setFamily}
                   disabled={isSubmitting}
                 />
               </div>
