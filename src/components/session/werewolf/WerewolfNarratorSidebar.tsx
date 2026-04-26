@@ -398,6 +398,7 @@ export function WerewolfNarratorSidebar({
                   name: selectedCharacter.name,
                   concept: selectedCharacter.concept,
                   vampiro_data: selectedCharacter.vampiro_data,
+                  experience_points: (selectedCharacter as any).experience_points ?? 0,
                 }}
                 sessionTrackers={{
                   gnosis: selectedParticipant?.session_gnosis ?? 0,
@@ -406,7 +407,6 @@ export function WerewolfNarratorSidebar({
                   healthDamage: selectedParticipant?.session_health_damage ?? Array(7).fill(false),
                   form: selectedParticipant?.session_form || 'hominid',
                 }}
-                experiencePoints={selectedParticipant?.experience_points}
                 readOnly
               />
             )}
