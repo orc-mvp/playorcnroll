@@ -241,7 +241,12 @@ export default function CreateSession() {
               <Button
                 type="submit"
                 className="w-full font-medieval text-lg h-12"
-                disabled={isSubmitting || !name.trim() || !family}
+                disabled={
+                  isSubmitting ||
+                  !name.trim() ||
+                  !family ||
+                  (family === 'storyteller' && allowedSystems.length === 0)
+                }
               >
                 {isSubmitting ? t.common.loading : t.session.create}
               </Button>
