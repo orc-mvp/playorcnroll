@@ -41,6 +41,7 @@ import { EditLobisomemCharacterModal } from '@/components/character/lobisomem/Ed
 import { CharacterNotes } from '@/components/character/CharacterNotes';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import LobisomemCharacterSheet from '@/components/character/lobisomem/LobisomemCharacterSheet';
+import MagoCharacterSheet from '@/components/character/mago/MagoCharacterSheet';
 import type { Json } from '@/integrations/supabase/types';
 
 interface MajorMark {
