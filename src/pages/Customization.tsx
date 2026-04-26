@@ -114,6 +114,19 @@ const attributeOptions = ['aggression', 'determination', 'seduction', 'cunning',
 
 type ActiveTab = 'marks' | 'merits_flaws';
 
+/**
+ * Sistemas exibidos no formulário/filtros de Vantagens & Desvantagens.
+ * Metamorfos compartilham M&F com Lobisomem (mesmo `lobisomem_w20` no banco),
+ * portanto escondemos `metamorfos_w20` aqui e renomeamos `lobisomem_w20` como
+ * "Lobisomem / Metamorfo" para deixar claro que serve aos dois.
+ */
+const getMfSystems = () =>
+  GAME_SYSTEMS.filter((s) => s.available && s.id !== 'metamorfos_w20');
+const getMfSystemLabel = (sysId: string, lobMetLabel: string) => {
+  if (sysId === 'lobisomem_w20') return lobMetLabel;
+  return GAME_SYSTEMS.find((s) => s.id === sysId)?.name || sysId;
+};
+
 export default function Customization() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
