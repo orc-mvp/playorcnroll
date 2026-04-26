@@ -238,7 +238,24 @@ export function WerewolfTrackers({
 
   const isMetamorph = character?.game_system === 'metamorfos_w20';
   const customForms = isMetamorph ? (lobData?.metamorph_forms || []) : undefined;
-  const themeAccent = isMetamorph ? 'amber-500' : 'emerald-500';
+  // Static Tailwind classes (purger-safe) por sistema
+  const themeClasses = isMetamorph
+    ? {
+        cardBorder: 'border-amber-500/20',
+        titleText: 'text-amber-500',
+        badgeBorder: 'border-amber-500/30',
+        badgeText: 'text-amber-500',
+        btnBorder: 'border-amber-500/30',
+        btnHover: 'hover:bg-amber-500/10',
+      }
+    : {
+        cardBorder: 'border-emerald-500/20',
+        titleText: 'text-emerald-500',
+        badgeBorder: 'border-emerald-500/30',
+        badgeText: 'text-emerald-500',
+        btnBorder: 'border-emerald-500/30',
+        btnHover: 'hover:bg-emerald-500/10',
+      };
 
   const getFormLabel = (form: string) => {
     if (isMetamorph) {
