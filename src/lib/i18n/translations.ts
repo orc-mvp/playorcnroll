@@ -1141,6 +1141,8 @@ export const translations = {
       defineIdentity: 'Defina a identidade do seu Garou',
       basicInfo: 'Informações Básicas',
       selectTribe: 'Selecione a tribo',
+      shifter: 'Metamorfo',
+      selectShifter: 'Selecione o metamorfo',
       selectAuspice: 'Selecione o augúrio',
       selectBreed: 'Selecione a raça',
       selectRank: 'Selecione o posto',
