@@ -85,7 +85,7 @@ export default function CreateSession() {
           narrator_id: user.id,
           invite_code: inviteCode,
           status: 'lobby',
-          game_system: gameSystem,
+          game_system: familyToGameSystem(family),
         })
         .select()
         .single();
