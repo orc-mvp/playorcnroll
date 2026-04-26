@@ -80,7 +80,7 @@ export default function AllowedSystemsSelector({
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h4 className="font-medieval font-semibold">
-                  {adapter.label}
+                  {adapter.fullLabel}
                 </h4>
                 {!adapter.available && (
                   <Badge variant="outline" className="text-xs">
