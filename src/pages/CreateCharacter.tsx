@@ -250,7 +250,7 @@ export default function CreateCharacter() {
           },
         });
         if (error) throw error;
-      } else if (gameSystem === 'lobisomem_w20') {
+      } else if (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') {
         const { error } = await supabase.from('characters').insert({
           user_id: user.id,
           name: lobisomemFormData.name.trim(),
@@ -277,6 +277,8 @@ export default function CreateCharacter() {
             backgrounds: lobisomemFormData.backgrounds,
             renown: lobisomemFormData.renown,
             merits_flaws: lobisomemFormData.merits_flaws || [],
+            // Metamorfos começa com lista vazia de formas — configurar na edição.
+            ...(gameSystem === 'metamorfos_w20' ? { metamorph_forms: [], metamorph_species: '' } : {}),
           },
         });
         if (error) throw error;
