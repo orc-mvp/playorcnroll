@@ -452,7 +452,6 @@ export default function StorytellerSession() {
   const PlayerSidePanel = myAdapter.PlayerSidePanel;
   const PendingTestComponent = myAdapter.PendingTestComponent;
   const TrackersComponent = myAdapter.PlayerTrackersComponent;
-  const TestRequestModalComponent = sessionAdapter.TestRequestModalComponent;
 
   // Props para trackers (variam por sistema)
   const buildTrackerProps = () => {
