@@ -287,12 +287,12 @@ export default function StepLobisomemBasicInfo({ formData, updateFormData, gameS
               </Label>
               <Select value={formData.breed} onValueChange={(v) => updateFormData({ breed: v })}>
                 <SelectTrigger className="font-body bg-input border-border">
-                  <SelectValue placeholder={t.lobisomem.selectBreed} />
+                  <SelectValue placeholder={isShifter ? (t.lobisomem.selectShifterBreed ?? t.lobisomem.selectBreed) : t.lobisomem.selectBreed} />
                 </SelectTrigger>
                 <SelectContent>
-                  {BREEDS.map((b) => (
+                  {(isShifter ? SHIFTER_BREEDS : BREEDS).map((b) => (
                     <SelectItem key={b} value={b}>
-                      {getLabel(BREED_I18N_MAP, b)}
+                      {isShifter ? getLabel(SHIFTER_BREED_I18N_MAP, b) : getLabel(BREED_I18N_MAP, b)}
                     </SelectItem>
                   ))}
                 </SelectContent>
