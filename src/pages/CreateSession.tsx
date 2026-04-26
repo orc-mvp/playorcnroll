@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ArrowLeft, Wand2 } from 'lucide-react';
 import SessionFamilySelector from '@/components/SessionFamilySelector';
 import type { GameSystemFamily } from '@/lib/gameSystems';
-import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
+
 
 function generateInviteCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
