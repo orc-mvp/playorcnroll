@@ -276,10 +276,39 @@ export default function CreateCharacter() {
           },
         });
         if (error) throw error;
+      } else if (gameSystem === 'mago_m20') {
+        const { error } = await supabase.from('characters').insert({
+          user_id: user.id,
+          name: magoFormData.name.trim(),
+          concept: magoFormData.concept.trim() || null,
+          game_system: gameSystem,
+          vampiro_data: {
+            player: magoFormData.player,
+            chronicle: magoFormData.chronicle,
+            nature: magoFormData.nature,
+            demeanor: magoFormData.demeanor,
+            tradition: magoFormData.tradition,
+            essence: magoFormData.essence,
+            cabal: magoFormData.cabal,
+            attributes: magoFormData.attributes,
+            abilities: magoFormData.abilities,
+            specializations: magoFormData.specializations,
+            spheres: magoFormData.spheres,
+            rotes: magoFormData.rotes,
+            backgrounds: magoFormData.backgrounds,
+            arete: magoFormData.arete,
+            willpower: magoFormData.willpower,
+            quintessence: magoFormData.quintessence,
+            paradox: magoFormData.paradox,
+            merits_flaws: magoFormData.merits_flaws || [],
+          },
+        });
+        if (error) throw error;
       }
 
       const charName = gameSystem === 'vampiro_v3' ? vampiroFormData.name
         : gameSystem === 'lobisomem_w20' ? lobisomemFormData.name
+        : gameSystem === 'mago_m20' ? magoFormData.name
         : formData.name;
 
       toast({
