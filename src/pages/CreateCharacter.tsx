@@ -171,6 +171,13 @@ export default function CreateCharacter() {
         case 2: case 3: case 4: case 5: return true;
         default: return false;
       }
+    } else if (gameSystem === 'mago_m20') {
+      switch (currentStep) {
+        case 0: return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
+        case 1: return magoFormData.name.trim().length >= 2 && magoFormData.tradition.length > 0;
+        case 2: case 3: case 4: case 5: case 6: return true;
+        default: return false;
+      }
     }
     return currentStep === 0 && gameSystem !== null;
   };
