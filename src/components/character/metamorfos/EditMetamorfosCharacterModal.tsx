@@ -146,28 +146,13 @@ export function EditMetamorfosCharacterModal({
   const [data, setData] = useState<LobisomemCharacterData>(character.vampiro_data || {});
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
-  const [availableMeritsFlaws, setAvailableMeritsFlaws] = useState<{ id: string; name: string; description: string; cost: number; category: string; prerequisites: string | null }[]>([]);
+
 
   useEffect(() => {
     setName(character.name);
     setConcept(character.concept || '');
     setData(character.vampiro_data || {});
   }, [character]);
-
-  useEffect(() => {
-    const fetchMF = async () => {
-      // Metamorfos compartilham vantagens/desvantagens com Lobisomem.
-      const { data: rows } = await supabase
-        .from('merits_flaws')
-        .select('id, name, description, cost, category, prerequisites')
-        .contains('game_systems', ['lobisomem_w20'])
-        .order('category')
-        .order('cost', { ascending: false })
-        .order('name');
-      if (rows) setAvailableMeritsFlaws(rows);
-    };
-    if (open) fetchMF();
-  }, [open]);
 
   const updateField = <K extends keyof LobisomemCharacterData>(key: K, value: LobisomemCharacterData[K]) => {
     setData(prev => ({ ...prev, [key]: value }));

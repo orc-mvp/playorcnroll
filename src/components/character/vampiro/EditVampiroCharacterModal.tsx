@@ -28,6 +28,7 @@ import {
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { User, Shield, Brain, Heart, Moon, Star, BookOpen, Sparkles } from 'lucide-react';
 import DotRating from './DotRating';
+import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
 
 // Types
 interface VampiroData {
@@ -360,7 +361,6 @@ export function EditVampiroCharacterModal({
   const [vampiroData, setVampiroData] = useState<VampiroData>(character.vampiro_data || {});
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
-  const [availableMeritsFlaws, setAvailableMeritsFlaws] = useState<{ id: string; name: string; description: string; cost: number; category: string; prerequisites: string | null }[]>([]);
 
   // Reset form when character changes
   useEffect(() => {
@@ -368,21 +368,6 @@ export function EditVampiroCharacterModal({
     setConcept(character.concept || '');
     setVampiroData(character.vampiro_data || {});
   }, [character]);
-
-  // Fetch available merits/flaws
-  useEffect(() => {
-    const fetch = async () => {
-      const { data } = await supabase
-        .from('merits_flaws')
-        .select('id, name, description, cost, category, prerequisites')
-        .contains('game_systems', ['vampiro_v3'])
-        .order('category')
-        .order('cost', { ascending: false })
-        .order('name');
-      if (data) setAvailableMeritsFlaws(data);
-    };
-    if (open) fetch();
-  }, [open]);
 
   const updateVampiroField = <K extends keyof VampiroData>(key: K, value: VampiroData[K]) => {
     setVampiroData(prev => ({ ...prev, [key]: value }));
