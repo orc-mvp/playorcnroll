@@ -170,7 +170,8 @@ const ABILITY_KEYS = {
   knowledges: ['academics', 'computer', 'enigmas', 'investigation', 'law', 'linguistics', 'medicine', 'occult', 'politics', 'rituals', 'science'] as const,
 };
 
-export default function LobisomemCharacterSheet({ character, sessionTrackers, experiencePoints, participantId, readOnly = false }: LobisomemCharacterSheetProps) {
+export default function LobisomemCharacterSheet({ character, sessionTrackers, readOnly = false }: LobisomemCharacterSheetProps) {
+  const experiencePoints = character.experience_points ?? 0;
   const { t, language } = useI18n();
   const data: LobisomemCharacterData = (character.vampiro_data as LobisomemCharacterData) || {};
   const lang = language === 'pt-BR' ? 'pt' : 'en';
