@@ -41,6 +41,7 @@ import { EditLobisomemCharacterModal } from '@/components/character/lobisomem/Ed
 import { CharacterNotes } from '@/components/character/CharacterNotes';
 import VampiroCharacterSheet from '@/components/character/vampiro/VampiroCharacterSheet';
 import LobisomemCharacterSheet from '@/components/character/lobisomem/LobisomemCharacterSheet';
+import MagoCharacterSheet from '@/components/character/mago/MagoCharacterSheet';
 import type { Json } from '@/integrations/supabase/types';
 
 interface MajorMark {
@@ -273,6 +274,16 @@ export default function CharacterSheet() {
             />
           ) : character.game_system === 'lobisomem_w20' ? (
             <LobisomemCharacterSheet
+              character={{
+                id: character.id,
+                name: character.name,
+                concept: character.concept,
+                vampiro_data: character.vampiro_data as any,
+                notes: character.notes,
+              }}
+            />
+          ) : character.game_system === 'mago_m20' ? (
+            <MagoCharacterSheet
               character={{
                 id: character.id,
                 name: character.name,

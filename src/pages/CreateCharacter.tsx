@@ -171,6 +171,13 @@ export default function CreateCharacter() {
         case 2: case 3: case 4: case 5: return true;
         default: return false;
       }
+    } else if (gameSystem === 'mago_m20') {
+      switch (currentStep) {
+        case 0: return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
+        case 1: return magoFormData.name.trim().length >= 2 && magoFormData.tradition.length > 0;
+        case 2: case 3: case 4: case 5: case 6: return true;
+        default: return false;
+      }
     }
     return currentStep === 0 && gameSystem !== null;
   };
@@ -269,10 +276,39 @@ export default function CreateCharacter() {
           },
         });
         if (error) throw error;
+      } else if (gameSystem === 'mago_m20') {
+        const { error } = await supabase.from('characters').insert({
+          user_id: user.id,
+          name: magoFormData.name.trim(),
+          concept: magoFormData.concept.trim() || null,
+          game_system: gameSystem,
+          vampiro_data: {
+            player: magoFormData.player,
+            chronicle: magoFormData.chronicle,
+            nature: magoFormData.nature,
+            demeanor: magoFormData.demeanor,
+            tradition: magoFormData.tradition,
+            essence: magoFormData.essence,
+            cabal: magoFormData.cabal,
+            attributes: magoFormData.attributes,
+            abilities: magoFormData.abilities,
+            specializations: magoFormData.specializations,
+            spheres: magoFormData.spheres,
+            rotes: magoFormData.rotes,
+            backgrounds: magoFormData.backgrounds,
+            arete: magoFormData.arete,
+            willpower: magoFormData.willpower,
+            quintessence: magoFormData.quintessence,
+            paradox: magoFormData.paradox,
+            merits_flaws: magoFormData.merits_flaws || [],
+          },
+        });
+        if (error) throw error;
       }
 
       const charName = gameSystem === 'vampiro_v3' ? vampiroFormData.name
         : gameSystem === 'lobisomem_w20' ? lobisomemFormData.name
+        : gameSystem === 'mago_m20' ? magoFormData.name
         : formData.name;
 
       toast({
@@ -442,6 +478,44 @@ export default function CreateCharacter() {
           />
         )}
 
+        {/* Mago Steps */}
+        {step === 1 && gameSystem === 'mago_m20' && (
+          <StepMagoBasicInfo
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 2 && gameSystem === 'mago_m20' && (
+          <StepMagoAttributes
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 3 && gameSystem === 'mago_m20' && (
+          <StepMagoSpheres
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 4 && gameSystem === 'mago_m20' && (
+          <StepMagoRotes
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 5 && gameSystem === 'mago_m20' && (
+          <StepMagoBackgrounds
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 6 && gameSystem === 'mago_m20' && (
+          <StepMagoMeritsFlaws
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+
         {/* Navigation Buttons */}
         <div className="flex justify-between mt-8 max-w-2xl mx-auto">
           <Button variant="outline" onClick={handleBack}>
@@ -461,6 +535,7 @@ export default function CreateCharacter() {
                 (gameSystem === 'herois_marcados' && !validateStep(step)) ||
                 (gameSystem === 'vampiro_v3' && (!vampiroFormData.name.trim() || !vampiroFormData.clan)) ||
                 (gameSystem === 'lobisomem_w20' && (!lobisomemFormData.name.trim() || !lobisomemFormData.tribe)) ||
+                (gameSystem === 'mago_m20' && (!magoFormData.name.trim() || !magoFormData.tradition)) ||
                 isSubmitting
               }
             >
