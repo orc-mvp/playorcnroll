@@ -331,32 +331,7 @@ export function VampireNarratorSidebar({
         <span className="font-medieval">{t.roles.narrator}</span>
       </div>
 
-      {/* Request Test Card */}
-      <Card className="medieval-card border-destructive/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="font-medieval text-base flex items-center gap-2">
-            <Dices className="w-4 h-4 text-destructive" />
-            {t.vampiroTests.requestTest}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Button
-            onClick={onRequestTest}
-            className="w-full bg-destructive hover:bg-destructive/90"
-          >
-            <Dices className="w-4 h-4 mr-2" />
-            {t.vampiroTests.test}
-          </Button>
-          <Button
-            onClick={onRequestRoll}
-            variant="outline"
-            className="w-full border-destructive/30 hover:bg-destructive/10"
-          >
-            <Dices className="w-4 h-4 mr-2" />
-            {t.vampiroTests.roll}
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Request Test Card removido — agora é único, renderizado pelo StorytellerSession */}
 
       {/* Coterie (Players) */}
       <Card className="medieval-card border-destructive/20">

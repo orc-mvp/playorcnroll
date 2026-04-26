@@ -24,6 +24,7 @@ import { SessionHeader } from '@/components/session/SessionHeader';
 import { ManagePlayersModal } from '@/components/session/vampire/ManagePlayersModal';
 import { StorytellerNarratorRollModal } from '@/components/session/storyteller/StorytellerNarratorRollModal';
 import StorytellerTestRequestModal from '@/components/session/storyteller/StorytellerTestRequestModal';
+import { StorytellerRequestTestCard } from '@/components/session/storyteller/StorytellerRequestTestCard';
 import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { WerewolfNarratorSidebar } from '@/components/session/werewolf/WerewolfNarratorSidebar';
@@ -50,6 +51,12 @@ interface StorytellerThemeBundle {
   asideBg: string;
   fabBg: string;
   fabText: string;
+  // Pedido de teste compartilhado
+  cardBorder: string;
+  cardIconText: string;
+  cardPrimaryBg: string;
+  cardOutlineBorder: string;
+  cardOutlineHover: string;
 }
 
 function getThemeBundle(
@@ -64,6 +71,41 @@ function getThemeBundle(
       asideBg: 'from-emerald-500/5 to-background',
       fabBg: 'bg-emerald-500 hover:bg-emerald-600',
       fabText: 'text-white',
+      cardBorder: 'border-emerald-500/20',
+      cardIconText: 'text-emerald-500',
+      cardPrimaryBg: 'bg-emerald-500 hover:bg-emerald-600',
+      cardOutlineBorder: 'border-emerald-500/30',
+      cardOutlineHover: 'hover:bg-emerald-500/10',
+    };
+  }
+  if (systemId === 'metamorfos_w20') {
+    return {
+      loadingIcon: <AdapterIcon className="w-8 h-8" />,
+      loadingText: 'text-amber-500',
+      asideBorder: 'border-amber-500/20',
+      asideBg: 'from-amber-500/5 to-background',
+      fabBg: 'bg-amber-500 hover:bg-amber-600',
+      fabText: 'text-white',
+      cardBorder: 'border-amber-500/20',
+      cardIconText: 'text-amber-500',
+      cardPrimaryBg: 'bg-amber-500 hover:bg-amber-600',
+      cardOutlineBorder: 'border-amber-500/30',
+      cardOutlineHover: 'hover:bg-amber-500/10',
+    };
+  }
+  if (systemId === 'mago_m20') {
+    return {
+      loadingIcon: <AdapterIcon className="w-8 h-8" />,
+      loadingText: 'text-purple-500',
+      asideBorder: 'border-purple-500/20',
+      asideBg: 'from-purple-500/5 to-background',
+      fabBg: 'bg-purple-500 hover:bg-purple-600',
+      fabText: 'text-white',
+      cardBorder: 'border-purple-500/20',
+      cardIconText: 'text-purple-500',
+      cardPrimaryBg: 'bg-purple-500 hover:bg-purple-600',
+      cardOutlineBorder: 'border-purple-500/30',
+      cardOutlineHover: 'hover:bg-purple-500/10',
     };
   }
   // default vampire
@@ -74,6 +116,11 @@ function getThemeBundle(
     asideBg: 'from-destructive/5 to-background',
     fabBg: 'bg-destructive hover:bg-destructive/90',
     fabText: 'text-destructive-foreground',
+    cardBorder: 'border-destructive/20',
+    cardIconText: 'text-destructive',
+    cardPrimaryBg: 'bg-destructive hover:bg-destructive/90',
+    cardOutlineBorder: 'border-destructive/30',
+    cardOutlineHover: 'hover:bg-destructive/10',
   };
 }
 
@@ -93,6 +140,8 @@ export default function StorytellerSession() {
   const [loading, setLoading] = useState(true);
   const [showManagePlayersModal, setShowManagePlayersModal] = useState(false);
   const [testModalOpen, setTestModalOpen] = useState(false);
+  /** Quem abriu o modal de teste — define o escopo de alvos disponíveis. */
+  const [testRequester, setTestRequester] = useState<'narrator' | 'player'>('narrator');
   const [rollModalOpen, setRollModalOpen] = useState(false);
   const [showPendingTestDrawer, setShowPendingTestDrawer] = useState(false);
 
@@ -403,6 +452,12 @@ export default function StorytellerSession() {
   }
 
   const theme = getThemeBundle(session.game_system, sessionAdapter.icon);
+  // Tema do bloco de "Pedir Teste" para o jogador — baseado no sistema do
+  // próprio personagem (mantém a identidade visual da ficha dele).
+  const playerTheme = getThemeBundle(
+    myCharacter?.game_system || session.game_system,
+    myAdapter.icon,
+  );
   const sceneTheme = getSceneThemeForSystem(session.game_system);
   const noCharThemeKey: 'vampire' | 'werewolf' =
     session.game_system === 'lobisomem_w20' ? 'werewolf' : 'vampire';
@@ -420,15 +475,38 @@ export default function StorytellerSession() {
            p.character?.game_system === 'metamorfos_w20',
   );
 
+  const openTestAsNarrator = () => {
+    setTestRequester('narrator');
+    setTestModalOpen(true);
+  };
+  const openTestAsPlayer = () => {
+    setTestRequester('player');
+    setTestModalOpen(true);
+  };
+
   const renderNarratorSidebar = () => (
     <div className="space-y-6">
+      {/* Bloco único de "Pedir Teste" + "Rolar" para o narrador */}
+      <StorytellerRequestTestCard
+        isNarrator
+        theme={{
+          border: theme.cardBorder,
+          iconText: theme.cardIconText,
+          primaryBg: theme.cardPrimaryBg,
+          outlineBorder: theme.cardOutlineBorder,
+          outlineHover: theme.cardOutlineHover,
+        }}
+        onRequestTest={openTestAsNarrator}
+        onRequestRoll={() => setRollModalOpen(true)}
+      />
+
       {vampireParticipants.length > 0 && (
         <VampireNarratorSidebar
           sessionId={sessionId!}
           participants={vampireParticipants as any}
           scenes={scenes as any}
           currentScene={currentScene as any}
-          onRequestTest={() => setTestModalOpen(true)}
+          onRequestTest={openTestAsNarrator}
           onRequestRoll={() => setRollModalOpen(true)}
           onSceneChange={setCurrentScene as any}
           onEventCreated={handleLocalEvent}
@@ -440,7 +518,7 @@ export default function StorytellerSession() {
           participants={werewolfParticipants as any}
           scenes={scenes as any}
           currentScene={currentScene as any}
-          onRequestTest={() => setTestModalOpen(true)}
+          onRequestTest={openTestAsNarrator}
           onRequestRoll={() => setRollModalOpen(true)}
           onSceneChange={setCurrentScene as any}
           onEventCreated={handleLocalEvent}
@@ -605,7 +683,22 @@ export default function StorytellerSession() {
                 {isNarrator ? (
                   renderNarratorSidebar()
                 ) : (
-                  <PlayerSidePanel {...(sidePanelProps as any)} />
+                  <>
+                    {myCharacter && (
+                      <StorytellerRequestTestCard
+                        isNarrator={false}
+                        theme={{
+                          border: playerTheme.cardBorder,
+                          iconText: playerTheme.cardIconText,
+                          primaryBg: playerTheme.cardPrimaryBg,
+                          outlineBorder: playerTheme.cardOutlineBorder,
+                          outlineHover: playerTheme.cardOutlineHover,
+                        }}
+                        onRequestTest={openTestAsPlayer}
+                      />
+                    )}
+                    <PlayerSidePanel {...(sidePanelProps as any)} />
+                  </>
                 )}
               </div>
             </TabsContent>
@@ -648,6 +741,19 @@ export default function StorytellerSession() {
                   renderNarratorSidebar()
                 ) : (
                   <div className="space-y-4">
+                    {myCharacter && (
+                      <StorytellerRequestTestCard
+                        isNarrator={false}
+                        theme={{
+                          border: playerTheme.cardBorder,
+                          iconText: playerTheme.cardIconText,
+                          primaryBg: playerTheme.cardPrimaryBg,
+                          outlineBorder: playerTheme.cardOutlineBorder,
+                          outlineHover: playerTheme.cardOutlineHover,
+                        }}
+                        onRequestTest={openTestAsPlayer}
+                      />
+                    )}
                     {pendingTestSharedProps && !hasRolledForPendingTest && (
                       <PendingTestComponent {...(pendingTestSharedProps as any)} />
                     )}
@@ -706,11 +812,17 @@ export default function StorytellerSession() {
         </div>
       )}
 
-      {/* Test Request Modal — unificado, mostra categorias por sistema dos alvos */}
+      {/* Test Request Modal — unificado.
+          - Narrador vê todos os participantes como alvos possíveis.
+          - Jogador só pode pedir teste para o próprio personagem. */}
       <StorytellerTestRequestModal
         open={testModalOpen}
         onOpenChange={setTestModalOpen}
-        participants={participants as any}
+        participants={
+          (testRequester === 'player' && myParticipant
+            ? [myParticipant]
+            : participants) as any
+        }
         onRequestTest={handleRequestTest}
       />
 
