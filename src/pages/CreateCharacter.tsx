@@ -118,14 +118,16 @@ export default function CreateCharacter() {
   const preSelectedSystem = searchParams.get('system');
   
   // Initialize state based on URL param
+  const VALID_PRE = ['vampiro_v3', 'herois_marcados', 'lobisomem_w20', 'mago_m20'];
+
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(() => {
-    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados' || preSelectedSystem === 'lobisomem_w20') {
+    if (preSelectedSystem && VALID_PRE.includes(preSelectedSystem)) {
       return preSelectedSystem as GameSystemId;
     }
     return null;
   });
   const [step, setStep] = useState(() => {
-    if (preSelectedSystem === 'vampiro_v3' || preSelectedSystem === 'herois_marcados' || preSelectedSystem === 'lobisomem_w20') {
+    if (preSelectedSystem && VALID_PRE.includes(preSelectedSystem)) {
       return 1;
     }
     return 0;
@@ -133,9 +135,14 @@ export default function CreateCharacter() {
   const [formData, setFormData] = useState<CharacterFormData>(initialFormData);
   const [vampiroFormData, setVampiroFormData] = useState<VampiroFormData>(initialVampiroFormData);
   const [lobisomemFormData, setLobisomemFormData] = useState<LobisomemFormData>(initialLobisomemFormData);
+  const [magoFormData, setMagoFormData] = useState<MagoFormData>(initialMagoFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const totalSteps = gameSystem === 'vampiro_v3' ? 6 : gameSystem === 'lobisomem_w20' ? 6 : 4;
+  const totalSteps =
+    gameSystem === 'vampiro_v3' ? 6 :
+    gameSystem === 'lobisomem_w20' ? 6 :
+    gameSystem === 'mago_m20' ? 7 :
+    4;
   const progress = ((step + 1) / totalSteps) * 100;
 
   const validateStep = (currentStep: number): boolean => {
