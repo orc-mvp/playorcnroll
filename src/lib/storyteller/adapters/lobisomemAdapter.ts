@@ -88,4 +88,56 @@ export const lobisomemAdapter: SystemAdapter = {
   // Lobisomem reusa o VampirePendingTest passando gameSystem='lobisomem_w20'
   PendingTestComponent: VampirePendingTest as any,
   PlayerSidePanel: LobisomemPlayerSidePanel,
+
+  testCategories: [
+    {
+      id: 'attribute_ability',
+      label: 'Atributo + Habilidade',
+      crossSystem: true,
+      testType: 'attribute_ability',
+      requiresAttribute: true,
+      requiresAbility: true,
+    },
+    {
+      id: 'attribute_only',
+      label: 'Atributo Puro',
+      crossSystem: true,
+      testType: 'attribute_only',
+      requiresAttribute: true,
+    },
+    {
+      id: 'willpower',
+      label: 'Vontade',
+      crossSystem: true,
+      testType: 'willpower',
+    },
+    {
+      id: 'gnosis',
+      label: 'Gnose',
+      crossSystem: false,
+      testType: 'gnosis',
+    },
+    {
+      id: 'rage',
+      label: 'Fúria',
+      crossSystem: false,
+      testType: 'rage',
+    },
+    {
+      id: 'raw_dice',
+      label: 'Pool Avulso',
+      crossSystem: true,
+      testType: 'raw_dice',
+      requiresDiceCount: true,
+    },
+  ],
+
+  narratorRollConfig: {
+    defaultDifficulty: 6,
+    allowExploding10s: true,
+    extraPools: [
+      { id: 'rage', label: 'Fúria', defaultDifficulty: 6 },
+      { id: 'gnosis', label: 'Gnose', defaultDifficulty: 6 },
+    ],
+  },
 };
