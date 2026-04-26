@@ -49,25 +49,22 @@ export const MAGO_BACKGROUNDS = [
 
 /** Tradições e Convenções (faccoes) — apenas para informações básicas do personagem */
 export const MAGO_TRADITIONS = [
-  'Akáshicos',
-  'Celestes Coros',
-  'Cultistas do Êxtase',
+  // Tradições
   'Adeptos da Virtualidade',
+  'Coro Celestial',
+  'Culto do Êxtase',
+  'Eutanatos',
   'Filhos do Éter',
-  'Hollow Ones',
-  'Onirodélicos',
+  'Irmandade de Akasha',
+  'Oradores dos Sonhos',
   'Ordem de Hermes',
-  'Sociedade de Éter',
   'Verbena',
   // Convenções da Tecnocracia
+  'Engenheiros do Vácuo',
   'Iteração X',
   'Nova Ordem Mundial',
   'Progenitores',
   'Sindicato',
-  'Vácuos',
-  // Marauders / Nephandi (raro)
-  'Marauder',
-  'Nephandi',
 ];
 
 export interface MagoCharacterData {
