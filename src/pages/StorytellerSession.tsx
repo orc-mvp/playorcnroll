@@ -419,7 +419,35 @@ export default function StorytellerSession() {
            p.character?.game_system === 'metamorfos_w20',
   );
 
-  const TrackersComponent = myAdapter.PlayerTrackersComponent;
+  const renderNarratorSidebar = () => (
+    <div className="space-y-6">
+      {vampireParticipants.length > 0 && (
+        <VampireNarratorSidebar
+          sessionId={sessionId!}
+          participants={vampireParticipants as any}
+          scenes={scenes as any}
+          currentScene={currentScene as any}
+          onRequestTest={() => setTestModalOpen(true)}
+          onRequestRoll={() => setRollModalOpen(true)}
+          onSceneChange={setCurrentScene as any}
+          onEventCreated={handleLocalEvent}
+        />
+      )}
+      {werewolfParticipants.length > 0 && (
+        <WerewolfNarratorSidebar
+          sessionId={sessionId!}
+          participants={werewolfParticipants as any}
+          scenes={scenes as any}
+          currentScene={currentScene as any}
+          onRequestTest={() => setTestModalOpen(true)}
+          onRequestRoll={() => setRollModalOpen(true)}
+          onSceneChange={setCurrentScene as any}
+          onEventCreated={handleLocalEvent}
+        />
+      )}
+    </div>
+  );
+
   const PlayerSidePanel = myAdapter.PlayerSidePanel;
   const PendingTestComponent = myAdapter.PendingTestComponent;
   const TestRequestModalComponent = sessionAdapter.TestRequestModalComponent;
