@@ -486,7 +486,7 @@ export default function StorytellerSession() {
     character: myCharacter,
     experiencePoints: myParticipant?.experience_points,
     sessionTrackers:
-      myCharacter?.game_system === 'lobisomem_w20'
+      (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
         ? {
             gnosis: myParticipant?.session_gnosis ?? 0,
             rage: myParticipant?.session_rage ?? 0,
