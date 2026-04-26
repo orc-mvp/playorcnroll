@@ -741,6 +741,19 @@ export default function StorytellerSession() {
                   renderNarratorSidebar()
                 ) : (
                   <div className="space-y-4">
+                    {myCharacter && (
+                      <StorytellerRequestTestCard
+                        isNarrator={false}
+                        theme={{
+                          border: playerTheme.cardBorder,
+                          iconText: playerTheme.cardIconText,
+                          primaryBg: playerTheme.cardPrimaryBg,
+                          outlineBorder: playerTheme.cardOutlineBorder,
+                          outlineHover: playerTheme.cardOutlineHover,
+                        }}
+                        onRequestTest={openTestAsPlayer}
+                      />
+                    )}
                     {pendingTestSharedProps && !hasRolledForPendingTest && (
                       <PendingTestComponent {...(pendingTestSharedProps as any)} />
                     )}
