@@ -313,7 +313,7 @@ export default function CreateCharacter() {
       }
 
       const charName = gameSystem === 'vampiro_v3' ? vampiroFormData.name
-        : gameSystem === 'lobisomem_w20' ? lobisomemFormData.name
+        : (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') ? lobisomemFormData.name
         : gameSystem === 'mago_m20' ? magoFormData.name
         : formData.name;
 
