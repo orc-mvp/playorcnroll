@@ -253,6 +253,8 @@ export default function CharacterSheet() {
                   setShowLobisomemEditModal(true);
                 } else if (character.game_system === 'mago_m20') {
                   setShowMagoEditModal(true);
+                } else if (character.game_system === 'metamorfos_w20') {
+                  setShowMetamorfosEditModal(true);
                 } else {
                   setShowEditModal(true);
                 }
