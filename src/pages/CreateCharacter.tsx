@@ -141,6 +141,7 @@ export default function CreateCharacter() {
   const totalSteps =
     gameSystem === 'vampiro_v3' ? 6 :
     gameSystem === 'lobisomem_w20' ? 6 :
+    gameSystem === 'metamorfos_w20' ? 6 :
     gameSystem === 'mago_m20' ? 7 :
     4;
   const progress = ((step + 1) / totalSteps) * 100;
