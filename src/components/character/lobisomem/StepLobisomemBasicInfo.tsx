@@ -119,8 +119,9 @@ const RANK_I18N_MAP: Record<string, string> = {
   'Elder': 'rank_elder',
 };
 
-export default function StepLobisomemBasicInfo({ formData, updateFormData }: StepLobisomemBasicInfoProps) {
+export default function StepLobisomemBasicInfo({ formData, updateFormData, gameSystem = 'lobisomem_w20' }: StepLobisomemBasicInfoProps) {
   const { t, language } = useI18n();
+  const isShifter = gameSystem === 'metamorfos_w20';
 
   const getLabel = (map: Record<string, string>, key: string) => {
     const i18nKey = map[key];
