@@ -28,8 +28,13 @@ export const STORYTELLER_SYSTEM_IDS: StorytellerSystemId[] = [
   'metamorfos_w20',
 ];
 
-/** Verifica se um game_system roda na sala Storyteller */
+/**
+ * Verifica se um game_system roda na sala Storyteller.
+ * Aceita também o ID genérico de família 'storyteller' (sessões novas
+ * criadas pela família unificada, sem comprometer com um sistema único).
+ */
 export function isStorytellerSystem(gameSystem: string): boolean {
+  if (gameSystem === 'storyteller') return true;
   return (STORYTELLER_SYSTEM_IDS as string[]).includes(gameSystem);
 }
 

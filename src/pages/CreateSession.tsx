@@ -10,8 +10,9 @@ import { SimpleEditor } from '@/components/ui/simple-editor';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Wand2 } from 'lucide-react';
-import GameSystemSelector from '@/components/GameSystemSelector';
-import { GameSystemId, getGameSystem } from '@/lib/gameSystems';
+import SessionFamilySelector from '@/components/SessionFamilySelector';
+import type { GameSystemFamily } from '@/lib/gameSystems';
+
 
 function generateInviteCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -28,7 +29,7 @@ export default function CreateSession() {
   const { t } = useI18n();
   const { toast } = useToast();
 
-  const [gameSystem, setGameSystem] = useState<GameSystemId | null>(null);
+  const [family, setFamily] = useState<GameSystemFamily | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -38,23 +39,23 @@ export default function CreateSession() {
     return null;
   }
 
+  /**
+   * Mapeia a família escolhida para o `game_system` que será gravado em
+   * `sessions.game_system`. Famílias unificadas usam o ID da família.
+   * - `herois_marcados` → sala dedicada de Heróis Marcados.
+   * - `storyteller`     → sala unificada WoD; aceita personagens de
+   *   Vampiro/Lobisomem/Mago/Metamorfos sem amarrar a sessão a um
+   *   sistema único (o sistema de cada personagem é definido na ficha).
+   */
+  const familyToGameSystem = (f: GameSystemFamily): string => f;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!gameSystem) {
+    if (!family) {
       toast({
         title: t.session.error,
         description: t.session.selectGameSystem,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const system = getGameSystem(gameSystem);
-    if (!system?.available) {
-      toast({
-        title: t.session.error,
-        description: t.session.systemNotAvailable,
         variant: 'destructive',
       });
       return;
@@ -84,7 +85,7 @@ export default function CreateSession() {
           narrator_id: user.id,
           invite_code: inviteCode,
           status: 'lobby',
-          game_system: gameSystem,
+          game_system: familyToGameSystem(family),
         })
         .select()
         .single();
@@ -157,9 +158,9 @@ export default function CreateSession() {
                 <Label className="font-medieval">
                   {t.session.gameSystem} *
                 </Label>
-                <GameSystemSelector
-                  value={gameSystem}
-                  onChange={setGameSystem}
+                <SessionFamilySelector
+                  value={family}
+                  onChange={setFamily}
                   disabled={isSubmitting}
                 />
               </div>
@@ -193,7 +194,7 @@ export default function CreateSession() {
               <Button
                 type="submit"
                 className="w-full font-medieval text-lg h-12"
-                disabled={isSubmitting || !name.trim() || !gameSystem || !getGameSystem(gameSystem)?.available}
+                disabled={isSubmitting || !name.trim() || !family}
               >
                 {isSubmitting ? t.common.loading : t.session.create}
               </Button>
