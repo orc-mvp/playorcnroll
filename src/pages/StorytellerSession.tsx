@@ -469,15 +469,38 @@ export default function StorytellerSession() {
            p.character?.game_system === 'metamorfos_w20',
   );
 
+  const openTestAsNarrator = () => {
+    setTestRequester('narrator');
+    setTestModalOpen(true);
+  };
+  const openTestAsPlayer = () => {
+    setTestRequester('player');
+    setTestModalOpen(true);
+  };
+
   const renderNarratorSidebar = () => (
     <div className="space-y-6">
+      {/* Bloco único de "Pedir Teste" + "Rolar" para o narrador */}
+      <StorytellerRequestTestCard
+        isNarrator
+        theme={{
+          border: theme.cardBorder,
+          iconText: theme.cardIconText,
+          primaryBg: theme.cardPrimaryBg,
+          outlineBorder: theme.cardOutlineBorder,
+          outlineHover: theme.cardOutlineHover,
+        }}
+        onRequestTest={openTestAsNarrator}
+        onRequestRoll={() => setRollModalOpen(true)}
+      />
+
       {vampireParticipants.length > 0 && (
         <VampireNarratorSidebar
           sessionId={sessionId!}
           participants={vampireParticipants as any}
           scenes={scenes as any}
           currentScene={currentScene as any}
-          onRequestTest={() => setTestModalOpen(true)}
+          onRequestTest={openTestAsNarrator}
           onRequestRoll={() => setRollModalOpen(true)}
           onSceneChange={setCurrentScene as any}
           onEventCreated={handleLocalEvent}
@@ -489,7 +512,7 @@ export default function StorytellerSession() {
           participants={werewolfParticipants as any}
           scenes={scenes as any}
           currentScene={currentScene as any}
-          onRequestTest={() => setTestModalOpen(true)}
+          onRequestTest={openTestAsNarrator}
           onRequestRoll={() => setRollModalOpen(true)}
           onSceneChange={setCurrentScene as any}
           onEventCreated={handleLocalEvent}
