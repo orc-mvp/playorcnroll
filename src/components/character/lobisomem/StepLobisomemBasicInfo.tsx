@@ -159,16 +159,16 @@ export default function StepLobisomemBasicInfo({ formData, updateFormData, gameS
 
             <div className="space-y-2">
               <Label className="font-medieval text-sm">
-                {t.lobisomem.tribe} *
+                {isShifter ? t.lobisomem.shifter : t.lobisomem.tribe} {!isShifter && '*'}
               </Label>
               <Select value={formData.tribe} onValueChange={(v) => updateFormData({ tribe: v })}>
                 <SelectTrigger className="font-body bg-input border-border">
-                  <SelectValue placeholder={t.lobisomem.selectTribe} />
+                  <SelectValue placeholder={isShifter ? t.lobisomem.selectShifter : t.lobisomem.selectTribe} />
                 </SelectTrigger>
                 <SelectContent>
-                  {TRIBES.map((tribe) => (
-                    <SelectItem key={tribe} value={tribe}>
-                      {getLabel(TRIBE_I18N_MAP, tribe)}
+                  {(isShifter ? SHIFTERS : TRIBES).map((item) => (
+                    <SelectItem key={item} value={item}>
+                      {isShifter ? item : getLabel(TRIBE_I18N_MAP, item)}
                     </SelectItem>
                   ))}
                 </SelectContent>
