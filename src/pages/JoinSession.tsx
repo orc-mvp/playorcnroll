@@ -552,7 +552,14 @@ export default function JoinSession() {
                               <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => navigate(`/character/create?system=${validatedSession.game_system}&returnTo=/join/${inviteCode.trim().toUpperCase()}`)}
+                                onClick={() => {
+                                  // Família 'storyteller' não tem sistema fixo:
+                                  // deixa o usuário escolher Vampiro/Lobisomem/etc.
+                                  const sys = validatedSession.game_system === 'storyteller'
+                                    ? ''
+                                    : `system=${validatedSession.game_system}&`;
+                                  navigate(`/character/create?${sys}returnTo=/join/${inviteCode.trim().toUpperCase()}`);
+                                }}
                               >
                                 {t.session.createCharacterFor} {getSystemLabel(validatedSession.game_system)}
                               </Button>
