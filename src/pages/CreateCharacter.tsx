@@ -541,6 +541,7 @@ export default function CreateCharacter() {
                 (gameSystem === 'herois_marcados' && !validateStep(step)) ||
                 (gameSystem === 'vampiro_v3' && (!vampiroFormData.name.trim() || !vampiroFormData.clan)) ||
                 (gameSystem === 'lobisomem_w20' && (!lobisomemFormData.name.trim() || !lobisomemFormData.tribe)) ||
+                (gameSystem === 'metamorfos_w20' && !lobisomemFormData.name.trim()) ||
                 (gameSystem === 'mago_m20' && (!magoFormData.name.trim() || !magoFormData.tradition)) ||
                 isSubmitting
               }
