@@ -9,7 +9,7 @@ import { Sparkles, Star, Zap, Heart } from 'lucide-react';
 import MagoCharacterSheet from '@/components/character/mago/MagoCharacterSheet';
 import { MagoTrackers } from '@/components/session/mage/MagoTrackers';
 import { MagoPlayerSidePanel } from '@/components/session/mage/MagoPlayerSidePanel';
-import WerewolfTestRequestModal from '@/components/session/werewolf/WerewolfTestRequestModal';
+import MagoTestRequestModal from '@/components/session/mage/MagoTestRequestModal';
 import { VampirePendingTest } from '@/components/session/vampire/VampirePendingTest';
 import type { SystemAdapter } from '../types';
 
@@ -94,8 +94,8 @@ export const magoAdapter: SystemAdapter = {
 
   CharacterSheet: MagoCharacterSheet as any,
   PlayerTrackersComponent: MagoTrackers as any,
-  // Mago reusa o WerewolfTestRequestModal (estrutura cross-system semelhante)
-  TestRequestModalComponent: WerewolfTestRequestModal as any,
+  // Mago tem modal próprio (cor roxa, tipos `arete` e `quintessence`)
+  TestRequestModalComponent: MagoTestRequestModal as any,
   // Mago reusa o VampirePendingTest passando gameSystem='mago_m20'
   PendingTestComponent: VampirePendingTest as any,
   PlayerSidePanel: MagoPlayerSidePanel,
