@@ -478,6 +478,44 @@ export default function CreateCharacter() {
           />
         )}
 
+        {/* Mago Steps */}
+        {step === 1 && gameSystem === 'mago_m20' && (
+          <StepMagoBasicInfo
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 2 && gameSystem === 'mago_m20' && (
+          <StepMagoAttributes
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 3 && gameSystem === 'mago_m20' && (
+          <StepMagoSpheres
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 4 && gameSystem === 'mago_m20' && (
+          <StepMagoRotes
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 5 && gameSystem === 'mago_m20' && (
+          <StepMagoBackgrounds
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+        {step === 6 && gameSystem === 'mago_m20' && (
+          <StepMagoMeritsFlaws
+            formData={magoFormData}
+            updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
+          />
+        )}
+
         {/* Navigation Buttons */}
         <div className="flex justify-between mt-8 max-w-2xl mx-auto">
           <Button variant="outline" onClick={handleBack}>
