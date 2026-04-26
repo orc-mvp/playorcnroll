@@ -2,21 +2,22 @@
  * Storyteller System Registry
  *
  * Ponto único de descoberta de sistemas WoD para a sala unificada.
- * Para adicionar Mago/Mortos-Vivos completo: criar adapter, importar aqui, e
- * trocar `available: false` para `true` no próprio adapter + em GAME_SYSTEMS.
+ * Para ativar Mago ou Metamorfos completos: criar a ficha real, apontar o
+ * adapter para ela e trocar `available: false` para `true` no adapter +
+ * em GAME_SYSTEMS.
  */
 
 import { vampiroAdapter } from './adapters/vampiroAdapter';
 import { lobisomemAdapter } from './adapters/lobisomemAdapter';
 import { magoAdapter } from './adapters/magoAdapter';
-import { mortosVivosAdapter } from './adapters/mortosVivosAdapter';
+import { metamorfosAdapter } from './adapters/metamorfosAdapter';
 import type { SystemAdapter, StorytellerSystemId } from './types';
 
 const REGISTRY: Record<StorytellerSystemId, SystemAdapter> = {
   vampiro_v3: vampiroAdapter,
   lobisomem_w20: lobisomemAdapter,
   mago_m20: magoAdapter,
-  mortos_vivos_w20: mortosVivosAdapter,
+  metamorfos_w20: metamorfosAdapter,
 };
 
 /** Lista de IDs de sistemas que rodam na sala unificada Storyteller */
@@ -24,7 +25,7 @@ export const STORYTELLER_SYSTEM_IDS: StorytellerSystemId[] = [
   'vampiro_v3',
   'lobisomem_w20',
   'mago_m20',
-  'mortos_vivos_w20',
+  'metamorfos_w20',
 ];
 
 /** Verifica se um game_system roda na sala Storyteller */
@@ -43,6 +44,13 @@ export function getSystemAdapter(gameSystem: string): SystemAdapter {
 /** Retorna todos os adapters registrados */
 export function getAllAdapters(): SystemAdapter[] {
   return Object.values(REGISTRY);
+}
+
+/** IDs de sistemas Storyteller atualmente disponíveis para criação/uso */
+export function getAvailableStorytellerSystemIds(): StorytellerSystemId[] {
+  return getAllAdapters()
+    .filter((a) => a.available)
+    .map((a) => a.id);
 }
 
 /**

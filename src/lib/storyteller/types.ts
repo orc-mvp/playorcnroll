@@ -1,8 +1,8 @@
 /**
  * Storyteller System Adapter — tipos compartilhados
  *
- * Estes tipos descrevem o "shape" comum a todos os sistemas WoD da plataforma
- * (Vampiro V3, Lobisomem W20, futuramente Mago M20 e Mortos-Vivos W20).
+ * Tipos comuns aos quatro sistemas WoD suportados pela sala Storyteller:
+ * Vampiro V3, Lobisomem W20, Mago M20 e Metamorfos (W20).
  *
  * A página `StorytellerSession` consome o registry e renderiza dinamicamente
  * trackers, ficha e modais do sistema de cada personagem individualmente.
@@ -16,7 +16,7 @@ export type StorytellerSystemId =
   | 'vampiro_v3'
   | 'lobisomem_w20'
   | 'mago_m20'
-  | 'mortos_vivos_w20';
+  | 'metamorfos_w20';
 
 /** Participante simplificado — campos session_* são preenchidos sob demanda por sistema */
 export interface StorytellerParticipant {
@@ -115,7 +115,7 @@ export type TrackerInitializer = (
 
 /**
  * Adapter completo de um sistema WoD.
- * Adicionar Mago/Mortos-Vivos = criar um novo adapter e registrar no registry.
+ * Adicionar um novo sistema = criar um adapter e registrá-lo no registry.
  */
 export interface SystemAdapter {
   id: StorytellerSystemId;
@@ -197,6 +197,6 @@ export interface SystemAdapter {
   /** Renderiza um evento do feed específico deste sistema (opcional — fallback genérico se ausente) */
   renderEventFeedItem?: (event: StorytellerEvent) => ReactNode;
 
-  /** Indica se o sistema está disponível para uso (false para stubs Mago/Mortos-Vivos) */
+  /** Indica se o sistema está disponível para uso (false para stubs Mago/Metamorfos) */
   available: boolean;
 }

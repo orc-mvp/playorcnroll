@@ -1,5 +1,5 @@
 /**
- * Placeholder para sistemas WoD ainda não implementados (Mago, Mortos-Vivos).
+ * Placeholder para sistemas WoD ainda não implementados (Mago, Metamorfos).
  * Renderiza um cartão informativo "Em breve" para qualquer slot do adapter.
  */
 

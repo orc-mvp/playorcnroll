@@ -2,7 +2,7 @@ import { isStorytellerSystem } from './storyteller/systemRegistry';
 
 /**
  * Get the correct session route based on game system.
- * - Sistemas WoD (Vampiro, Lobisomem, Mago, Mortos-Vivos) → sala unificada Storyteller
+ * - Sistemas WoD (Vampiro, Lobisomem, Mago, Metamorfos) → sala unificada Storyteller
  * - Demais sistemas (Heróis Marcados) → sala genérica
  */
 export function getSessionRoute(sessionId: string, gameSystem: string): string {
