@@ -18,9 +18,9 @@ import { Dices, Lock, Heart, Star, Users, ChevronRight, MessageSquare, Minus, Pl
 import { cn } from '@/lib/utils';
 import {
   ALL_ATTRIBUTES,
-  WOD_TALENTS,
-  WOD_SKILLS,
-  WOD_KNOWLEDGES,
+  TALENTS,
+  SKILLS,
+  KNOWLEDGES,
 } from '@/lib/vampiro/diceUtils';
 
 /**
