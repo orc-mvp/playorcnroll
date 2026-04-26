@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
     // Find session by exact invite code match using admin client
     const { data: session, error: sessionError } = await supabaseAdmin
       .from("sessions")
-      .select("id, status, name, game_system, description, join_locked")
+      .select("id, status, name, game_system, description, join_locked, allowed_systems")
       .eq("invite_code", normalizedCode)
       .single();
 
@@ -116,6 +116,7 @@ Deno.serve(async (req) => {
           game_system: session.game_system,
           description: session.description,
           join_locked: session.join_locked,
+          allowed_systems: session.allowed_systems ?? [],
         },
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
