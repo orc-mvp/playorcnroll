@@ -363,23 +363,23 @@ export function WerewolfTrackers({
       </Card>
 
       {/* CURRENT FORM */}
-      <Card className="medieval-card border-emerald-500/20">
+      <Card className={`medieval-card border-${themeAccent}/20`}>
         <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2 text-emerald-500">
+          <CardTitle className={`font-medieval text-sm flex items-center gap-2 text-${themeAccent}`}>
             <Dog className="w-4 h-4" />
             {t.lobisomem?.currentForm || 'Forma Atual'}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
-            <Badge variant="outline" className="border-emerald-500/30 text-emerald-500 font-medieval">
+            <Badge variant="outline" className={`border-${themeAccent}/30 text-${themeAccent} font-medieval`}>
               {getFormLabel(currentForm)}
             </Badge>
             <Button
               size="sm"
               variant="outline"
               onClick={() => setIsFormModalOpen(true)}
-              className="border-emerald-500/30 hover:bg-emerald-500/10 text-xs"
+              className={`border-${themeAccent}/30 hover:bg-${themeAccent}/10 text-xs`}
             >
               <Dog className="w-3 h-3 mr-1" />
               {t.lobisomem?.changeForm || 'Mudar Forma'}
@@ -392,6 +392,7 @@ export function WerewolfTrackers({
       <FormChangeModal
         open={isFormModalOpen}
         currentForm={currentForm}
+        customForms={customForms}
         onConfirm={(form) => {
           setIsFormModalOpen(false);
           handleFormChange(form);
