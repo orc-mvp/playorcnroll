@@ -108,17 +108,20 @@ export function ManagePlayersModal({
     setLocalOverrides({});
   }, [participants]);
 
-  const getEffectiveValue = useCallback(
-    <K extends 'sheet_locked' | 'experience_points'>(
-      participant: Participant,
-      key: K
-    ): NonNullable<Participant[K]> => {
+  const getEffectiveLocked = useCallback(
+    (participant: Participant): boolean => {
       const override = localOverrides[participant.id];
-      if (override && key in override) {
-        return override[key] as NonNullable<Participant[K]>;
-      }
-      if (key === 'sheet_locked') return (participant.sheet_locked ?? true) as NonNullable<Participant[K]>;
-      return (participant.character?.experience_points ?? 0) as NonNullable<Participant[K]>;
+      if (override && 'sheet_locked' in override) return override.sheet_locked!;
+      return participant.sheet_locked ?? true;
+    },
+    [localOverrides]
+  );
+
+  const getEffectiveXp = useCallback(
+    (participant: Participant): number => {
+      const override = localOverrides[participant.id];
+      if (override && 'experience_points' in override) return override.experience_points!;
+      return participant.character?.experience_points ?? 0;
     },
     [localOverrides]
   );
