@@ -157,8 +157,8 @@ export default function StorytellerSession() {
           id, user_id, character_id,
           session_blood_pool, session_willpower_current, session_health_damage,
           session_gnosis, session_rage, session_form,
-          sheet_locked, experience_points,
-          characters:character_id (id, name, concept, game_system, vampiro_data)
+          sheet_locked,
+          characters:character_id (id, name, concept, game_system, experience_points, vampiro_data)
         `)
         .eq('session_id', sessionId);
 
@@ -562,7 +562,7 @@ export default function StorytellerSession() {
   // Props para PlayerSidePanel
   const sidePanelProps = {
     character: myCharacter,
-    experiencePoints: myParticipant?.experience_points,
+    experiencePoints: myCharacter?.experience_points,
     sessionTrackers:
       (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
         ? {

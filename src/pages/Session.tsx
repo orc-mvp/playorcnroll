@@ -163,11 +163,11 @@ export default function Session() {
           user_id,
           character_id,
           sheet_locked,
-          experience_points,
           characters:character_id (
             id,
             name,
             concept,
+            experience_points,
             aggression_type,
             determination_type,
             seduction_type,
