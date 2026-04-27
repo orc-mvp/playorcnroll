@@ -89,9 +89,7 @@ export function XpReducer({ characterId, currentXp }: XpReducerProps) {
         variant="outline"
         size="sm"
         onClick={() => setOpen(true)}
-        className="gap-1.5"
       >
-        <Minus className="w-3.5 h-3.5" />
         {t.xpReducer?.spendXp || 'Usar XP'}
       </Button>
 
