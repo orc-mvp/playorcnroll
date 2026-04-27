@@ -238,8 +238,8 @@ export function ManagePlayersModal({
 
             <div className="space-y-4">
               {participants.map((participant) => {
-                const isLocked = getEffectiveValue(participant, 'sheet_locked') as boolean;
-                const xp = getEffectiveValue(participant, 'experience_points') as number;
+                const isLocked = getEffectiveLocked(participant);
+                const xp = getEffectiveXp(participant);
                 const displayName = participant.profile?.display_name || participant.user_id.slice(0, 8).toUpperCase();
                 const charName = participant.character?.name || t.managePlayers.noCharacter;
                 const hasNoCharacter = !participant.character_id || !participant.character;
