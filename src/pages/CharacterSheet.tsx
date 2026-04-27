@@ -89,6 +89,7 @@ interface Character {
   game_system: string;
   vampiro_data: Json | null;
   notes: string | null;
+  experience_points: number;
   created_at: string;
   updated_at: string;
 }
