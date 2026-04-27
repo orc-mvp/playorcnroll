@@ -92,7 +92,7 @@ export function XpReducer({ characterId, currentXp }: XpReducerProps) {
         className="gap-1.5"
       >
         <Minus className="w-3.5 h-3.5" />
-        {t.xpReducer?.spendXp || 'Gastar XP'}
+        {t.xpReducer?.spendXp || 'Usar XP'}
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -181,7 +181,7 @@ export function XpReducer({ characterId, currentXp }: XpReducerProps) {
             >
               {saving
                 ? t.common?.saving || 'Salvando...'
-                : t.xpReducer?.confirm || 'Gastar XP'}
+                : t.xpReducer?.confirm || 'Usar XP'}
             </Button>
           </DialogFooter>
         </DialogContent>
