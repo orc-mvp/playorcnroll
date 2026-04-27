@@ -278,6 +278,7 @@ export default function CharacterSheet() {
                 concept: character.concept,
                 vampiro_data: character.vampiro_data as any,
                 notes: character.notes,
+                experience_points: character.experience_points,
               }} 
             />
           ) : (character.game_system === 'lobisomem_w20' || character.game_system === 'metamorfos_w20') ? (
@@ -288,6 +289,7 @@ export default function CharacterSheet() {
                 concept: character.concept,
                 vampiro_data: character.vampiro_data as any,
                 notes: character.notes,
+                experience_points: character.experience_points,
               }}
             />
           ) : character.game_system === 'mago_m20' ? (
@@ -298,6 +300,7 @@ export default function CharacterSheet() {
                 concept: character.concept,
                 vampiro_data: character.vampiro_data as any,
                 notes: character.notes,
+                experience_points: character.experience_points,
               }}
             />
           ) : (
