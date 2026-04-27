@@ -68,15 +68,13 @@ interface VampiroCharacterSheetProps {
     concept: string | null;
     vampiro_data: VampiroData | null;
     notes?: string | null;
+    experience_points?: number;
   };
   sessionTrackers?: {
     bloodPool?: number;
     willpower?: number;
     healthDamage?: boolean[];
   };
-  experiencePoints?: number;
-  /** ID do session_participant — quando presente e !readOnly, o jogador pode reduzir XP */
-  participantId?: string;
   readOnly?: boolean;
 }
 
@@ -229,10 +227,11 @@ const HEALTH_LEVELS = [
   { key: 'incapacitated', penalty: '' },
 ] as const;
 
-export default function VampiroCharacterSheet({ character, sessionTrackers, experiencePoints, participantId, readOnly = false }: VampiroCharacterSheetProps) {
+export default function VampiroCharacterSheet({ character, sessionTrackers, readOnly = false }: VampiroCharacterSheetProps) {
   const { t, language } = useI18n();
   const data = character.vampiro_data || {};
   const lang = language === 'pt-BR' ? 'pt' : 'en';
+  const experiencePoints = character.experience_points ?? 0;
   
   // Interactive state for trackers - use session values if provided
   const [bloodPool, setBloodPool] = useState(sessionTrackers?.bloodPool ?? 0);
@@ -350,13 +349,13 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, expe
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="font-medieval text-2xl text-foreground">{character.name}</h2>
-                {(experiencePoints ?? 0) > 0 && (
+                {experiencePoints > 0 && (
                   <Badge variant="outline" className="font-mono text-xs px-1.5">
                     {experiencePoints} XP
                   </Badge>
                 )}
-                {!readOnly && participantId && (experiencePoints ?? 0) > 0 && (
-                  <XpReducer participantId={participantId} currentXp={experiencePoints ?? 0} />
+                {!readOnly && experiencePoints > 0 && (
+                  <XpReducer characterId={character.id} currentXp={experiencePoints} />
                 )}
                 {data.clan && (
                   <Badge variant="outline" className="border-destructive/30 text-destructive">

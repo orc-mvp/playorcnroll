@@ -541,13 +541,13 @@ export function VampireNarratorSidebar({
                   name: selectedCharacter.name,
                   concept: selectedCharacter.concept,
                   vampiro_data: selectedCharacter.vampiro_data,
+                  experience_points: (selectedCharacter as any).experience_points ?? 0,
                 }}
                 sessionTrackers={{
                   bloodPool: selectedParticipant?.session_blood_pool ?? 0,
                   willpower: selectedParticipant?.session_willpower_current ?? 0,
                   healthDamage: selectedParticipant?.session_health_damage ?? [false, false, false, false, false, false, false],
                 }}
-                experiencePoints={selectedParticipant?.experience_points}
                 readOnly
               />
             )}

@@ -34,6 +34,7 @@ interface MagoCharacterSheetProps {
     concept: string | null;
     vampiro_data: MagoCharacterData | null;
     notes?: string | null;
+    experience_points?: number;
   };
   sessionTrackers?: {
     quintessence?: number;
@@ -42,9 +43,6 @@ interface MagoCharacterSheetProps {
     willpower?: number;
     healthDamage?: boolean[];
   };
-  experiencePoints?: number;
-  /** ID do session_participant — quando presente e !readOnly, o jogador pode reduzir XP */
-  participantId?: string;
   readOnly?: boolean;
 }
 
@@ -113,9 +111,10 @@ const ABILITY_KEYS = {
   knowledges: ['academics', 'computer', 'cosmology', 'enigmas', 'esoterica', 'investigation', 'law', 'medicine', 'occult', 'politics', 'science'] as const,
 };
 
-export default function MagoCharacterSheet({ character, sessionTrackers, experiencePoints, participantId, readOnly = false }: MagoCharacterSheetProps) {
+export default function MagoCharacterSheet({ character, sessionTrackers, readOnly = false }: MagoCharacterSheetProps) {
   const { t, language } = useI18n();
   const data: MagoCharacterData = (character.vampiro_data as MagoCharacterData) || ({} as MagoCharacterData);
+  const experiencePoints = character.experience_points ?? 0;
 
   const [healthDamage, setHealthDamage] = useState<boolean[]>(sessionTrackers?.healthDamage ?? Array(7).fill(false));
   const [expandedMeritFlaw, setExpandedMeritFlaw] = useState<string | null>(null);
@@ -200,13 +199,13 @@ export default function MagoCharacterSheet({ character, sessionTrackers, experie
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="font-medieval text-2xl text-foreground">{character.name}</h2>
-                {(experiencePoints ?? 0) > 0 && (
+                {experiencePoints > 0 && (
                   <Badge variant="outline" className="font-mono text-xs px-1.5">
                     {experiencePoints} XP
                   </Badge>
                 )}
-                {!readOnly && participantId && (experiencePoints ?? 0) > 0 && (
-                  <XpReducer participantId={participantId} currentXp={experiencePoints ?? 0} />
+                {!readOnly && experiencePoints > 0 && (
+                  <XpReducer characterId={character.id} currentXp={experiencePoints} />
                 )}
                 {data.tradition && (
                   <Badge variant="outline" className="border-purple-500/30 text-purple-500">

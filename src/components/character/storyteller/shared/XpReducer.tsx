@@ -1,10 +1,9 @@
 /**
- * XpReducer — botão para o jogador reduzir seu próprio pool de XP
- * com dupla confirmação. Atualiza session_participants.experience_points
- * em tempo real (realtime já configurado no canal de participants).
+ * XpReducer — botão para o jogador reduzir seu próprio pool global de XP
+ * com dupla confirmação. Atualiza characters.experience_points em tempo real.
  *
- * Usado dentro das fichas WoD (Vampiro, Lobisomem, Mago) quando exibidas
- * em contexto de sessão para o próprio dono.
+ * Usado dentro das fichas WoD (Vampiro, Lobisomem, Mago, Metamorfos) e na
+ * página /character/:id, sempre que o usuário logado é o dono do personagem.
  */
 
 import { useState } from 'react';
@@ -26,11 +25,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useI18n } from '@/lib/i18n';
 
 interface XpReducerProps {
-  participantId: string;
+  characterId: string;
   currentXp: number;
 }
 
-export function XpReducer({ participantId, currentXp }: XpReducerProps) {
+export function XpReducer({ characterId, currentXp }: XpReducerProps) {
   const { t } = useI18n();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -58,9 +57,9 @@ export function XpReducer({ participantId, currentXp }: XpReducerProps) {
     try {
       const newXp = Math.max(0, currentXp - parsed);
       const { error } = await supabase
-        .from('session_participants')
+        .from('characters')
         .update({ experience_points: newXp })
-        .eq('id', participantId);
+        .eq('id', characterId);
       if (error) throw error;
       toast({
         title: t.xpReducer?.successTitle || 'XP atualizado',

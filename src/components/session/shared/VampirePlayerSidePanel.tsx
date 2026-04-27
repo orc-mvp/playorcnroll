@@ -187,10 +187,9 @@ export function VampirePlayerSidePanel({
                   name: character.name,
                   concept: character.concept,
                   vampiro_data: character.vampiro_data,
+                  experience_points: experiencePoints,
                 }}
                 sessionTrackers={sessionTrackers as any}
-                experiencePoints={experiencePoints}
-                participantId={participants.find((p) => p.user_id === currentUserId)?.id}
                 readOnly={sheetLocked}
               />
             )}

@@ -92,6 +92,7 @@ interface LobisomemCharacterSheetProps {
     concept: string | null;
     vampiro_data: LobisomemCharacterData | null;
     notes?: string | null;
+    experience_points?: number;
   };
   sessionTrackers?: {
     gnosis?: number;
@@ -100,9 +101,6 @@ interface LobisomemCharacterSheetProps {
     healthDamage?: boolean[];
     form?: string;
   };
-  experiencePoints?: number;
-  /** ID do session_participant — quando presente e !readOnly, o jogador pode reduzir XP */
-  participantId?: string;
   readOnly?: boolean;
 }
 
@@ -172,7 +170,8 @@ const ABILITY_KEYS = {
   knowledges: ['academics', 'computer', 'enigmas', 'investigation', 'law', 'linguistics', 'medicine', 'occult', 'politics', 'rituals', 'science'] as const,
 };
 
-export default function LobisomemCharacterSheet({ character, sessionTrackers, experiencePoints, participantId, readOnly = false }: LobisomemCharacterSheetProps) {
+export default function LobisomemCharacterSheet({ character, sessionTrackers, readOnly = false }: LobisomemCharacterSheetProps) {
+  const experiencePoints = character.experience_points ?? 0;
   const { t, language } = useI18n();
   const data: LobisomemCharacterData = (character.vampiro_data as LobisomemCharacterData) || {};
   const lang = language === 'pt-BR' ? 'pt' : 'en';
@@ -247,13 +246,13 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, ex
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="font-medieval text-2xl text-foreground">{character.name}</h2>
-                {(experiencePoints ?? 0) > 0 && (
+                {experiencePoints > 0 && (
                   <Badge variant="outline" className="font-mono text-xs px-1.5">
                     {experiencePoints} XP
                   </Badge>
                 )}
-                {!readOnly && participantId && (experiencePoints ?? 0) > 0 && (
-                  <XpReducer participantId={participantId} currentXp={experiencePoints ?? 0} />
+                {!readOnly && experiencePoints > 0 && (
+                  <XpReducer characterId={character.id} currentXp={experiencePoints} />
                 )}
                 {data.tribe && (
                   <Badge variant="outline" className="border-emerald-500/30 text-emerald-500">
