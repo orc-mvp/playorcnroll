@@ -30,10 +30,10 @@ interface Participant {
   user_id: string;
   character_id: string | null;
   sheet_locked?: boolean;
-  experience_points?: number;
   character?: {
     id: string;
     name: string;
+    experience_points?: number;
   } | null;
   profile?: {
     display_name: string | null;
@@ -118,7 +118,7 @@ export function ManagePlayersModal({
         return override[key] as NonNullable<Participant[K]>;
       }
       if (key === 'sheet_locked') return (participant.sheet_locked ?? true) as NonNullable<Participant[K]>;
-      return (participant.experience_points ?? 0) as NonNullable<Participant[K]>;
+      return (participant.character?.experience_points ?? 0) as NonNullable<Participant[K]>;
     },
     [localOverrides]
   );
@@ -154,7 +154,11 @@ export function ManagePlayersModal({
     }
   };
 
-  const handleXpChange = async (participantId: string, currentXp: number, delta: number, _characterId: string | null) => {
+  const handleXpChange = async (participantId: string, currentXp: number, delta: number, characterId: string | null) => {
+    if (!characterId) {
+      toast({ title: t.managePlayers.noCharacter, variant: 'destructive' });
+      return;
+    }
     const newXp = Math.max(0, currentXp + delta);
     // Optimistic update
     setLocalOverrides((prev) => ({
@@ -164,9 +168,9 @@ export function ManagePlayersModal({
 
     try {
       const { error } = await supabase
-        .from('session_participants')
+        .from('characters')
         .update({ experience_points: newXp })
-        .eq('id', participantId);
+        .eq('id', characterId);
 
       if (error) throw error;
     } catch (error) {
