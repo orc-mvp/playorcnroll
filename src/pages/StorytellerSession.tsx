@@ -528,6 +528,18 @@ export default function StorytellerSession() {
           onEventCreated={handleLocalEvent}
         />
       )}
+      {magoParticipants.length > 0 && (
+        <MagoNarratorSidebar
+          sessionId={sessionId!}
+          participants={magoParticipants as any}
+          scenes={scenes as any}
+          currentScene={currentScene as any}
+          onRequestTest={openTestAsNarrator}
+          onRequestRoll={() => setRollModalOpen(true)}
+          onSceneChange={setCurrentScene as any}
+          onEventCreated={handleLocalEvent}
+        />
+      )}
     </div>
   );
 
