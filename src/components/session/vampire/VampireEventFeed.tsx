@@ -375,24 +375,34 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
     const criticalType = eventData.type as string;
     const charName = eventData.character_name as string;
     const isBlood = criticalType === 'blood_depleted';
+    const isParadox = criticalType === 'paradox_overflow';
+
+    const labelMap: Record<string, string> = {
+      blood_depleted: t.vampiro?.bloodDepleted || 'Sangue Esgotado!',
+      willpower_depleted: t.vampiro?.willpowerDepleted || 'Vontade Exaurida!',
+      quintessence_depleted: t.mago?.quintessenceDepleted || 'Quintessência Esgotada!',
+      paradox_overflow: t.mago?.paradoxOverflow || 'Paradoxo Crítico!',
+      rage_depleted: 'Fúria Esgotada!',
+      gnosis_depleted: 'Gnose Esgotada!',
+    };
+
+    const useDestructive = isBlood || isParadox;
 
     return (
       <div className={cn(
         "rounded-lg p-3 animate-pulse",
-        isBlood 
-          ? 'bg-destructive/20 border border-destructive/40' 
+        useDestructive
+          ? 'bg-destructive/20 border border-destructive/40'
           : 'bg-amber-500/20 border border-amber-500/40'
       )}>
         <div className="flex items-center gap-2">
-          {isBlood ? (
+          {useDestructive ? (
             <Skull className="w-5 h-5 text-destructive" />
           ) : (
             <AlertTriangle className="w-5 h-5 text-amber-500" />
           )}
-          <span className={cn("font-medieval", isBlood ? 'text-destructive' : 'text-amber-500')}>
-            {charName} - {isBlood 
-              ? t.vampiro.bloodDepleted
-              : t.vampiro.willpowerDepleted}
+          <span className={cn("font-medieval", useDestructive ? 'text-destructive' : 'text-amber-500')}>
+            {charName} - {labelMap[criticalType] || criticalType}
           </span>
         </div>
       </div>
