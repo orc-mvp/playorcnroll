@@ -107,10 +107,10 @@ function AbilityRow({ name, value, specialization }: { name: string; value: numb
 }
 
 const ABILITY_KEYS = {
-  talents: ['alertness', 'athletics', 'brawl', 'dodge', 'empathy', 'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge'] as const,
-  skills: ['crafts', 'drive', 'etiquette', 'firearms', 'martialArts', 'meditation', 'melee', 'research', 'stealth', 'survival', 'technology'] as const,
-  knowledges: ['academics', 'computer', 'cosmology', 'enigmas', 'esoterica', 'investigation', 'law', 'medicine', 'occult', 'politics', 'science'] as const,
-};
+  talents: STORYTELLER_ABILITIES.talents.items.map((i) => i.key),
+  skills: STORYTELLER_ABILITIES.skills.items.map((i) => i.key),
+  knowledges: STORYTELLER_ABILITIES.knowledges.items.map((i) => i.key),
+} as const;
 
 export default function MagoCharacterSheet({ character, sessionTrackers, readOnly = false }: MagoCharacterSheetProps) {
   const { t, language } = useI18n();
