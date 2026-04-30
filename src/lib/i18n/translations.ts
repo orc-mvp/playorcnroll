@@ -969,6 +969,10 @@ export const translations = {
       joinLockedEnabled: 'Entrada bloqueada',
       joinLockedDisabled: 'Entrada liberada',
       joinLockedByNarrator: 'O narrador bloqueou a entrada de novos jogadores nesta sessão',
+      allowedSystemsTitle: 'Sistemas permitidos',
+      allowedSystemsHint: 'Escolha quais tipos de personagens podem entrar nesta sala.',
+      allowedSystemsUpdated: 'Sistemas permitidos atualizados',
+      allowedSystemsEmptyWarning: 'Selecione pelo menos um sistema',
     },
 
     // Session rejoin
@@ -2263,6 +2267,10 @@ export const translations = {
       joinLockedEnabled: 'Joining blocked',
       joinLockedDisabled: 'Joining open',
       joinLockedByNarrator: 'The narrator has blocked new players from joining this session',
+      allowedSystemsTitle: 'Allowed systems',
+      allowedSystemsHint: 'Choose which character types can join this room.',
+      allowedSystemsUpdated: 'Allowed systems updated',
+      allowedSystemsEmptyWarning: 'Select at least one system',
     },
 
     // Session rejoin
