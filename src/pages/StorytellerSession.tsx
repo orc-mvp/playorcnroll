@@ -28,6 +28,7 @@ import { StorytellerRequestTestCard } from '@/components/session/storyteller/Sto
 import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { WerewolfNarratorSidebar } from '@/components/session/werewolf/WerewolfNarratorSidebar';
+import { MagoNarratorSidebar } from '@/components/session/mage/MagoNarratorSidebar';
 
 import {
   StorytellerScenePanel,
@@ -474,6 +475,9 @@ export default function StorytellerSession() {
     (p) => p.character?.game_system === 'lobisomem_w20' ||
            p.character?.game_system === 'metamorfos_w20',
   );
+  const magoParticipants = participants.filter(
+    (p) => p.character?.game_system === 'mago_m20',
+  );
 
   const openTestAsNarrator = () => {
     setTestRequester('narrator');
@@ -516,6 +520,18 @@ export default function StorytellerSession() {
         <WerewolfNarratorSidebar
           sessionId={sessionId!}
           participants={werewolfParticipants as any}
+          scenes={scenes as any}
+          currentScene={currentScene as any}
+          onRequestTest={openTestAsNarrator}
+          onRequestRoll={() => setRollModalOpen(true)}
+          onSceneChange={setCurrentScene as any}
+          onEventCreated={handleLocalEvent}
+        />
+      )}
+      {magoParticipants.length > 0 && (
+        <MagoNarratorSidebar
+          sessionId={sessionId!}
+          participants={magoParticipants as any}
           scenes={scenes as any}
           currentScene={currentScene as any}
           onRequestTest={openTestAsNarrator}
