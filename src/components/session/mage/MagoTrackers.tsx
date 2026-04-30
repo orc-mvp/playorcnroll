@@ -186,11 +186,15 @@ export function MagoTrackers({
     setIsConfirmOpen(true);
   };
 
-  const requestAreteChange = (index: number) => {
-    const newValue = index < currentArete ? index : index + 1;
-    setPendingChange({ type: 'arete', currentValue: currentArete, newValue: Math.max(1, newValue) });
-    setIsConfirmOpen(true);
-  };
+  // Arête é fixo: vem da ficha. Sincroniza session_arete com o valor da ficha
+  // sempre que mudar (edição da ficha) e não permite alteração na sessão.
+  useEffect(() => {
+    if (maxArete !== currentArete) {
+      setCurrentArete(maxArete);
+      saveTrackers(currentQuintessence, currentParadox, maxArete, currentWillpower, healthDamage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [maxArete]);
 
   const requestWillpowerChange = (index: number) => {
     const newValue = index < currentWillpower ? index : index + 1;
