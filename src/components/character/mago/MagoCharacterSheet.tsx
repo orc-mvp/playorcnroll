@@ -16,6 +16,7 @@ import { XpReducer } from '../storyteller/shared/XpReducer';
 import { toTitleCase } from '@/lib/textUtils';
 import { MAGO_SPHERES, MAGO_BACKGROUNDS, type MagoCharacterData } from '@/lib/mago/spheres';
 import { CharacterNotes } from '../CharacterNotes';
+import { STORYTELLER_ABILITIES } from '@/lib/storyteller/traits';
 
 const HEALTH_LEVELS = [
   { key: 'bruised', penalty: '' },
