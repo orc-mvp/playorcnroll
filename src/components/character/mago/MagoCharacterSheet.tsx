@@ -16,6 +16,7 @@ import { XpReducer } from '../storyteller/shared/XpReducer';
 import { toTitleCase } from '@/lib/textUtils';
 import { MAGO_SPHERES, MAGO_BACKGROUNDS, type MagoCharacterData } from '@/lib/mago/spheres';
 import { CharacterNotes } from '../CharacterNotes';
+import { STORYTELLER_ABILITIES, getTraitLabel } from '@/lib/storyteller/traits';
 
 const HEALTH_LEVELS = [
   { key: 'bruised', penalty: '' },
@@ -106,10 +107,10 @@ function AbilityRow({ name, value, specialization }: { name: string; value: numb
 }
 
 const ABILITY_KEYS = {
-  talents: ['alertness', 'athletics', 'brawl', 'dodge', 'empathy', 'expression', 'intimidation', 'leadership', 'streetwise', 'subterfuge'] as const,
-  skills: ['crafts', 'drive', 'etiquette', 'firearms', 'martialArts', 'meditation', 'melee', 'research', 'stealth', 'survival', 'technology'] as const,
-  knowledges: ['academics', 'computer', 'cosmology', 'enigmas', 'esoterica', 'investigation', 'law', 'medicine', 'occult', 'politics', 'science'] as const,
-};
+  talents: STORYTELLER_ABILITIES.talents.items.map((i) => i.key),
+  skills: STORYTELLER_ABILITIES.skills.items.map((i) => i.key),
+  knowledges: STORYTELLER_ABILITIES.knowledges.items.map((i) => i.key),
+} as const;
 
 export default function MagoCharacterSheet({ character, sessionTrackers, readOnly = false }: MagoCharacterSheetProps) {
   const { t, language } = useI18n();
@@ -325,7 +326,7 @@ export default function MagoCharacterSheet({ character, sessionTrackers, readOnl
                   {ABILITY_KEYS[cat].map((key) => (
                     <AbilityRow
                       key={key}
-                      name={(t.vampiro as any)[key] || key}
+                      name={getTraitLabel(key, language === 'pt-BR' ? 'pt-BR' : 'en-US')}
                       value={(abilities[cat] as Record<string, number>)?.[key] || 0}
                       specialization={specializations[key]}
                     />
