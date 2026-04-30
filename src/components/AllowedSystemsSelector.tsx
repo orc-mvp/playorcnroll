@@ -58,7 +58,7 @@ export default function AllowedSystemsSelector({
             disabled={isDisabled}
             aria-pressed={isSelected}
             className={cn(
-              'relative flex items-start gap-3 p-4 rounded-lg border-2 transition-all text-left',
+              'relative flex items-start gap-2 p-2.5 rounded-lg border-2 transition-all text-left min-w-0',
               isSelected
                 ? 'border-primary bg-primary/10'
                 : 'border-border bg-card hover:border-muted-foreground/50',
@@ -68,27 +68,27 @@ export default function AllowedSystemsSelector({
           >
             <div
               className={cn(
-                'mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors',
+                'mt-0.5 w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors',
                 isSelected
                   ? 'bg-primary border-primary text-primary-foreground'
                   : 'border-muted-foreground/40',
               )}
             >
-              {isSelected && <Check className="w-3.5 h-3.5" />}
+              {isSelected && <Check className="w-3 h-3" />}
             </div>
 
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h4 className="font-medieval font-semibold">
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <h4 className="font-medieval text-sm font-semibold leading-tight break-words">
                   {adapter.fullLabel}
                 </h4>
                 {!adapter.available && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-[10px] px-1 py-0">
                     {comingSoon}
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground font-body mt-1">
+              <p className="text-[11px] text-muted-foreground font-body mt-0.5 leading-tight">
                 {adapter.shortLabel}
               </p>
             </div>
