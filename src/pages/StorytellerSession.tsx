@@ -474,6 +474,9 @@ export default function StorytellerSession() {
     (p) => p.character?.game_system === 'lobisomem_w20' ||
            p.character?.game_system === 'metamorfos_w20',
   );
+  const magoParticipants = participants.filter(
+    (p) => p.character?.game_system === 'mago_m20',
+  );
 
   const openTestAsNarrator = () => {
     setTestRequester('narrator');
