@@ -24,6 +24,9 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Lock, Unlock, Minus, Plus, Sparkles, User, Trash2, AlertTriangle, ShieldBan, ShieldCheck } from 'lucide-react';
+import AllowedSystemsSelector from '@/components/AllowedSystemsSelector';
+import { isStorytellerSystem } from '@/lib/storyteller/systemRegistry';
+import type { StorytellerSystemId } from '@/lib/storyteller/types';
 
 interface Participant {
   id: string;
@@ -67,22 +70,54 @@ export function ManagePlayersModal({
   const [localOverrides, setLocalOverrides] = useState<LocalOverrides>({});
   const [joinLocked, setJoinLocked] = useState(false);
   const [loadingJoinLock, setLoadingJoinLock] = useState(true);
+  const [gameSystem, setGameSystem] = useState<string | null>(null);
+  const [allowedSystems, setAllowedSystems] = useState<StorytellerSystemId[]>([]);
+  const [savingAllowed, setSavingAllowed] = useState(false);
 
-  // Fetch current join_locked state
+  // Fetch current join_locked + allowed_systems state
   useEffect(() => {
     if (!open) return;
-    const fetchJoinLock = async () => {
+    const fetchSessionConfig = async () => {
       setLoadingJoinLock(true);
       const { data } = await supabase
         .from('sessions')
-        .select('join_locked')
+        .select('join_locked, allowed_systems, game_system')
         .eq('id', sessionId)
         .single();
-      if (data) setJoinLocked(data.join_locked ?? false);
+      if (data) {
+        setJoinLocked(data.join_locked ?? false);
+        setGameSystem(data.game_system ?? null);
+        setAllowedSystems(((data.allowed_systems ?? []) as StorytellerSystemId[]));
+      }
       setLoadingJoinLock(false);
     };
-    fetchJoinLock();
+    fetchSessionConfig();
   }, [open, sessionId]);
+
+  const isStorytellerRoom = gameSystem ? isStorytellerSystem(gameSystem) : false;
+
+  const handleAllowedSystemsChange = async (next: StorytellerSystemId[]) => {
+    if (next.length === 0) {
+      toast({ title: t.managePlayers.allowedSystemsEmptyWarning, variant: 'destructive' });
+      return;
+    }
+    const previous = allowedSystems;
+    setAllowedSystems(next); // optimistic
+    setSavingAllowed(true);
+    try {
+      const { error } = await supabase
+        .from('sessions')
+        .update({ allowed_systems: next })
+        .eq('id', sessionId);
+      if (error) throw error;
+      toast({ title: t.managePlayers.allowedSystemsUpdated, duration: 2000 });
+    } catch {
+      setAllowedSystems(previous);
+      toast({ title: t.common.errorSaving, variant: 'destructive' });
+    } finally {
+      setSavingAllowed(false);
+    }
+  };
 
   const handleToggleJoinLock = async () => {
     const newValue = !joinLocked;
