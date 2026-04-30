@@ -353,12 +353,10 @@ export function MagoTrackers({
         <CardContent className="space-y-2">
           <div className="flex flex-wrap gap-2 md:gap-1 justify-center">
             {Array.from({ length: maxArete }, (_, i) => (
-              <button
+              <div
                 key={i}
-                type="button"
-                onClick={() => requestAreteChange(i)}
-                className={`w-6 h-6 md:w-4 md:h-4 rounded-full border-2 transition-colors cursor-pointer hover:border-purple-500 ${
-                  i < currentArete
+                className={`w-6 h-6 md:w-4 md:h-4 rounded-full border-2 ${
+                  i < maxArete
                     ? 'bg-purple-500 border-purple-500'
                     : 'border-muted-foreground/40 bg-transparent'
                 }`}
@@ -366,7 +364,7 @@ export function MagoTrackers({
             ))}
           </div>
           <p className="text-xs text-muted-foreground text-center">
-            {currentArete}/{maxArete}
+            {maxArete}/10
           </p>
         </CardContent>
       </Card>
