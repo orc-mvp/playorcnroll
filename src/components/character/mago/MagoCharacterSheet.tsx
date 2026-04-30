@@ -326,7 +326,7 @@ export default function MagoCharacterSheet({ character, sessionTrackers, readOnl
                   {ABILITY_KEYS[cat].map((key) => (
                     <AbilityRow
                       key={key}
-                      name={getTraitLabel(key, language)}
+                      name={getTraitLabel(key, language === 'pt-BR' ? 'pt-BR' : 'en-US')}
                       value={(abilities[cat] as Record<string, number>)?.[key] || 0}
                       specialization={specializations[key]}
                     />
