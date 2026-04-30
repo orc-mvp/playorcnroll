@@ -379,9 +379,9 @@ export default function MagoCharacterSheet({ character, sessionTrackers, readOnl
                       <h5 className="font-medieval text-xs text-muted-foreground/70 mb-1">
                         {language === 'pt-BR' ? `Nível ${level}` : `Level ${level}`}
                       </h5>
-                      <div className="space-y-0.5">
+                      <div className="divide-y divide-border/40">
                         {levelRotes.map((rote, i) => (
-                          <div key={i} className="text-sm font-body pl-2 border-l-2 border-purple-500/30 py-0.5">
+                          <div key={i} className="text-sm font-body pl-2 border-l-2 border-purple-500/30 py-1">
                             {rote}
                           </div>
                         ))}
