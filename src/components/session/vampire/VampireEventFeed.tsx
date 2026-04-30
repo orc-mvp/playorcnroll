@@ -151,8 +151,15 @@ const getVampireEventConfig = (t: any) => ({
     label: (data: Record<string, unknown>) => {
       const charName = data.character_name as string;
       const type = data.type as string;
-      const isBlood = type === 'blood_depleted';
-      return `${charName} - ${isBlood ? t.vampiro.bloodDepleted : t.vampiro.willpowerDepleted}`;
+      const labelMap: Record<string, string> = {
+        blood_depleted: t.vampiro?.bloodDepleted || 'Sangue Esgotado!',
+        willpower_depleted: t.vampiro?.willpowerDepleted || 'Vontade Exaurida!',
+        quintessence_depleted: t.mago?.quintessenceDepleted || 'Quintessência Esgotada!',
+        paradox_overflow: t.mago?.paradoxOverflow || 'Paradoxo Crítico!',
+        rage_depleted: 'Fúria Esgotada!',
+        gnosis_depleted: 'Gnose Esgotada!',
+      };
+      return `${charName} - ${labelMap[type] || type}`;
     },
   },
   narrator_roll: {
