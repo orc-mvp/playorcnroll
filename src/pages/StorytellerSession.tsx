@@ -28,6 +28,7 @@ import { StorytellerRequestTestCard } from '@/components/session/storyteller/Sto
 import { MobilePendingTestDrawer } from '@/components/session/vampire/MobilePendingTestDrawer';
 import { VampireNarratorSidebar } from '@/components/session/vampire/VampireNarratorSidebar';
 import { WerewolfNarratorSidebar } from '@/components/session/werewolf/WerewolfNarratorSidebar';
+import { MagoNarratorSidebar } from '@/components/session/mage/MagoNarratorSidebar';
 
 import {
   StorytellerScenePanel,
