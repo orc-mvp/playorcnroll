@@ -271,6 +271,21 @@ export function ManagePlayersModal({
               />
             </div>
 
+            {/* Allowed systems (Storyteller rooms only) */}
+            {isStorytellerRoom && (
+              <div className="p-3 rounded-lg border border-border bg-muted/30 mb-4 space-y-3">
+                <div>
+                  <Label className="text-sm font-medium">{t.managePlayers.allowedSystemsTitle}</Label>
+                  <p className="text-xs text-muted-foreground mt-1">{t.managePlayers.allowedSystemsHint}</p>
+                </div>
+                <AllowedSystemsSelector
+                  value={allowedSystems}
+                  onChange={handleAllowedSystemsChange}
+                  disabled={savingAllowed || loadingJoinLock}
+                />
+              </div>
+            )}
+
             <div className="space-y-4">
               {participants.map((participant) => {
                 const isLocked = getEffectiveLocked(participant);
