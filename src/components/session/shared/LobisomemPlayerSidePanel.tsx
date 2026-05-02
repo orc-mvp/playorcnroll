@@ -16,6 +16,7 @@ import {
 import { Dog, Sparkles, Users, User, FileText, Crown } from 'lucide-react';
 import LobisomemCharacterSheet from '@/components/character/lobisomem/LobisomemCharacterSheet';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import { isShifterData, getShifterAuspiceLabel } from '@/lib/lobisomem/auspiceLabels';
 import type { StorytellerParticipant } from '@/lib/storyteller/types';
 
 interface Props {
