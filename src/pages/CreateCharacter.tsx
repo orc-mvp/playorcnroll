@@ -201,7 +201,11 @@ export default function CreateCharacter() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !gameSystem) return;
+    console.log('[CreateCharacter] handleSubmit called', { user: !!user, gameSystem });
+    if (!user || !gameSystem) {
+      console.warn('[CreateCharacter] handleSubmit aborted', { user: !!user, gameSystem });
+      return;
+    }
 
     setIsSubmitting(true);
     try {
