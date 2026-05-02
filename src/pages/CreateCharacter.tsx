@@ -201,11 +201,18 @@ export default function CreateCharacter() {
   };
 
   const handleSubmit = async () => {
-    console.log('[CreateCharacter] handleSubmit called', { user: !!user, gameSystem });
-    if (!user || !gameSystem) {
-      console.warn('[CreateCharacter] handleSubmit aborted', { user: !!user, gameSystem });
+    if (!user) {
+      toast({
+        title: language === 'pt-BR' ? 'Sessão expirada' : 'Session expired',
+        description: language === 'pt-BR'
+          ? 'Faça login novamente para criar o personagem.'
+          : 'Please log in again to create your character.',
+        variant: 'destructive',
+      });
+      navigate('/login?returnTo=' + encodeURIComponent(window.location.pathname + window.location.search));
       return;
     }
+    if (!gameSystem) return;
 
     setIsSubmitting(true);
     try {
