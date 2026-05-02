@@ -83,7 +83,7 @@ export function LobisomemPlayerSidePanel({
                 )}
                 {lobData?.auspice && (
                   <Badge variant="outline" className="border-emerald-500/20 text-muted-foreground text-xs ml-1">
-                    {lobData.auspice}
+                    {isShifterData(lobData) ? getShifterAuspiceLabel(lobData.auspice) : lobData.auspice}
                   </Badge>
                 )}
               </div>
