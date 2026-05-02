@@ -215,18 +215,29 @@ export default function StepLobisomemBasicInfo({ formData, updateFormData, gameS
 
             <div className="space-y-2">
               <Label className="font-medieval text-sm">
-                {t.lobisomem.auspice} *
+                {t.lobisomem.auspice} {!isShifter && '*'}
               </Label>
               <Select value={formData.auspice} onValueChange={(v) => updateFormData({ auspice: v })}>
                 <SelectTrigger className="font-body bg-input border-border">
                   <SelectValue placeholder={t.lobisomem.selectAuspice} />
                 </SelectTrigger>
                 <SelectContent>
-                  {AUSPICES.map((a) => (
-                    <SelectItem key={a} value={a}>
-                      {getLabel(AUSPICE_I18N_MAP, a)}
-                    </SelectItem>
-                  ))}
+                  {isShifter ? (
+                    <>
+                      <SelectItem value="Ahroun">Lua/Sol do Guerreiro</SelectItem>
+                      <SelectItem value="Theurge">Lua/Sol do Xamã</SelectItem>
+                      <SelectItem value="Galliard">Lua/Sol do Bardo</SelectItem>
+                      <SelectItem value="Ragabash">Lua/Sol do Silencioso</SelectItem>
+                      <SelectItem value="Philodox">Lua/Sol do Juiz</SelectItem>
+                      <SelectItem value="Outro">Outro</SelectItem>
+                    </>
+                  ) : (
+                    AUSPICES.map((a) => (
+                      <SelectItem key={a} value={a}>
+                        {getLabel(AUSPICE_I18N_MAP, a)}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
