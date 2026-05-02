@@ -16,6 +16,7 @@ import {
 import { Dog, Sparkles, Users, User, FileText, Crown } from 'lucide-react';
 import LobisomemCharacterSheet from '@/components/character/lobisomem/LobisomemCharacterSheet';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import { isShifterData, getShifterAuspiceLabel } from '@/lib/lobisomem/auspiceLabels';
 import type { StorytellerParticipant } from '@/lib/storyteller/types';
 
 interface Props {
@@ -82,7 +83,7 @@ export function LobisomemPlayerSidePanel({
                 )}
                 {lobData?.auspice && (
                   <Badge variant="outline" className="border-emerald-500/20 text-muted-foreground text-xs ml-1">
-                    {lobData.auspice}
+                    {isShifterData(lobData) ? getShifterAuspiceLabel(lobData.auspice) : lobData.auspice}
                   </Badge>
                 )}
               </div>

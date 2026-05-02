@@ -15,6 +15,7 @@ import { Dog, User, Shield, Brain, Sparkles, Users, Flame, Star, Heart, Crown } 
 import { XpReducer } from '../storyteller/shared/XpReducer';
 import { toTitleCase } from '@/lib/textUtils';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import { isShifterData, getShifterAuspiceLabel } from '@/lib/lobisomem/auspiceLabels';
 import { CharacterNotes } from '../CharacterNotes';
 
 // Tribe key mapping
@@ -285,7 +286,11 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
             {data.auspice && (
               <div className="space-y-1">
                 <span className="text-xs text-muted-foreground/60 block">{t.lobisomem.auspice}</span>
-                <span className="font-body text-foreground">{getTranslatedName(data.auspice, AUSPICE_KEYS)}</span>
+                <span className="font-body text-foreground">
+                  {isShifterData(data)
+                    ? getShifterAuspiceLabel(data.auspice)
+                    : getTranslatedName(data.auspice, AUSPICE_KEYS)}
+                </span>
               </div>
             )}
             {data.breed && (
