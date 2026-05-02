@@ -28,6 +28,7 @@ import {
   Zap,
 } from 'lucide-react';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import { isShifterData, getShifterAuspiceLabel } from '@/lib/lobisomem/auspiceLabels';
 
 interface Participant {
   id: string;
