@@ -270,7 +270,7 @@ export function WerewolfNarratorSidebar({
                         </div>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           {lobData?.tribe && <span className="capitalize">{lobData.tribe}</span>}
-                          {lobData?.auspice && <><span>•</span><span>{lobData.auspice}</span></>}
+                          {lobData?.auspice && <><span>•</span><span>{isShifterData(lobData) ? getShifterAuspiceLabel(lobData.auspice) : lobData.auspice}</span></>}
                         </div>
                       </div>
                     </div>
