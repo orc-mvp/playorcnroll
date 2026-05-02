@@ -15,6 +15,7 @@ import { Dog, User, Shield, Brain, Sparkles, Users, Flame, Star, Heart, Crown } 
 import { XpReducer } from '../storyteller/shared/XpReducer';
 import { toTitleCase } from '@/lib/textUtils';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
+import { isShifterData, getShifterAuspiceLabel } from '@/lib/lobisomem/auspiceLabels';
 import { CharacterNotes } from '../CharacterNotes';
 
 // Tribe key mapping
