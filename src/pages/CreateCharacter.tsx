@@ -331,10 +331,10 @@ export default function CreateCharacter() {
       const returnTo = searchParams.get('returnTo');
       navigate(returnTo || '/dashboard');
     } catch (error) {
-      if (import.meta.env.DEV) console.error('Error creating character:', error);
+      console.error('[CreateCharacter] Error creating character:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível criar o personagem.',
+        description: (error as { message?: string })?.message || 'Não foi possível criar o personagem.',
         variant: 'destructive',
       });
     } finally {
