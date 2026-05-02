@@ -201,7 +201,18 @@ export default function CreateCharacter() {
   };
 
   const handleSubmit = async () => {
-    if (!user || !gameSystem) return;
+    if (!user) {
+      toast({
+        title: language === 'pt-BR' ? 'Sessão expirada' : 'Session expired',
+        description: language === 'pt-BR'
+          ? 'Faça login novamente para criar o personagem.'
+          : 'Please log in again to create your character.',
+        variant: 'destructive',
+      });
+      navigate('/login?returnTo=' + encodeURIComponent(window.location.pathname + window.location.search));
+      return;
+    }
+    if (!gameSystem) return;
 
     setIsSubmitting(true);
     try {
@@ -327,10 +338,10 @@ export default function CreateCharacter() {
       const returnTo = searchParams.get('returnTo');
       navigate(returnTo || '/dashboard');
     } catch (error) {
-      if (import.meta.env.DEV) console.error('Error creating character:', error);
+      console.error('[CreateCharacter] Error creating character:', error);
       toast({
         title: 'Erro',
-        description: 'Não foi possível criar o personagem.',
+        description: (error as { message?: string })?.message || 'Não foi possível criar o personagem.',
         variant: 'destructive',
       });
     } finally {
