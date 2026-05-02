@@ -543,6 +543,14 @@ export default function JoinSession() {
                           validatedSession.allowed_systems,
                         );
 
+                        // Sessões Storyteller aceitam vários sistemas — não
+                        // pré-seleciona nenhum no fluxo de criação.
+                        const buildCreateUrl = () => {
+                          const isStoryteller = isStorytellerSystem(validatedSession.game_system);
+                          const sys = isStoryteller ? '' : `system=${validatedSession.game_system}&`;
+                          return `/character/create?${sys}returnTo=/join/${inviteCode.trim().toUpperCase()}`;
+                        };
+
                         if (compatibleCharacters.length === 0) {
                           return (
                             <div className="text-center py-4 bg-muted/30 rounded-lg">
@@ -555,14 +563,7 @@ export default function JoinSession() {
                               <Button
                                 type="button"
                                 variant="outline"
-                                onClick={() => {
-                                  // Família 'storyteller' não tem sistema fixo:
-                                  // deixa o usuário escolher Vampiro/Lobisomem/etc.
-                                  const sys = validatedSession.game_system === 'storyteller'
-                                    ? ''
-                                    : `system=${validatedSession.game_system}&`;
-                                  navigate(`/character/create?${sys}returnTo=/join/${inviteCode.trim().toUpperCase()}`);
-                                }}
+                                onClick={() => navigate(buildCreateUrl())}
                               >
                                 {t.session.createCharacterFor} {getSystemLabel(validatedSession.game_system)}
                               </Button>
@@ -571,37 +572,48 @@ export default function JoinSession() {
                         }
 
                         return (
-                          <Select
-                            value={selectedCharacterId}
-                            onValueChange={setSelectedCharacterId}
-                            disabled={isJoining}
-                          >
-                            <SelectTrigger className="font-body">
-                              <SelectValue placeholder={t.session.selectCharacterPlaceholder} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {compatibleCharacters.map((char) => {
-                                const adapter = isStorytellerSystem(char.game_system)
-                                  ? getSystemAdapter(char.game_system)
-                                  : null;
-                                return (
-                                  <SelectItem key={char.id} value={char.id}>
-                                    <span className="font-medieval">{char.name}</span>
-                                    {adapter && (
-                                      <span className="text-muted-foreground ml-2 text-xs">
-                                        [{adapter.shortLabel}]
-                                      </span>
-                                    )}
-                                    {char.concept && (
-                                      <span className="text-muted-foreground ml-2 text-sm">
-                                        - {char.concept}
-                                      </span>
-                                    )}
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
+                          <div className="space-y-2">
+                            <Select
+                              value={selectedCharacterId}
+                              onValueChange={setSelectedCharacterId}
+                              disabled={isJoining}
+                            >
+                              <SelectTrigger className="font-body">
+                                <SelectValue placeholder={t.session.selectCharacterPlaceholder} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {compatibleCharacters.map((char) => {
+                                  const adapter = isStorytellerSystem(char.game_system)
+                                    ? getSystemAdapter(char.game_system)
+                                    : null;
+                                  return (
+                                    <SelectItem key={char.id} value={char.id}>
+                                      <span className="font-medieval">{char.name}</span>
+                                      {adapter && (
+                                        <span className="text-muted-foreground ml-2 text-xs">
+                                          [{adapter.shortLabel}]
+                                        </span>
+                                      )}
+                                      {char.concept && (
+                                        <span className="text-muted-foreground ml-2 text-sm">
+                                          - {char.concept}
+                                        </span>
+                                      )}
+                                    </SelectItem>
+                                  );
+                                })}
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="w-full text-xs text-muted-foreground hover:text-foreground"
+                              onClick={() => navigate(buildCreateUrl())}
+                            >
+                              + {t.session.createCharacterFor} {getSystemLabel(validatedSession.game_system)}
+                            </Button>
+                          </div>
                         );
                       })()}
                     </div>
