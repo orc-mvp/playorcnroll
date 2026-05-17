@@ -1,0 +1,15 @@
+# Orc & Roll
+
+> Plataforma de RPG online em teatro da mente. Jogue Heróis Marcados, Vampiro: A Máscara (V3), Lobisomem: O Apocalipse (W20), Mago: A Ascensão (M20) e Metamorfos com dados 3D, sessões em tempo real e fichas gerenciadas.
+
+Orc & Roll é uma plataforma web brasileira para mesas de RPG narrativo. Narradores criam sessões e convidam jogadores via código; jogadores criam personagens em sistemas suportados e participam de cenas com rolagens animadas, fichas vivas e eventos sincronizados em tempo real. Interface bilíngue (PT-BR/EN).
+
+## Pages
+
+- [Início](/): Apresentação da plataforma e sistemas suportados.
+- [Entrar](/login): Acessar conta existente.
+- [Criar conta](/signup): Registrar nova conta gratuita.
+
+## Optional
+
+- [Autenticação](/auth): Tela combinada de login e cadastro.

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
@@ -131,8 +132,26 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
     );
   }
 
+  const pageTitle = mode === 'login'
+    ? 'Entrar — Orc & Roll'
+    : 'Criar conta — Orc & Roll';
+  const pageDesc = mode === 'login'
+    ? 'Acesse sua conta no Orc & Roll para gerenciar personagens e participar de sessões de RPG online em tempo real.'
+    : 'Crie sua conta gratuita no Orc & Roll e comece a jogar RPG online em teatro da mente com dados 3D e fichas vivas.';
+  const canonical = mode === 'login'
+    ? 'https://play.orcnroll.com/login'
+    : 'https://play.orcnroll.com/signup';
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-parchment">
+    <main className="min-h-screen flex flex-col items-center justify-center p-4 bg-parchment">
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:url" content={canonical} />
+      </Helmet>
       {/* Language Toggle */}
       <div className="absolute top-4 right-4 flex gap-2">
         <Button
@@ -279,6 +298,6 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
           </p>
         </CardFooter>
       </Card>
-    </div>
+    </main>
   );
 }
