@@ -27,6 +27,14 @@ export default function Index() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>Orc &amp; Roll — RPG Online em Teatro da Mente</title>
+        <meta name="description" content="Plataforma de RPG online em teatro da mente. Jogue Heróis Marcados, Vampiro, Lobisomem, Mago e Metamorfos com dados 3D e sessões em tempo real." />
+        <link rel="canonical" href="https://play.orcnroll.com/" />
+        <meta property="og:title" content="Orc &amp; Roll — RPG Online em Teatro da Mente" />
+        <meta property="og:description" content="Plataforma brasileira de RPG online com dados 3D, fichas vivas e sessões em tempo real." />
+        <meta property="og:url" content="https://play.orcnroll.com/" />
+      </Helmet>
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-10 p-4">
         <div className="container mx-auto flex items-center justify-between">
