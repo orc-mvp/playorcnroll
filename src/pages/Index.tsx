@@ -194,6 +194,7 @@ export default function Index() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-border bg-parchment">
