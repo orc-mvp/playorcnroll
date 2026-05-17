@@ -67,8 +67,9 @@ export default function Index() {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-16 bg-parchment">
+      <main>
+        {/* Hero Section */}
+        <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-16 bg-parchment">
         {/* Logo */}
         <div className="mb-6">
           <img
