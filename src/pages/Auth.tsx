@@ -298,6 +298,6 @@ export default function Auth({ defaultMode = 'login' }: AuthProps) {
           </p>
         </CardFooter>
       </Card>
-    </div>
+    </main>
   );
 }
