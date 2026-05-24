@@ -211,6 +211,17 @@ export function ManagePlayersModal({
         .eq('id', characterId);
 
       if (error) throw error;
+
+      // Log the XP change so players can see who awarded/removed XP
+      const { data: auth } = await supabase.auth.getUser();
+      if (auth?.user && delta !== 0) {
+        await supabase.from('xp_log').insert({
+          character_id: characterId,
+          session_id: sessionId,
+          awarded_by: auth.user.id,
+          amount: delta,
+        });
+      }
     } catch (error) {
       console.error('Error updating XP:', error);
       // Revert optimistic update
