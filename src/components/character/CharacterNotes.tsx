@@ -184,10 +184,21 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
             >
               <Textarea
                 value={note.text}
-                onChange={(e) => handleChange(note.id, e.target.value)}
+                onChange={(e) => {
+                  handleChange(note.id, e.target.value);
+                  e.target.style.height = 'auto';
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }}
+                ref={(el) => {
+                  if (el) {
+                    el.style.height = 'auto';
+                    el.style.height = `${el.scrollHeight}px`;
+                  }
+                }}
                 placeholder={t.characterSheet.notesPlaceholder}
                 readOnly={readOnly}
-                className="flex-1 min-h-[64px] resize-y bg-muted/30 border-border font-body text-sm"
+                rows={1}
+                className="flex-1 resize-none overflow-hidden bg-muted/30 border-border font-body text-sm"
               />
               {!readOnly && (
                 <AlertDialog>
