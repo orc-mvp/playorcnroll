@@ -116,6 +116,13 @@ export default function Session() {
         return;
       }
 
+      // Redireciona para a sala unificada Storyteller se for sistema WoD
+      // (cobre URLs antigas/bookmark de /session/:id de sessões 'storyteller').
+      if (isStorytellerSystem(sessionData.game_system)) {
+        navigate(`/session/storyteller/${sessionId}`, { replace: true });
+        return;
+      }
+
       // Redirect to lobby if not active
       if (sessionData.status !== 'active') {
         navigate(`/session/${sessionId}/lobby`);
