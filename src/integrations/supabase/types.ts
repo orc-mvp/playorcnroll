@@ -603,6 +603,36 @@ export type Database = {
           },
         ]
       }
+      xp_log: {
+        Row: {
+          amount: number
+          awarded_by: string
+          character_id: string
+          created_at: string
+          id: string
+          reason: string | null
+          session_id: string | null
+        }
+        Insert: {
+          amount: number
+          awarded_by: string
+          character_id: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          session_id?: string | null
+        }
+        Update: {
+          amount?: number
+          awarded_by?: string
+          character_id?: string
+          created_at?: string
+          id?: string
+          reason?: string | null
+          session_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
