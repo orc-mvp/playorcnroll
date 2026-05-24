@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,7 +15,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { StickyNote, Plus, Trash2, Check } from 'lucide-react';
+import { StickyNote, Plus, Trash2, Save } from 'lucide-react';
 
 interface NoteItem {
   id: string;
@@ -55,15 +55,17 @@ function serializeNotes(notes: NoteItem[]): string {
 
 export function CharacterNotes({ characterId, initialNotes = '', readOnly = false }: CharacterNotesProps) {
   const { t } = useI18n();
-  const { toast } = useToast();
   const [notes, setNotes] = useState<NoteItem[]>(() => parseNotes(initialNotes));
-  const [saved, setSaved] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [saving, setSaving] = useState(false);
   const skipNextRealtimeRef = useRef(false);
 
-  // Sync with external changes
+  // Sync with external changes when not editing
   useEffect(() => {
-    setNotes(parseNotes(initialNotes));
+    if (!dirty) {
+      setNotes(parseNotes(initialNotes));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialNotes]);
 
   // Realtime
@@ -84,7 +86,7 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
             return;
           }
           const newNotes = (payload.new as any).notes;
-          if (typeof newNotes === 'string') {
+          if (typeof newNotes === 'string' && !dirty) {
             setNotes(parseNotes(newNotes));
           }
         }
@@ -94,56 +96,48 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [characterId]);
+  }, [characterId, dirty]);
 
   const persist = useCallback(
     async (value: NoteItem[]) => {
+      setSaving(true);
       skipNextRealtimeRef.current = true;
       const { error } = await supabase
         .from('characters')
         .update({ notes: serializeNotes(value) })
         .eq('id', characterId);
+      setSaving(false);
       if (error) {
-        toast({ title: t.common.errorSaving, variant: 'destructive' });
-      } else {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 1500);
+        toast.error(t.common.errorSaving);
+        return false;
       }
+      toast.success(t.characterSheet.notesSaved);
+      setDirty(false);
+      return true;
     },
-    [characterId, t, toast]
+    [characterId, t]
   );
-
-  const scheduleSave = useCallback(
-    (value: NoteItem[]) => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-      debounceRef.current = setTimeout(() => persist(value), 800);
-    },
-    [persist]
-  );
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
 
   const handleAdd = () => {
     const next = [...notes, { id: genId(), text: '' }];
     setNotes(next);
-    persist(next);
+    setDirty(true);
   };
 
   const handleChange = (id: string, text: string) => {
     const next = notes.map((n) => (n.id === id ? { ...n, text } : n));
     setNotes(next);
-    scheduleSave(next);
+    setDirty(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     const next = notes.filter((n) => n.id !== id);
     setNotes(next);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    persist(next);
+    await persist(next);
+  };
+
+  const handleSave = () => {
+    persist(notes);
   };
 
   return (
@@ -153,14 +147,18 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
           <StickyNote className="w-4 h-4" />
           {t.characterSheet.notes}
         </h4>
-        <div className="flex items-center gap-2">
-          {saved && (
-            <span className="text-xs text-green-500 flex items-center gap-1">
-              <Check className="w-3 h-3" />
-              {t.characterSheet.notesSaved}
-            </span>
-          )}
-          {!readOnly && (
+        {!readOnly && (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleSave}
+              disabled={!dirty || saving}
+              className="h-7 px-2 text-xs gap-1"
+              aria-label={t.common.save}
+            >
+              <Save className="w-3 h-3" />
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -169,8 +167,8 @@ export function CharacterNotes({ characterId, initialNotes = '', readOnly = fals
             >
               <Plus className="w-3 h-3" />
             </Button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {notes.length === 0 ? (
