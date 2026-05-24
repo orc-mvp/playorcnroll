@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { UserMenu, type UserMenuExtraItem } from '@/components/UserMenu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ChevronLeft, LogOut, Sword, Moon, Dog, Users, Link } from 'lucide-react';
+import { ChevronLeft, LogOut, Sword, Moon, Dog, Users, Link, Sparkles, PawPrint, BookOpen } from 'lucide-react';
 import { EndSessionModal } from './EndSessionModal';
 import { SessionInfoModal } from './SessionInfoModal';
 import type { SessionData, Participant } from '@/pages/Session';
