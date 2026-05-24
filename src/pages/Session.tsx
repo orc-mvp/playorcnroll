@@ -14,6 +14,7 @@ import { PendingTestNotification } from '@/components/dice/PendingTestNotificati
 import { ManagePlayersModal } from '@/components/session/vampire/ManagePlayersModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, Scroll, User, Dices } from 'lucide-react';
+import { isStorytellerSystem } from '@/lib/storyteller/systemRegistry';
 
 export interface SessionData {
   id: string;
@@ -113,6 +114,13 @@ export default function Session() {
       if (sessionError || !sessionData) {
         toast({ title: t.session.sessionNotFound, variant: 'destructive' });
         navigate('/dashboard');
+        return;
+      }
+
+      // Redireciona para a sala unificada Storyteller se for sistema WoD
+      // (cobre URLs antigas/bookmark de /session/:id de sessões 'storyteller').
+      if (isStorytellerSystem(sessionData.game_system)) {
+        navigate(`/session/storyteller/${sessionId}`, { replace: true });
         return;
       }
 
