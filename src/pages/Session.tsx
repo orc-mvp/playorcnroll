@@ -14,6 +14,7 @@ import { PendingTestNotification } from '@/components/dice/PendingTestNotificati
 import { ManagePlayersModal } from '@/components/session/vampire/ManagePlayersModal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, Scroll, User, Dices } from 'lucide-react';
+import { isStorytellerSystem } from '@/lib/storyteller/systemRegistry';
 
 export interface SessionData {
   id: string;
