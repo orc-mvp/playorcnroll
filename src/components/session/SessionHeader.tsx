@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { UserMenu, type UserMenuExtraItem } from '@/components/UserMenu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ChevronLeft, LogOut, Sword, Moon, Dog, Users, Link } from 'lucide-react';
+import { ChevronLeft, LogOut, Sword, Moon, Dog, Users, Link, Sparkles, PawPrint, BookOpen } from 'lucide-react';
 import { EndSessionModal } from './EndSessionModal';
 import { SessionInfoModal } from './SessionInfoModal';
 import type { SessionData, Participant } from '@/pages/Session';
@@ -42,6 +42,36 @@ function getSystemConfig(gameSystem?: string) {
       gradientClass: 'from-emerald-500/10',
       badgeBorderClass: 'border-emerald-500/30 text-emerald-500',
       decorationClass: 'decoration-emerald-500/30',
+    };
+  }
+  if (gameSystem === 'mago_m20') {
+    return {
+      icon: <Sparkles className="w-6 h-6 text-purple-500" />,
+      badgeLabel: 'Mago: A Ascensão',
+      accentClass: 'border-purple-500/20',
+      gradientClass: 'from-purple-500/10',
+      badgeBorderClass: 'border-purple-500/30 text-purple-500',
+      decorationClass: 'decoration-purple-500/30',
+    };
+  }
+  if (gameSystem === 'metamorfos_w20') {
+    return {
+      icon: <PawPrint className="w-6 h-6 text-amber-500" />,
+      badgeLabel: 'Metamorfos',
+      accentClass: 'border-amber-500/20',
+      gradientClass: 'from-amber-500/10',
+      badgeBorderClass: 'border-amber-500/30 text-amber-500',
+      decorationClass: 'decoration-amber-500/30',
+    };
+  }
+  if (gameSystem === 'storyteller') {
+    return {
+      icon: <BookOpen className="w-6 h-6 text-destructive" />,
+      badgeLabel: 'Storyteller (Mundo das Trevas)',
+      accentClass: 'border-destructive/20',
+      gradientClass: 'from-destructive/10',
+      badgeBorderClass: 'border-destructive/30 text-destructive',
+      decorationClass: 'decoration-destructive/30',
     };
   }
   return {
