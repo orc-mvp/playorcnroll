@@ -82,18 +82,25 @@ export default function MySessions() {
 
       const allSessions: SessionWithRole[] = [];
 
-      if (narratorResult.data) {
-        const withCounts = await Promise.all(
-          narratorResult.data.map(async (session) => {
-            const { count } = await supabase
-              .from('session_participants')
-              .select('*', { count: 'exact', head: true })
-              .eq('session_id', session.id);
+      if (narratorResult.data && narratorResult.data.length > 0) {
+        const narratorSessionIds = narratorResult.data.map((s) => s.id);
+        const { data: participantsRows } = await supabase
+          .from('session_participants')
+          .select('session_id')
+          .in('session_id', narratorSessionIds);
 
-            return { ...session, participant_count: count || 0, contextRole: 'narrator' as const };
-          })
-        );
-        allSessions.push(...withCounts);
+        const counts = new Map<string, number>();
+        (participantsRows || []).forEach((p) => {
+          counts.set(p.session_id, (counts.get(p.session_id) || 0) + 1);
+        });
+
+        narratorResult.data.forEach((session) => {
+          allSessions.push({
+            ...session,
+            participant_count: counts.get(session.id) || 0,
+            contextRole: 'narrator' as const,
+          });
+        });
       }
 
       if (participantResult.data) {

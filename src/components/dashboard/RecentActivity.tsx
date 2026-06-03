@@ -45,20 +45,45 @@ export function RecentActivity({ userId }: RecentActivityProps) {
       const allActivities: ActivityItem[] = [];
 
       try {
-        // Fetch sessions where user is narrator
-        const { data: narratorSessions } = await supabase
-          .from('sessions')
-          .select('id, name, status, game_system, created_at, updated_at')
-          .eq('narrator_id', userId)
-          .order('updated_at', { ascending: false })
-          .limit(10);
+        const [narratorRes, charactersRes, participationsRes, rollsRes] = await Promise.all([
+          supabase
+            .from('sessions')
+            .select('id, name, status, game_system, created_at, updated_at')
+            .eq('narrator_id', userId)
+            .order('updated_at', { ascending: false })
+            .limit(10),
+          supabase
+            .from('characters')
+            .select('id, name, created_at, updated_at')
+            .eq('user_id', userId)
+            .order('updated_at', { ascending: false })
+            .limit(5),
+          supabase
+            .from('session_participants')
+            .select(`id, joined_at, sessions(id, name, status, game_system)`)
+            .eq('user_id', userId)
+            .order('joined_at', { ascending: false })
+            .limit(5),
+          supabase
+            .from('test_rolls')
+            .select(`id, dice1, dice2, total, result, rolled_at, characters(name), tests(attribute, sessions(id, name))`)
+            .eq('user_id', userId)
+            .not('rolled_at', 'is', null)
+            .order('rolled_at', { ascending: false })
+            .limit(5),
+        ]);
+
+        const narratorSessions = narratorRes.data;
+        const characters = charactersRes.data;
+        const participations = participationsRes.data;
+        const rolls = rollsRes.data;
 
         if (narratorSessions) {
           narratorSessions.forEach(session => {
             const getSessionLink = (s: typeof session) => {
               if (s.status === 'active') {
-                return s.game_system === 'vampiro_v3' 
-                  ? `/session/vampire/${s.id}` 
+                return s.game_system === 'vampiro_v3'
+                  ? `/session/vampire/${s.id}`
                   : s.game_system === 'lobisomem_w20'
                   ? `/session/werewolf/${s.id}`
                   : `/session/${s.id}`;
@@ -102,14 +127,6 @@ export function RecentActivity({ userId }: RecentActivityProps) {
           });
         }
 
-        // Fetch characters
-        const { data: characters } = await supabase
-          .from('characters')
-          .select('id, name, created_at, updated_at')
-          .eq('user_id', userId)
-          .order('updated_at', { ascending: false })
-          .limit(5);
-
         if (characters) {
           characters.forEach(char => {
             allActivities.push({
@@ -123,30 +140,18 @@ export function RecentActivity({ userId }: RecentActivityProps) {
           });
         }
 
-        // Fetch sessions where user is participant
-        const { data: participations } = await supabase
-          .from('session_participants')
-          .select(`
-            id,
-            joined_at,
-            sessions(id, name, status, game_system)
-          `)
-          .eq('user_id', userId)
-          .order('joined_at', { ascending: false })
-          .limit(5);
-
         if (participations) {
           participations.forEach(p => {
             const session = p.sessions as any;
             if (session) {
-              const link = session.status === 'active' 
-                ? (session.game_system === 'vampiro_v3' 
-                  ? `/session/vampire/${session.id}` 
+              const link = session.status === 'active'
+                ? (session.game_system === 'vampiro_v3'
+                  ? `/session/vampire/${session.id}`
                   : session.game_system === 'lobisomem_w20'
                   ? `/session/werewolf/${session.id}`
                   : `/session/${session.id}`)
                 : `/session/${session.id}/lobby`;
-              
+
               allActivities.push({
                 id: `joined-${p.id}`,
                 type: 'session_joined',
@@ -160,31 +165,9 @@ export function RecentActivity({ userId }: RecentActivityProps) {
           });
         }
 
-        // Fetch dice rolls
-        const { data: rolls } = await supabase
-          .from('test_rolls')
-          .select(`
-            id,
-            dice1,
-            dice2,
-            total,
-            result,
-            rolled_at,
-            characters(name),
-            tests(
-              attribute,
-              sessions(id, name)
-            )
-          `)
-          .eq('user_id', userId)
-          .not('rolled_at', 'is', null)
-          .order('rolled_at', { ascending: false })
-          .limit(5);
-
         if (rolls) {
           rolls.forEach(roll => {
             const charName = (roll.characters as any)?.name || 'Personagem';
-            const sessionName = (roll.tests as any)?.sessions?.name || '';
             const attr = (roll.tests as any)?.attribute || '';
 
             allActivities.push({
