@@ -646,6 +646,10 @@ export type Database = {
         Args: { p_session_id: string; p_user_id: string }
         Returns: boolean
       }
+      join_session_with_code: {
+        Args: { p_character_id: string; p_invite_code: string; p_patch?: Json }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
