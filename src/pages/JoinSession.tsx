@@ -298,16 +298,14 @@ export default function JoinSession() {
         characterData?.vampiro_data,
       );
 
-      const { error: joinError } = await supabase
-        .from('session_participants')
-        .insert({
-          session_id: sessionData.id,
-          user_id: user.id,
-          character_id: selectedCharacterId,
-          ...patch,
-        });
+      const { error: joinError } = await supabase.rpc('join_session_with_code', {
+        p_invite_code: inviteCode.trim().toUpperCase(),
+        p_character_id: selectedCharacterId,
+        p_patch: patch as any,
+      });
 
       if (joinError) throw joinError;
+
 
       toast({
         title: t.session.joinedSession,
