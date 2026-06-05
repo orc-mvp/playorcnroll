@@ -49,7 +49,7 @@ interface MeritsFlawsSelectorProps {
   onAvailableLoaded?: (available: MeritFlawItem[]) => void;
 }
 
-type TypeFilter = 'all' | 'merit' | 'flaw';
+type TypeFilter = 'all' | 'merit' | 'flaw' | 'selected';
 
 export default function MeritsFlawsSelector({
   gameSystem,
@@ -125,17 +125,19 @@ export default function MeritsFlawsSelector({
 
   const normalizedSearch = search.trim().toLowerCase();
   const filtered = useMemo(() => {
+    const selectedIds = new Set(selected.map((s) => s.id));
     return available.filter((item) => {
       if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
       if (typeFilter === 'merit' && item.cost <= 0) return false;
       if (typeFilter === 'flaw' && item.cost >= 0) return false;
+      if (typeFilter === 'selected' && !selectedIds.has(item.id)) return false;
       if (normalizedSearch) {
         const hay = `${item.name} ${item.description} ${item.prerequisites ?? ''}`.toLowerCase();
         if (!hay.includes(normalizedSearch)) return false;
       }
       return true;
     });
-  }, [available, categoryFilter, typeFilter, normalizedSearch]);
+  }, [available, categoryFilter, typeFilter, normalizedSearch, selected]);
 
   const grouped = useMemo(() => {
     return filtered.reduce<Record<string, MeritFlawItem[]>>((acc, item) => {
@@ -148,14 +150,6 @@ export default function MeritsFlawsSelector({
   const hasActiveFilters =
     normalizedSearch.length > 0 || categoryFilter !== 'all' || typeFilter !== 'all';
 
-  // Items already selected but hidden by current filters — surfaced at top so user never loses them
-  const selectedHiddenItems = useMemo(() => {
-    if (!hasActiveFilters) return [] as MeritFlawItem[];
-    const filteredIds = new Set(filtered.map((i) => i.id));
-    return available.filter(
-      (i) => selected.some((s) => s.id === i.id) && !filteredIds.has(i.id),
-    );
-  }, [available, filtered, selected, hasActiveFilters]);
 
   const clearFilters = () => {
     setSearch('');
@@ -289,6 +283,9 @@ export default function MeritsFlawsSelector({
             <SelectItem value="all">{t.meritsFlaws.allTypes}</SelectItem>
             <SelectItem value="merit">{t.meritsFlaws.meritsOnly}</SelectItem>
             <SelectItem value="flaw">{t.meritsFlaws.flawsOnly}</SelectItem>
+            <SelectItem value="selected" disabled={selected.length === 0}>
+              {t.meritsFlaws.selectedOnly} ({selected.length})
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -310,14 +307,7 @@ export default function MeritsFlawsSelector({
     </div>
   );
 
-  const selectedHiddenBlock = selectedHiddenItems.length > 0 && (
-    <div className="space-y-2">
-      <h4 className="font-medieval text-xs text-muted-foreground">
-        {t.meritsFlaws.selectedHeader}
-      </h4>
-      <div className="space-y-2">{selectedHiddenItems.map(renderItem)}</div>
-    </div>
-  );
+  const selectedHiddenBlock = null;
 
   const listBlock =
     filtered.length === 0 ? (

@@ -1044,6 +1044,7 @@ export const translations = {
       clearFilters: 'Limpar filtros',
       shownCount: '{shown} de {total}',
       selectedHeader: 'Selecionadas',
+      selectedOnly: 'Apenas Selecionadas',
       noResults: 'Nenhum resultado para os filtros aplicados.',
     },
 
@@ -2347,6 +2348,7 @@ export const translations = {
       clearFilters: 'Clear filters',
       shownCount: '{shown} of {total}',
       selectedHeader: 'Selected',
+      selectedOnly: 'Selected only',
       noResults: 'No results for the applied filters.',
     },
 
