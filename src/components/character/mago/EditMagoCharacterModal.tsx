@@ -196,7 +196,7 @@ export function EditMagoCharacterModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col w-[95vw]">
+      <DialogContent className="w-[95vw] max-w-2xl md:max-w-3xl lg:max-w-5xl max-h-[90vh] flex flex-col">
         <DialogHeader className="shrink-0">
           <DialogTitle className="font-medieval flex items-center gap-2">
             <Star className="w-5 h-5 text-purple-500" />

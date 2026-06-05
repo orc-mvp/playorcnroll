@@ -315,7 +315,7 @@ export function EditMetamorfosCharacterModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="w-[95vw] max-w-2xl md:max-w-3xl lg:max-w-5xl max-h-[90vh] flex flex-col">
         <DialogHeader className="shrink-0">
           <DialogTitle className="font-medieval flex items-center gap-2">
             <PawPrint className="w-5 h-5 text-amber-500" />
