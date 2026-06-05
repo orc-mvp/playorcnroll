@@ -2343,6 +2343,11 @@ export const translations = {
       freebieExceeded: 'Insufficient points',
       lobisomemOrShifter: 'Werewolf / Shifter',
       selectAtLeastOneSystem: 'Select at least one system',
+      searchPlaceholder: 'Search merit or flaw...',
+      clearFilters: 'Clear filters',
+      shownCount: '{shown} of {total}',
+      selectedHeader: 'Selected',
+      noResults: 'No results for the applied filters.',
     },
 
     // XP Log
