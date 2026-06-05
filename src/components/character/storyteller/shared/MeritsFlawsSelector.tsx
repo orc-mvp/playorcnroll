@@ -125,17 +125,19 @@ export default function MeritsFlawsSelector({
 
   const normalizedSearch = search.trim().toLowerCase();
   const filtered = useMemo(() => {
+    const selectedIds = new Set(selected.map((s) => s.id));
     return available.filter((item) => {
       if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
       if (typeFilter === 'merit' && item.cost <= 0) return false;
       if (typeFilter === 'flaw' && item.cost >= 0) return false;
+      if (typeFilter === 'selected' && !selectedIds.has(item.id)) return false;
       if (normalizedSearch) {
         const hay = `${item.name} ${item.description} ${item.prerequisites ?? ''}`.toLowerCase();
         if (!hay.includes(normalizedSearch)) return false;
       }
       return true;
     });
-  }, [available, categoryFilter, typeFilter, normalizedSearch]);
+  }, [available, categoryFilter, typeFilter, normalizedSearch, selected]);
 
   const grouped = useMemo(() => {
     return filtered.reduce<Record<string, MeritFlawItem[]>>((acc, item) => {
