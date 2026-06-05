@@ -4,7 +4,16 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Loader2, Search, X } from 'lucide-react';
 import { toTitleCase } from '@/lib/textUtils';
 
 export interface SelectedMeritFlaw {
@@ -31,24 +40,16 @@ export type MeritsFlawsSystemKey =
   | 'mago_m20';
 
 interface MeritsFlawsSelectorProps {
-  /** Sistema do personagem — filtra a lista do banco. */
   gameSystem: MeritsFlawsSystemKey;
-  /** M&F atualmente selecionadas. */
   selected: SelectedMeritFlaw[];
-  /** Callback chamado a cada alteração na seleção. */
   onChange: (next: SelectedMeritFlaw[]) => void;
-  /** Quando informado, exibe contador de pontos livres restantes. */
   freebieBudget?: number;
-  /**
-   * `creation` exibe scroll alto (~400px) com cards grandes e descrição expandida.
-   * `edit` é compacto, sem ScrollArea (o pai já controla o overflow).
-   */
   variant?: 'creation' | 'edit';
-  /** Cor de destaque do item selecionado. Padrão: 'primary'. */
   accent?: 'primary' | 'amber';
-  /** Já notificadas como removidas pela limpeza automática (opcional). */
   onAvailableLoaded?: (available: MeritFlawItem[]) => void;
 }
+
+type TypeFilter = 'all' | 'merit' | 'flaw';
 
 export default function MeritsFlawsSelector({
   gameSystem,
@@ -62,6 +63,9 @@ export default function MeritsFlawsSelector({
   const { t, language } = useI18n();
   const [available, setAvailable] = useState<MeritFlawItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
 
   useEffect(() => {
     let cancelled = false;
@@ -92,7 +96,7 @@ export default function MeritsFlawsSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameSystem]);
 
-  const toggleItem = (item: MeritFlawItem) => {
+  const toggleItem = (item: Pick<MeritFlawItem, 'id' | 'name' | 'cost' | 'category'>) => {
     const isSelected = selected.some((s) => s.id === item.id);
     const next = isSelected
       ? selected.filter((s) => s.id !== item.id)
@@ -113,13 +117,42 @@ export default function MeritsFlawsSelector({
   const categoryLabel = (cat: string) =>
     (t.meritsFlaws[cat as keyof typeof t.meritsFlaws] as string) || cat;
 
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    available.forEach((i) => set.add(i.category));
+    return Array.from(set).sort();
+  }, [available]);
+
+  const normalizedSearch = search.trim().toLowerCase();
+  const filtered = useMemo(() => {
+    return available.filter((item) => {
+      if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
+      if (typeFilter === 'merit' && item.cost <= 0) return false;
+      if (typeFilter === 'flaw' && item.cost >= 0) return false;
+      if (normalizedSearch) {
+        const hay = `${item.name} ${item.description} ${item.prerequisites ?? ''}`.toLowerCase();
+        if (!hay.includes(normalizedSearch)) return false;
+      }
+      return true;
+    });
+  }, [available, categoryFilter, typeFilter, normalizedSearch]);
+
   const grouped = useMemo(() => {
-    return available.reduce<Record<string, MeritFlawItem[]>>((acc, item) => {
+    return filtered.reduce<Record<string, MeritFlawItem[]>>((acc, item) => {
       if (!acc[item.category]) acc[item.category] = [];
       acc[item.category].push(item);
       return acc;
     }, {});
-  }, [available]);
+  }, [filtered]);
+
+  const hasActiveFilters =
+    normalizedSearch.length > 0 || categoryFilter !== 'all' || typeFilter !== 'all';
+
+  const clearFilters = () => {
+    setSearch('');
+    setCategoryFilter('all');
+    setTypeFilter('all');
+  };
 
   if (loading) {
     return (
@@ -198,6 +231,113 @@ export default function MeritsFlawsSelector({
     </div>
   );
 
+  const noResults = (
+    <div className="text-center py-6 text-muted-foreground font-body text-sm">
+      {t.meritsFlaws.noResults}
+    </div>
+  );
+
+  // Items already selected but hidden by current filters — surfaced at top so user never loses them
+  const selectedHiddenItems = useMemo(() => {
+    if (!hasActiveFilters) return [];
+    const filteredIds = new Set(filtered.map((i) => i.id));
+    return available.filter(
+      (i) => selected.some((s) => s.id === i.id) && !filteredIds.has(i.id),
+    );
+  }, [available, filtered, selected, hasActiveFilters]);
+
+  const shownText = t.meritsFlaws.shownCount
+    .replace('{shown}', String(filtered.length))
+    .replace('{total}', String(available.length));
+
+  const controls = available.length > 0 && (
+    <div className="space-y-2">
+      <div className="relative">
+        <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+        <Input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t.meritsFlaws.searchPlaceholder}
+          className={`pl-8 ${isCompact ? 'h-8 text-xs' : 'h-9 text-sm'}`}
+        />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className={isCompact ? 'h-8 text-xs' : 'h-9 text-sm'}>
+            <SelectValue placeholder={t.meritsFlaws.filterByCategory} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t.meritsFlaws.allCategories}</SelectItem>
+            {categories.map((c) => (
+              <SelectItem key={c} value={c}>
+                {categoryLabel(c)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select
+          value={typeFilter}
+          onValueChange={(v) => setTypeFilter(v as TypeFilter)}
+        >
+          <SelectTrigger className={isCompact ? 'h-8 text-xs' : 'h-9 text-sm'}>
+            <SelectValue placeholder={t.meritsFlaws.filterByType} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t.meritsFlaws.allTypes}</SelectItem>
+            <SelectItem value="merit">{t.meritsFlaws.meritsOnly}</SelectItem>
+            <SelectItem value="flaw">{t.meritsFlaws.flawsOnly}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground font-body">
+        <span>{shownText}</span>
+        {hasActiveFilters && (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-6 px-2 text-xs"
+          >
+            <X className="w-3 h-3 mr-1" />
+            {t.meritsFlaws.clearFilters}
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+
+  const selectedHiddenBlock = selectedHiddenItems.length > 0 && (
+    <div className="space-y-2">
+      <h4 className="font-medieval text-xs text-muted-foreground">
+        {t.meritsFlaws.selectedHeader}
+      </h4>
+      <div className="space-y-2">{selectedHiddenItems.map(renderItem)}</div>
+    </div>
+  );
+
+  const listBlock =
+    filtered.length === 0 ? (
+      noResults
+    ) : isCompact ? (
+      <div className="space-y-2">
+        {Object.entries(grouped).flatMap(([, items]) => items.map(renderItem))}
+      </div>
+    ) : (
+      <ScrollArea className="h-[400px] pr-4">
+        <div className="space-y-6">
+          {Object.entries(grouped).map(([category, items]) => (
+            <div key={category}>
+              <h4 className="font-medieval text-sm text-muted-foreground mb-2">
+                {categoryLabel(category)}
+              </h4>
+              <div className="space-y-2">{items.map(renderItem)}</div>
+            </div>
+          ))}
+        </div>
+      </ScrollArea>
+    );
+
   return (
     <div className="space-y-3">
       {remaining !== null && (
@@ -221,25 +361,13 @@ export default function MeritsFlawsSelector({
 
       {available.length === 0 ? (
         empty
-      ) : isCompact ? (
-        <div className="space-y-2">
-          {Object.entries(grouped).flatMap(([, items]) => items.map(renderItem))}
-        </div>
       ) : (
-        <ScrollArea className="h-[400px] pr-4">
-          <div className="space-y-6">
-            {Object.entries(grouped).map(([category, items]) => (
-              <div key={category}>
-                <h4 className="font-medieval text-sm text-muted-foreground mb-2">
-                  {categoryLabel(category)}
-                </h4>
-                <div className="space-y-2">{items.map(renderItem)}</div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
+        <>
+          {controls}
+          {selectedHiddenBlock}
+          {listBlock}
+        </>
       )}
     </div>
   );
 }
-

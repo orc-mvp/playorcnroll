@@ -1040,6 +1040,11 @@ export const translations = {
       freebieExceeded: 'Pontos insuficientes',
       lobisomemOrShifter: 'Lobisomem / Metamorfo',
       selectAtLeastOneSystem: 'Selecione ao menos um sistema',
+      searchPlaceholder: 'Buscar vantagem ou desvantagem...',
+      clearFilters: 'Limpar filtros',
+      shownCount: '{shown} de {total}',
+      selectedHeader: 'Selecionadas',
+      noResults: 'Nenhum resultado para os filtros aplicados.',
     },
 
     // XP Log
@@ -2338,6 +2343,11 @@ export const translations = {
       freebieExceeded: 'Insufficient points',
       lobisomemOrShifter: 'Werewolf / Shifter',
       selectAtLeastOneSystem: 'Select at least one system',
+      searchPlaceholder: 'Search merit or flaw...',
+      clearFilters: 'Clear filters',
+      shownCount: '{shown} of {total}',
+      selectedHeader: 'Selected',
+      noResults: 'No results for the applied filters.',
     },
 
     // XP Log
