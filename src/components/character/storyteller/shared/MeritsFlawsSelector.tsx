@@ -150,14 +150,6 @@ export default function MeritsFlawsSelector({
   const hasActiveFilters =
     normalizedSearch.length > 0 || categoryFilter !== 'all' || typeFilter !== 'all';
 
-  // Items already selected but hidden by current filters — surfaced at top so user never loses them
-  const selectedHiddenItems = useMemo(() => {
-    if (!hasActiveFilters) return [] as MeritFlawItem[];
-    const filteredIds = new Set(filtered.map((i) => i.id));
-    return available.filter(
-      (i) => selected.some((s) => s.id === i.id) && !filteredIds.has(i.id),
-    );
-  }, [available, filtered, selected, hasActiveFilters]);
 
   const clearFilters = () => {
     setSearch('');
