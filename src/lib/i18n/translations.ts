@@ -2348,6 +2348,7 @@ export const translations = {
       clearFilters: 'Clear filters',
       shownCount: '{shown} of {total}',
       selectedHeader: 'Selected',
+      selectedOnly: 'Selected only',
       noResults: 'No results for the applied filters.',
     },
 
