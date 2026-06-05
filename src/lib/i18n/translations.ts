@@ -1040,6 +1040,11 @@ export const translations = {
       freebieExceeded: 'Pontos insuficientes',
       lobisomemOrShifter: 'Lobisomem / Metamorfo',
       selectAtLeastOneSystem: 'Selecione ao menos um sistema',
+      searchPlaceholder: 'Buscar vantagem ou desvantagem...',
+      clearFilters: 'Limpar filtros',
+      shownCount: '{shown} de {total}',
+      selectedHeader: 'Selecionadas',
+      noResults: 'Nenhum resultado para os filtros aplicados.',
     },
 
     // XP Log
