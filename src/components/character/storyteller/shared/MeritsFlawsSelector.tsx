@@ -283,6 +283,9 @@ export default function MeritsFlawsSelector({
             <SelectItem value="all">{t.meritsFlaws.allTypes}</SelectItem>
             <SelectItem value="merit">{t.meritsFlaws.meritsOnly}</SelectItem>
             <SelectItem value="flaw">{t.meritsFlaws.flawsOnly}</SelectItem>
+            <SelectItem value="selected" disabled={selected.length === 0}>
+              {t.meritsFlaws.selectedOnly} ({selected.length})
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
