@@ -49,7 +49,7 @@ interface MeritsFlawsSelectorProps {
   onAvailableLoaded?: (available: MeritFlawItem[]) => void;
 }
 
-type TypeFilter = 'all' | 'merit' | 'flaw';
+type TypeFilter = 'all' | 'merit' | 'flaw' | 'selected';
 
 export default function MeritsFlawsSelector({
   gameSystem,
