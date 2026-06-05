@@ -307,14 +307,7 @@ export default function MeritsFlawsSelector({
     </div>
   );
 
-  const selectedHiddenBlock = selectedHiddenItems.length > 0 && (
-    <div className="space-y-2">
-      <h4 className="font-medieval text-xs text-muted-foreground">
-        {t.meritsFlaws.selectedHeader}
-      </h4>
-      <div className="space-y-2">{selectedHiddenItems.map(renderItem)}</div>
-    </div>
-  );
+  const selectedHiddenBlock = null;
 
   const listBlock =
     filtered.length === 0 ? (
