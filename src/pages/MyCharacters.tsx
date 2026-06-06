@@ -377,6 +377,10 @@ export default function MyCharacters() {
         )}
       </main>
 
+      <UpgradeRequiredModal open={upgradeOpen} onOpenChange={setUpgradeOpen} />
+
+
+
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
