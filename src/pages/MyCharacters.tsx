@@ -213,13 +213,21 @@ export default function MyCharacters() {
             </div>
           </div>
 
-          <Link to="/character/create" className="shrink-0">
-            <Button size="sm">
+          {canCreate ? (
+            <Link to="/character/create" className="shrink-0">
+              <Button size="sm">
+                <Plus className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">{t.character.create}</span>
+                <span className="sm:hidden">{t.myCharacters.newShort}</span>
+              </Button>
+            </Link>
+          ) : (
+            <Button size="sm" className="shrink-0" onClick={() => setUpgradeOpen(true)}>
               <Plus className="w-4 h-4 mr-1" />
               <span className="hidden sm:inline">{t.character.create}</span>
               <span className="sm:hidden">{t.myCharacters.newShort}</span>
             </Button>
-          </Link>
+          )}
         </div>
       </header>
 
