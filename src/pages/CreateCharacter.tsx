@@ -139,6 +139,20 @@ export default function CreateCharacter() {
   const [lobisomemFormData, setLobisomemFormData] = useState<LobisomemFormData>(initialLobisomemFormData);
   const [magoFormData, setMagoFormData] = useState<MagoFormData>(initialMagoFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isPremium } = usePremium();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+
+  // Block creation if user already has 3+ characters and is not premium
+  useEffect(() => {
+    if (!user || isPremium) return;
+    (async () => {
+      const { count } = await supabase
+        .from('characters')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if ((count ?? 0) >= 3) setUpgradeOpen(true);
+    })();
+  }, [user, isPremium]);
 
   const totalSteps =
     gameSystem === 'vampiro_v3' ? 6 :
