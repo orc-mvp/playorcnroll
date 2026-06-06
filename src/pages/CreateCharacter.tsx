@@ -230,6 +230,18 @@ export default function CreateCharacter() {
     }
     if (!gameSystem) return;
 
+    // Re-check character limit at submit time
+    if (!isPremium) {
+      const { count } = await supabase
+        .from('characters')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if ((count ?? 0) >= 3) {
+        setUpgradeOpen(true);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     try {
       if (gameSystem === 'herois_marcados') {
