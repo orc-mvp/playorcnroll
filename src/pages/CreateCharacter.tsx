@@ -29,6 +29,8 @@ import StepMagoSpheres from '@/components/character/mago/StepMagoSpheres';
 import StepMagoRotes from '@/components/character/mago/StepMagoRotes';
 import StepMagoBackgrounds from '@/components/character/mago/StepMagoBackgrounds';
 import StepMagoMeritsFlaws from '@/components/character/mago/StepMagoMeritsFlaws';
+import { usePremium } from '@/hooks/usePremium';
+import UpgradeRequiredModal from '@/components/UpgradeRequiredModal';
 
 export type AttributeType = 'strong' | 'neutral' | 'weak';
 
@@ -137,6 +139,20 @@ export default function CreateCharacter() {
   const [lobisomemFormData, setLobisomemFormData] = useState<LobisomemFormData>(initialLobisomemFormData);
   const [magoFormData, setMagoFormData] = useState<MagoFormData>(initialMagoFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { isPremium } = usePremium();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+
+  // Block creation if user already has 3+ characters and is not premium
+  useEffect(() => {
+    if (!user || isPremium) return;
+    (async () => {
+      const { count } = await supabase
+        .from('characters')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if ((count ?? 0) >= 3) setUpgradeOpen(true);
+    })();
+  }, [user, isPremium]);
 
   const totalSteps =
     gameSystem === 'vampiro_v3' ? 6 :
@@ -213,6 +229,18 @@ export default function CreateCharacter() {
       return;
     }
     if (!gameSystem) return;
+
+    // Re-check character limit at submit time
+    if (!isPremium) {
+      const { count } = await supabase
+        .from('characters')
+        .select('id', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+      if ((count ?? 0) >= 3) {
+        setUpgradeOpen(true);
+        return;
+      }
+    }
 
     setIsSubmitting(true);
     try {
@@ -361,6 +389,7 @@ export default function CreateCharacter() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      <UpgradeRequiredModal open={upgradeOpen} onOpenChange={(v) => { setUpgradeOpen(v); if (!v) navigate('/characters'); }} />
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">

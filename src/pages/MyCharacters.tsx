@@ -41,6 +41,8 @@ import {
   PawPrint,
   Trash2,
 } from 'lucide-react';
+import { usePremium } from '@/hooks/usePremium';
+import UpgradeRequiredModal from '@/components/UpgradeRequiredModal';
 import { getGameSystem, GameSystemId } from '@/lib/gameSystems';
 
 interface Character {
@@ -87,6 +89,9 @@ export default function MyCharacters() {
   const [deleteTarget, setDeleteTarget] = useState<Character | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const { isPremium } = usePremium();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const canCreate = isPremium || characters.length < 3;
 
   useEffect(() => {
     if (!user) return;
@@ -208,13 +213,21 @@ export default function MyCharacters() {
             </div>
           </div>
 
-          <Link to="/character/create" className="shrink-0">
-            <Button size="sm">
+          {canCreate ? (
+            <Link to="/character/create" className="shrink-0">
+              <Button size="sm">
+                <Plus className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">{t.character.create}</span>
+                <span className="sm:hidden">{t.myCharacters.newShort}</span>
+              </Button>
+            </Link>
+          ) : (
+            <Button size="sm" className="shrink-0" onClick={() => setUpgradeOpen(true)}>
               <Plus className="w-4 h-4 mr-1" />
               <span className="hidden sm:inline">{t.character.create}</span>
               <span className="sm:hidden">{t.myCharacters.newShort}</span>
             </Button>
-          </Link>
+          )}
         </div>
       </header>
 
@@ -363,6 +376,10 @@ export default function MyCharacters() {
           </Card>
         )}
       </main>
+
+      <UpgradeRequiredModal open={upgradeOpen} onOpenChange={setUpgradeOpen} />
+
+
 
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>
