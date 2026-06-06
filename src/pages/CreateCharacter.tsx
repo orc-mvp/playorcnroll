@@ -389,6 +389,7 @@ export default function CreateCharacter() {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      <UpgradeRequiredModal open={upgradeOpen} onOpenChange={(v) => { setUpgradeOpen(v); if (!v) navigate('/characters'); }} />
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
