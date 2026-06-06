@@ -41,6 +41,8 @@ import {
   PawPrint,
   Trash2,
 } from 'lucide-react';
+import { usePremium } from '@/hooks/usePremium';
+import UpgradeRequiredModal from '@/components/UpgradeRequiredModal';
 import { getGameSystem, GameSystemId } from '@/lib/gameSystems';
 
 interface Character {
