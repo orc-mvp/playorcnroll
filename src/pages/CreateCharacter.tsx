@@ -29,6 +29,8 @@ import StepMagoSpheres from '@/components/character/mago/StepMagoSpheres';
 import StepMagoRotes from '@/components/character/mago/StepMagoRotes';
 import StepMagoBackgrounds from '@/components/character/mago/StepMagoBackgrounds';
 import StepMagoMeritsFlaws from '@/components/character/mago/StepMagoMeritsFlaws';
+import { usePremium } from '@/hooks/usePremium';
+import UpgradeRequiredModal from '@/components/UpgradeRequiredModal';
 
 export type AttributeType = 'strong' | 'neutral' | 'weak';
 
