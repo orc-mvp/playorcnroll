@@ -24,10 +24,10 @@ export default function Upgrade() {
     return null;
   }
 
-  const checkout = async (method: 'card' | 'pix') => {
-    setBusy(method);
+  const checkout = async () => {
+    setBusy('card');
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', { body: { method } });
+      const { data, error } = await supabase.functions.invoke('create-checkout', { body: { method: 'card' } });
       if (error) throw error;
       if (data?.url) window.location.href = data.url;
     } catch (e) {
