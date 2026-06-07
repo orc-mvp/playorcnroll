@@ -90,6 +90,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        <h1 className="sr-only">{t.dashboard?.heading ?? t.nav.dashboard ?? 'Dashboard'}</h1>
         {/* Quick Actions - 5 cards */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
           {/* Sessions */}
