@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import {
   Select,
   SelectContent,
@@ -396,6 +397,7 @@ export default function JoinSession() {
           </h1>
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

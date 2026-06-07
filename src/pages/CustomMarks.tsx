@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import {
   Dialog,
   DialogContent,
@@ -320,6 +321,7 @@ export default function CustomMarks() {
           </Button>
         </div>
       </header>
+      <UpgradeBanner />
 
         {/* Sub-navigation */}
         <div className="container mx-auto px-4 py-3 flex gap-2 border-b border-border bg-card/50 backdrop-blur-sm sticky top-[65px] z-40">

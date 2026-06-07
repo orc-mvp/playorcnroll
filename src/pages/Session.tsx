@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
@@ -351,6 +352,7 @@ export default function Session() {
           onManagePlayers={() => setShowManagePlayersModal(true)}
           onLeaveSession={handleLeaveSession}
         />
+        <UpgradeBanner />
 
         {/* Pending Test Notification for Players */}
         {!isNarrator && myCharacter && currentScene && (
@@ -454,6 +456,7 @@ export default function Session() {
         onManagePlayers={() => setShowManagePlayersModal(true)}
         onLeaveSession={handleLeaveSession}
       />
+      <UpgradeBanner />
 
       <div className="flex-1 flex overflow-hidden">
         {/* Main Content */}

@@ -42,6 +42,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { usePremium } from '@/hooks/usePremium';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import UpgradeRequiredModal from '@/components/UpgradeRequiredModal';
 import { getGameSystem, GameSystemId } from '@/lib/gameSystems';
 
@@ -230,6 +231,7 @@ export default function MyCharacters() {
           )}
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-6 max-w-6xl">
         {characters.length > 0 ? (

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { UserMenu } from '@/components/UserMenu';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarDays, Plus, Trash2, ArrowLeft, Pencil, Clock } from 'lucide-react';
 import { format, parseISO, isSameDay } from 'date-fns';
@@ -201,6 +202,7 @@ export default function GameCalendar() {
           <UserMenu />
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="flex items-center gap-3 mb-6">

@@ -21,7 +21,6 @@ import Profile from "./pages/Profile";
 import GameCalendar from "./pages/GameCalendar";
 import Upgrade from "./pages/Upgrade";
 import NotFound from "./pages/NotFound";
-import UpgradeBanner from "./components/UpgradeBanner";
 
 const queryClient = new QueryClient();
 
@@ -33,7 +32,6 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <UpgradeBanner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth defaultMode="login" />} />

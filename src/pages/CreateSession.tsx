@@ -10,6 +10,7 @@ import { SimpleEditor } from '@/components/ui/simple-editor';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Wand2 } from 'lucide-react';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import SessionFamilySelector from '@/components/SessionFamilySelector';
 import AllowedSystemsSelector from '@/components/AllowedSystemsSelector';
 import type { GameSystemFamily } from '@/lib/gameSystems';
@@ -157,6 +158,7 @@ export default function CreateSession() {
           </h1>
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-8 max-w-2xl">
         <Card className="medieval-card">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
@@ -267,6 +268,7 @@ export default function CharacterSheet() {
           )}
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-6 max-w-4xl">
         <ScrollArea className="h-[calc(100vh-120px)]">

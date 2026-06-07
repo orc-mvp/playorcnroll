@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import { Sword, Moon, Dog, Trash2, Crown, Users as UsersIcon } from 'lucide-react';
 import { 
   ArrowLeft, 
@@ -216,6 +217,7 @@ export default function MySessions() {
           </Button>
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         {sessions.length === 0 ? (

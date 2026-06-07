@@ -23,7 +23,7 @@ export default function UpgradeBanner() {
   if (!user || loading || isPremium || dismissed) return null;
 
   return (
-    <div className="sticky top-0 z-50 w-full bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-amber-50 shadow-md border-b border-amber-900/40">
+    <div className="w-full bg-gradient-to-r from-amber-700 via-amber-600 to-amber-700 text-amber-50 shadow-md border-b border-amber-900/40">
       <div className="container mx-auto px-3 py-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <Sparkles className="w-4 h-4 shrink-0" />

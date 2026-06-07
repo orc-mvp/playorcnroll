@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RichTextDisplay } from '@/components/ui/rich-text-display';
 import { SimpleEditor } from '@/components/ui/simple-editor';
 import { getSessionRoute } from '@/lib/sessionRoutes';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import {
   ArrowLeft,
   Copy,
@@ -251,6 +252,7 @@ export default function SessionLobby() {
           )}
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-8 max-w-4xl overflow-hidden">
         <div className="grid gap-6 md:grid-cols-2">
