@@ -13,6 +13,8 @@ import { Badge } from '@/components/ui/badge';
 import {
   Select,
   SelectContent,
+} from '@/components/ui/select';
+import UpgradeBanner from '@/components/UpgradeBanner';
   SelectItem,
   SelectTrigger,
   SelectValue,
