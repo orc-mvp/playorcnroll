@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, CreditCard, QrCode, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CreditCard, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { usePremium } from '@/hooks/usePremium';
 import { useI18n } from '@/lib/i18n';
