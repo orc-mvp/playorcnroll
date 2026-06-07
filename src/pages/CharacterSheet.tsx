@@ -268,6 +268,7 @@ export default function CharacterSheet() {
           )}
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-6 max-w-4xl">
         <ScrollArea className="h-[calc(100vh-120px)]">
