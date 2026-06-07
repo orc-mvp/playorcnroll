@@ -67,6 +67,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => setLanguage('pt-BR')}
                 className="text-xs px-2"
+                aria-label="Mudar idioma para Português"
               >
                 PT
               </Button>
@@ -75,6 +76,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => setLanguage('en')}
                 className="text-xs px-2"
+                aria-label="Switch language to English"
               >
                 EN
               </Button>
