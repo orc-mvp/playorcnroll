@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Sword, Construction, Dog } from 'lucide-react';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import StepBasicInfo from '@/components/character/StepBasicInfo';
 import StepAttributes from '@/components/character/StepAttributes';
 import StepMinorMarks from '@/components/character/StepMinorMarks';
