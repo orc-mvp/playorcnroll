@@ -32,7 +32,6 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <UpgradeBanner />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth defaultMode="login" />} />
