@@ -74,7 +74,6 @@ Deno.serve(async (req) => {
       session = await stripe.checkout.sessions.create({
         mode: "payment",
         customer: customerId,
-        payment_method_types: ["pix"],
         line_items: [
           {
             price_data: {
