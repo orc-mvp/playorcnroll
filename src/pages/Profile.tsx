@@ -127,6 +127,7 @@ export default function Profile() {
           </div>
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-8 max-w-lg">
         <Button

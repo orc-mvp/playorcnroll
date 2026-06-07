@@ -60,6 +60,7 @@ export default function Upgrade() {
           <h1 className="font-medieval text-xl">{t.upgrade?.pageTitle}</h1>
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-8 max-w-3xl space-y-6">
         {isPremium && (

@@ -202,6 +202,7 @@ export default function GameCalendar() {
           <UserMenu />
         </div>
       </header>
+      <UpgradeBanner />
 
       <main className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="flex items-center gap-3 mb-6">
