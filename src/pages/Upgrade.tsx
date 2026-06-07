@@ -101,7 +101,7 @@ export default function Upgrade() {
             </div>
           </CardHeader>
           <CardContent className="grid sm:grid-cols-2 gap-4">
-            <Card className="border-primary/30">
+          <Card className="border-primary/30 max-w-sm mx-auto">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <CreditCard className="w-4 h-4" /> {t.upgrade?.cardTitle}
@@ -109,21 +109,8 @@ export default function Upgrade() {
                 <CardDescription>{t.upgrade?.cardDescription}</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button className="w-full" onClick={() => checkout('card')} disabled={!!busy}>
+                <Button className="w-full" onClick={() => checkout()} disabled={!!busy}>
                   {busy === 'card' ? '...' : t.upgrade?.payWithCard}
-                </Button>
-              </CardContent>
-            </Card>
-            <Card className="border-primary/30">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <QrCode className="w-4 h-4" /> {t.upgrade?.pixTitle}
-                </CardTitle>
-                <CardDescription>{t.upgrade?.pixDescription}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="outline" className="w-full" onClick={() => checkout('pix')} disabled={!!busy}>
-                  {busy === 'pix' ? '...' : t.upgrade?.payWithPix}
                 </Button>
               </CardContent>
             </Card>
