@@ -49,46 +49,25 @@ Deno.serve(async (req) => {
     const successUrl = `${origin}/upgrade?status=success`;
     const cancelUrl = `${origin}/upgrade?status=cancel`;
 
-    let session;
-    if (method === "card") {
-      session = await stripe.checkout.sessions.create({
-        mode: "subscription",
-        customer: customerId,
-        payment_method_types: ["card"],
-        line_items: [
-          {
-            price_data: {
-              currency: "brl",
-              recurring: { interval: "month" },
-              product_data: { name: "Apoiador Orc'n Roll" },
-              unit_amount: PRICE_BRL_CENTS,
-            },
-            quantity: 1,
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer: customerId,
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "brl",
+            recurring: { interval: "month" },
+            product_data: { name: "Apoiador Orc'n Roll" },
+            unit_amount: PRICE_BRL_CENTS,
           },
-        ],
-        metadata: { user_id: userId },
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-      });
-    } else {
-      session = await stripe.checkout.sessions.create({
-        mode: "payment",
-        customer: customerId,
-        line_items: [
-          {
-            price_data: {
-              currency: "brl",
-              product_data: { name: "Apoiador Orc'n Roll (1 mês via PIX)" },
-              unit_amount: PRICE_BRL_CENTS,
-            },
-            quantity: 1,
-          },
-        ],
-        metadata: { user_id: userId, payment_kind: "pix_monthly" },
-        success_url: successUrl,
-        cancel_url: cancelUrl,
-      });
-    }
+          quantity: 1,
+        },
+      ],
+      metadata: { user_id: userId },
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+    });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
