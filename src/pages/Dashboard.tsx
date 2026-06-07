@@ -9,6 +9,7 @@ import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { CharacterOptionsModal } from '@/components/dashboard/CharacterOptionsModal';
 import { SessionOptionsModal } from '@/components/dashboard/SessionOptionsModal';
 import { UserMenu } from '@/components/UserMenu';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import { 
   Scroll,
   BookOpen,
