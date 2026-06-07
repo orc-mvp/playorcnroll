@@ -101,29 +101,18 @@ Deno.serve(async (req) => {
       }
       case "checkout.session.completed": {
         const cs = event.data.object as Stripe.Checkout.Session;
-        if (cs.mode === "payment" && cs.payment_status === "paid") {
-          // PIX manual: extend +30 days
+        if (cs.mode === "subscription" && cs.payment_status === "paid") {
           const customerId = cs.customer as string;
           const userId = await resolveUserId(customerId, cs.customer_email);
           if (!userId) break;
 
-          const { data: current } = await supabase
-            .from("subscriptions")
-            .select("current_period_end")
-            .eq("user_id", userId)
-            .maybeSingle();
-
-          const now = Date.now();
-          const base = current?.current_period_end ? new Date(current.current_period_end).getTime() : 0;
-          const start = Math.max(base, now);
-          const newEnd = new Date(start + 30 * 24 * 60 * 60 * 1000).toISOString();
-
           await supabase.from("subscriptions").upsert({
             user_id: userId,
             status: "active",
-            payment_method: "pix",
+            payment_method: "card",
             stripe_customer_id: customerId,
-            current_period_end: newEnd,
+            stripe_subscription_id: cs.subscription as string,
+            current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
             cancel_at_period_end: false,
           });
         }
