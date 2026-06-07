@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft, User, KeyRound } from 'lucide-react';
 import { UserMenu } from '@/components/UserMenu';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 
 export default function Profile() {

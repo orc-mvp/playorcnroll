@@ -42,6 +42,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { usePremium } from '@/hooks/usePremium';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import UpgradeRequiredModal from '@/components/UpgradeRequiredModal';
 import { getGameSystem, GameSystemId } from '@/lib/gameSystems';
 

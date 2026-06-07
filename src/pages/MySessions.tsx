@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import { Sword, Moon, Dog, Trash2, Crown, Users as UsersIcon } from 'lucide-react';
 import { 
   ArrowLeft, 
