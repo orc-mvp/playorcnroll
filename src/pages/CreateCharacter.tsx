@@ -409,6 +409,7 @@ export default function CreateCharacter() {
           </div>
         </div>
       </header>
+      <UpgradeBanner />
 
       {/* Progress Bar */}
       <div className="container mx-auto px-4 py-4">
