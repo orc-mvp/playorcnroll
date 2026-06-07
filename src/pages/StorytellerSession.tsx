@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import UpgradeBanner from '@/components/UpgradeBanner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
