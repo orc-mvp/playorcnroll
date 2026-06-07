@@ -267,6 +267,7 @@ export default function MyCharacters() {
                             <Button
                               variant="ghost"
                               size="icon"
+                              aria-label={`${t.common.delete} ${char.name}`}
                               className="h-7 w-7 text-muted-foreground hover:text-destructive"
                               onClick={(e) => {
                                 e.preventDefault();

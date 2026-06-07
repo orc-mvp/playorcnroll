@@ -45,6 +45,7 @@ export default function Index() {
               size="sm"
               onClick={() => setLanguage('pt-BR')}
               className="font-body"
+              aria-label="Mudar idioma para Português"
             >
               PT
             </Button>
@@ -53,6 +54,7 @@ export default function Index() {
               size="sm"
               onClick={() => setLanguage('en')}
               className="font-body"
+              aria-label="Switch language to English"
             >
               EN
             </Button>
@@ -79,10 +81,16 @@ export default function Index() {
           />
         </div>
 
+        {/* Page heading (visible to crawlers/AT, visual identity handled by logo + tagline) */}
+        <h1 className="sr-only">Orc &amp; Roll — RPG Online em Teatro da Mente</h1>
+
         {/* Tagline */}
         <p className="text-xl md:text-2xl text-on-light-alt font-body mb-12 text-center">
           {t.landing.tagline}
         </p>
+
+        {/* Available systems */}
+        <h2 className="sr-only">Sistemas disponíveis</h2>
 
         {/* Game Systems Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl w-full mb-12">

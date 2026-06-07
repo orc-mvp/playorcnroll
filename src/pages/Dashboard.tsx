@@ -67,6 +67,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => setLanguage('pt-BR')}
                 className="text-xs px-2"
+                aria-label="Mudar idioma para Português"
               >
                 PT
               </Button>
@@ -75,6 +76,7 @@ export default function Dashboard() {
                 size="sm"
                 onClick={() => setLanguage('en')}
                 className="text-xs px-2"
+                aria-label="Switch language to English"
               >
                 EN
               </Button>
@@ -88,6 +90,7 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        <h1 className="sr-only">{language === 'en' ? 'Your Dashboard' : 'Seu Painel'}</h1>
         {/* Quick Actions - 5 cards */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
           {/* Sessions */}
