@@ -352,6 +352,7 @@ export default function Session() {
           onManagePlayers={() => setShowManagePlayersModal(true)}
           onLeaveSession={handleLeaveSession}
         />
+        <UpgradeBanner />
 
         {/* Pending Test Notification for Players */}
         {!isNarrator && myCharacter && currentScene && (
