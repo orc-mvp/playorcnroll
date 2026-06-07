@@ -456,6 +456,7 @@ export default function Session() {
         onManagePlayers={() => setShowManagePlayersModal(true)}
         onLeaveSession={handleLeaveSession}
       />
+      <UpgradeBanner />
 
       <div className="flex-1 flex overflow-hidden">
         {/* Main Content */}

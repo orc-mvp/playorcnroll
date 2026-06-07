@@ -641,6 +641,7 @@ export default function StorytellerSession() {
         onManagePlayers={() => setShowManagePlayersModal(true)}
         onLeaveSession={handleLeaveSession}
       />
+      <UpgradeBanner />
 
       {isMobile ? (
         <>
