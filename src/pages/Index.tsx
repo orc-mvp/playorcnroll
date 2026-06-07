@@ -45,6 +45,7 @@ export default function Index() {
               size="sm"
               onClick={() => setLanguage('pt-BR')}
               className="font-body"
+              aria-label="Mudar idioma para Português"
             >
               PT
             </Button>
@@ -53,6 +54,7 @@ export default function Index() {
               size="sm"
               onClick={() => setLanguage('en')}
               className="font-body"
+              aria-label="Switch language to English"
             >
               EN
             </Button>
