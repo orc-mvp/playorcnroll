@@ -84,6 +84,7 @@ export default function Dashboard() {
           </div>
         </div>
       </header>
+      <UpgradeBanner />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
