@@ -470,6 +470,7 @@ export default function Customization() {
           </Button>
         </div>
       </header>
+      <UpgradeBanner />
 
       {/* Tabs + Search + Filters */}
       <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-[65px] z-40">
