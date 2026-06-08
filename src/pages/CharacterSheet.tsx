@@ -251,7 +251,7 @@ export default function CharacterSheet() {
 
                 if (character.game_system === 'vampiro_v3') {
                   setShowVampiroEditModal(true);
-                } else if (character.game_system === 'lobisomem_w20') {
+                } else if (character.game_system === 'lobisomem_w20' || character.game_system === 'lobisomem_w5') {
                   setShowLobisomemEditModal(true);
                 } else if (character.game_system === 'mago_m20') {
                   setShowMagoEditModal(true);
@@ -284,7 +284,7 @@ export default function CharacterSheet() {
                 experience_points: character.experience_points,
               }} 
             />
-          ) : (character.game_system === 'lobisomem_w20' || character.game_system === 'metamorfos_w20') ? (
+          ) : (character.game_system === 'lobisomem_w20' || character.game_system === 'metamorfos_w20' || character.game_system === 'lobisomem_w5') ? (
             <LobisomemCharacterSheet
               character={{
                 id: character.id,
@@ -713,6 +713,7 @@ export default function CharacterSheet() {
       {character &&
         character.game_system !== 'vampiro_v3' &&
         character.game_system !== 'lobisomem_w20' &&
+        character.game_system !== 'lobisomem_w5' &&
         character.game_system !== 'mago_m20' &&
         character.game_system !== 'metamorfos_w20' && (
           <EditCharacterModal
@@ -794,7 +795,7 @@ export default function CharacterSheet() {
       )}
 
       {/* Edit Character Modal - Lobisomem */}
-      {character && character.game_system === 'lobisomem_w20' && (
+      {character && (character.game_system === 'lobisomem_w20' || character.game_system === 'lobisomem_w5') && (
         <EditLobisomemCharacterModal
           open={showLobisomemEditModal}
           onOpenChange={setShowLobisomemEditModal}
