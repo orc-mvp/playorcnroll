@@ -186,13 +186,13 @@ export default function CreateSession() {
                   value={family}
                   onChange={(f) => {
                     setFamily(f);
-                    // Ao trocar para Storyteller, pré-preenche com todos os
-                    // sistemas disponíveis para conveniência (narrador pode
-                    // desmarcar os indesejados). Ao trocar para Heróis Marcados,
-                    // limpa, pois a coluna não se aplica.
+                    // Storyteller: reseta edition para forçar escolha excludente.
+                    // Heróis Marcados: limpa tudo (não usa allowedSystems).
                     if (f === 'storyteller') {
-                      setAllowedSystems(getAvailableStorytellerSystemIds());
+                      setEdition(null);
+                      setAllowedSystems([]);
                     } else {
+                      setEdition(null);
                       setAllowedSystems([]);
                     }
                   }}
@@ -203,6 +203,28 @@ export default function CreateSession() {
               {family === 'storyteller' && (
                 <div className="space-y-2">
                   <Label className="font-medieval">
+                    {t.session.editionLabel} *
+                  </Label>
+                  <p className="text-xs text-muted-foreground font-body">
+                    {t.session.editionHelp}
+                  </p>
+                  <StorytellerEditionSelector
+                    value={edition}
+                    onChange={(ed) => {
+                      setEdition(ed);
+                      // Pré-seleciona todos os sistemas da edição escolhida.
+                      setAllowedSystems(
+                        getAdaptersByEdition(ed).map((a) => a.id),
+                      );
+                    }}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              )}
+
+              {family === 'storyteller' && edition && (
+                <div className="space-y-2">
+                  <Label className="font-medieval">
                     {t.session.allowedSystemsLabel} *
                   </Label>
                   <p className="text-xs text-muted-foreground font-body">
@@ -211,6 +233,7 @@ export default function CreateSession() {
                   <AllowedSystemsSelector
                     value={allowedSystems}
                     onChange={setAllowedSystems}
+                    edition={edition}
                     disabled={isSubmitting}
                   />
                 </div>
