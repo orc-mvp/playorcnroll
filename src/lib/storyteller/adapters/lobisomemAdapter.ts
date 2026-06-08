@@ -20,6 +20,7 @@ export const lobisomemAdapter: SystemAdapter = {
   color: 'text-emerald-500',
   borderColor: 'border-emerald-500/20',
   bgColor: 'bg-emerald-500/10',
+  edition: 'classic',
   available: true,
 
   participantSelectFields: [

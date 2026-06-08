@@ -1,4 +1,4 @@
-export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20' | 'mago_m20' | 'metamorfos_w20';
+export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20' | 'mago_m20' | 'metamorfos_w20' | 'lobisomem_w5';
 
 /**
  * "Família" do sistema — usada para agrupar sistemas que rodam na mesma sala
