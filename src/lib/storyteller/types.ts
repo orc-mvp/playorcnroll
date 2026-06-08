@@ -217,6 +217,12 @@ export interface SystemAdapter {
   /** Classe tailwind de fundo temática (ex: 'bg-destructive/10') */
   bgColor: string;
 
+  /**
+   * Edição de regras. Sistemas só podem compartilhar sala Storyteller com
+   * sistemas da MESMA edição (escolha excludente em `CreateSession`).
+   */
+  edition: StorytellerEdition;
+
   /** Trackers exibidos no card do personagem (na ordem) */
   trackers: TrackerDef[];
 
