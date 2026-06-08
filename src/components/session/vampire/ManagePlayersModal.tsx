@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Lock, Unlock, Minus, Plus, Sparkles, User, Trash2, AlertTriangle, ShieldBan, ShieldCheck } from 'lucide-react';
 import AllowedSystemsSelector from '@/components/AllowedSystemsSelector';
-import { isStorytellerSystem } from '@/lib/storyteller/systemRegistry';
+import { isStorytellerSystem, getSessionEdition } from '@/lib/storyteller/systemRegistry';
 import type { StorytellerSystemId } from '@/lib/storyteller/types';
 
 interface Participant {
