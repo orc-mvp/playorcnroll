@@ -292,6 +292,7 @@ export function ManagePlayersModal({
                 <AllowedSystemsSelector
                   value={allowedSystems}
                   onChange={handleAllowedSystemsChange}
+                  edition={getSessionEdition(allowedSystems)}
                   disabled={savingAllowed || loadingJoinLock}
                 />
               </div>
