@@ -1,4 +1,4 @@
-export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20' | 'mago_m20' | 'metamorfos_w20';
+export type GameSystemId = 'herois_marcados' | 'vampiro_v3' | 'lobisomem_w20' | 'mago_m20' | 'metamorfos_w20' | 'lobisomem_w5';
 
 /**
  * "Família" do sistema — usada para agrupar sistemas que rodam na mesma sala
@@ -86,6 +86,19 @@ export const GAME_SYSTEMS: GameSystem[] = [
     color: 'amber',
     available: true,
     features: ['Pool de d10', 'Fúria', 'Gnose', 'Formas Customizáveis']
+  },
+  {
+    id: 'lobisomem_w5',
+    name: 'Lobisomem: A Fera Sombria',
+    shortName: 'Storyteller 5ed',
+    family: 'storyteller',
+    description: {
+      'pt-BR': 'Lobisomem 5ª Edição. Sala Storyteller exclusiva 5ed — pool dividido com dados de Fúria, Messy Critical e Brutal Outcome.',
+      'en': 'Werewolf 5th Edition. 5ed-only Storyteller room — split pool with Rage dice, Messy Critical and Brutal Outcome.'
+    },
+    color: 'red',
+    available: true,
+    features: ['Pool dividido', 'Fúria 0-5', 'Messy Critical', '5ª Edição']
   }
 ];
 

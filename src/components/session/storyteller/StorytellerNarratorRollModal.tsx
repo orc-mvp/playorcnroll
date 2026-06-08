@@ -97,6 +97,8 @@ function performRoll(pool: number, difficulty: number, exploding: boolean) {
   };
 }
 
+import W5NarratorRollModal from './W5NarratorRollModal';
+
 export function StorytellerNarratorRollModal({
   open,
   onOpenChange,
@@ -106,6 +108,19 @@ export function StorytellerNarratorRollModal({
   const { t } = useI18n();
   const adapter = useMemo(() => getSystemAdapter(gameSystem), [gameSystem]);
   const config = adapter.narratorRollConfig;
+
+  // 5ed (W5) usa modal dedicado com pool dividido (normais + Fúria).
+  // Detectado pelo flag `mode: 'w5-split'` no adapter — não há overhead
+  // para sistemas clássicos.
+  if (config.mode === 'w5-split') {
+    return (
+      <W5NarratorRollModal
+        open={open}
+        onOpenChange={onOpenChange}
+        onRollComplete={onRollComplete}
+      />
+    );
+  }
 
   const [diceCount, setDiceCount] = useState(1);
   const [difficulty, setDifficulty] = useState(config.defaultDifficulty);

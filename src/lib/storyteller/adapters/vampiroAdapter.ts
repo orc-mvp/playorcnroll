@@ -22,6 +22,7 @@ export const vampiroAdapter: SystemAdapter = {
   color: 'text-destructive',
   borderColor: 'border-destructive/20',
   bgColor: 'bg-destructive/10',
+  edition: 'classic',
   available: true,
 
   participantSelectFields: [

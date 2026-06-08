@@ -17,6 +17,7 @@ const systemIcons: Record<GameSystemId, React.ReactNode> = {
   lobisomem_w20: <Dog className="w-6 h-6" />,
   mago_m20: <Star className="w-6 h-6" />,
   metamorfos_w20: <PawPrint className="w-6 h-6" />,
+  lobisomem_w5: <Moon className="w-6 h-6" />,
 };
 
 export default function GameSystemSelector({

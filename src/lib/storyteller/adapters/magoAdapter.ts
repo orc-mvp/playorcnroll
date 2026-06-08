@@ -21,6 +21,7 @@ export const magoAdapter: SystemAdapter = {
   color: 'text-purple-500',
   borderColor: 'border-purple-500/20',
   bgColor: 'bg-purple-500/10',
+  edition: 'classic',
   available: true,
 
   participantSelectFields: [

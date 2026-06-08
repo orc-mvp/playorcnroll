@@ -50,7 +50,7 @@ export interface LobisomemFormData {
 interface StepLobisomemBasicInfoProps {
   formData: LobisomemFormData;
   updateFormData: (updates: Partial<LobisomemFormData>) => void;
-  gameSystem?: 'lobisomem_w20' | 'metamorfos_w20';
+  gameSystem?: 'lobisomem_w20' | 'metamorfos_w20' | 'lobisomem_w5';
 }
 
 const SHIFTERS = [

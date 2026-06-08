@@ -11,13 +11,15 @@ import { vampiroAdapter } from './adapters/vampiroAdapter';
 import { lobisomemAdapter } from './adapters/lobisomemAdapter';
 import { magoAdapter } from './adapters/magoAdapter';
 import { metamorfosAdapter } from './adapters/metamorfosAdapter';
-import type { SystemAdapter, StorytellerSystemId } from './types';
+import { lobisomemW5Adapter } from './adapters/lobisomemW5Adapter';
+import type { SystemAdapter, StorytellerSystemId, StorytellerEdition } from './types';
 
 const REGISTRY: Record<StorytellerSystemId, SystemAdapter> = {
   vampiro_v3: vampiroAdapter,
   lobisomem_w20: lobisomemAdapter,
   mago_m20: magoAdapter,
   metamorfos_w20: metamorfosAdapter,
+  lobisomem_w5: lobisomemW5Adapter,
 };
 
 /** Lista de IDs de sistemas que rodam na sala unificada Storyteller */
@@ -26,6 +28,7 @@ export const STORYTELLER_SYSTEM_IDS: StorytellerSystemId[] = [
   'lobisomem_w20',
   'mago_m20',
   'metamorfos_w20',
+  'lobisomem_w5',
 ];
 
 /**
@@ -56,6 +59,32 @@ export function getAvailableStorytellerSystemIds(): StorytellerSystemId[] {
   return getAllAdapters()
     .filter((a) => a.available)
     .map((a) => a.id);
+}
+
+/** Adapters disponíveis filtrados por edição (5ed ou clássico). */
+export function getAdaptersByEdition(edition: StorytellerEdition): SystemAdapter[] {
+  return getAllAdapters().filter((a) => a.available && a.edition === edition);
+}
+
+/** Resolve a edição a partir de um ID de sistema. */
+export function getEditionOf(systemId: string): StorytellerEdition | null {
+  const a = REGISTRY[systemId as StorytellerSystemId];
+  return a?.edition ?? null;
+}
+
+/**
+ * Dado um array `allowed_systems` de uma sessão, deduz a edição da sala.
+ * Como a escolha é excludente, basta olhar o primeiro sistema válido.
+ * Retorna 'classic' como fallback (compatível com sessões antigas).
+ */
+export function getSessionEdition(allowedSystems?: string[] | null): StorytellerEdition {
+  if (allowedSystems) {
+    for (const id of allowedSystems) {
+      const e = getEditionOf(id);
+      if (e) return e;
+    }
+  }
+  return 'classic';
 }
 
 /**

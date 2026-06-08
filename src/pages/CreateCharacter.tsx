@@ -121,7 +121,7 @@ export default function CreateCharacter() {
   const preSelectedSystem = searchParams.get('system');
   
   // Initialize state based on URL param
-  const VALID_PRE = ['vampiro_v3', 'herois_marcados', 'lobisomem_w20', 'mago_m20', 'metamorfos_w20'];
+  const VALID_PRE = ['vampiro_v3', 'herois_marcados', 'lobisomem_w20', 'mago_m20', 'metamorfos_w20', 'lobisomem_w5'];
 
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(() => {
     if (preSelectedSystem && VALID_PRE.includes(preSelectedSystem)) {
@@ -158,6 +158,7 @@ export default function CreateCharacter() {
   const totalSteps =
     gameSystem === 'vampiro_v3' ? 6 :
     gameSystem === 'lobisomem_w20' ? 6 :
+    gameSystem === 'lobisomem_w5' ? 6 :
     gameSystem === 'metamorfos_w20' ? 6 :
     gameSystem === 'mago_m20' ? 7 :
     4;
@@ -182,7 +183,7 @@ export default function CreateCharacter() {
         case 2: case 3: case 4: case 5: return true;
         default: return false;
       }
-    } else if (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') {
+    } else if (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') {
       switch (currentStep) {
         case 0: return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
         case 1:
@@ -290,7 +291,7 @@ export default function CreateCharacter() {
           },
         });
         if (error) throw error;
-      } else if (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') {
+      } else if (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') {
         const { error } = await supabase.from('characters').insert({
           user_id: user.id,
           name: lobisomemFormData.name.trim(),
@@ -353,7 +354,7 @@ export default function CreateCharacter() {
       }
 
       const charName = gameSystem === 'vampiro_v3' ? vampiroFormData.name
-        : (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') ? lobisomemFormData.name
+        : (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') ? lobisomemFormData.name
         : gameSystem === 'mago_m20' ? magoFormData.name
         : formData.name;
 
@@ -495,32 +496,32 @@ export default function CreateCharacter() {
         )}
 
         {/* Lobisomem & Metamorfos Steps (compartilham os mesmos componentes) */}
-        {step === 1 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
+        {step === 1 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') && (
           <StepLobisomemBasicInfo
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
             gameSystem={gameSystem}
           />
         )}
-        {step === 2 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
+        {step === 2 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') && (
           <StepLobisomemAttributes
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 3 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
+        {step === 3 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') && (
           <StepLobisomemGifts
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 4 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
+        {step === 4 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') && (
           <StepLobisomemBackgrounds
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 5 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20') && (
+        {step === 5 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') && (
           <StepLobisomemMeritsFlaws
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
@@ -584,6 +585,7 @@ export default function CreateCharacter() {
                 (gameSystem === 'herois_marcados' && !validateStep(step)) ||
                 (gameSystem === 'vampiro_v3' && (!vampiroFormData.name.trim() || !vampiroFormData.clan)) ||
                 (gameSystem === 'lobisomem_w20' && (!lobisomemFormData.name.trim() || !lobisomemFormData.tribe)) ||
+                (gameSystem === 'lobisomem_w5' && (!lobisomemFormData.name.trim() || !lobisomemFormData.tribe)) ||
                 (gameSystem === 'metamorfos_w20' && !lobisomemFormData.name.trim()) ||
                 (gameSystem === 'mago_m20' && (!magoFormData.name.trim() || !magoFormData.tradition)) ||
                 isSubmitting
