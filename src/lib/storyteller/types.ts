@@ -16,7 +16,17 @@ export type StorytellerSystemId =
   | 'vampiro_v3'
   | 'lobisomem_w20'
   | 'mago_m20'
-  | 'metamorfos_w20';
+  | 'metamorfos_w20'
+  | 'lobisomem_w5';
+
+/**
+ * Edição de regras. Sistemas Clássicos (V3/W20/M20/Metamorfos) são compatíveis
+ * entre si na sala Storyteller. Sistemas 5ª Edição (W5 e futuros V5/H5) têm
+ * motor de dados diferente (pool dividido com Fome/Fúria, criticals em pares
+ * de 10) e NÃO podem coexistir com Clássico na mesma sala — a escolha de
+ * edição no `CreateSession` é excludente.
+ */
+export type StorytellerEdition = 'classic' | '5ed';
 
 /** Participante simplificado — campos session_* são preenchidos sob demanda por sistema */
 export interface StorytellerParticipant {
@@ -172,12 +182,20 @@ export interface ExtraNarratorPool {
 }
 
 export interface NarratorRollConfig {
-  /** Dificuldade default da rolagem livre (Vampiro=6, Lobisomem=6). */
+  /** Dificuldade default da rolagem livre (Vampiro=6, Lobisomem=6, W5=2 sucessos). */
   defaultDifficulty: number;
-  /** Permite 10s explosivos (Lobisomem com surto). */
+  /** Permite 10s explosivos (Lobisomem clássico com surto). */
   allowExploding10s: boolean;
   /** Pools sistema-específicos (atalhos pra Fúria, Gnose, etc). */
   extraPools: ExtraNarratorPool[];
+  /**
+   * Motor de resolução:
+   *  - `classic` (default): pool único, conta sucessos por TN, 1s subtraem.
+   *  - `w5-split`: pool DIVIDIDO em normais + dados de Fúria/Fome (5ed).
+   *    Pares de 10 = +2 sucessos. Messy Critical se 10 envolvido é de Fúria.
+   *    Brutal Outcome se falha com 1 em dado de Fúria. Dificuldade = nº sucessos.
+   */
+  mode?: 'classic' | 'w5-split';
 }
 
 /**
