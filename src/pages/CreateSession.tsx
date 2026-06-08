@@ -13,9 +13,10 @@ import { ArrowLeft, Wand2 } from 'lucide-react';
 import UpgradeBanner from '@/components/UpgradeBanner';
 import SessionFamilySelector from '@/components/SessionFamilySelector';
 import AllowedSystemsSelector from '@/components/AllowedSystemsSelector';
+import StorytellerEditionSelector from '@/components/StorytellerEditionSelector';
 import type { GameSystemFamily } from '@/lib/gameSystems';
-import { getAvailableStorytellerSystemIds } from '@/lib/storyteller/systemRegistry';
-import type { StorytellerSystemId } from '@/lib/storyteller/types';
+import { getAdaptersByEdition } from '@/lib/storyteller/systemRegistry';
+import type { StorytellerSystemId, StorytellerEdition } from '@/lib/storyteller/types';
 
 
 function generateInviteCode(): string {
@@ -34,6 +35,7 @@ export default function CreateSession() {
   const { toast } = useToast();
 
   const [family, setFamily] = useState<GameSystemFamily | null>(null);
+  const [edition, setEdition] = useState<StorytellerEdition | null>(null);
   const [allowedSystems, setAllowedSystems] = useState<StorytellerSystemId[]>([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');

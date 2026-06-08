@@ -3,34 +3,32 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { useI18n } from '@/lib/i18n';
 import { getAllAdapters } from '@/lib/storyteller/systemRegistry';
-import type { StorytellerSystemId } from '@/lib/storyteller/types';
+import type { StorytellerSystemId, StorytellerEdition } from '@/lib/storyteller/types';
 
 /**
  * Seletor de quais sistemas WoD são aceitos numa sessão Storyteller.
  *
- * Cada sistema disponível no `systemRegistry` (Vampiro, Lobisomem, e futuros
- * Mago/Metamorfos quando ficarem `available: true`) aparece como um cartão
- * clicável. Sistemas indisponíveis (ainda em desenvolvimento) aparecem
- * desabilitados com badge "Em breve" para sinalizar a roadmap.
- *
- * O valor é um array de IDs (`StorytellerSystemId[]`) que será gravado em
- * `sessions.allowed_systems` e usado por `filterCompatibleCharacters` no
- * lobby para restringir a lista de personagens disponíveis.
+ * A edição (clássico vs 5ed) é escolhida ANTES e passada via `edition`. O
+ * seletor mostra apenas adapters compatíveis com a edição selecionada —
+ * essa restrição é o que garante que 5ed não se misture com Clássico, já
+ * que os motores de dados são incompatíveis.
  */
 
 interface AllowedSystemsSelectorProps {
   value: StorytellerSystemId[];
   onChange: (value: StorytellerSystemId[]) => void;
+  edition: StorytellerEdition;
   disabled?: boolean;
 }
 
 export default function AllowedSystemsSelector({
   value,
   onChange,
+  edition,
   disabled = false,
 }: AllowedSystemsSelectorProps) {
   const { language } = useI18n();
-  const adapters = getAllAdapters();
+  const adapters = getAllAdapters().filter((a) => a.edition === edition);
 
   const toggle = (id: StorytellerSystemId) => {
     if (disabled) return;
