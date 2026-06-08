@@ -844,11 +844,17 @@ export default function StorytellerSession() {
         onRequestTest={handleRequestTest}
       />
 
-      {/* Narrator Roll Modal — unificado, lê narratorRollConfig do adapter */}
+      {/* Narrator Roll Modal — unificado, lê narratorRollConfig do adapter.
+          Para resolver a edição/regras da rolagem, prioriza o primeiro
+          `allowed_systems` da sessão (ex: 'lobisomem_w5' aciona modal 5ed
+          com pool dividido). Cai em `session.game_system` (geralmente
+          'storyteller') quando allowed_systems está vazio. */}
       <StorytellerNarratorRollModal
         open={rollModalOpen}
         onOpenChange={setRollModalOpen}
-        gameSystem={session.game_system}
+        gameSystem={
+          (session as any).allowed_systems?.[0] || session.game_system
+        }
         onRollComplete={async (result) => {
           if (!sessionId) return;
           await supabase.from('session_events').insert([
