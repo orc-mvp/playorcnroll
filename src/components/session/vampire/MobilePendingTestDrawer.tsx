@@ -1,6 +1,7 @@
 import { useTranslation } from '@/lib/i18n';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 import { VampirePendingTest } from './VampirePendingTest';
+import { W5PendingTest } from '@/components/session/storyteller/W5PendingTest';
 import { Dices } from 'lucide-react';
 import type { VampiroCharacterData, TestType } from '@/lib/vampiro/diceUtils';
 
@@ -33,6 +34,7 @@ export interface MobilePendingTestDrawerProps {
   };
   currentForm?: string;
   gameSystem?: string;
+  currentRage?: number;
 }
 
 export function MobilePendingTestDrawer({
@@ -46,8 +48,10 @@ export function MobilePendingTestDrawer({
   testEvent,
   currentForm,
   gameSystem,
+  currentRage,
 }: MobilePendingTestDrawerProps) {
   const t = useTranslation();
+  const isW5 = gameSystem === 'lobisomem_w5';
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} dismissible={false}>
@@ -59,19 +63,34 @@ export function MobilePendingTestDrawer({
           </DrawerTitle>
         </DrawerHeader>
         <div className="p-4 overflow-y-auto">
-          <VampirePendingTest
-            sessionId={sessionId}
-            sceneId={sceneId}
-            characterId={characterId}
-            characterName={characterName}
-            vampiroData={vampiroData}
-            testEvent={testEvent}
-            onTestComplete={() => onOpenChange(false)}
-            currentForm={currentForm}
-            gameSystem={gameSystem}
-          />
+          {isW5 ? (
+            <W5PendingTest
+              sessionId={sessionId}
+              sceneId={sceneId}
+              characterId={characterId}
+              characterName={characterName}
+              vampiroData={vampiroData as any}
+              testEvent={testEvent as any}
+              onTestComplete={() => onOpenChange(false)}
+              currentForm={currentForm}
+              currentRage={currentRage ?? 0}
+            />
+          ) : (
+            <VampirePendingTest
+              sessionId={sessionId}
+              sceneId={sceneId}
+              characterId={characterId}
+              characterName={characterName}
+              vampiroData={vampiroData}
+              testEvent={testEvent}
+              onTestComplete={() => onOpenChange(false)}
+              currentForm={currentForm}
+              gameSystem={gameSystem}
+            />
+          )}
         </div>
       </DrawerContent>
     </Drawer>
   );
 }
+
