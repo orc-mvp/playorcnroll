@@ -20,6 +20,7 @@ import StorytellerSession from "./pages/StorytellerSession";
 import Profile from "./pages/Profile";
 import GameCalendar from "./pages/GameCalendar";
 import Upgrade from "./pages/Upgrade";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
