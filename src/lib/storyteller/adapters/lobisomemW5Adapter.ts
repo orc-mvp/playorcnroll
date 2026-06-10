@@ -19,7 +19,9 @@
 
 import { Moon } from 'lucide-react';
 import { lobisomemAdapter } from './lobisomemAdapter';
+import { W5PendingTest } from '@/components/session/storyteller/W5PendingTest';
 import type { SystemAdapter } from '../types';
+
 
 export const lobisomemW5Adapter: SystemAdapter = {
   ...lobisomemAdapter,
