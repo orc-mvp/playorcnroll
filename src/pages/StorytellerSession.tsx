@@ -617,14 +617,20 @@ export default function StorytellerSession() {
             created_at: pendingTestEvent.created_at,
           },
           onTestComplete: () => {},
-          ...((myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20')
+          ...((myCharacter.game_system === 'lobisomem_w20' ||
+          myCharacter.game_system === 'metamorfos_w20' ||
+          myCharacter.game_system === 'lobisomem_w5')
             ? {
                 currentForm: myParticipant?.session_form || 'hominid',
-                gameSystem: myCharacter.game_system as 'lobisomem_w20' | 'metamorfos_w20',
+                gameSystem: myCharacter.game_system,
               }
+            : {}),
+          ...(myCharacter.game_system === 'lobisomem_w5'
+            ? { currentRage: myParticipant?.session_rage ?? 0 }
             : {}),
         }
       : null;
+
 
   const tabsCount = 2 + (trackerProps ? 1 : 0) + 1; // feed + scenes + (trackers?) + info
 

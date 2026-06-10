@@ -19,7 +19,9 @@
 
 import { Moon } from 'lucide-react';
 import { lobisomemAdapter } from './lobisomemAdapter';
+import { W5PendingTest } from '@/components/session/storyteller/W5PendingTest';
 import type { SystemAdapter } from '../types';
+
 
 export const lobisomemW5Adapter: SystemAdapter = {
   ...lobisomemAdapter,
@@ -32,6 +34,8 @@ export const lobisomemW5Adapter: SystemAdapter = {
   bgColor: 'bg-red-600/10',
   edition: '5ed',
   available: true,
+  PendingTestComponent: W5PendingTest as any,
+
 
   // Trackers: Fúria e Vontade capadas em 5 via getMax. Health/Forma reusam W20.
   trackers: lobisomemAdapter.trackers.map((t) => {

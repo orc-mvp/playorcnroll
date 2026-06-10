@@ -22,19 +22,18 @@ type: feature
 
 ## Arquivos chave
 - `src/lib/lobisomemW5/diceUtils.ts` — motor `rollW5()` e `splitPool()`
-- `src/lib/storyteller/adapters/lobisomemW5Adapter.ts` — herda do W20; tema `text-red-600`; trackers Fúria/Vontade capados em 5; sem Gnose; testCategories sem Gnose; `narratorRollConfig.mode = 'w5-split'`
-- `src/components/session/storyteller/W5NarratorRollModal.tsx` — UI dedicada com pool total + dados de Fúria; banners Messy/Brutal
-- `src/components/session/storyteller/StorytellerNarratorRollModal.tsx` — delega para W5 modal quando adapter.narratorRollConfig.mode === 'w5-split'
+- `src/lib/storyteller/adapters/lobisomemW5Adapter.ts` — herda do W20; tema `text-red-600`; trackers Fúria/Vontade capados em 5; sem Gnose; `narratorRollConfig.mode = 'w5-split'`; `PendingTestComponent = W5PendingTest`
+- `src/components/session/storyteller/W5NarratorRollModal.tsx` — UI dedicada do narrador
+- `src/components/session/storyteller/W5PendingTest.tsx` — UI do JOGADOR com split pool, Messy/Brutal; pega `currentRage` do tracker via prop. Aceita `testType` rage/willpower/attribute_*/raw_dice. Em 'willpower' não mistura Fúria; em 'rage' o pool inteiro é de Fúria.
+- `src/components/session/vampire/MobilePendingTestDrawer.tsx` — agora roteia para W5PendingTest quando `gameSystem === 'lobisomem_w5'`
+- `src/components/session/storyteller/StorytellerNarratorRollModal.tsx` — delega para W5 modal
 - `src/components/StorytellerEditionSelector.tsx` — seletor Clássico vs 5ª Edição (excludente)
-- `src/components/AllowedSystemsSelector.tsx` — agora exige prop `edition` e filtra adapters por edição
 
 ## Sala Storyteller
-- `StorytellerSession` passa `allowed_systems?.[0] || session.game_system` para o modal de rolagem. Como edição é excludente, qualquer sistema permitido na sala determina o motor.
-- `getSessionEdition(allowed_systems)` e `getAdaptersByEdition(edition)` em `systemRegistry.ts`.
+- `StorytellerSession` passa `currentRage = myParticipant.session_rage` no `pendingTestSharedProps` quando o personagem é W5.
+- `getSessionEdition(allowed_systems)` em `systemRegistry.ts`.
 
-## Limitações MVP (iterar depois)
-- Ficha e wizard de criação do W5 reusam os componentes do W20 (mesmo schema). Jogadores devem capar Rage/Vontade em 5 manualmente até termos steps próprios.
-- Trackers de sessão reusam colunas `session_rage` / `session_willpower_current` do W20 (capadas em 5 via `getMax`).
-- Colunas `session_w5_rage`, `session_w5_willpower_current`, `session_w5_harmony` foram criadas no DB mas ainda não usadas — reservadas para a próxima iteração (trackers próprios + Harmony).
-- Sem teste pendente W5 para jogadores ainda — usa `VampirePendingTest` (clássico). Próximo release: split pool no lado do jogador também.
-- V5/H5 fora de escopo deste release.
+## Limitações MVP restantes
+- Ficha e wizard reusam W20 (jogadores capam Rage/Vontade em 5 manualmente).
+- Trackers de sessão reusam `session_rage` / `session_willpower_current` (capados em 5 via `getMax`). Colunas `session_w5_*` reservadas para próxima iteração + Harmony.
+
