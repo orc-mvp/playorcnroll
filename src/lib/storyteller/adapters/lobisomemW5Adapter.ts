@@ -34,6 +34,8 @@ export const lobisomemW5Adapter: SystemAdapter = {
   bgColor: 'bg-red-600/10',
   edition: '5ed',
   available: true,
+  PendingTestComponent: W5PendingTest as any,
+
 
   // Trackers: Fúria e Vontade capadas em 5 via getMax. Health/Forma reusam W20.
   trackers: lobisomemAdapter.trackers.map((t) => {
