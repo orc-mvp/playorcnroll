@@ -59,6 +59,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/calendar" element={<GameCalendar />} />
             <Route path="/upgrade" element={<Upgrade />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
