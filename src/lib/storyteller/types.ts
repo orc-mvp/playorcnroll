@@ -46,6 +46,12 @@ export interface StorytellerParticipant {
   session_rage?: number;
   /** Forma atual (Lobisomem) */
   session_form?: string;
+  /** Fúria W5 (Lobisomem 5ed) — 0-5 */
+  session_w5_rage?: number;
+  /** Vontade W5 (Lobisomem 5ed) — 0-5 */
+  session_w5_willpower_current?: number;
+  /** Harmonia W5 (Lobisomem 5ed) — 0-10 */
+  session_w5_harmony?: number;
   character?: {
     id: string;
     name: string;
