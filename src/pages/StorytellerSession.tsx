@@ -561,6 +561,22 @@ export default function StorytellerSession() {
         (myParticipant.session_health_damage as boolean[]) ||
         [false, false, false, false, false, false, false],
     };
+    if (myCharacter.game_system === 'lobisomem_w5') {
+      const anyP = myParticipant as any;
+      return {
+        participantId: myParticipant.id,
+        sessionId: sessionId!,
+        sceneId: currentScene?.id || null,
+        character: myCharacter,
+        initialRage: anyP.session_w5_rage ?? 0,
+        initialWillpower: anyP.session_w5_willpower_current ?? 0,
+        initialHarmony: anyP.session_w5_harmony ?? 7,
+        initialHealthDamage:
+          (myParticipant.session_health_damage as boolean[]) ||
+          [false, false, false, false, false, false, false],
+        initialForm: myParticipant.session_form || 'hominid',
+      };
+    }
     if (myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20') {
       return {
         ...base,
