@@ -3,7 +3,7 @@
  *
  * Difere do W20 (clássico) em:
  *  - Fúria 0–5, Vontade 0–5 (escalas reduzidas).
- *  - Sem Gnose como pool consumível.
+ *  - Sem Gnose como pool consumível; adiciona Harmonia 0–10.
  *  - Motor de dados em "pool dividido": cada rolagem mistura dados normais
  *    com dados de Fúria (cor diferente). Pares de 10 = +2 sucessos.
  *    Messy Critical se 10 envolvido é de Fúria. Brutal Outcome em falha
@@ -11,17 +11,15 @@
  *  - Dificuldade = NÚMERO DE SUCESSOS (não TN por dado).
  *  - Não usa 10s explosivos (substituído por pares de 10).
  *
- * Estratégia (MVP): herda do `lobisomemAdapter` toda a parte de
- * personagem/ficha/edição (visualmente igual; valores capados em 5 são
- * convenção do jogador na ficha). Sobrescreve id/edição/cor/trackers e
- * configuração da rolagem do narrador para acionar a UI W5 dividida.
+ * Trackers persistem em colunas dedicadas `session_w5_*` (não compartilham
+ * com `session_rage`/`session_willpower_current` do W20).
  */
 
-import { Moon } from 'lucide-react';
+import { Moon, Flame, Zap, Heart, Scale } from 'lucide-react';
 import { lobisomemAdapter } from './lobisomemAdapter';
 import { W5PendingTest } from '@/components/session/storyteller/W5PendingTest';
+import { W5Trackers } from '@/components/session/storyteller/W5Trackers';
 import type { SystemAdapter } from '../types';
-
 
 export const lobisomemW5Adapter: SystemAdapter = {
   ...lobisomemAdapter,
@@ -35,26 +33,69 @@ export const lobisomemW5Adapter: SystemAdapter = {
   edition: '5ed',
   available: true,
   PendingTestComponent: W5PendingTest as any,
+  PlayerTrackersComponent: W5Trackers as any,
 
+  participantSelectFields: [
+    'session_w5_rage',
+    'session_w5_willpower_current',
+    'session_w5_harmony',
+    'session_health_damage',
+    'session_form',
+  ],
 
-  // Trackers: Fúria e Vontade capadas em 5 via getMax. Health/Forma reusam W20.
-  trackers: lobisomemAdapter.trackers.map((t) => {
-    if (t.key === 'gnosis') return null;
-    if (t.key === 'rage') {
-      return {
-        ...t,
-        label: 'Fúria',
-        color: 'text-red-600',
-        getMax: () => 5,
-      };
+  trackers: [
+    {
+      key: 'rage',
+      label: 'Fúria',
+      icon: Flame,
+      color: 'text-red-600',
+      getMax: () => 5,
+      getCurrent: (p) => (p as any).session_w5_rage ?? 0,
+    },
+    {
+      key: 'willpower',
+      label: 'Vontade',
+      icon: Zap,
+      color: 'text-foreground',
+      getMax: () => 5,
+      getCurrent: (p) => (p as any).session_w5_willpower_current ?? 0,
+    },
+    {
+      key: 'harmony',
+      label: 'Harmonia',
+      icon: Scale,
+      color: 'text-emerald-500',
+      getMax: () => 10,
+      getCurrent: (p) => (p as any).session_w5_harmony ?? 7,
+    },
+    {
+      key: 'health',
+      label: 'Vitalidade',
+      icon: Heart,
+      color: 'text-destructive',
+      getMax: () => 7,
+      getCurrent: (p) =>
+        7 - ((p.session_health_damage as boolean[] | null)?.filter(Boolean).length ?? 0),
+      kind: 'health',
+      isHealth: true,
+    },
+  ],
+
+  initializeTrackers: (p) => {
+    // Inicializa apenas se ainda for default — Harmony default no DB é 7.
+    const anyP = p as any;
+    if ((anyP.session_w5_rage ?? 0) !== 0 || (anyP.session_w5_willpower_current ?? 0) !== 0) {
+      return null;
     }
-    if (t.key === 'willpower') {
-      return { ...t, getMax: () => 5 };
-    }
-    return t;
-  }).filter(Boolean) as SystemAdapter['trackers'],
+    return {
+      session_w5_rage: 1,
+      session_w5_willpower_current: 3,
+      session_w5_harmony: anyP.session_w5_harmony ?? 7,
+      session_health_damage: [false, false, false, false, false, false, false],
+      session_form: 'hominid',
+    } as any;
+  },
 
-  // Categorias de teste do W5: sem Gnose, adiciona Frenesi.
   testCategories: [
     {
       id: 'attribute_ability',
@@ -84,6 +125,12 @@ export const lobisomemW5Adapter: SystemAdapter = {
       testType: 'rage',
     },
     {
+      id: 'harmony',
+      label: 'Teste de Harmonia',
+      crossSystem: false,
+      testType: 'harmony',
+    },
+    {
       id: 'raw_dice',
       label: 'Pool Avulso',
       crossSystem: true,
@@ -93,9 +140,7 @@ export const lobisomemW5Adapter: SystemAdapter = {
   ],
 
   narratorRollConfig: {
-    // 5ed usa "sucessos necessários" — default 2 (testes simples).
     defaultDifficulty: 2,
-    // Sem 10s explosivos no W5 (substituídos por pares de 10 = +2).
     allowExploding10s: false,
     extraPools: [],
     mode: 'w5-split',

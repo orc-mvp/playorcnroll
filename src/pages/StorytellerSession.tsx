@@ -159,6 +159,7 @@ export default function StorytellerSession() {
           id, user_id, character_id,
           session_blood_pool, session_willpower_current, session_health_damage,
           session_gnosis, session_rage, session_form,
+          session_w5_rage, session_w5_willpower_current, session_w5_harmony,
           sheet_locked,
           characters:character_id (id, name, concept, game_system, experience_points, vampiro_data)
         `)
@@ -561,6 +562,22 @@ export default function StorytellerSession() {
         (myParticipant.session_health_damage as boolean[]) ||
         [false, false, false, false, false, false, false],
     };
+    if (myCharacter.game_system === 'lobisomem_w5') {
+      const anyP = myParticipant as any;
+      return {
+        participantId: myParticipant.id,
+        sessionId: sessionId!,
+        sceneId: currentScene?.id || null,
+        character: myCharacter,
+        initialRage: anyP.session_w5_rage ?? 0,
+        initialWillpower: anyP.session_w5_willpower_current ?? 0,
+        initialHarmony: anyP.session_w5_harmony ?? 7,
+        initialHealthDamage:
+          (myParticipant.session_health_damage as boolean[]) ||
+          [false, false, false, false, false, false, false],
+        initialForm: myParticipant.session_form || 'hominid',
+      };
+    }
     if (myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20') {
       return {
         ...base,
@@ -581,7 +598,17 @@ export default function StorytellerSession() {
     character: myCharacter,
     experiencePoints: myCharacter?.experience_points,
     sessionTrackers:
-      (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
+      myCharacter?.game_system === 'lobisomem_w5'
+        ? {
+            rage: (myParticipant as any)?.session_w5_rage ?? 0,
+            willpower: (myParticipant as any)?.session_w5_willpower_current ?? 0,
+            harmony: (myParticipant as any)?.session_w5_harmony ?? 7,
+            healthDamage:
+              (myParticipant?.session_health_damage as boolean[]) ||
+              Array(7).fill(false),
+            form: myParticipant?.session_form || 'hominid',
+          }
+        : (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
         ? {
             gnosis: myParticipant?.session_gnosis ?? 0,
             rage: myParticipant?.session_rage ?? 0,
@@ -626,7 +653,7 @@ export default function StorytellerSession() {
               }
             : {}),
           ...(myCharacter.game_system === 'lobisomem_w5'
-            ? { currentRage: myParticipant?.session_rage ?? 0 }
+            ? { currentRage: (myParticipant as any)?.session_w5_rage ?? 0 }
             : {}),
         }
       : null;
