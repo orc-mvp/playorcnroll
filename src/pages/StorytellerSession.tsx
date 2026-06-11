@@ -597,7 +597,17 @@ export default function StorytellerSession() {
     character: myCharacter,
     experiencePoints: myCharacter?.experience_points,
     sessionTrackers:
-      (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
+      myCharacter?.game_system === 'lobisomem_w5'
+        ? {
+            rage: (myParticipant as any)?.session_w5_rage ?? 0,
+            willpower: (myParticipant as any)?.session_w5_willpower_current ?? 0,
+            harmony: (myParticipant as any)?.session_w5_harmony ?? 7,
+            healthDamage:
+              (myParticipant?.session_health_damage as boolean[]) ||
+              Array(7).fill(false),
+            form: myParticipant?.session_form || 'hominid',
+          }
+        : (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
         ? {
             gnosis: myParticipant?.session_gnosis ?? 0,
             rage: myParticipant?.session_rage ?? 0,
