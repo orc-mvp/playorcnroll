@@ -652,7 +652,7 @@ export default function StorytellerSession() {
               }
             : {}),
           ...(myCharacter.game_system === 'lobisomem_w5'
-            ? { currentRage: myParticipant?.session_rage ?? 0 }
+            ? { currentRage: (myParticipant as any)?.session_w5_rage ?? 0 }
             : {}),
         }
       : null;
