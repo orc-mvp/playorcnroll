@@ -8,6 +8,7 @@ import { LobisomemFormData } from './StepLobisomemBasicInfo';
 interface StepLobisomemBackgroundsProps {
   formData: LobisomemFormData;
   updateFormData: (updates: Partial<LobisomemFormData>) => void;
+  gameSystem?: 'lobisomem_w20' | 'metamorfos_w20' | 'lobisomem_w5';
 }
 
 const BACKGROUNDS = [

@@ -42,6 +42,8 @@ export interface LobisomemFormData {
   rage: number;
   willpower: number;
   renown: { glory: number; honor: number; wisdom: number };
+  /** W5 only — substitui Renome. 0-10, default 7. */
+  harmony?: number;
 
   // Step 5 - Merits & Flaws
   merits_flaws: { id: string; name: string; cost: number; category: string }[];
