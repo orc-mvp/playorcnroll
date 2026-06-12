@@ -143,6 +143,19 @@ export default function CreateCharacter() {
   const { isPremium } = usePremium();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 
+  // Apply W5 defaults (caps 0-5 for Rage/Will, Harmony 7) once the system is W5.
+  useEffect(() => {
+    if (gameSystem === 'lobisomem_w5') {
+      setLobisomemFormData(prev => ({
+        ...prev,
+        rage: Math.min(prev.rage || 1, 5),
+        willpower: Math.min(prev.willpower || 3, 5),
+        gnosis: 0,
+        harmony: prev.harmony ?? 7,
+      }));
+    }
+  }, [gameSystem]);
+
   // Block creation if user already has 3+ characters and is not premium
   useEffect(() => {
     if (!user || isPremium) return;
