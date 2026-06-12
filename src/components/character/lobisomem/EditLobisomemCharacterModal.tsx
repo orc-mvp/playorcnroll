@@ -34,6 +34,7 @@ interface Character {
   name: string;
   concept: string | null;
   vampiro_data: LobisomemCharacterData | null;
+  game_system?: string;
 }
 
 interface EditLobisomemCharacterModalProps {
@@ -108,6 +109,7 @@ export function EditLobisomemCharacterModal({
 }: EditLobisomemCharacterModalProps) {
   const { t, language } = useI18n();
   const { toast } = useToast();
+  const isW5 = character.game_system === 'lobisomem_w5';
 
   const [name, setName] = useState(character.name);
   const [concept, setConcept] = useState(character.concept || '');
@@ -360,23 +362,49 @@ export function EditLobisomemCharacterModal({
                     </div>
                   </div>
 
-                  {/* Gnosis, Rage, Willpower */}
+                  {/* Pools vitais */}
                   <div className="space-y-2 pt-2 border-t border-border">
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">{t.lobisomem.gnosis}</span>
-                      <DotRating value={lobData.gnosis || 1} onChange={(val) => updateField('gnosis', val)} maxValue={10} minValue={1} />
-                    </div>
+                    {!isW5 && (
+                      <div className="flex items-center justify-between">
+                        <span className="font-body text-sm">{t.lobisomem.gnosis}</span>
+                        <DotRating value={lobData.gnosis || 1} onChange={(val) => updateField('gnosis', val)} maxValue={10} minValue={1} />
+                      </div>
+                    )}
                     <div className="flex items-center justify-between">
                       <span className="font-body text-sm">{t.lobisomem.rage}</span>
-                      <DotRating value={lobData.rage || 1} onChange={(val) => updateField('rage', val)} maxValue={10} minValue={1} />
+                      <DotRating
+                        value={Math.min(lobData.rage || 1, isW5 ? 5 : 10)}
+                        onChange={(val) => updateField('rage', val)}
+                        maxValue={isW5 ? 5 : 10}
+                        minValue={isW5 ? 0 : 1}
+                      />
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="font-body text-sm">{t.lobisomem.willpowerLabel}</span>
-                      <DotRating value={lobData.willpower || 1} onChange={(val) => updateField('willpower', val)} maxValue={10} minValue={1} />
+                      <DotRating
+                        value={Math.min(lobData.willpower || 1, isW5 ? 5 : 10)}
+                        onChange={(val) => updateField('willpower', val)}
+                        maxValue={isW5 ? 5 : 10}
+                        minValue={isW5 ? 0 : 1}
+                      />
                     </div>
+                    {isW5 && (
+                      <div className="flex items-center justify-between">
+                        <span className="font-body text-sm">
+                          {language === 'pt-BR' ? 'Harmonia' : 'Harmony'}
+                        </span>
+                        <DotRating
+                          value={(lobData as any).harmony ?? 7}
+                          onChange={(val) => updateField('harmony' as any, val as any)}
+                          maxValue={10}
+                          minValue={0}
+                        />
+                      </div>
+                    )}
                   </div>
 
-                  {/* Renown */}
+                  {/* Renown — apenas W20 (W5 usa Harmonia acima) */}
+                  {!isW5 && (
                   <div className="space-y-2 pt-2 border-t border-border">
                     <h4 className="font-medieval text-sm text-muted-foreground">{t.lobisomem.renown}</h4>
                     {(() => {
@@ -402,6 +430,7 @@ export function EditLobisomemCharacterModal({
                       );
                     })()}
                   </div>
+                  )}
                 </div>
               </TabsContent>
 

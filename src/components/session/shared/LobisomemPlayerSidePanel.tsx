@@ -233,6 +233,7 @@ export function LobisomemPlayerSidePanel({
                   concept: character.concept,
                   vampiro_data: character.vampiro_data,
                   experience_points: experiencePoints,
+                  game_system: (character as any).game_system,
                 }}
                 sessionTrackers={sessionTrackers as any}
                 readOnly={sheetLocked}

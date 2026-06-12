@@ -94,11 +94,13 @@ interface LobisomemCharacterSheetProps {
     vampiro_data: LobisomemCharacterData | null;
     notes?: string | null;
     experience_points?: number;
+    game_system?: string;
   };
   sessionTrackers?: {
     gnosis?: number;
     rage?: number;
     willpower?: number;
+    harmony?: number;
     healthDamage?: boolean[];
     form?: string;
   };
@@ -213,9 +215,11 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
   const abilities = data.abilities || { talents: {}, skills: {}, knowledges: {} };
   const specializations = data.specializations || {};
   const backgrounds = data.backgrounds || {};
-  const gnosis = data.gnosis || 1;
+  const isW5 = character.game_system === 'lobisomem_w5';
+  const gnosis = data.gnosis || (isW5 ? 0 : 1);
   const rage = data.rage || 1;
   const willpower = data.willpower || 1;
+  const harmony = (data as any).harmony ?? 7;
   const gifts = data.gifts || {};
   const renown = data.renown || { glory: 0, honor: 0, wisdom: 0 };
 
@@ -643,29 +647,42 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left column: Gnose, Fúria, Força de Vontade */}
+            {/* Left column: pools vitais */}
             <div className="space-y-4">
-              <div>
-                <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.lobisomem.gnosis}</h4>
-                <div className="flex justify-center">
-                  <DotDisplay value={gnosis} maxValue={10} />
+              {!isW5 && (
+                <div>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.lobisomem.gnosis}</h4>
+                  <div className="flex justify-center">
+                    <DotDisplay value={gnosis} maxValue={10} />
+                  </div>
+                  <p className="text-center text-xs text-muted-foreground mt-1">{gnosis}/10</p>
                 </div>
-                <p className="text-center text-xs text-muted-foreground mt-1">{gnosis}/10</p>
-              </div>
+              )}
               <div>
                 <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.lobisomem.rage}</h4>
                 <div className="flex justify-center">
-                  <DotDisplay value={rage} maxValue={10} />
+                  <DotDisplay value={Math.min(rage, isW5 ? 5 : 10)} maxValue={isW5 ? 5 : 10} />
                 </div>
-                <p className="text-center text-xs text-muted-foreground mt-1">{rage}/10</p>
+                <p className="text-center text-xs text-muted-foreground mt-1">{Math.min(rage, isW5 ? 5 : 10)}/{isW5 ? 5 : 10}</p>
               </div>
               <div>
                 <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.lobisomem.willpowerLabel}</h4>
                 <div className="flex justify-center">
-                  <DotDisplay value={willpower} maxValue={10} />
+                  <DotDisplay value={Math.min(willpower, isW5 ? 5 : 10)} maxValue={isW5 ? 5 : 10} />
                 </div>
-                <p className="text-center text-xs text-muted-foreground mt-1">{willpower}/10</p>
+                <p className="text-center text-xs text-muted-foreground mt-1">{Math.min(willpower, isW5 ? 5 : 10)}/{isW5 ? 5 : 10}</p>
               </div>
+              {isW5 && (
+                <div>
+                  <h4 className="font-medieval text-sm text-muted-foreground mb-2">
+                    {language === 'pt-BR' ? 'Harmonia' : 'Harmony'}
+                  </h4>
+                  <div className="flex justify-center">
+                    <DotDisplay value={harmony} maxValue={10} />
+                  </div>
+                  <p className="text-center text-xs text-muted-foreground mt-1">{harmony}/10</p>
+                </div>
+              )}
             </div>
 
             {/* Right column: Vitalidade */}
@@ -702,7 +719,8 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
         </CardContent>
       </Card>
 
-      {/* Renome: Glória, Honra, Sabedoria */}
+      {/* Renome — apenas W20/Metamorfos (W5 substitui por Harmonia, exibida acima) */}
+      {!isW5 && (
       <Card className="medieval-card border-emerald-500/20">
         <CardHeader className="pb-3">
           <CardTitle className="font-medieval flex items-center gap-2 text-emerald-500">
@@ -737,6 +755,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Notes */}
       <CharacterNotes
