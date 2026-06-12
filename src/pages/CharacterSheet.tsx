@@ -293,6 +293,7 @@ export default function CharacterSheet() {
                 vampiro_data: character.vampiro_data as any,
                 notes: character.notes,
                 experience_points: character.experience_points,
+                game_system: character.game_system,
               }}
             />
           ) : character.game_system === 'mago_m20' ? (

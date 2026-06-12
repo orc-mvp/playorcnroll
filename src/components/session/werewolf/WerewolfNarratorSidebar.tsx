@@ -400,6 +400,7 @@ export function WerewolfNarratorSidebar({
                   concept: selectedCharacter.concept,
                   vampiro_data: selectedCharacter.vampiro_data,
                   experience_points: (selectedCharacter as any).experience_points ?? 0,
+                  game_system: (selectedCharacter as any).game_system,
                 }}
                 sessionTrackers={{
                   gnosis: selectedParticipant?.session_gnosis ?? 0,
