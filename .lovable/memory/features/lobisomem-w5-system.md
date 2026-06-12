@@ -38,6 +38,9 @@ type: feature
 - `StorytellerSession` seleciona colunas `session_w5_*` e branchea trackerProps/sidePanel/currentRage para W5.
 - `getSessionEdition(allowed_systems)` em `systemRegistry.ts`.
 
+## Wizard de criação
+- `StepLobisomemBackgrounds` aceita `gameSystem`. Em W5: oculta Gnose e Renome, mostra Harmonia (0-10, default 7), capa Rage/Vontade em 0-5.
+- `CreateCharacter` inicializa defaults W5 (rage=1, willpower=3, harmony=7, gnosis=0) ao selecionar o sistema e persiste `harmony` no JSON (não grava `renown` em W5).
+
 ## Limitações restantes
-- Ficha/wizard reusam W20: jogadores ainda capam Rage/Vontade em 5 manualmente.
-- Próximo passo: wizard W5 dedicado com Renome → Harmonia inicial e caps 0-5.
+- Edição (`EditLobisomemCharacterModal`) e ficha (`LobisomemCharacterSheet`) ainda mostram Gnose/Renome para W5 — próximo passo.

@@ -143,6 +143,19 @@ export default function CreateCharacter() {
   const { isPremium } = usePremium();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 
+  // Apply W5 defaults (caps 0-5 for Rage/Will, Harmony 7) once the system is W5.
+  useEffect(() => {
+    if (gameSystem === 'lobisomem_w5') {
+      setLobisomemFormData(prev => ({
+        ...prev,
+        rage: Math.min(prev.rage || 1, 5),
+        willpower: Math.min(prev.willpower || 3, 5),
+        gnosis: 0,
+        harmony: prev.harmony ?? 7,
+      }));
+    }
+  }, [gameSystem]);
+
   // Block creation if user already has 3+ characters and is not premium
   useEffect(() => {
     if (!user || isPremium) return;
@@ -292,6 +305,9 @@ export default function CreateCharacter() {
         });
         if (error) throw error;
       } else if (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') {
+        const isW5 = gameSystem === 'lobisomem_w5';
+        const rage = isW5 ? Math.min(lobisomemFormData.rage, 5) : lobisomemFormData.rage;
+        const willpower = isW5 ? Math.min(lobisomemFormData.willpower, 5) : lobisomemFormData.willpower;
         const { error } = await supabase.from('characters').insert({
           user_id: user.id,
           name: lobisomemFormData.name.trim(),
@@ -311,12 +327,15 @@ export default function CreateCharacter() {
             attributes: lobisomemFormData.attributes,
             abilities: lobisomemFormData.abilities,
             specializations: lobisomemFormData.specializations,
-            gnosis: lobisomemFormData.gnosis,
-            rage: lobisomemFormData.rage,
-            willpower: lobisomemFormData.willpower,
+            gnosis: isW5 ? 0 : lobisomemFormData.gnosis,
+            rage,
+            willpower,
             gifts: lobisomemFormData.gifts,
             backgrounds: lobisomemFormData.backgrounds,
-            renown: lobisomemFormData.renown,
+            // W5 não usa Renome — substitui por Harmonia.
+            ...(isW5
+              ? { harmony: lobisomemFormData.harmony ?? 7 }
+              : { renown: lobisomemFormData.renown }),
             merits_flaws: lobisomemFormData.merits_flaws || [],
             // Metamorfos começa com lista vazia de formas — configurar na edição.
             ...(gameSystem === 'metamorfos_w20' ? { metamorph_forms: [], metamorph_species: '' } : {}),
@@ -519,6 +538,7 @@ export default function CreateCharacter() {
           <StepLobisomemBackgrounds
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
+            gameSystem={gameSystem}
           />
         )}
         {step === 5 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') && (

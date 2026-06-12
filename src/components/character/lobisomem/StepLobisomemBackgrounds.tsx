@@ -8,6 +8,7 @@ import { LobisomemFormData } from './StepLobisomemBasicInfo';
 interface StepLobisomemBackgroundsProps {
   formData: LobisomemFormData;
   updateFormData: (updates: Partial<LobisomemFormData>) => void;
+  gameSystem?: 'lobisomem_w20' | 'metamorfos_w20' | 'lobisomem_w5';
 }
 
 const BACKGROUNDS = [
@@ -27,8 +28,9 @@ const BACKGROUNDS = [
   { key: 'totemPersonal', labelPt: 'Totem (Pessoal)', labelEn: 'Totem (Personal)' },
 ];
 
-export default function StepLobisomemBackgrounds({ formData, updateFormData }: StepLobisomemBackgroundsProps) {
+export default function StepLobisomemBackgrounds({ formData, updateFormData, gameSystem = 'lobisomem_w20' }: StepLobisomemBackgroundsProps) {
   const { t, language } = useI18n();
+  const isW5 = gameSystem === 'lobisomem_w5';
 
   const backgrounds = formData.backgrounds || {};
 
@@ -38,35 +40,43 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData }: S
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      {/* Gnosis, Rage, Willpower */}
+      {/* Pools vitais */}
       <Card className="medieval-card">
         <CardHeader className="text-center pb-4">
           <CardTitle className="font-medieval text-2xl">
-            {t.lobisomem.gnosisRage}
+            {isW5
+              ? (language === 'pt-BR' ? 'Fúria, Vontade e Harmonia' : 'Rage, Willpower and Harmony')
+              : t.lobisomem.gnosisRage}
           </CardTitle>
           <CardDescription className="font-body">
-            {language === 'pt-BR'
-              ? 'Defina os valores iniciais de Gnose, Fúria e Força de Vontade'
-              : 'Set initial values for Gnosis, Rage and Willpower'}
+            {isW5
+              ? (language === 'pt-BR'
+                  ? 'Escalas 5ª Edição — Fúria e Vontade 0–5, Harmonia 0–10 (sugestão inicial: 7)'
+                  : 'W5 scales — Rage and Willpower 0–5, Harmony 0–10 (suggested start: 7)')
+              : (language === 'pt-BR'
+                  ? 'Defina os valores iniciais de Gnose, Fúria e Força de Vontade'
+                  : 'Set initial values for Gnosis, Rage and Willpower')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
-            <span className="font-body text-sm min-w-[140px]">{t.lobisomem.gnosis}</span>
-            <DotRating
-              value={formData.gnosis}
-              onChange={(value) => updateFormData({ gnosis: value })}
-              maxValue={10}
-              minValue={1}
-            />
-          </div>
+          {!isW5 && (
+            <div className="flex items-center justify-between gap-4">
+              <span className="font-body text-sm min-w-[140px]">{t.lobisomem.gnosis}</span>
+              <DotRating
+                value={formData.gnosis}
+                onChange={(value) => updateFormData({ gnosis: value })}
+                maxValue={10}
+                minValue={1}
+              />
+            </div>
+          )}
           <div className="flex items-center justify-between gap-4">
             <span className="font-body text-sm min-w-[140px]">{t.lobisomem.rage}</span>
             <DotRating
-              value={formData.rage}
+              value={Math.min(formData.rage, isW5 ? 5 : 10)}
               onChange={(value) => updateFormData({ rage: value })}
-              maxValue={10}
-              minValue={1}
+              maxValue={isW5 ? 5 : 10}
+              minValue={isW5 ? 0 : 1}
             />
           </div>
           <div className="flex items-center justify-between gap-4">
@@ -74,16 +84,30 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData }: S
               {t.lobisomem.willpowerLabel}
             </span>
             <DotRating
-              value={formData.willpower}
+              value={Math.min(formData.willpower, isW5 ? 5 : 10)}
               onChange={(value) => updateFormData({ willpower: value })}
-              maxValue={10}
-              minValue={1}
+              maxValue={isW5 ? 5 : 10}
+              minValue={isW5 ? 0 : 1}
             />
           </div>
+          {isW5 && (
+            <div className="flex items-center justify-between gap-4">
+              <span className="font-body text-sm min-w-[140px]">
+                {language === 'pt-BR' ? 'Harmonia' : 'Harmony'}
+              </span>
+              <DotRating
+                value={formData.harmony ?? 7}
+                onChange={(value) => updateFormData({ harmony: value })}
+                maxValue={10}
+                minValue={0}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      {/* Renown */}
+      {/* Renown — apenas W20/Metamorfos (W5 substitui por Harmonia) */}
+      {!isW5 && (
       <Card className="medieval-card">
         <CardHeader className="text-center pb-4">
           <CardTitle className="font-medieval text-2xl">
@@ -133,6 +157,7 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData }: S
           })()}
         </CardContent>
       </Card>
+      )}
 
       {/* Backgrounds */}
       <Card className="medieval-card">
