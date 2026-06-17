@@ -95,7 +95,7 @@ function getThemeBundle(
       cardOutlineHover: 'hover:bg-amber-500/10',
     };
   }
-  if (systemId === 'mago_m20') {
+  if (systemId === 'mago_m20' || systemId === 'mago_m5') {
     return {
       loadingIcon: <AdapterIcon className="w-8 h-8" />,
       loadingText: 'text-purple-500',
@@ -160,6 +160,7 @@ export default function StorytellerSession() {
           session_blood_pool, session_willpower_current, session_health_damage,
           session_gnosis, session_rage, session_form,
           session_w5_rage, session_w5_willpower_current, session_w5_harmony,
+          session_quintessence, session_paradox, session_arete,
           sheet_locked,
           characters:character_id (id, name, concept, game_system, experience_points, vampiro_data)
         `)
@@ -479,7 +480,7 @@ export default function StorytellerSession() {
            p.character?.game_system === 'lobisomem_w5',
   );
   const magoParticipants = participants.filter(
-    (p) => p.character?.game_system === 'mago_m20',
+    (p) => p.character?.game_system === 'mago_m20' || p.character?.game_system === 'mago_m5',
   );
 
   const openTestAsNarrator = () => {
@@ -579,6 +580,22 @@ export default function StorytellerSession() {
         initialForm: myParticipant.session_form || 'hominid',
       };
     }
+    if (myCharacter.game_system === 'mago_m5') {
+      const anyP = myParticipant as any;
+      return {
+        participantId: myParticipant.id,
+        sessionId: sessionId!,
+        sceneId: currentScene?.id || null,
+        character: myCharacter,
+        initialQuintessence: anyP.session_quintessence ?? 0,
+        initialParadox: anyP.session_paradox ?? 0,
+        initialArete: anyP.session_arete ?? 1,
+        initialWillpower: myParticipant.session_willpower_current ?? 0,
+        initialHealthDamage:
+          (myParticipant.session_health_damage as boolean[]) ||
+          [false, false, false, false, false, false, false],
+      };
+    }
     if (myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20') {
       return {
         ...base,
@@ -608,6 +625,16 @@ export default function StorytellerSession() {
               (myParticipant?.session_health_damage as boolean[]) ||
               Array(7).fill(false),
             form: myParticipant?.session_form || 'hominid',
+          }
+        : myCharacter?.game_system === 'mago_m5' || myCharacter?.game_system === 'mago_m20'
+        ? {
+            quintessence: (myParticipant as any)?.session_quintessence ?? 0,
+            paradox: (myParticipant as any)?.session_paradox ?? 0,
+            arete: (myParticipant as any)?.session_arete ?? 1,
+            willpower: myParticipant?.session_willpower_current ?? 0,
+            healthDamage:
+              (myParticipant?.session_health_damage as boolean[]) ||
+              Array(7).fill(false),
           }
         : (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
         ? {
@@ -655,6 +682,9 @@ export default function StorytellerSession() {
             : {}),
           ...(myCharacter.game_system === 'lobisomem_w5'
             ? { currentRage: (myParticipant as any)?.session_w5_rage ?? 0 }
+            : {}),
+          ...(myCharacter.game_system === 'mago_m5'
+            ? { currentParadox: (myParticipant as any)?.session_paradox ?? 0 }
             : {}),
         }
       : null;
@@ -918,6 +948,16 @@ export default function StorytellerSession() {
                   crit_bonus: result.critBonus,
                   is_messy_critical: result.isMessyCritical,
                   is_brutal_outcome: result.isBrutalOutcome,
+                  margin: result.margin,
+                }),
+                // M5 split-pool fields (Mago 5ed)
+                ...(result.mode === 'm5-split' && {
+                  mode: 'm5-split',
+                  normal_dice: result.normalDice,
+                  paradox_dice: result.paradoxDice,
+                  crit_bonus: result.critBonus,
+                  is_quiet_critical: result.isQuietCritical,
+                  is_backlash: result.isBacklash,
                   margin: result.margin,
                 }),
               },

@@ -12,6 +12,7 @@ import { lobisomemAdapter } from './adapters/lobisomemAdapter';
 import { magoAdapter } from './adapters/magoAdapter';
 import { metamorfosAdapter } from './adapters/metamorfosAdapter';
 import { lobisomemW5Adapter } from './adapters/lobisomemW5Adapter';
+import { magoM5Adapter } from './adapters/magoM5Adapter';
 import type { SystemAdapter, StorytellerSystemId, StorytellerEdition } from './types';
 
 const REGISTRY: Record<StorytellerSystemId, SystemAdapter> = {
@@ -20,6 +21,7 @@ const REGISTRY: Record<StorytellerSystemId, SystemAdapter> = {
   mago_m20: magoAdapter,
   metamorfos_w20: metamorfosAdapter,
   lobisomem_w5: lobisomemW5Adapter,
+  mago_m5: magoM5Adapter,
 };
 
 /** Lista de IDs de sistemas que rodam na sala unificada Storyteller */
@@ -29,6 +31,7 @@ export const STORYTELLER_SYSTEM_IDS: StorytellerSystemId[] = [
   'mago_m20',
   'metamorfos_w20',
   'lobisomem_w5',
+  'mago_m5',
 ];
 
 /**

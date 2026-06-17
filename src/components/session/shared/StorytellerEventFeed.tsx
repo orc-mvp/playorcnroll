@@ -29,6 +29,8 @@ export function StorytellerEventFeed({ events, gameSystem, currentUserId, isNarr
       />
     );
   }
+  // mago_m5 reaproveita o VampireEventFeed (renderização clássica funciona
+  // pois M5PendingTest/M5NarratorRollModal emitem `base_results` compatíveis).
   return (
     <VampireEventFeed
       events={events as any}

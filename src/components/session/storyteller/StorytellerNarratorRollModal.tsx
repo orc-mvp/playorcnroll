@@ -44,19 +44,25 @@ export interface StorytellerNarratorRollResult {
   poolId?: string;
   /** Se 10s explodiram nessa rolagem. */
   exploded: boolean;
-  /** Modo de resolução: 'classic' (default, omitido) ou 'w5-split'. */
-  mode?: 'classic' | 'w5-split';
-  /** W5: dados normais (sem Fúria). */
+  /** Modo de resolução: 'classic' (default, omitido), 'w5-split' ou 'm5-split'. */
+  mode?: 'classic' | 'w5-split' | 'm5-split';
+  /** W5/M5: dados normais. */
   normalDice?: number[];
   /** W5: dados de Fúria. */
   rageDice?: number[];
-  /** W5: bonus por pares de 10. */
+  /** M5: dados de Paradoxo. */
+  paradoxDice?: number[];
+  /** W5/M5: bonus por pares de 10. */
   critBonus?: number;
   /** W5: crítico envolvendo dado de Fúria. */
   isMessyCritical?: boolean;
   /** W5: falha com 1 em dado de Fúria. */
   isBrutalOutcome?: boolean;
-  /** W5: margem de sucessos (totalSuccesses - difficulty). */
+  /** M5: crítico envolvendo dado de Paradoxo. */
+  isQuietCritical?: boolean;
+  /** M5: falha com 1 em dado de Paradoxo. */
+  isBacklash?: boolean;
+  /** W5/M5: margem de sucessos (totalSuccesses - difficulty). */
   margin?: number;
 }
 
@@ -112,6 +118,7 @@ function performRoll(pool: number, difficulty: number, exploding: boolean) {
 }
 
 import W5NarratorRollModal from './W5NarratorRollModal';
+import M5NarratorRollModal from './M5NarratorRollModal';
 
 export function StorytellerNarratorRollModal({
   open,
@@ -123,16 +130,15 @@ export function StorytellerNarratorRollModal({
   const adapter = useMemo(() => getSystemAdapter(gameSystem), [gameSystem]);
   const config = adapter.narratorRollConfig;
 
-  // 5ed (W5) usa modal dedicado com pool dividido (normais + Fúria).
-  // Detectado pelo flag `mode: 'w5-split'` no adapter — não há overhead
-  // para sistemas clássicos.
+  // 5ed: cada sistema tem seu modal dedicado com pool dividido.
   if (config.mode === 'w5-split') {
     return (
-      <W5NarratorRollModal
-        open={open}
-        onOpenChange={onOpenChange}
-        onRollComplete={onRollComplete}
-      />
+      <W5NarratorRollModal open={open} onOpenChange={onOpenChange} onRollComplete={onRollComplete} />
+    );
+  }
+  if (config.mode === 'm5-split') {
+    return (
+      <M5NarratorRollModal open={open} onOpenChange={onOpenChange} onRollComplete={onRollComplete} />
     );
   }
 

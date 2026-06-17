@@ -17,7 +17,8 @@ export type StorytellerSystemId =
   | 'lobisomem_w20'
   | 'mago_m20'
   | 'metamorfos_w20'
-  | 'lobisomem_w5';
+  | 'lobisomem_w5'
+  | 'mago_m5';
 
 /**
  * Edição de regras. Sistemas Clássicos (V3/W20/M20/Metamorfos) são compatíveis
@@ -52,6 +53,12 @@ export interface StorytellerParticipant {
   session_w5_willpower_current?: number;
   /** Harmonia W5 (Lobisomem 5ed) — 0-10 */
   session_w5_harmony?: number;
+  /** Quintessência (Mago) — 0-20 clássico / 0-5 M5 */
+  session_quintessence?: number;
+  /** Paradoxo (Mago) — 0-20 clássico / 0-10 M5 */
+  session_paradox?: number;
+  /** Arête (Mago) — vem da ficha; sincronizada no tracker */
+  session_arete?: number;
   character?: {
     id: string;
     name: string;
@@ -201,7 +208,7 @@ export interface NarratorRollConfig {
    *    Pares de 10 = +2 sucessos. Messy Critical se 10 envolvido é de Fúria.
    *    Brutal Outcome se falha com 1 em dado de Fúria. Dificuldade = nº sucessos.
    */
-  mode?: 'classic' | 'w5-split';
+  mode?: 'classic' | 'w5-split' | 'm5-split';
 }
 
 /**
