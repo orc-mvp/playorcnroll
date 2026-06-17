@@ -48,3 +48,11 @@ type: feature
 - Sessões `lobisomem_w5` usam `WerewolfEventFeed` (rota em `StorytellerEventFeed`).
 - `vampire_test_result` e `narrator_roll` com `mode='w5-split'` renderizam normais + Fúria com cores próprias e badges **Messy Critical** / **Brutal Outcome** + "X / Y sucessos".
 - `StorytellerNarratorRollResult` carrega `mode`, `normalDice`, `rageDice`, `critBonus`, `isMessyCritical`, `isBrutalOutcome`, `margin`; `StorytellerSession` persiste no `event_data` apenas quando `mode='w5-split'`.
+
+## Sidebar do Narrador (W5)
+- `WerewolfNarratorSidebar` aceita W5 (`session_w5_*`): mostra Harmonia (0-10) no slot da Gnose, Fúria/Vontade capadas em 0-5, badge "5ed", e abre `NarratorTrackerAdjustModal` com `maxValue` correto. Grava em `session_w5_rage|willpower_current|harmony` via novos cases (`w5_rage|w5_willpower|w5_harmony`) no `confirmChange`.
+- `StorytellerSession` inclui `lobisomem_w5` no filtro `werewolfParticipants` para passar W5 ao sidebar.
+- `LobisomemCharacterSheet` agora aceita `sessionTrackers.harmony` (sobrepõe ao valor da ficha).
+
+## Pendente do jogador (W5)
+- `W5PendingTest` adicionou o tipo `harmony` (pool = harmony rating, sem dados de Fúria misturados).

@@ -475,7 +475,8 @@ export default function StorytellerSession() {
   );
   const werewolfParticipants = participants.filter(
     (p) => p.character?.game_system === 'lobisomem_w20' ||
-           p.character?.game_system === 'metamorfos_w20',
+           p.character?.game_system === 'metamorfos_w20' ||
+           p.character?.game_system === 'lobisomem_w5',
   );
   const magoParticipants = participants.filter(
     (p) => p.character?.game_system === 'mago_m20',
