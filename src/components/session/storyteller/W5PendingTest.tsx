@@ -118,6 +118,9 @@ export function W5PendingTest({
       case 'rage':
         pool = Math.min(5, currentRage);
         break;
+      case 'harmony':
+        pool = Math.min(10, (vampiroData as any).harmony ?? 7);
+        break;
       default:
         pool = 1;
     }
