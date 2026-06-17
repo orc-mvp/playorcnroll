@@ -479,7 +479,7 @@ export default function StorytellerSession() {
            p.character?.game_system === 'lobisomem_w5',
   );
   const magoParticipants = participants.filter(
-    (p) => p.character?.game_system === 'mago_m20',
+    (p) => p.character?.game_system === 'mago_m20' || p.character?.game_system === 'mago_m5',
   );
 
   const openTestAsNarrator = () => {
@@ -577,6 +577,22 @@ export default function StorytellerSession() {
           (myParticipant.session_health_damage as boolean[]) ||
           [false, false, false, false, false, false, false],
         initialForm: myParticipant.session_form || 'hominid',
+      };
+    }
+    if (myCharacter.game_system === 'mago_m5') {
+      const anyP = myParticipant as any;
+      return {
+        participantId: myParticipant.id,
+        sessionId: sessionId!,
+        sceneId: currentScene?.id || null,
+        character: myCharacter,
+        initialQuintessence: anyP.session_quintessence ?? 0,
+        initialParadox: anyP.session_paradox ?? 0,
+        initialArete: anyP.session_arete ?? 1,
+        initialWillpower: myParticipant.session_willpower_current ?? 0,
+        initialHealthDamage:
+          (myParticipant.session_health_damage as boolean[]) ||
+          [false, false, false, false, false, false, false],
       };
     }
     if (myCharacter.game_system === 'lobisomem_w20' || myCharacter.game_system === 'metamorfos_w20') {
