@@ -128,11 +128,11 @@ export function W5PendingTest({
   };
 
   const dicePool = calculatePool();
-  // Em 'rage' o pool já É de Fúria; em 'willpower' não mistura Fúria.
+  // 'rage' o pool já É de Fúria; 'willpower' e 'harmony' não misturam Fúria.
   const effectiveRage =
     config.testType === 'rage'
       ? Math.min(currentRage, dicePool)
-      : config.testType === 'willpower'
+      : config.testType === 'willpower' || config.testType === 'harmony'
         ? 0
         : Math.min(currentRage, dicePool);
 
