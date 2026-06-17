@@ -26,6 +26,7 @@ import {
   FileText,
   Flame,
   Zap,
+  Scale,
 } from 'lucide-react';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 import { isShifterData, getShifterAuspiceLabel } from '@/lib/lobisomem/auspiceLabels';
@@ -39,6 +40,9 @@ interface Participant {
   session_willpower_current?: number;
   session_health_damage?: boolean[];
   session_form?: string;
+  session_w5_rage?: number;
+  session_w5_willpower_current?: number;
+  session_w5_harmony?: number;
   experience_points?: number;
   sheet_locked?: boolean;
   character?: {
