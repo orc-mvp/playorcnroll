@@ -44,6 +44,20 @@ export interface StorytellerNarratorRollResult {
   poolId?: string;
   /** Se 10s explodiram nessa rolagem. */
   exploded: boolean;
+  /** Modo de resolução: 'classic' (default, omitido) ou 'w5-split'. */
+  mode?: 'classic' | 'w5-split';
+  /** W5: dados normais (sem Fúria). */
+  normalDice?: number[];
+  /** W5: dados de Fúria. */
+  rageDice?: number[];
+  /** W5: bonus por pares de 10. */
+  critBonus?: number;
+  /** W5: crítico envolvendo dado de Fúria. */
+  isMessyCritical?: boolean;
+  /** W5: falha com 1 em dado de Fúria. */
+  isBrutalOutcome?: boolean;
+  /** W5: margem de sucessos (totalSuccesses - difficulty). */
+  margin?: number;
 }
 
 interface Props {
