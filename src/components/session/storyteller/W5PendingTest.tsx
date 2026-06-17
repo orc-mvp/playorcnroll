@@ -331,6 +331,7 @@ export function W5PendingTest({
     if (config.testType === 'attribute_only') return config.attribute ?? '';
     if (config.testType === 'willpower') return 'Vontade';
     if (config.testType === 'rage') return 'Frenesi (Fúria)';
+    if (config.testType === 'harmony') return 'Harmonia';
     if (config.testType === 'raw_dice')
       return `${config.diceCount ?? 1} dados`;
     return config.testType;
