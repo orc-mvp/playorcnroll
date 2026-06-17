@@ -99,7 +99,7 @@ export function LobisomemPlayerSidePanel({
         </Card>
 
         {lobData?.gifts &&
-          Object.values(lobData.gifts).some((g) => (g as string[])?.length > 0) && (
+          Object.values(lobData.gifts).some((g) => (g as any[])?.length > 0) && (
             <Card className="medieval-card border-emerald-500/20">
               <CardHeader className="pb-2">
                 <CardTitle className="font-medieval text-sm flex items-center gap-2">
@@ -108,19 +108,30 @@ export function LobisomemPlayerSidePanel({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {[1, 2, 3, 4, 5].map((level) => {
-                    const gifts = (lobData.gifts as Record<number, string[]>)?.[level] || [];
+                    const gifts = (lobData.gifts as Record<number, any[]>)?.[level] || [];
                     if (gifts.length === 0) return null;
-                    return gifts.map((gift, i) => (
-                      <div
-                        key={`${level}-${i}`}
-                        className="text-sm font-body pl-2 border-l-2 border-emerald-500/30 py-0.5"
-                      >
-                        <span className="text-xs text-muted-foreground mr-1">{level}.</span>
-                        {gift}
-                      </div>
-                    ));
+                    return gifts.map((gift, i) => {
+                      const giftName = typeof gift === 'string' ? gift : (gift?.name ?? '');
+                      const giftDesc = typeof gift === 'string' ? '' : (gift?.description ?? '');
+                      return (
+                        <div
+                          key={`${level}-${i}`}
+                          className="text-sm font-body pl-2 border-l-2 border-emerald-500/30 py-0.5"
+                        >
+                          <div>
+                            <span className="text-xs text-muted-foreground mr-1">{level}.</span>
+                            {giftName}
+                          </div>
+                          {giftDesc && (
+                            <div className="text-xs text-muted-foreground whitespace-pre-wrap pl-4">
+                              {giftDesc}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
                   })}
                 </div>
               </CardContent>
