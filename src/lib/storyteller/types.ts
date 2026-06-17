@@ -17,7 +17,8 @@ export type StorytellerSystemId =
   | 'lobisomem_w20'
   | 'mago_m20'
   | 'metamorfos_w20'
-  | 'lobisomem_w5';
+  | 'lobisomem_w5'
+  | 'mago_m5';
 
 /**
  * Edição de regras. Sistemas Clássicos (V3/W20/M20/Metamorfos) são compatíveis
