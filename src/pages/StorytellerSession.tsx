@@ -950,6 +950,16 @@ export default function StorytellerSession() {
                   is_brutal_outcome: result.isBrutalOutcome,
                   margin: result.margin,
                 }),
+                // M5 split-pool fields (Mago 5ed)
+                ...(result.mode === 'm5-split' && {
+                  mode: 'm5-split',
+                  normal_dice: result.normalDice,
+                  paradox_dice: result.paradoxDice,
+                  crit_bonus: result.critBonus,
+                  is_quiet_critical: result.isQuietCritical,
+                  is_backlash: result.isBacklash,
+                  margin: result.margin,
+                }),
               },
             },
           ]);
