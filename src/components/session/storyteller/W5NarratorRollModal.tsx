@@ -81,6 +81,13 @@ export function W5NarratorRollModal({ open, onOpenChange, onRollComplete }: Prop
       context: context.trim() || undefined,
       poolId: rageDice > 0 ? 'rage' : undefined,
       exploded: false,
+      mode: 'w5-split',
+      normalDice: result.normalDice,
+      rageDice: result.rageDice,
+      critBonus: result.critBonus,
+      isMessyCritical: result.isMessyCritical,
+      isBrutalOutcome: result.isBrutalOutcome,
+      margin: result.margin,
     };
     onRollComplete(mapped);
   };
