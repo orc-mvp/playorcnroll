@@ -244,19 +244,32 @@ export function WerewolfNarratorSidebar({
             <div className="space-y-3">
               {participants.map((p) => {
                 const lobData = p.character?.vampiro_data as LobisomemCharacterData | null;
+                const isW5 = p.character?.game_system === 'lobisomem_w5';
+
                 const maxGnosis = lobData?.gnosis || 1;
-                const maxRage = lobData?.rage || 1;
-                const maxWillpower = lobData?.willpower || 1;
+                const maxRageW20 = lobData?.rage || 1;
+                const maxWpW20 = lobData?.willpower || 1;
+
                 const currentGnosis = p.session_gnosis || 0;
-                const currentRage = p.session_rage || 0;
-                const currentWillpower = p.session_willpower_current || 0;
+                const currentRageW20 = p.session_rage || 0;
+                const currentWpW20 = p.session_willpower_current || 0;
+
+                const currentRageW5 = p.session_w5_rage || 0;
+                const currentWpW5 = p.session_w5_willpower_current || 0;
+                const currentHarmony = p.session_w5_harmony ?? 7;
+
+                const currentRage = isW5 ? currentRageW5 : currentRageW20;
+                const currentWillpower = isW5 ? currentWpW5 : currentWpW20;
+                const maxRage = isW5 ? 5 : maxRageW20;
+                const maxWillpower = isW5 ? 5 : maxWpW20;
+
                 const healthDamage = p.session_health_damage || [];
                 const damagedLevels = healthDamage.filter(Boolean).length;
                 const currentForm = p.session_form || 'hominid';
 
-                const isGnosisCritical = currentGnosis === 0;
+                const isFirstCritical = isW5 ? currentHarmony === 0 : currentGnosis === 0;
                 const isWillpowerCritical = currentWillpower === 0;
-                const hasCriticalState = isGnosisCritical || isWillpowerCritical;
+                const hasCriticalState = isFirstCritical || isWillpowerCritical;
 
                 return (
                   <div
@@ -278,6 +291,9 @@ export function WerewolfNarratorSidebar({
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="font-medieval text-sm truncate">{p.character?.name || t.vampireSession.noCharacter}</p>
+                          {isW5 && (
+                            <Badge variant="outline" className="text-[9px] px-1.5 py-0 shrink-0 border-red-600/40 text-red-500">5ed</Badge>
+                          )}
                           {(p.experience_points ?? 0) > 0 && (
                             <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 font-mono">{p.experience_points} XP</Badge>
                           )}
@@ -317,36 +333,50 @@ export function WerewolfNarratorSidebar({
                     {/* Interactive Trackers Row */}
                     {p.character && (
                       <div className="grid grid-cols-4 gap-1.5 text-xs">
-                        {/* Gnosis */}
-                        <button
-                          type="button"
-                          onClick={() => openAdjustModal('blood' as TrackerType, currentGnosis, p.id, p.character?.name || '', undefined, maxGnosis, false, 'gnosis')}
-                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
-                            isGnosisCritical ? 'bg-amber-500/30 border-amber-500' : 'bg-emerald-500/10 border-emerald-500/20'
-                          }`}
-                        >
-                          {isGnosisCritical
-                            ? <Skull className="w-3 h-3 text-amber-500 mb-0.5 animate-pulse" />
-                            : <Sparkles className="w-3 h-3 text-emerald-500 mb-0.5" />}
-                          <span className={`font-medium ${isGnosisCritical ? 'text-amber-500' : 'text-emerald-500'}`}>{currentGnosis}</span>
-                          <span className="text-muted-foreground text-[9px]">{t.lobisomem?.gnosis || 'Gnose'}</span>
-                        </button>
+                        {/* First slot: Gnose (W20) ou Harmonia (W5) */}
+                        {isW5 ? (
+                          <button
+                            type="button"
+                            onClick={() => openAdjustModal('blood' as TrackerType, currentHarmony, p.id, p.character?.name || '', undefined, 10, false, 'w5_harmony')}
+                            className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                              currentHarmony === 0 ? 'bg-amber-500/30 border-amber-500' : 'bg-emerald-500/10 border-emerald-500/20'
+                            }`}
+                          >
+                            <Scale className={`w-3 h-3 mb-0.5 ${currentHarmony === 0 ? 'text-amber-500' : 'text-emerald-500'}`} />
+                            <span className={`font-medium ${currentHarmony === 0 ? 'text-amber-500' : 'text-emerald-500'}`}>{currentHarmony}/10</span>
+                            <span className="text-muted-foreground text-[9px]">Harmonia</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => openAdjustModal('blood' as TrackerType, currentGnosis, p.id, p.character?.name || '', undefined, maxGnosis, false, 'gnosis')}
+                            className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                              isFirstCritical ? 'bg-amber-500/30 border-amber-500' : 'bg-emerald-500/10 border-emerald-500/20'
+                            }`}
+                          >
+                            {isFirstCritical
+                              ? <Skull className="w-3 h-3 text-amber-500 mb-0.5 animate-pulse" />
+                              : <Sparkles className="w-3 h-3 text-emerald-500 mb-0.5" />}
+                            <span className={`font-medium ${isFirstCritical ? 'text-amber-500' : 'text-emerald-500'}`}>{currentGnosis}</span>
+                            <span className="text-muted-foreground text-[9px]">{t.lobisomem?.gnosis || 'Gnose'}</span>
+                          </button>
+                        )}
 
                         {/* Rage */}
                         <button
                           type="button"
-                          onClick={() => openAdjustModal('blood' as TrackerType, currentRage, p.id, p.character?.name || '', undefined, maxRage, false, 'rage')}
+                          onClick={() => openAdjustModal('blood' as TrackerType, currentRage, p.id, p.character?.name || '', undefined, maxRage, false, isW5 ? 'w5_rage' : 'rage')}
                           className="flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 bg-destructive/10 border-destructive/20"
                         >
                           <Flame className="w-3 h-3 text-destructive mb-0.5" />
-                          <span className="font-medium text-destructive">{currentRage}</span>
+                          <span className="font-medium text-destructive">{currentRage}{isW5 ? '/5' : ''}</span>
                           <span className="text-muted-foreground text-[9px]">{t.lobisomem?.rage || 'Fúria'}</span>
                         </button>
 
                         {/* Willpower */}
                         <button
                           type="button"
-                          onClick={() => openAdjustModal('willpower', currentWillpower, p.id, p.character?.name || '', undefined, maxWillpower, false, 'willpower')}
+                          onClick={() => openAdjustModal('willpower', currentWillpower, p.id, p.character?.name || '', undefined, maxWillpower, false, isW5 ? 'w5_willpower' : 'willpower')}
                           className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
                             isWillpowerCritical ? 'bg-amber-500/30 border-amber-500' : 'bg-muted/50 border-border'
                           }`}
