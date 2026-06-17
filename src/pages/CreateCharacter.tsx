@@ -121,7 +121,7 @@ export default function CreateCharacter() {
   const preSelectedSystem = searchParams.get('system');
   
   // Initialize state based on URL param
-  const VALID_PRE = ['vampiro_v3', 'herois_marcados', 'lobisomem_w20', 'mago_m20', 'metamorfos_w20', 'lobisomem_w5'];
+  const VALID_PRE = ['vampiro_v3', 'herois_marcados', 'lobisomem_w20', 'mago_m20', 'metamorfos_w20', 'lobisomem_w5', 'mago_m5'];
 
   const [gameSystem, setGameSystem] = useState<GameSystemId | null>(() => {
     if (preSelectedSystem && VALID_PRE.includes(preSelectedSystem)) {
@@ -154,6 +154,15 @@ export default function CreateCharacter() {
         harmony: prev.harmony ?? 7,
       }));
     }
+    if (gameSystem === 'mago_m5') {
+      setMagoFormData(prev => ({
+        ...prev,
+        arete: Math.min(prev.arete || 1, 5),
+        willpower: Math.min(prev.willpower || 3, 5),
+        quintessence: Math.min(prev.quintessence ?? 0, 5),
+        paradox: Math.min(prev.paradox ?? 0, 10),
+      }));
+    }
   }, [gameSystem]);
 
   // Block creation if user already has 3+ characters and is not premium
@@ -174,6 +183,7 @@ export default function CreateCharacter() {
     gameSystem === 'lobisomem_w5' ? 6 :
     gameSystem === 'metamorfos_w20' ? 6 :
     gameSystem === 'mago_m20' ? 7 :
+    gameSystem === 'mago_m5' ? 7 :
     4;
   const progress = ((step + 1) / totalSteps) * 100;
 
@@ -206,7 +216,7 @@ export default function CreateCharacter() {
         case 2: case 3: case 4: case 5: return true;
         default: return false;
       }
-    } else if (gameSystem === 'mago_m20') {
+    } else if (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') {
       switch (currentStep) {
         case 0: return gameSystem !== null && getGameSystem(gameSystem)?.available === true;
         case 1: return magoFormData.name.trim().length >= 2 && magoFormData.tradition.length > 0;
@@ -342,7 +352,12 @@ export default function CreateCharacter() {
           },
         });
         if (error) throw error;
-      } else if (gameSystem === 'mago_m20') {
+      } else if (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') {
+        const isM5 = gameSystem === 'mago_m5';
+        const arete = isM5 ? Math.min(magoFormData.arete, 5) : magoFormData.arete;
+        const willpower = isM5 ? Math.min(magoFormData.willpower, 5) : magoFormData.willpower;
+        const quintessence = isM5 ? Math.min(magoFormData.quintessence, 5) : magoFormData.quintessence;
+        const paradox = isM5 ? Math.min(magoFormData.paradox, 10) : magoFormData.paradox;
         const { error } = await supabase.from('characters').insert({
           user_id: user.id,
           name: magoFormData.name.trim(),
@@ -362,10 +377,10 @@ export default function CreateCharacter() {
             spheres: magoFormData.spheres,
             rotes: magoFormData.rotes,
             backgrounds: magoFormData.backgrounds,
-            arete: magoFormData.arete,
-            willpower: magoFormData.willpower,
-            quintessence: magoFormData.quintessence,
-            paradox: magoFormData.paradox,
+            arete,
+            willpower,
+            quintessence,
+            paradox,
             merits_flaws: magoFormData.merits_flaws || [],
           },
         });
@@ -374,7 +389,7 @@ export default function CreateCharacter() {
 
       const charName = gameSystem === 'vampiro_v3' ? vampiroFormData.name
         : (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') ? lobisomemFormData.name
-        : gameSystem === 'mago_m20' ? magoFormData.name
+        : (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') ? magoFormData.name
         : formData.name;
 
       toast({
