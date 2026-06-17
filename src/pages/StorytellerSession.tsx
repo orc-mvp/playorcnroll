@@ -909,6 +909,16 @@ export default function StorytellerSession() {
                 pool_id: result.poolId,
                 exploded: result.exploded,
                 scene_name: currentScene?.name || null,
+                // W5 split-pool fields (omitidos quando mode='classic')
+                ...(result.mode === 'w5-split' && {
+                  mode: 'w5-split',
+                  normal_dice: result.normalDice,
+                  rage_dice: result.rageDice,
+                  crit_bonus: result.critBonus,
+                  is_messy_critical: result.isMessyCritical,
+                  is_brutal_outcome: result.isBrutalOutcome,
+                  margin: result.margin,
+                }),
               },
             },
           ]);
