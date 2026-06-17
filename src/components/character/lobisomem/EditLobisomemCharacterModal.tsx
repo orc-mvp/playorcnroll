@@ -155,26 +155,37 @@ export function EditLobisomemCharacterModal({
     setLobData(prev => ({ ...prev, backgrounds: { ...prev.backgrounds, [key]: value } }));
   };
 
-  const updateGift = (level: number, index: number, value: string) => {
-    const gifts = { ...(lobData.gifts || {}) };
+  const updateGiftField = (
+    level: number,
+    index: number,
+    field: 'name' | 'description',
+    value: string,
+  ) => {
+    const gifts = { ...(lobData.gifts || {}) } as Record<number, any[]>;
     const levelGifts = [...(gifts[level] || [])];
-    levelGifts[index] = value;
+    const current = levelGifts[index];
+    const normalized =
+      typeof current === 'string'
+        ? { name: current, description: '' }
+        : { name: current?.name ?? '', description: current?.description ?? '' };
+    normalized[field] = value;
+    levelGifts[index] = normalized;
     gifts[level] = levelGifts;
-    setLobData(prev => ({ ...prev, gifts }));
+    setLobData(prev => ({ ...prev, gifts } as any));
   };
 
   const addGift = (level: number) => {
-    const gifts = { ...(lobData.gifts || {}) };
-    gifts[level] = [...(gifts[level] || []), ''];
-    setLobData(prev => ({ ...prev, gifts }));
+    const gifts = { ...(lobData.gifts || {}) } as Record<number, any[]>;
+    gifts[level] = [...(gifts[level] || []), { name: '', description: '' }];
+    setLobData(prev => ({ ...prev, gifts } as any));
   };
 
   const removeGift = (level: number, index: number) => {
-    const gifts = { ...(lobData.gifts || {}) };
+    const gifts = { ...(lobData.gifts || {}) } as Record<number, any[]>;
     const levelGifts = [...(gifts[level] || [])];
     levelGifts.splice(index, 1);
     gifts[level] = levelGifts;
-    setLobData(prev => ({ ...prev, gifts }));
+    setLobData(prev => ({ ...prev, gifts } as any));
   };
 
   const handleSave = async () => {
@@ -534,19 +545,32 @@ export function EditLobisomemCharacterModal({
                             <Plus className="w-3 h-3 mr-1" /> {t.lobisomem.addGift}
                           </Button>
                         </div>
-                        {levelGifts.map((gift: string, i: number) => (
-                          <div key={i} className="flex items-center gap-2">
-                            <Input
-                              value={gift}
-                              onChange={(e) => updateGift(level, i, e.target.value)}
-                              placeholder={t.lobisomem.giftPlaceholder}
-                              className="font-body flex-1"
-                            />
-                            <Button type="button" variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => removeGift(level, i)}>
-                              <X className="w-3 h-3" />
-                            </Button>
-                          </div>
-                        ))}
+                        {levelGifts.map((gift: any, i: number) => {
+                          const giftName = typeof gift === 'string' ? gift : (gift?.name ?? '');
+                          const giftDesc = typeof gift === 'string' ? '' : (gift?.description ?? '');
+                          return (
+                            <div key={i} className="space-y-1 rounded-md border border-border/60 p-2">
+                              <div className="flex items-center gap-2">
+                                <Input
+                                  value={giftName}
+                                  onChange={(e) => updateGiftField(level, i, 'name', e.target.value)}
+                                  placeholder={t.lobisomem.giftPlaceholder}
+                                  className="font-body flex-1"
+                                />
+                                <Button type="button" variant="ghost" size="icon" className="shrink-0 h-8 w-8" onClick={() => removeGift(level, i)}>
+                                  <X className="w-3 h-3" />
+                                </Button>
+                              </div>
+                              <textarea
+                                value={giftDesc}
+                                onChange={(e) => updateGiftField(level, i, 'description', e.target.value)}
+                                placeholder={language === 'pt-BR' ? 'Descrição (opcional)' : 'Description (optional)'}
+                                rows={2}
+                                className="w-full text-sm rounded-md border border-input bg-background px-3 py-2 font-body"
+                              />
+                            </div>
+                          );
+                        })}
                       </div>
                     );
                   })}

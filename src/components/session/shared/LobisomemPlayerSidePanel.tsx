@@ -39,6 +39,10 @@ export function LobisomemPlayerSidePanel({
   const { t, language } = useI18n();
   const lobData = character?.vampiro_data as LobisomemCharacterData | null;
   const [showSheet, setShowSheet] = useState(false);
+  const isW5 = (character as any)?.game_system === 'lobisomem_w5';
+  const w5Rage = (sessionTrackers as any)?.rage ?? 0;
+  const w5Willpower = (sessionTrackers as any)?.willpower ?? 0;
+  const w5Harmony = (sessionTrackers as any)?.harmony ?? 7;
 
   if (!character) {
     return (
@@ -99,7 +103,7 @@ export function LobisomemPlayerSidePanel({
         </Card>
 
         {lobData?.gifts &&
-          Object.values(lobData.gifts).some((g) => (g as string[])?.length > 0) && (
+          Object.values(lobData.gifts).some((g) => (g as any[])?.length > 0) && (
             <Card className="medieval-card border-emerald-500/20">
               <CardHeader className="pb-2">
                 <CardTitle className="font-medieval text-sm flex items-center gap-2">
@@ -108,26 +112,91 @@ export function LobisomemPlayerSidePanel({
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {[1, 2, 3, 4, 5].map((level) => {
-                    const gifts = (lobData.gifts as Record<number, string[]>)?.[level] || [];
+                    const gifts = (lobData.gifts as Record<number, any[]>)?.[level] || [];
                     if (gifts.length === 0) return null;
-                    return gifts.map((gift, i) => (
-                      <div
-                        key={`${level}-${i}`}
-                        className="text-sm font-body pl-2 border-l-2 border-emerald-500/30 py-0.5"
-                      >
-                        <span className="text-xs text-muted-foreground mr-1">{level}.</span>
-                        {gift}
-                      </div>
-                    ));
+                    return gifts.map((gift, i) => {
+                      const giftName = typeof gift === 'string' ? gift : (gift?.name ?? '');
+                      const giftDesc = typeof gift === 'string' ? '' : (gift?.description ?? '');
+                      return (
+                        <div
+                          key={`${level}-${i}`}
+                          className="text-sm font-body pl-2 border-l-2 border-emerald-500/30 py-0.5"
+                        >
+                          <div>
+                            <span className="text-xs text-muted-foreground mr-1">{level}.</span>
+                            {giftName}
+                          </div>
+                          {giftDesc && (
+                            <div className="text-xs text-muted-foreground whitespace-pre-wrap pl-4">
+                              {giftDesc}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
                   })}
                 </div>
               </CardContent>
             </Card>
           )}
 
-        {lobData?.renown &&
+        {isW5 && (
+          <Card className="medieval-card border-red-600/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-medieval text-sm flex items-center gap-2">
+                <Crown className="w-4 h-4 text-red-600" />
+                Trackers 5ed
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 text-sm font-body">
+                <div className="flex items-center justify-between">
+                  <span className="text-red-600">Fúria</span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          i < w5Rage ? 'bg-red-600' : 'bg-muted-foreground/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Vontade</span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          i < w5Willpower ? 'bg-foreground' : 'bg-muted-foreground/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-emerald-500">Harmonia</span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2 h-2 rounded-full ${
+                          i < w5Harmony ? 'bg-emerald-500' : 'bg-muted-foreground/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {!isW5 && lobData?.renown &&
           (lobData.renown.glory > 0 || lobData.renown.honor > 0 || lobData.renown.wisdom > 0) && (
             <Card className="medieval-card border-emerald-500/20">
               <CardHeader className="pb-2">

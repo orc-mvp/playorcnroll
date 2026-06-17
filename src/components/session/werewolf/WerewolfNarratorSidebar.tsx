@@ -312,10 +312,16 @@ export function WerewolfNarratorSidebar({
                     </Badge>
 
                     {/* Gifts summary */}
-                    {lobData?.gifts && Object.values(lobData.gifts).some(g => g?.length > 0) && (
+                    {lobData?.gifts && Object.values(lobData.gifts).some((g: any) => g?.length > 0) && (
                       <div className="flex flex-wrap gap-1">
                         {Object.entries(lobData.gifts)
-                          .flatMap(([level, gifts]) => (gifts || []).map(g => ({ level: Number(level), name: g })))
+                          .flatMap(([level, gifts]: [string, any]) =>
+                            (gifts || []).map((g: any) => ({
+                              level: Number(level),
+                              name: typeof g === 'string' ? g : (g?.name ?? ''),
+                            })),
+                          )
+                          .filter((g) => g.name)
                           .slice(0, 3)
                           .map((g, i) => (
                             <Badge key={i} variant="outline" className="text-[10px] px-1.5 py-0">

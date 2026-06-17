@@ -182,6 +182,48 @@ export function W5PendingTest({
           ),
         },
       ]);
+
+      // Brutal Outcome → -1 Harmonia (clamped a 0). Lê o valor atual e grava.
+      if (r.isBrutalOutcome) {
+        try {
+          const { data: row } = await supabase
+            .from('session_participants')
+            .select('id, session_w5_harmony')
+            .eq('session_id', sessionId)
+            .eq('character_id', characterId)
+            .maybeSingle();
+          if (row) {
+            const current = (row as any).session_w5_harmony ?? 7;
+            const next = Math.max(0, current - 1);
+            if (next !== current) {
+              await supabase
+                .from('session_participants')
+                .update({ session_w5_harmony: next } as any)
+                .eq('id', (row as any).id);
+              await supabase.from('session_events').insert([
+                {
+                  session_id: sessionId,
+                  scene_id: sceneId,
+                  event_type: 'tracker_update',
+                  event_data: JSON.parse(
+                    JSON.stringify({
+                      character_id: characterId,
+                      character_name: characterName,
+                      tracker: 'harmony',
+                      previous: current,
+                      next,
+                      reason: 'brutal_outcome',
+                    }),
+                  ),
+                },
+              ]);
+            }
+          }
+        } catch (e) {
+          if (import.meta.env.DEV) console.error('W5 harmony decrement error', e);
+        }
+      }
+
       toast({
         title: r.isBrutalOutcome
           ? 'Brutal Outcome'
@@ -190,6 +232,7 @@ export function W5PendingTest({
             : r.passed
               ? t.vampiroTests.success
               : t.vampiroTests.failure,
+        description: r.isBrutalOutcome ? 'Harmonia -1' : undefined,
       });
     } catch (e) {
       if (import.meta.env.DEV) console.error('W5 test save error', e);

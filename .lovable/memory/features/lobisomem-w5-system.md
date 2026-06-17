@@ -39,10 +39,10 @@ type: feature
 - `getSessionEdition(allowed_systems)` em `systemRegistry.ts`.
 
 ## Wizard, ficha e edição
-## Wizard, ficha e edição
 - `StepLobisomemBackgrounds`, `LobisomemCharacterSheet` e `EditLobisomemCharacterModal` aceitam o sistema e, em W5: ocultam Gnose e Renome, exibem Harmonia (0-10, default 7) e capam Rage/Vontade em 0-5.
 - `CreateCharacter` inicializa defaults W5 (rage=1, willpower=3, harmony=7, gnosis=0) ao selecionar o sistema e persiste `harmony` (não grava `renown` em W5).
 - `LobisomemCharacterSheet` recebe `game_system` via prop (passada em CharacterSheet, narrator sidebar e player side panel).
+- **Dons**: formato passou a ser `{ name, description }` por item (com fallback retro p/ string). `StepLobisomemGifts` e os edit modals (Lobisomem + Metamorfos) têm campos nome + descrição; sheet, side panel e sidebar do narrador exibem descrição abaixo do nome quando presente. Helper em `src/lib/lobisomem/giftUtils.ts`.
 
 ## Feed de eventos
 - Sessões `lobisomem_w5` usam `WerewolfEventFeed` (rota em `StorytellerEventFeed`).
@@ -54,5 +54,9 @@ type: feature
 - `StorytellerSession` inclui `lobisomem_w5` no filtro `werewolfParticipants` para passar W5 ao sidebar.
 - `LobisomemCharacterSheet` agora aceita `sessionTrackers.harmony` (sobrepõe ao valor da ficha).
 
+## Painel do Jogador (W5)
+- `LobisomemPlayerSidePanel` detecta `game_system='lobisomem_w5'` e troca o card de Renome por um card "Trackers 5ed" com Fúria (0-5, vermelho), Vontade (0-5) e Harmonia (0-10, esmeralda).
+
 ## Pendente do jogador (W5)
 - `W5PendingTest` adicionou o tipo `harmony` (pool = harmony rating, sem dados de Fúria misturados).
+- **Brutal Outcome automático**: após rolagem com `isBrutalOutcome`, decrementa `session_w5_harmony` em 1 (mínimo 0) e registra `tracker_update` com `reason='brutal_outcome'` no feed.
