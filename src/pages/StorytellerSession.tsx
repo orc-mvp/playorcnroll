@@ -95,7 +95,7 @@ function getThemeBundle(
       cardOutlineHover: 'hover:bg-amber-500/10',
     };
   }
-  if (systemId === 'mago_m20') {
+  if (systemId === 'mago_m20' || systemId === 'mago_m5') {
     return {
       loadingIcon: <AdapterIcon className="w-8 h-8" />,
       loadingText: 'text-purple-500',
