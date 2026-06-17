@@ -120,6 +120,56 @@ export function WerewolfEventFeed({ events, currentUserId, isNarrator = false }:
   const totalPages = Math.ceil(filteredEvents.length / ITEMS_PER_PAGE);
   const paginatedEvents = filteredEvents.slice(currentPage * ITEMS_PER_PAGE, (currentPage + 1) * ITEMS_PER_PAGE);
 
+  const renderW5Dice = (
+    normalDice: number[] = [],
+    rageDice: number[] = [],
+    difficulty: number,
+    totalSuccesses: number,
+    critBonus: number,
+    isMessy: boolean,
+    isBrutal: boolean,
+    passed: boolean,
+  ) => (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-1 items-center">
+        {normalDice.map((die, i) => (
+          <span key={`n-${i}`} className={cn("inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+            die === 10 ? 'bg-yellow-500/30 text-yellow-500 ring-1 ring-yellow-400'
+              : die >= 6 ? 'bg-green-500/20 text-green-500'
+              : 'bg-muted text-muted-foreground'
+          )}>{die}</span>
+        ))}
+        {rageDice.length > 0 && <Flame className="w-3 h-3 text-red-600 mx-1 shrink-0" />}
+        {rageDice.map((die, i) => (
+          <span key={`r-${i}`} className={cn("inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold ring-2",
+            die === 10 ? 'bg-red-600/30 text-red-600 ring-red-500'
+              : die === 1 ? 'bg-red-900/40 text-red-300 ring-red-700'
+              : die >= 6 ? 'bg-green-500/20 text-green-500 ring-red-600/40'
+              : 'bg-muted text-muted-foreground ring-red-600/40'
+          )}>{die}</span>
+        ))}
+      </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        {isMessy && (
+          <Badge className="bg-yellow-500 text-xs flex items-center gap-1">
+            <Sparkles className="w-3 h-3" /> Messy Critical
+          </Badge>
+        )}
+        {isBrutal && (
+          <Badge variant="destructive" className="text-xs flex items-center gap-1">
+            <AlertTriangle className="w-3 h-3" /> Brutal Outcome
+          </Badge>
+        )}
+        <Badge variant={passed ? 'default' : 'secondary'} className={cn("text-xs", passed && 'bg-green-600')}>
+          {totalSuccesses} / {difficulty} sucessos
+        </Badge>
+        {critBonus > 0 && (
+          <span className="text-xs text-muted-foreground">+{critBonus} crítico</span>
+        )}
+      </div>
+    </div>
+  );
+
   const renderTestResult = (eventData: Record<string, unknown>) => {
     const characterName = eventData.character_name as string;
     const testConfig = eventData.test_config as Record<string, unknown>;
@@ -131,6 +181,7 @@ export function WerewolfEventFeed({ events, currentUserId, isNarrator = false }:
     const extraResults = (eventData.extra_results as number[]) || [];
     const difficulty = testConfig?.difficulty as number;
     const dicePool = eventData.dice_pool as number;
+    const isW5 = eventData.mode === 'w5-split';
 
     return (
       <div className="space-y-2">
@@ -144,27 +195,42 @@ export function WerewolfEventFeed({ events, currentUserId, isNarrator = false }:
           <span className="text-sm font-medium">{getTestLabel(testConfig || {}, t)}</span>
           {isPrivate && <Lock className="w-3 h-3 text-muted-foreground" />}
         </div>
-        <div className="flex flex-wrap gap-1">
-          {baseResults?.map((die, i) => (
-            <span key={`b-${i}`} className={cn("inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
-              die >= difficulty ? 'bg-green-500/20 text-green-500' : die === 1 ? 'bg-destructive/20 text-destructive' : 'bg-muted text-muted-foreground'
-            )}>{die}</span>
-          ))}
-          {extraResults?.map((die, i) => (
-            <span key={`e-${i}`} className={cn("inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold border border-dashed",
-              die >= difficulty ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500' : die === 1 ? 'bg-destructive/20 text-destructive border-destructive' : 'bg-muted text-muted-foreground border-muted-foreground'
-            )}>{die}</span>
-          ))}
-        </div>
-        <div className="flex items-center gap-2">
-          {isBotch ? <Badge variant="destructive" className="text-xs">{t.vampiroTests?.botch || 'Falha Crítica'}</Badge>
-            : isExceptional ? <Badge className="bg-yellow-500 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'} — {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}</Badge>
-            : finalSuccesses > 0 ? <Badge variant="default" className="bg-green-600 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'}</Badge>
-            : <Badge variant="secondary" className="text-xs">{t.vampiroTests?.failure || 'Falha'}</Badge>}
-          <span className="text-xs text-muted-foreground">
-            {t.vampiroTests?.poolLabel || 'Pool'}: {dicePool} | {t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}
-          </span>
-        </div>
+        {isW5 ? (
+          renderW5Dice(
+            (eventData.normal_dice as number[]) || [],
+            (eventData.rage_dice as number[]) || [],
+            difficulty,
+            finalSuccesses,
+            (eventData.crit_bonus as number) || 0,
+            eventData.is_messy_critical as boolean,
+            eventData.is_brutal_outcome as boolean,
+            (eventData.passed as boolean) ?? finalSuccesses >= difficulty,
+          )
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-1">
+              {baseResults?.map((die, i) => (
+                <span key={`b-${i}`} className={cn("inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+                  die >= difficulty ? 'bg-green-500/20 text-green-500' : die === 1 ? 'bg-destructive/20 text-destructive' : 'bg-muted text-muted-foreground'
+                )}>{die}</span>
+              ))}
+              {extraResults?.map((die, i) => (
+                <span key={`e-${i}`} className={cn("inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold border border-dashed",
+                  die >= difficulty ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500' : die === 1 ? 'bg-destructive/20 text-destructive border-destructive' : 'bg-muted text-muted-foreground border-muted-foreground'
+                )}>{die}</span>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              {isBotch ? <Badge variant="destructive" className="text-xs">{t.vampiroTests?.botch || 'Falha Crítica'}</Badge>
+                : isExceptional ? <Badge className="bg-yellow-500 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'} — {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}</Badge>
+                : finalSuccesses > 0 ? <Badge variant="default" className="bg-green-600 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'}</Badge>
+                : <Badge variant="secondary" className="text-xs">{t.vampiroTests?.failure || 'Falha'}</Badge>}
+              <span className="text-xs text-muted-foreground">
+                {t.vampiroTests?.poolLabel || 'Pool'}: {dicePool} | {t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}
+              </span>
+            </div>
+          </>
+        )}
       </div>
     );
   };
@@ -298,28 +364,49 @@ export function WerewolfEventFeed({ events, currentUserId, isNarrator = false }:
     const isBotch = eventData.is_botch as boolean;
     const isExceptional = eventData.is_exceptional as boolean;
     const context = eventData.context as string | undefined;
+    const isW5 = eventData.mode === 'w5-split';
 
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <Dices className="w-4 h-4 text-emerald-500 shrink-0" />
+          <Dices className={cn("w-4 h-4 shrink-0", isW5 ? 'text-red-600' : 'text-emerald-500')} />
           <span className="font-medieval text-sm">{t.vampiroTests?.narratorRolled || 'Narrador rolou'}</span>
-          <Badge variant="outline" className="text-xs">{eventData.dice_count as number}d10 | {t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}</Badge>
+          <Badge variant="outline" className="text-xs">
+            {eventData.dice_count as number}d10
+            {isW5
+              ? ` | ${(eventData.rage_dice as number[] | undefined)?.length ?? 0} Fúria | Suc: ${difficulty}`
+              : ` | ${t.vampiroTests?.difficultyLabel || 'Dif'}: ${difficulty}`}
+          </Badge>
         </div>
         {context && <p className="text-xs text-muted-foreground italic">"{context}"</p>}
-        <div className="flex flex-wrap gap-1">
-          {results?.map((die, i) => (
-            <span key={i} className={cn("inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
-              die >= difficulty ? 'bg-green-500/20 text-green-500' : die === 1 ? 'bg-destructive/20 text-destructive' : 'bg-muted text-muted-foreground'
-            )}>{die}</span>
-          ))}
-        </div>
-        <div className="flex items-center gap-2">
-          {isBotch ? <Badge variant="destructive" className="text-xs">{t.vampiroTests?.botch || 'Falha Crítica'}</Badge>
-            : isExceptional ? <Badge className="bg-yellow-500 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'} — {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}</Badge>
-            : finalSuccesses > 0 ? <Badge variant="default" className="bg-green-600 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'}</Badge>
-            : <Badge variant="secondary" className="text-xs">{t.vampiroTests?.failure || 'Falha'}</Badge>}
-        </div>
+        {isW5 ? (
+          renderW5Dice(
+            (eventData.normal_dice as number[]) || [],
+            (eventData.rage_dice as number[]) || [],
+            difficulty,
+            finalSuccesses,
+            (eventData.crit_bonus as number) || 0,
+            eventData.is_messy_critical as boolean,
+            eventData.is_brutal_outcome as boolean,
+            finalSuccesses >= difficulty,
+          )
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-1">
+              {results?.map((die, i) => (
+                <span key={i} className={cn("inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+                  die >= difficulty ? 'bg-green-500/20 text-green-500' : die === 1 ? 'bg-destructive/20 text-destructive' : 'bg-muted text-muted-foreground'
+                )}>{die}</span>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              {isBotch ? <Badge variant="destructive" className="text-xs">{t.vampiroTests?.botch || 'Falha Crítica'}</Badge>
+                : isExceptional ? <Badge className="bg-yellow-500 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'} — {t.vampiroTests?.exceptional || 'Sucesso Excepcional'}</Badge>
+                : finalSuccesses > 0 ? <Badge variant="default" className="bg-green-600 text-xs">{finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'}</Badge>
+                : <Badge variant="secondary" className="text-xs">{t.vampiroTests?.failure || 'Falha'}</Badge>}
+            </div>
+          </>
+        )}
       </div>
     );
   };

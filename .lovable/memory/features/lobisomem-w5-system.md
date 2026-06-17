@@ -39,6 +39,12 @@ type: feature
 - `getSessionEdition(allowed_systems)` em `systemRegistry.ts`.
 
 ## Wizard, ficha e edição
+## Wizard, ficha e edição
 - `StepLobisomemBackgrounds`, `LobisomemCharacterSheet` e `EditLobisomemCharacterModal` aceitam o sistema e, em W5: ocultam Gnose e Renome, exibem Harmonia (0-10, default 7) e capam Rage/Vontade em 0-5.
 - `CreateCharacter` inicializa defaults W5 (rage=1, willpower=3, harmony=7, gnosis=0) ao selecionar o sistema e persiste `harmony` (não grava `renown` em W5).
 - `LobisomemCharacterSheet` recebe `game_system` via prop (passada em CharacterSheet, narrator sidebar e player side panel).
+
+## Feed de eventos
+- Sessões `lobisomem_w5` usam `WerewolfEventFeed` (rota em `StorytellerEventFeed`).
+- `vampire_test_result` e `narrator_roll` com `mode='w5-split'` renderizam normais + Fúria com cores próprias e badges **Messy Critical** / **Brutal Outcome** + "X / Y sucessos".
+- `StorytellerNarratorRollResult` carrega `mode`, `normalDice`, `rageDice`, `critBonus`, `isMessyCritical`, `isBrutalOutcome`, `margin`; `StorytellerSession` persiste no `event_data` apenas quando `mode='w5-split'`.
