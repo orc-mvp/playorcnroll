@@ -167,6 +167,15 @@ export function WerewolfNarratorSidebar({
         case 'willpower':
           updateData.session_willpower_current = pendingChange.newValue;
           break;
+        case 'w5_rage':
+          updateData.session_w5_rage = pendingChange.newValue;
+          break;
+        case 'w5_willpower':
+          updateData.session_w5_willpower_current = pendingChange.newValue;
+          break;
+        case 'w5_harmony':
+          updateData.session_w5_harmony = pendingChange.newValue;
+          break;
         case 'health':
           const newHealth = Array(7).fill(false);
           for (let i = 0; i < pendingChange.newValue; i++) newHealth[i] = true;
