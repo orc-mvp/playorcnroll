@@ -564,37 +564,37 @@ export default function CreateCharacter() {
         )}
 
         {/* Mago Steps */}
-        {step === 1 && gameSystem === 'mago_m20' && (
+        {step === 1 && (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') && (
           <StepMagoBasicInfo
             formData={magoFormData}
             updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 2 && gameSystem === 'mago_m20' && (
+        {step === 2 && (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') && (
           <StepMagoAttributes
             formData={magoFormData}
             updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 3 && gameSystem === 'mago_m20' && (
+        {step === 3 && (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') && (
           <StepMagoSpheres
             formData={magoFormData}
             updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 4 && gameSystem === 'mago_m20' && (
+        {step === 4 && (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') && (
           <StepMagoRotes
             formData={magoFormData}
             updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 5 && gameSystem === 'mago_m20' && (
+        {step === 5 && (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') && (
           <StepMagoBackgrounds
             formData={magoFormData}
             updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
           />
         )}
-        {step === 6 && gameSystem === 'mago_m20' && (
+        {step === 6 && (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') && (
           <StepMagoMeritsFlaws
             formData={magoFormData}
             updateFormData={(u) => setMagoFormData(prev => ({ ...prev, ...u }))}
@@ -622,7 +622,7 @@ export default function CreateCharacter() {
                 (gameSystem === 'lobisomem_w20' && (!lobisomemFormData.name.trim() || !lobisomemFormData.tribe)) ||
                 (gameSystem === 'lobisomem_w5' && (!lobisomemFormData.name.trim() || !lobisomemFormData.tribe)) ||
                 (gameSystem === 'metamorfos_w20' && !lobisomemFormData.name.trim()) ||
-                (gameSystem === 'mago_m20' && (!magoFormData.name.trim() || !magoFormData.tradition)) ||
+                ((gameSystem === 'mago_m20' || gameSystem === 'mago_m5') && (!magoFormData.name.trim() || !magoFormData.tradition)) ||
                 isSubmitting
               }
             >
