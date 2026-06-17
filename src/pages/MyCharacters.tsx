@@ -78,6 +78,7 @@ const systemIcons: Record<string, React.ElementType> = {
   mago_m20: Star,
   metamorfos_w20: PawPrint,
   lobisomem_w5: Moon,
+  mago_m5: Star,
 };
 
 export default function MyCharacters() {
@@ -199,7 +200,9 @@ export default function MyCharacters() {
               ? 'text-amber-500'
               : systemId === 'lobisomem_w5'
                 ? 'text-red-600'
-                : 'text-primary';
+                : systemId === 'mago_m5'
+                  ? 'text-purple-600'
+                  : 'text-primary';
     return { system, Icon, color };
   };
 

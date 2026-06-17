@@ -44,7 +44,7 @@ function getSystemConfig(gameSystem?: string) {
       decorationClass: 'decoration-emerald-500/30',
     };
   }
-  if (gameSystem === 'mago_m20') {
+  if (gameSystem === 'mago_m20' || gameSystem === 'mago_m5') {
     return {
       icon: <Sparkles className="w-6 h-6 text-purple-500" />,
       badgeLabel: 'Mago: A Ascensão',

@@ -253,7 +253,7 @@ export default function CharacterSheet() {
                   setShowVampiroEditModal(true);
                 } else if (character.game_system === 'lobisomem_w20' || character.game_system === 'lobisomem_w5') {
                   setShowLobisomemEditModal(true);
-                } else if (character.game_system === 'mago_m20') {
+                } else if (character.game_system === 'mago_m20' || character.game_system === 'mago_m5') {
                   setShowMagoEditModal(true);
                 } else if (character.game_system === 'metamorfos_w20') {
                   setShowMetamorfosEditModal(true);
@@ -296,7 +296,7 @@ export default function CharacterSheet() {
                 game_system: character.game_system,
               }}
             />
-          ) : character.game_system === 'mago_m20' ? (
+          ) : (character.game_system === 'mago_m20' || character.game_system === 'mago_m5') ? (
             <MagoCharacterSheet
               character={{
                 id: character.id,
@@ -716,6 +716,7 @@ export default function CharacterSheet() {
         character.game_system !== 'lobisomem_w20' &&
         character.game_system !== 'lobisomem_w5' &&
         character.game_system !== 'mago_m20' &&
+        character.game_system !== 'mago_m5' &&
         character.game_system !== 'metamorfos_w20' && (
           <EditCharacterModal
             open={showEditModal}
@@ -748,7 +749,7 @@ export default function CharacterSheet() {
       )}
 
       {/* Edit Character Modal - Mago */}
-      {character && character.game_system === 'mago_m20' && (
+      {character && (character.game_system === 'mago_m20' || character.game_system === 'mago_m5') && (
         <EditMagoCharacterModal
           open={showMagoEditModal}
           onOpenChange={setShowMagoEditModal}

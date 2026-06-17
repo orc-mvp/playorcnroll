@@ -249,6 +249,7 @@ export function getSceneThemeForSystem(systemId: string): ThemeClasses {
     case 'metamorfos_w20':
       return SCENE_PANEL_THEMES.werewolf;
     case 'mago_m20':
+    case 'mago_m5':
       return SCENE_PANEL_THEMES.mage;
     default:
       return SCENE_PANEL_THEMES.vampire;
