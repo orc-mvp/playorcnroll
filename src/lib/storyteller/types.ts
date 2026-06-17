@@ -202,7 +202,7 @@ export interface NarratorRollConfig {
    *    Pares de 10 = +2 sucessos. Messy Critical se 10 envolvido é de Fúria.
    *    Brutal Outcome se falha com 1 em dado de Fúria. Dificuldade = nº sucessos.
    */
-  mode?: 'classic' | 'w5-split';
+  mode?: 'classic' | 'w5-split' | 'm5-split';
 }
 
 /**
