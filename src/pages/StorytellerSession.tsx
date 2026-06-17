@@ -626,6 +626,16 @@ export default function StorytellerSession() {
               Array(7).fill(false),
             form: myParticipant?.session_form || 'hominid',
           }
+        : myCharacter?.game_system === 'mago_m5' || myCharacter?.game_system === 'mago_m20'
+        ? {
+            quintessence: (myParticipant as any)?.session_quintessence ?? 0,
+            paradox: (myParticipant as any)?.session_paradox ?? 0,
+            arete: (myParticipant as any)?.session_arete ?? 1,
+            willpower: myParticipant?.session_willpower_current ?? 0,
+            healthDamage:
+              (myParticipant?.session_health_damage as boolean[]) ||
+              Array(7).fill(false),
+          }
         : (myCharacter?.game_system === 'lobisomem_w20' || myCharacter?.game_system === 'metamorfos_w20')
         ? {
             gnosis: myParticipant?.session_gnosis ?? 0,
@@ -672,6 +682,9 @@ export default function StorytellerSession() {
             : {}),
           ...(myCharacter.game_system === 'lobisomem_w5'
             ? { currentRage: (myParticipant as any)?.session_w5_rage ?? 0 }
+            : {}),
+          ...(myCharacter.game_system === 'mago_m5'
+            ? { currentParadox: (myParticipant as any)?.session_paradox ?? 0 }
             : {}),
         }
       : null;
