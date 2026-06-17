@@ -443,12 +443,19 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
                       <h5 className="font-medieval text-xs text-muted-foreground/70 mb-1">
                         {(t.lobisomem.giftLevel as string).replace('{level}', String(level))}
                       </h5>
-                      <div className="space-y-0.5">
-                        {levelGifts.map((gift: string, i: number) => (
-                          <div key={i} className="text-sm font-body pl-2 border-l-2 border-emerald-500/30 py-0.5">
-                            {gift}
-                          </div>
-                        ))}
+                      <div className="space-y-1">
+                        {levelGifts.map((gift: any, i: number) => {
+                          const giftName = typeof gift === 'string' ? gift : (gift?.name ?? '');
+                          const giftDesc = typeof gift === 'string' ? '' : (gift?.description ?? '');
+                          return (
+                            <div key={i} className="text-sm font-body pl-2 border-l-2 border-emerald-500/30 py-0.5">
+                              <div>{giftName}</div>
+                              {giftDesc && (
+                                <div className="text-xs text-muted-foreground whitespace-pre-wrap">{giftDesc}</div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
