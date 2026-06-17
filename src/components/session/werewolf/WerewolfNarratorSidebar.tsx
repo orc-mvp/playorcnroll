@@ -435,26 +435,39 @@ export function WerewolfNarratorSidebar({
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-auto">
-            {selectedCharacter && selectedCharacter.vampiro_data && (
-              <LobisomemCharacterSheet
-                character={{
-                  id: selectedCharacter.id,
-                  name: selectedCharacter.name,
-                  concept: selectedCharacter.concept,
-                  vampiro_data: selectedCharacter.vampiro_data,
-                  experience_points: (selectedCharacter as any).experience_points ?? 0,
-                  game_system: (selectedCharacter as any).game_system,
-                }}
-                sessionTrackers={{
-                  gnosis: selectedParticipant?.session_gnosis ?? 0,
-                  rage: selectedParticipant?.session_rage ?? 0,
-                  willpower: selectedParticipant?.session_willpower_current ?? 0,
-                  healthDamage: selectedParticipant?.session_health_damage ?? Array(7).fill(false),
-                  form: selectedParticipant?.session_form || 'hominid',
-                }}
-                readOnly
-              />
-            )}
+            {selectedCharacter && selectedCharacter.vampiro_data && (() => {
+              const isW5Sel = (selectedCharacter as any).game_system === 'lobisomem_w5';
+              return (
+                <LobisomemCharacterSheet
+                  character={{
+                    id: selectedCharacter.id,
+                    name: selectedCharacter.name,
+                    concept: selectedCharacter.concept,
+                    vampiro_data: selectedCharacter.vampiro_data,
+                    experience_points: (selectedCharacter as any).experience_points ?? 0,
+                    game_system: (selectedCharacter as any).game_system,
+                  }}
+                  sessionTrackers={
+                    isW5Sel
+                      ? {
+                          rage: selectedParticipant?.session_w5_rage ?? 0,
+                          willpower: selectedParticipant?.session_w5_willpower_current ?? 0,
+                          harmony: selectedParticipant?.session_w5_harmony ?? 7,
+                          healthDamage: selectedParticipant?.session_health_damage ?? Array(7).fill(false),
+                          form: selectedParticipant?.session_form || 'hominid',
+                        }
+                      : {
+                          gnosis: selectedParticipant?.session_gnosis ?? 0,
+                          rage: selectedParticipant?.session_rage ?? 0,
+                          willpower: selectedParticipant?.session_willpower_current ?? 0,
+                          healthDamage: selectedParticipant?.session_health_damage ?? Array(7).fill(false),
+                          form: selectedParticipant?.session_form || 'hominid',
+                        }
+                  }
+                  readOnly
+                />
+              );
+            })()}
           </div>
         </DialogContent>
       </Dialog>
