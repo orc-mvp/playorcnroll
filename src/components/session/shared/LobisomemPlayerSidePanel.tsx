@@ -142,7 +142,61 @@ export function LobisomemPlayerSidePanel({
             </Card>
           )}
 
-        {lobData?.renown &&
+        {isW5 && (
+          <Card className="medieval-card border-red-600/30">
+            <CardHeader className="pb-2">
+              <CardTitle className="font-medieval text-sm flex items-center gap-2">
+                <Crown className="w-4 h-4 text-red-600" />
+                Trackers 5ed
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 text-sm font-body">
+                <div className="flex items-center justify-between">
+                  <span className="text-red-600">Fúria</span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          i < w5Rage ? 'bg-red-600' : 'bg-muted-foreground/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span>Vontade</span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          i < w5Willpower ? 'bg-foreground' : 'bg-muted-foreground/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-emerald-500">Harmonia</span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 10 }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2 h-2 rounded-full ${
+                          i < w5Harmony ? 'bg-emerald-500' : 'bg-muted-foreground/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {!isW5 && lobData?.renown &&
           (lobData.renown.glory > 0 || lobData.renown.honor > 0 || lobData.renown.wisdom > 0) && (
             <Card className="medieval-card border-emerald-500/20">
               <CardHeader className="pb-2">
