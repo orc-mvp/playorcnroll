@@ -219,7 +219,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
   const gnosis = data.gnosis || (isW5 ? 0 : 1);
   const rage = data.rage || 1;
   const willpower = data.willpower || 1;
-  const harmony = (data as any).harmony ?? 7;
+  const harmony = sessionTrackers?.harmony ?? (data as any).harmony ?? 7;
   const gifts = data.gifts || {};
   const renown = data.renown || { glory: 0, honor: 0, wisdom: 0 };
 
