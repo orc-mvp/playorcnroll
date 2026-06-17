@@ -20,7 +20,7 @@ interface Props {
 }
 
 export function StorytellerEventFeed({ events, gameSystem, currentUserId, isNarrator }: Props) {
-  if (gameSystem === 'lobisomem_w20') {
+  if (gameSystem === 'lobisomem_w20' || gameSystem === 'lobisomem_w5') {
     return (
       <WerewolfEventFeed
         events={events as any}
