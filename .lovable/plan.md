@@ -1,138 +1,39 @@
-# Assinatura Premium R$4,90/mês + Superadmin + Paywall de Personagens
+## Mago 5ed (`mago_m5`) — Novo sistema espelhando W5
 
-## 1. Stripe (sua conta — BYOK)
+Vou criar `mago_m5` como sistema separado, coexistindo com `mago_m20`, seguindo exatamente o mesmo padrão arquitetural usado para `lobisomem_w5`. Sem polimento/i18n além do essencial.
 
-Integração via `enable_stripe` (bring-your-own-key). Você vai precisar fornecer:
+### Regras 5ed adotadas (mapeadas a partir de V5/W5)
+- Pool de d10. 6+ = sucesso. Pares de 10 = +2 (crítico).
+- **Pool dividido**: dados normais + dados de **Paradoxo** (`paradoxDice = min(currentParadox, totalDice)`).
+- **Quiet Crítico** (análogo ao Messy): par de 10s envolvendo ≥1 dado de Paradoxo.
+- **Backlash** (análogo ao Brutal): falha com ≥1 `1` em dado de Paradoxo → +1 Paradoxo automático.
+- Trackers 5ed: **Arête 1-5**, **Quintessência 0-5**, **Paradoxo 0-10** (default 0), **Vontade 0-5**, Vitalidade (7 níveis padrão).
 
-- `STRIPE_SECRET_KEY` (sk_live_… ou sk_test_…)
-- `STRIPE_WEBHOOK_SECRET` (gerado quando você cadastrar o endpoint do webhook no dashboard Stripe)
+### Arquivos a criar
+1. `src/lib/magoM5/diceUtils.ts` — motor `rollM5()` / `splitPool()` (cópia adaptada de `lobisomemW5/diceUtils.ts`, troca Rage→Paradox, Messy→Quiet, Brutal→Backlash).
+2. `src/lib/storyteller/adapters/magoM5Adapter.ts` — `edition: '5ed'`, trackers próprios (sem session_w5_*, usa colunas existentes `session_arete`, `session_quintessence`, `session_paradox`, `session_willpower_current`), `PlayerTrackersComponent = M5Trackers`, `PendingTestComponent = M5PendingTest`.
+3. `src/components/session/storyteller/M5Trackers.tsx` — Arête (1-5)/Quint (0-5)/Paradoxo (0-10)/Vontade (0-5)/Saúde.
+4. `src/components/session/storyteller/M5PendingTest.tsx` — split pool no lado do jogador, lê paradoxo atual; categorias: atributo+habilidade, atributo puro, vontade, **arête**, **quintessência**.
+5. `src/components/session/storyteller/M5NarratorRollModal.tsx` — narrador insere dados de Paradoxo manualmente.
 
-Configuração no seu dashboard Stripe (você faz, eu te oriento):
+### Arquivos a editar
+- `src/lib/gameSystems.ts` — registrar `mago_m5`.
+- `src/lib/storyteller/systemRegistry.ts` — registrar adapter; `getSessionEdition` já cobre via `edition` do adapter.
+- `src/components/StorytellerEditionSelector.tsx` — incluir mago_m5 quando família = mago.
+- `src/components/AllowedSystemsSelector.tsx` / `SessionFamilySelector.tsx` se necessário para listar.
+- `src/pages/CreateCharacter.tsx` — defaults M5 (arete=1, quintessence=0, paradox=0, willpower=3) ao selecionar sistema.
+- `src/components/character/mago/EditMagoCharacterModal.tsx` e `MagoCharacterSheet.tsx` — receber `game_system` e em M5 capar Arête/Quint/Vontade em 5, ocultar Rotinas opcional? **Manter Rotinas e Esferas idênticas** ao M20 para não criar wizards novos.
+- `src/components/character/mago/StepMagoSpheres.tsx` / `StepMagoBackgrounds.tsx` — apenas aceitam `gameSystem` opcional p/ defaults; sem mudança visual.
+- `src/pages/StorytellerSession.tsx` — branchear edition/sidebar/painel para mago_m5 (modelo W5).
+- `src/components/session/shared/StorytellerEventFeed.tsx` — rotear `mago_m5` para feed com renderização de Paradox dice (cor roxa, badges Quiet/Backlash). Vou reutilizar `WerewolfEventFeed` adicionando flag mode (já tem suporte a 'w5-split'); adapto para também aceitar `mode='m5-split'` com cores roxas — ou crio `MageEventFeed` thin wrapper.
+- `src/components/session/storyteller/StorytellerNarratorRollModal.tsx` / `StorytellerSession.tsx` — persistir campos M5 quando `mode='m5-split'`.
+- `src/components/session/mage/MagoNarratorSidebar.tsx` — aceitar M5 (badge "5ed", caps 0-5, Paradoxo 0-10).
+- `src/components/session/mage/MagoPlayerSidePanel.tsx` — card "Trackers 5ed".
 
-- 1 Produto: "Apoiador - Orc & Roll"
-- 1 Price recorrente: R$ 4,90 BRL por mês no cartão. R$ 49,90 BRL  por 1 ano no pix (2 meses grátis) ou R$ 26,46 BRL por 6 meses (10% de desconto).
-- Habilitar PIX e Cartão como métodos de pagamento na conta
-- Criar webhook endpoint apontando para a URL da edge function `stripe-webhook` (eu te passo a URL após o deploy)
+### Não incluso (fica para depois)
+- Tradições/Convenções 5ed específicas, Hubris, Avatar mechanics aprofundadas.
+- i18n completo (só strings indispensáveis em PT).
+- Testes automatizados.
 
-**Cartão (recorrente automático):** assinatura Stripe — renova sozinho, cancela pelo Customer perfil do usuário.
-
-**PIX (manual mensal):** Stripe não faz PIX recorrente no Brasil. Cada PIX é cobrança avulsa referente ao período que estende validade premium em **+6 meses ou +12 meses** a partir do `current_period_end` atual (ou de hoje, o que for maior). Usuário paga de novo antes de vencer; banner volta 1 dia após vencimento.
-
-## 2. Banco de dados
-
-### Roles (tabela separada — exigência de segurança)
-
-```sql
-create type app_role as enum ('superadmin', 'admin', 'user');
-
-create table user_roles (
-  id uuid pk, user_id uuid, role app_role,
-  unique(user_id, role)
-);
--- + grants, RLS, has_role() security definer
-```
-
-Seed: `jordao@jordaobevilaqua.com` recebe `superadmin` (lookup em `auth.users`; se ainda não tiver conta, `handle_new_user` atribui automaticamente quando o email se cadastrar).
-
-`has_role()` substitui/generaliza o admin atual hardcoded (`8b192f50-…`).
-
-### Subscriptions
-
-```sql
-create table subscriptions (
-  user_id uuid pk,
-  status text,                    -- active | past_due | canceled | none
-  payment_method text,            -- card | pix
-  stripe_customer_id text,
-  stripe_subscription_id text,    -- só card
-  current_period_end timestamptz, -- premium ativo enquanto > now()
-  cancel_at_period_end boolean,
-  ...
-);
-```
-
-RLS: usuário lê só a própria; superadmin lê todas; escrita apenas via edge functions (service role).
-
-Helper `is_premium(uid)` → `current_period_end > now()` OU `has_role(uid,'superadmin')` OU `has_role(uid,'admin')`.
-
-## 3. Edge Functions
-
-- `**create-checkout**` — body `{ method: 'card' | 'pix' }`. Cria/recupera Stripe Customer por email, retorna URL:
-  - card → Checkout `mode: subscription`, price R$4,90/mês
-  - pix → Checkout `mode: payment`, R$4,90, `payment_method_types: ['pix']`
-- `**stripe-webhook**` (`verify_jwt = false`, valida signature com `STRIPE_WEBHOOK_SECRET`):
-  - `customer.subscription.created/updated` → upsert (card)
-  - `invoice.payment_succeeded` (card) → atualiza `current_period_end`
-  - `invoice.payment_failed` / `subscription.deleted` → `past_due`/`canceled`
-  - `checkout.session.completed` modo `payment` (PIX) → estende `current_period_end += 30 dias`
-- `**customer-portal**` — abre portal Stripe (cancelar/atualizar cartão; só faz sentido para card).
-- `**check-subscription**` — opcional; força refresh após retorno do checkout.
-
-## 4. Frontend
-
-### Hook `usePremium()`
-
-Lê `subscriptions` + roles do usuário logado; retorna `{ isPremium, daysUntilExpiry, paymentMethod, status }`. Realtime na tabela.
-
-### Banner global (`UpgradeBanner.tsx`)
-
-Faixa fina logo abaixo da logo no header que pode ser fechada, mas sempre abre novamente a cada refresh de página, fundo dourado-rústico:
-
-> "Faça upgrade para ter personagens ilimitados, retirar essa barra e contribuir com o desenvolvimento"
-
-Botão "Fazer upgrade" → `/upgrade`. Some quando `isPremium`. Volta automaticamente 1 dia após vencimento.
-
-### Página `/upgrade`
-
-- Card R$4,90/mês.
-- "Pagar com Cartão (recorrente)" e "Pagar com PIX (mensal)".
-- PIX: texto explicando que é manual e precisa renovar antes de vencer.
-- Se já premium: status, data de vencimento, "Gerenciar" (portal, só card) ou "Renovar com PIX".
-
-### Paywall de personagens
-
-- Se `count >= 3 && !isPremium` → bloqueia botão "Criar" e abre `UpgradeRequiredModal`:
-  > "Fazer upgrade para liberar mais de 3 personagens e apoiar o Orc & Roll"
-  > Botões: "Fazer upgrade" | "Gerenciar personagens"
-- Usuários com > 3 personagens hoje **mantêm acesso a todos** — só não criam novos sem upgrade.
-- Superadmin/admin: bypass.
-
-## 5. i18n
-
-Strings novas em pt-BR + en (banner, modal, página /upgrade, mensagens PIX/cartão).
-
-## Arquivos afetados
-
-**Novos**
-
-- `supabase/migrations/<ts>_roles_and_subscriptions.sql`
-- `supabase/functions/create-checkout/index.ts`
-- `supabase/functions/stripe-webhook/index.ts`
-- `supabase/functions/customer-portal/index.ts`
-- `supabase/functions/check-subscription/index.ts`
-- `src/hooks/usePremium.ts`
-- `src/components/UpgradeBanner.tsx`
-- `src/components/UpgradeRequiredModal.tsx`
-- `src/pages/Upgrade.tsx`
-
-**Editados**
-
-- `src/App.tsx` (rota /upgrade + banner global)
-- header/layout principal (montar banner)
-- `src/pages/MyCharacters.tsx` / `CreateCharacter.tsx` (paywall)
-- `src/lib/i18n/translations.ts`
-- `supabase/config.toml` (`stripe-webhook` com `verify_jwt = false`)
-
-## Fora de escopo
-
-- Painel admin de gestão de assinaturas (você pediu "só bypass").
-- PIX automático recorrente (limitação Stripe BR).
-- Email de aviso de vencimento.
-
-## Ordem de execução
-
-1. Migração (roles + subscriptions + has_role + is_premium + seed superadmin).
-2. `enable_stripe` (BYOK) — você cola sua `STRIPE_SECRET_KEY`.
-3. Deploy das 4 edge functions.
-4. Eu te passo a URL do webhook; você cadastra no Stripe e me devolve o `STRIPE_WEBHOOK_SECRET`.
-5. Frontend (hook, banner, página /upgrade, paywall).
+### Resultado esperado
+Narrador cria sessão Storyteller marcando "Mago 5ed", jogador cria personagem mago_m5, entra na sala, narrador pede testes (incluindo Arête/Quint), sistema rola pool dividido com Paradox dice, Backlash incrementa Paradoxo automaticamente, feed mostra resultados.
