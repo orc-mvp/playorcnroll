@@ -160,6 +160,7 @@ export default function StorytellerSession() {
           session_blood_pool, session_willpower_current, session_health_damage,
           session_gnosis, session_rage, session_form,
           session_w5_rage, session_w5_willpower_current, session_w5_harmony,
+          session_quintessence, session_paradox, session_arete,
           sheet_locked,
           characters:character_id (id, name, concept, game_system, experience_points, vampiro_data)
         `)
