@@ -39,6 +39,10 @@ export function LobisomemPlayerSidePanel({
   const { t, language } = useI18n();
   const lobData = character?.vampiro_data as LobisomemCharacterData | null;
   const [showSheet, setShowSheet] = useState(false);
+  const isW5 = (character as any)?.game_system === 'lobisomem_w5';
+  const w5Rage = (sessionTrackers as any)?.rage ?? 0;
+  const w5Willpower = (sessionTrackers as any)?.willpower ?? 0;
+  const w5Harmony = (sessionTrackers as any)?.harmony ?? 7;
 
   if (!character) {
     return (
