@@ -48,6 +48,9 @@ import {
 import { PawPrint, User, Shield, Brain, Star, BookOpen, Sparkles, Plus, X, Info } from 'lucide-react';
 import DotRating from '@/components/character/vampiro/DotRating';
 import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
+import AttributesEditor, { type AttributeValues } from '@/components/character/storyteller/shared/AttributesEditor';
+import AbilitiesEditor, { type AbilityValues } from '@/components/character/storyteller/shared/AbilitiesEditor';
+import { getTraitOverrides } from '@/lib/storyteller/traitOverrides';
 import type { LobisomemCharacterData, MetamorphForm } from '@/lib/lobisomem/diceUtils';
 
 interface Character {
@@ -554,66 +557,25 @@ export function EditMetamorfosCharacterModal({
 
               {/* Attributes */}
               <TabsContent value="attributes" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
-                <div className="space-y-6">
-                  {[
-                    { cat: 'physical', label: t.vampiro.physical, items: [
-                      { key: 'strength', label: t.vampiro.strength },
-                      { key: 'dexterity', label: t.vampiro.dexterity },
-                      { key: 'stamina', label: t.vampiro.stamina },
-                    ]},
-                    { cat: 'social', label: t.vampiro.social, items: [
-                      { key: 'charisma', label: t.vampiro.charisma },
-                      { key: 'manipulation', label: t.vampiro.manipulation },
-                      { key: 'appearance', label: t.vampiro.appearance },
-                    ]},
-                    { cat: 'mental', label: t.vampiro.mental, items: [
-                      { key: 'perception', label: t.vampiro.perception },
-                      { key: 'intelligence', label: t.vampiro.intelligence },
-                      { key: 'wits', label: t.vampiro.wits },
-                    ]},
-                  ].map(({ cat, label, items }) => (
-                    <div key={cat}>
-                      <h4 className="font-medieval text-sm text-muted-foreground mb-3">{label}</h4>
-                      <div className="space-y-2">
-                        {items.map(attr => (
-                          <div key={attr.key} className="flex items-center justify-between">
-                            <span className="font-body text-sm">{attr.label}</span>
-                            <DotRating
-                              value={(attributes as any)[cat][attr.key] || 1}
-                              onChange={(val) => updateAttribute(cat as any, attr.key, val)}
-                              maxValue={5}
-                              minValue={1}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <AttributesEditor
+                  value={attributes as AttributeValues}
+                  onChange={(next) => setData((prev) => ({ ...prev, attributes: next as typeof prev.attributes }))}
+                  minValue={1}
+                  noCard
+                  showTotals
+                  totalOffset={-3}
+                />
               </TabsContent>
 
               {/* Abilities */}
               <TabsContent value="abilities" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
-                <div className="space-y-6">
-                  {(['talents', 'skills', 'knowledges'] as const).map((cat) => (
-                    <div key={cat}>
-                      <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro[cat]}</h4>
-                      <div className="space-y-2">
-                        {Object.entries(ABILITY_NAMES[cat]).map(([key, label]) => (
-                          <div key={key} className="flex items-center justify-between">
-                            <span className="font-body text-sm">{(t.vampiro as any)[key] || label}</span>
-                            <DotRating
-                              value={(abilities[cat] as Record<string, number>)?.[key] || 0}
-                              onChange={(val) => updateAbility(cat, key, val)}
-                              maxValue={5}
-                              minValue={0}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <AbilitiesEditor
+                  value={abilities as AbilityValues}
+                  onChange={(next) => setData((prev) => ({ ...prev, abilities: next }))}
+                  specializations={(data as any).specializations || {}}
+                  onSpecializationsChange={(next) => setData((prev) => ({ ...prev, specializations: next } as any))}
+                  noCard
+                />
               </TabsContent>
 
               {/* Gifts */}
