@@ -541,6 +541,7 @@ export default function CreateCharacter() {
           <StepLobisomemAttributes
             formData={lobisomemFormData}
             updateFormData={(u) => setLobisomemFormData(prev => ({ ...prev, ...u }))}
+            edition={gameSystem === 'lobisomem_w5' ? '5ed' : '20th'}
           />
         )}
         {step === 3 && (gameSystem === 'lobisomem_w20' || gameSystem === 'metamorfos_w20' || gameSystem === 'lobisomem_w5') && (
