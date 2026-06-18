@@ -29,6 +29,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { User, Shield, Brain, Heart, Moon, Star, BookOpen, Sparkles } from 'lucide-react';
 import DotRating from './DotRating';
 import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
+import AttributesEditor, { type AttributeValues } from '@/components/character/storyteller/shared/AttributesEditor';
+import AbilitiesEditor, { type AbilityValues } from '@/components/character/storyteller/shared/AbilitiesEditor';
+import VirtuesBlock from '@/components/character/storyteller/shared/VirtuesBlock';
+import { getTraitOverrides } from '@/lib/storyteller/traitOverrides';
 
 // Types
 interface VampiroData {
@@ -71,6 +75,7 @@ interface Character {
   name: string;
   concept: string | null;
   vampiro_data: VampiroData | null;
+  game_system?: string;
 }
 
 interface EditVampiroCharacterModalProps {
@@ -699,142 +704,27 @@ export function EditVampiroCharacterModal({
 
               {/* Attributes Tab */}
               <TabsContent value="attributes" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
-                <div className="space-y-6">
-                {/* Physical */}
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.physical}</h4>
-                  <div className="space-y-2">
-                    {[
-                      { key: 'strength', label: t.vampiro.strength },
-                      { key: 'dexterity', label: t.vampiro.dexterity },
-                      { key: 'stamina', label: t.vampiro.stamina },
-                    ].map(attr => (
-                      <div key={attr.key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{attr.label}</span>
-                        <DotRating
-                          value={attributes.physical[attr.key as keyof typeof attributes.physical] || 1}
-                          onChange={(val) => updateAttribute('physical', attr.key, val)}
-                          maxValue={5}
-                          minValue={1}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Social */}
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.social}</h4>
-                  <div className="space-y-2">
-                    {[
-                      { key: 'charisma', label: t.vampiro.charisma },
-                      { key: 'manipulation', label: t.vampiro.manipulation },
-                      { key: 'appearance', label: t.vampiro.appearance },
-                    ].map(attr => (
-                      <div key={attr.key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{attr.label}</span>
-                        <DotRating
-                          value={attributes.social[attr.key as keyof typeof attributes.social] || 1}
-                          onChange={(val) => updateAttribute('social', attr.key, val)}
-                          maxValue={5}
-                          minValue={1}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Mental */}
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.mental}</h4>
-                  <div className="space-y-2">
-                    {[
-                      { key: 'perception', label: t.vampiro.perception },
-                      { key: 'intelligence', label: t.vampiro.intelligence },
-                      { key: 'wits', label: t.vampiro.wits },
-                    ].map(attr => (
-                      <div key={attr.key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{attr.label}</span>
-                        <DotRating
-                          value={attributes.mental[attr.key as keyof typeof attributes.mental] || 1}
-                          onChange={(val) => updateAttribute('mental', attr.key, val)}
-                          maxValue={5}
-                          minValue={1}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                </div>
+                <AttributesEditor
+                  value={attributes as AttributeValues}
+                  onChange={(next) => setVampiroData((prev) => ({ ...prev, attributes: next as VampiroData['attributes'] }))}
+                  minValue={1}
+                  noCard
+                  overrides={getTraitOverrides(character.game_system).attributes}
+                />
               </TabsContent>
 
               {/* Abilities Tab */}
               <TabsContent value="abilities" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
-                <div className="space-y-6">
-                {/* Talents */}
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">
-                    {t.vampiro.talents}{' '}
-                    <span className="text-muted-foreground/60">({Object.values(abilities.talents).reduce((s, v) => s + (v || 0), 0)})</span>
-                  </h4>
-                  <div className="space-y-2">
-                    {Object.entries(ABILITY_NAMES.talents).map(([key, label]) => (
-                      <div key={key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{t.vampiro[key as keyof typeof t.vampiro] || label}</span>
-                        <DotRating
-                          value={abilities.talents[key] || 0}
-                          onChange={(val) => updateAbility('talents', key, val)}
-                          maxValue={5}
-                          minValue={0}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Skills */}
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">
-                    {t.vampiro.skills}{' '}
-                    <span className="text-muted-foreground/60">({Object.values(abilities.skills).reduce((s, v) => s + (v || 0), 0)})</span>
-                  </h4>
-                  <div className="space-y-2">
-                    {Object.entries(ABILITY_NAMES.skills).map(([key, label]) => (
-                      <div key={key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{t.vampiro[key as keyof typeof t.vampiro] || label}</span>
-                        <DotRating
-                          value={abilities.skills[key] || 0}
-                          onChange={(val) => updateAbility('skills', key, val)}
-                          maxValue={5}
-                          minValue={0}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Knowledges */}
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">
-                    {t.vampiro.knowledges}{' '}
-                    <span className="text-muted-foreground/60">({Object.values(abilities.knowledges).reduce((s, v) => s + (v || 0), 0)})</span>
-                  </h4>
-                  <div className="space-y-2">
-                    {Object.entries(ABILITY_NAMES.knowledges).map(([key, label]) => (
-                      <div key={key} className="flex items-center justify-between">
-                        <span className="font-body text-sm">{t.vampiro[key as keyof typeof t.vampiro] || label}</span>
-                        <DotRating
-                          value={abilities.knowledges[key] || 0}
-                          onChange={(val) => updateAbility('knowledges', key, val)}
-                          maxValue={5}
-                          minValue={0}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                </div>
+                <AbilitiesEditor
+                  value={abilities as AbilityValues}
+                  onChange={(next) => setVampiroData((prev) => ({ ...prev, abilities: next }))}
+                  specializations={vampiroData.specializations || {}}
+                  onSpecializationsChange={(next) => setVampiroData((prev) => ({ ...prev, specializations: next }))}
+                  noCard
+                  overrides={getTraitOverrides(character.game_system).abilities}
+                />
               </TabsContent>
+
 
               {/* Disciplines Tab */}
               <TabsContent value="disciplines" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
@@ -936,70 +826,41 @@ export function EditVampiroCharacterModal({
               {/* Virtues Tab */}
               <TabsContent value="virtues" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
                 <div className="space-y-6">
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.virtues}</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">
-                        {virtues.virtueType1 === 'conscience' ? t.vampiro.conscience : t.vampiro.conviction}
-                      </span>
-                      <DotRating
-                        value={virtues.virtueValue1 || 1}
-                        onChange={(val) => updateVirtue('virtueValue1', val)}
-                        maxValue={5}
-                        minValue={1}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">
-                        {virtues.virtueType2 === 'selfControl' ? t.vampiro.selfControl : t.vampiro.instinct}
-                      </span>
-                      <DotRating
-                        value={virtues.virtueValue2 || 1}
-                        onChange={(val) => updateVirtue('virtueValue2', val)}
-                        maxValue={5}
-                        minValue={1}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">{t.vampiro.courage}</span>
-                      <DotRating
-                        value={virtues.courage || 1}
-                        onChange={(val) => updateVirtue('courage', val)}
-                        maxValue={5}
-                        minValue={1}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">
-                    {vampiroData.moralityType === 'path' ? `${t.vampiro.path}: ${vampiroData.pathName}` : t.vampiro.humanity}
-                  </h4>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">{t.editVampiro.value}</span>
-                    <DotRating
-                      value={vampiroData.humanity || 1}
-                      onChange={(val) => updateVampiroField('humanity', val)}
-                      maxValue={10}
-                      minValue={0}
+                  <div>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.virtues}</h4>
+                    <VirtuesBlock
+                      value={virtues}
+                      onChange={(next) => setVampiroData((prev) => ({ ...prev, virtues: next }))}
                     />
                   </div>
-                </div>
 
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.willpower}</h4>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">{t.editVampiro.value}</span>
-                    <DotRating
-                      value={vampiroData.willpower || 1}
-                      onChange={(val) => updateVampiroField('willpower', val)}
-                      maxValue={10}
-                      minValue={1}
-                    />
+                  <div>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">
+                      {vampiroData.moralityType === 'path' ? `${t.vampiro.path}: ${vampiroData.pathName}` : t.vampiro.humanity}
+                    </h4>
+                    <div className="flex items-center justify-between">
+                      <span className="font-body text-sm">{t.editVampiro.value}</span>
+                      <DotRating
+                        value={vampiroData.humanity || 1}
+                        onChange={(val) => updateVampiroField('humanity', val)}
+                        maxValue={10}
+                        minValue={0}
+                      />
+                    </div>
                   </div>
-                </div>
+
+                  <div>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.willpower}</h4>
+                    <div className="flex items-center justify-between">
+                      <span className="font-body text-sm">{t.editVampiro.value}</span>
+                      <DotRating
+                        value={vampiroData.willpower || 1}
+                        onChange={(val) => updateVampiroField('willpower', val)}
+                        maxValue={10}
+                        minValue={1}
+                      />
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
           </div>

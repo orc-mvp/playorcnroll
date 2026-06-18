@@ -26,6 +26,9 @@ import {
 import { Star, User, Shield, Brain, BookOpen, Sparkles, Plus, X, Users, Zap } from 'lucide-react';
 import DotRating from '@/components/character/vampiro/DotRating';
 import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
+import AttributesEditor, { type AttributeValues } from '@/components/character/storyteller/shared/AttributesEditor';
+import AbilitiesEditor, { type AbilityValues } from '@/components/character/storyteller/shared/AbilitiesEditor';
+import { getTraitOverrides } from '@/lib/storyteller/traitOverrides';
 import { MAGO_SPHERES, MAGO_BACKGROUNDS, MAGO_TRADITIONS, type MagoCharacterData } from '@/lib/mago/spheres';
 import {
   STORYTELLER_ATTRIBUTES as ATTRIBUTES,
@@ -37,6 +40,7 @@ interface Character {
   name: string;
   concept: string | null;
   vampiro_data: MagoCharacterData | null;
+  game_system?: string;
 }
 
 interface EditMagoCharacterModalProps {
@@ -401,71 +405,27 @@ export function EditMagoCharacterModal({
 
               {/* Attributes */}
               <TabsContent value="attributes" className="mt-0 max-h-[55vh] overflow-y-auto pr-2">
-                <div className="space-y-6">
-                  {(['physical', 'social', 'mental'] as AttributeCategory[]).map((cat) => {
-                    const section = ATTRIBUTES[cat];
-                    return (
-                      <div key={cat}>
-                        <h4 className="font-medieval text-sm text-muted-foreground mb-3">
-                          {section.label[language as 'pt-BR' | 'en-US']}
-                        </h4>
-                        <div className="space-y-2">
-                          {section.items.map((attr) => (
-                            <div key={attr.key} className="flex items-center justify-between">
-                              <span className="font-body text-sm">
-                                {attr.label[language as 'pt-BR' | 'en-US']}
-                              </span>
-                              <DotRating
-                                value={
-                                  (attributes as any)[cat][attr.key] ?? 1
-                                }
-                                onChange={(val) => updateAttribute(cat, attr.key, val)}
-                                maxValue={5}
-                                minValue={1}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <AttributesEditor
+                  value={attributes as AttributeValues}
+                  onChange={(next) => setMagoData((prev) => ({ ...prev, attributes: next as typeof prev.attributes }))}
+                  minValue={1}
+                  noCard
+                  showTotals
+                  totalOffset={-3}
+                  overrides={getTraitOverrides(character.game_system).attributes}
+                />
               </TabsContent>
 
               {/* Abilities */}
               <TabsContent value="abilities" className="mt-0 max-h-[55vh] overflow-y-auto pr-2">
-                <div className="space-y-6">
-                  {(['talents', 'skills', 'knowledges'] as AbilityCategory[]).map((cat) => {
-                    const section = ABILITIES[cat];
-                    const total = section.items.reduce(
-                      (s, item) => s + ((abilities[cat] as Record<string, number>)?.[item.key] || 0),
-                      0,
-                    );
-                    return (
-                      <div key={cat}>
-                        <h4 className="font-medieval text-sm text-muted-foreground mb-3">
-                          {section.label[language as 'pt-BR' | 'en-US']}{' '}
-                          <span className="text-muted-foreground/60">({total})</span>
-                        </h4>
-                        <div className="space-y-2">
-                          {section.items.map((ability) => (
-                            <div key={ability.key} className="flex items-center justify-between">
-                              <span className="font-body text-sm">
-                                {ability.label[language as 'pt-BR' | 'en-US']}
-                              </span>
-                              <DotRating
-                                value={(abilities[cat] as Record<string, number>)?.[ability.key] || 0}
-                                onChange={(val) => updateAbility(cat, ability.key, val)}
-                                maxValue={5}
-                                minValue={0}
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                <AbilitiesEditor
+                  value={abilities as AbilityValues}
+                  onChange={(next) => setMagoData((prev) => ({ ...prev, abilities: next }))}
+                  specializations={(magoData as any).specializations || {}}
+                  onSpecializationsChange={(next) => setMagoData((prev) => ({ ...prev, specializations: next } as any))}
+                  noCard
+                  overrides={getTraitOverrides(character.game_system).abilities}
+                />
               </TabsContent>
 
               {/* Spheres */}

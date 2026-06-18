@@ -1,9 +1,10 @@
 /**
- * Shared Attributes editor for Storyteller WoD systems
- * (Vampiro, Lobisomem, Mago, Metamorfos).
+ * Bloco compartilhado de Atributos do Storyteller (WoD).
  *
- * Replaces duplicated attribute UI in StepVampiroAttributes,
- * StepLobisomemAttributes, StepMagoAttributes.
+ * Renderiza Físicos/Sociais/Mentais a partir de `STORYTELLER_ATTRIBUTES`.
+ * - `readOnly` alterna entre edição (dots clicáveis) e exibição (dots estáticos).
+ * - `overrides` substitui labels específicos por sistema/edição (ex.: 5ed → Compostura/Determinação).
+ *   `edition` é um atalho legado: se omitido `overrides`, mapeia 5ed automaticamente.
  */
 import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
@@ -12,32 +13,29 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ChevronDown } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import DotRating from '@/components/character/vampiro/DotRating';
-import { STORYTELLER_ATTRIBUTES } from '@/lib/storyteller/traits';
+import { STORYTELLER_ATTRIBUTES, type BilingualLabel } from '@/lib/storyteller/traits';
 
 export type AttributeCategory = 'physical' | 'social' | 'mental';
-
 export type AttributeValues = Record<AttributeCategory, Record<string, number>>;
 
 interface AttributesEditorProps {
   value: AttributeValues;
-  onChange: (next: AttributeValues) => void;
-  /** Minimum value per attribute (default 1 — WoD). */
+  onChange?: (next: AttributeValues) => void;
   minValue?: number;
-  /** Maximum dots displayed (default 5). */
   maxValue?: number;
-  /** Show category total badge next to title. */
   showTotals?: boolean;
-  /** Subtract this from displayed total per category (e.g. -3 for "spent points"). */
   totalOffset?: number;
-  /** Hide the outer card (used inside Edit modal tabs). */
   noCard?: boolean;
-  /** Override card title. */
   title?: string;
-  /** WoD edition — '5ed' renames Appearance→Composure, Perception→Resolve. */
+  /** Edição WoD: 20ª ou 5ª. Atalho que injeta overrides padrão se `overrides` não for passado. */
   edition?: '20th' | '5ed';
+  /** Override pontual de labels por chave (sobrescreve `edition`). */
+  overrides?: Record<string, BilingualLabel>;
+  /** Modo leitura: dots não clicáveis, sem atrelar handlers. */
+  readOnly?: boolean;
 }
 
-const EDITION_5ED_LABELS: Record<string, { 'pt-BR': string; 'en-US': string }> = {
+const EDITION_5ED_LABELS: Record<string, BilingualLabel> = {
   appearance: { 'pt-BR': 'Compostura', 'en-US': 'Composure' },
   perception: { 'pt-BR': 'Determinação', 'en-US': 'Resolve' },
 };
@@ -52,6 +50,8 @@ export default function AttributesEditor({
   noCard = false,
   title,
   edition = '20th',
+  overrides,
+  readOnly = false,
 }: AttributesEditorProps) {
   const { language } = useI18n();
   const isMobile = useIsMobile();
@@ -61,11 +61,14 @@ export default function AttributesEditor({
     mental: true,
   });
 
+  const labelOverrides: Record<string, BilingualLabel> = overrides ?? (edition === '5ed' ? EDITION_5ED_LABELS : {});
+
   const toggleSection = (section: string) => {
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
   const updateAttribute = (category: AttributeCategory, key: string, val: number) => {
+    if (readOnly || !onChange) return;
     onChange({
       ...value,
       [category]: { ...value[category], [key]: val },
@@ -77,7 +80,8 @@ export default function AttributesEditor({
 
   const renderSection = (category: AttributeCategory) => {
     const section = STORYTELLER_ATTRIBUTES[category];
-    const labelText = section.label[language as 'pt-BR' | 'en-US'];
+    const lang = language as 'pt-BR' | 'en-US';
+    const labelText = section.label[lang];
     const totalSuffix = showTotals ? (
       <span className="text-muted-foreground/60"> ({getCategoryTotal(category)})</span>
     ) : null;
@@ -85,28 +89,24 @@ export default function AttributesEditor({
     const content = (
       <div className="space-y-2">
         {section.items.map((attr) => {
-          const lang = language as 'pt-BR' | 'en-US';
-          const displayLabel = edition === '5ed' && EDITION_5ED_LABELS[attr.key]
-            ? EDITION_5ED_LABELS[attr.key][lang]
-            : attr.label[lang];
+          const displayLabel = labelOverrides[attr.key]?.[lang] ?? attr.label[lang];
           return (
-          <div key={attr.key} className="flex items-center justify-between gap-2">
-            <span className="text-sm font-body min-w-[100px]">
-              {displayLabel}
-            </span>
-            <DotRating
-              value={value[category]?.[attr.key] ?? minValue}
-              onChange={(val) => updateAttribute(category, attr.key, val)}
-              minValue={minValue}
-              maxValue={maxValue}
-            />
-          </div>
+            <div key={attr.key} className="flex items-center justify-between gap-2">
+              <span className="text-sm font-body min-w-[100px]">{displayLabel}</span>
+              <DotRating
+                value={value[category]?.[attr.key] ?? minValue}
+                onChange={(val) => updateAttribute(category, attr.key, val)}
+                minValue={minValue}
+                maxValue={maxValue}
+                readOnly={readOnly}
+              />
+            </div>
           );
         })}
       </div>
     );
 
-    if (isMobile) {
+    if (isMobile && !readOnly) {
       return (
         <Collapsible
           key={category}

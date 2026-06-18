@@ -25,6 +25,10 @@ import {
 import { toTitleCase } from '@/lib/textUtils';
 import { CharacterNotes } from '../CharacterNotes';
 import { XpReducer } from '../storyteller/shared/XpReducer';
+import AttributesEditor from '../storyteller/shared/AttributesEditor';
+import AbilitiesEditor from '../storyteller/shared/AbilitiesEditor';
+import VirtuesBlock from '../storyteller/shared/VirtuesBlock';
+import { getTraitOverrides } from '@/lib/storyteller/traitOverrides';
 
 interface VampiroData {
   player?: string;
@@ -69,6 +73,7 @@ interface VampiroCharacterSheetProps {
     vampiro_data: VampiroData | null;
     notes?: string | null;
     experience_points?: number;
+    game_system?: string;
   };
   sessionTrackers?: {
     bloodPool?: number;
@@ -424,37 +429,12 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, read
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Physical */}
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.physical}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.strength} value={attributes.physical.strength} />
-                <AttributeRow name={t.vampiro.dexterity} value={attributes.physical.dexterity} />
-                <AttributeRow name={t.vampiro.stamina} value={attributes.physical.stamina} />
-              </div>
-            </div>
-            
-            {/* Social */}
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.social}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.charisma} value={attributes.social.charisma} />
-                <AttributeRow name={t.vampiro.manipulation} value={attributes.social.manipulation} />
-                <AttributeRow name={t.vampiro.appearance} value={attributes.social.appearance} />
-              </div>
-            </div>
-            
-            {/* Mental */}
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.mental}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.perception} value={attributes.mental.perception} />
-                <AttributeRow name={t.vampiro.intelligence} value={attributes.mental.intelligence} />
-                <AttributeRow name={t.vampiro.wits} value={attributes.mental.wits} />
-              </div>
-            </div>
-          </div>
+          <AttributesEditor
+            value={attributes}
+            noCard
+            readOnly
+            overrides={getTraitOverrides(character.game_system).attributes}
+          />
         </CardContent>
       </Card>
 
@@ -467,61 +447,13 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, read
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Talents */}
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
-                {t.vampiro.talents}{' '}
-                <span className="text-muted-foreground/60">({ABILITY_KEYS.talents.reduce((sum, k) => sum + (abilities.talents[k] || 0), 0)})</span>
-              </h4>
-              <div className="space-y-1">
-                {ABILITY_KEYS.talents.map((key) => (
-                  <AbilityRow 
-                    key={key} 
-                    name={t.vampiro[key]} 
-                    value={abilities.talents[key] || 0}
-                    specialization={specializations[key]}
-                  />
-                ))}
-              </div>
-            </div>
-            
-            {/* Skills */}
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
-                {t.vampiro.skills}{' '}
-                <span className="text-muted-foreground/60">({ABILITY_KEYS.skills.reduce((sum, k) => sum + (abilities.skills[k] || 0), 0)})</span>
-              </h4>
-              <div className="space-y-1">
-                {ABILITY_KEYS.skills.map((key) => (
-                  <AbilityRow 
-                    key={key} 
-                    name={t.vampiro[key]} 
-                    value={abilities.skills[key] || 0}
-                    specialization={specializations[key]}
-                  />
-                ))}
-              </div>
-            </div>
-            
-            {/* Knowledges */}
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
-                {t.vampiro.knowledges}{' '}
-                <span className="text-muted-foreground/60">({ABILITY_KEYS.knowledges.reduce((sum, k) => sum + (abilities.knowledges[k] || 0), 0)})</span>
-              </h4>
-              <div className="space-y-1">
-                {ABILITY_KEYS.knowledges.map((key) => (
-                  <AbilityRow 
-                    key={key} 
-                    name={t.vampiro[key]} 
-                    value={abilities.knowledges[key] || 0}
-                    specialization={specializations[key]}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+          <AbilitiesEditor
+            value={abilities}
+            specializations={specializations}
+            noCard
+            readOnly
+            overrides={getTraitOverrides(character.game_system).abilities}
+          />
         </CardContent>
       </Card>
 
@@ -755,20 +687,7 @@ export default function VampiroCharacterSheet({ character, sessionTrackers, read
             {/* Virtues */}
             <div>
               <h4 className="font-medieval text-sm text-muted-foreground mb-3 text-center">{t.vampiro.virtues}</h4>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-body">{getVirtueName(virtues.virtueType1)}</span>
-                  <DotDisplay value={virtues.virtueValue1} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-body">{getVirtueName(virtues.virtueType2)}</span>
-                  <DotDisplay value={virtues.virtueValue2} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-body">{t.vampiro.courage}</span>
-                  <DotDisplay value={virtues.courage} />
-                </div>
-              </div>
+              <VirtuesBlock value={virtues} readOnly variant="sheet" />
             </div>
             
             {/* Humanity/Path */}
