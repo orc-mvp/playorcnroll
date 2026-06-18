@@ -826,70 +826,41 @@ export function EditVampiroCharacterModal({
               {/* Virtues Tab */}
               <TabsContent value="virtues" className="mt-0 max-h-[50vh] overflow-y-auto pr-2">
                 <div className="space-y-6">
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.virtues}</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">
-                        {virtues.virtueType1 === 'conscience' ? t.vampiro.conscience : t.vampiro.conviction}
-                      </span>
-                      <DotRating
-                        value={virtues.virtueValue1 || 1}
-                        onChange={(val) => updateVirtue('virtueValue1', val)}
-                        maxValue={5}
-                        minValue={1}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">
-                        {virtues.virtueType2 === 'selfControl' ? t.vampiro.selfControl : t.vampiro.instinct}
-                      </span>
-                      <DotRating
-                        value={virtues.virtueValue2 || 1}
-                        onChange={(val) => updateVirtue('virtueValue2', val)}
-                        maxValue={5}
-                        minValue={1}
-                      />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-body text-sm">{t.vampiro.courage}</span>
-                      <DotRating
-                        value={virtues.courage || 1}
-                        onChange={(val) => updateVirtue('courage', val)}
-                        maxValue={5}
-                        minValue={1}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">
-                    {vampiroData.moralityType === 'path' ? `${t.vampiro.path}: ${vampiroData.pathName}` : t.vampiro.humanity}
-                  </h4>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">{t.editVampiro.value}</span>
-                    <DotRating
-                      value={vampiroData.humanity || 1}
-                      onChange={(val) => updateVampiroField('humanity', val)}
-                      maxValue={10}
-                      minValue={0}
+                  <div>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.virtues}</h4>
+                    <VirtuesBlock
+                      value={virtues}
+                      onChange={(next) => setVampiroData((prev) => ({ ...prev, virtues: next }))}
                     />
                   </div>
-                </div>
 
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.willpower}</h4>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">{t.editVampiro.value}</span>
-                    <DotRating
-                      value={vampiroData.willpower || 1}
-                      onChange={(val) => updateVampiroField('willpower', val)}
-                      maxValue={10}
-                      minValue={1}
-                    />
+                  <div>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">
+                      {vampiroData.moralityType === 'path' ? `${t.vampiro.path}: ${vampiroData.pathName}` : t.vampiro.humanity}
+                    </h4>
+                    <div className="flex items-center justify-between">
+                      <span className="font-body text-sm">{t.editVampiro.value}</span>
+                      <DotRating
+                        value={vampiroData.humanity || 1}
+                        onChange={(val) => updateVampiroField('humanity', val)}
+                        maxValue={10}
+                        minValue={0}
+                      />
+                    </div>
                   </div>
-                </div>
+
+                  <div>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-3">{t.vampiro.willpower}</h4>
+                    <div className="flex items-center justify-between">
+                      <span className="font-body text-sm">{t.editVampiro.value}</span>
+                      <DotRating
+                        value={vampiroData.willpower || 1}
+                        onChange={(val) => updateVampiroField('willpower', val)}
+                        maxValue={10}
+                        minValue={1}
+                      />
+                    </div>
+                  </div>
                 </div>
               </TabsContent>
           </div>
