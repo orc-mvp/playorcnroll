@@ -1,39 +1,70 @@
-## Mago 5ed (`mago_m5`) — Novo sistema espelhando W5
+# Unificação dos Edit Modals e Fichas Storyteller
 
-Vou criar `mago_m5` como sistema separado, coexistindo com `mago_m20`, seguindo exatamente o mesmo padrão arquitetural usado para `lobisomem_w5`. Sem polimento/i18n além do essencial.
+## Objetivo
 
-### Regras 5ed adotadas (mapeadas a partir de V5/W5)
-- Pool de d10. 6+ = sucesso. Pares de 10 = +2 (crítico).
-- **Pool dividido**: dados normais + dados de **Paradoxo** (`paradoxDice = min(currentParadox, totalDice)`).
-- **Quiet Crítico** (análogo ao Messy): par de 10s envolvendo ≥1 dado de Paradoxo.
-- **Backlash** (análogo ao Brutal): falha com ≥1 `1` em dado de Paradoxo → +1 Paradoxo automático.
-- Trackers 5ed: **Arête 1-5**, **Quintessência 0-5**, **Paradoxo 0-10** (default 0), **Vontade 0-5**, Vitalidade (7 níveis padrão).
+Hoje só a **criação** usa blocos compartilhados (`AttributesEditor`, `AbilitiesEditor`). Os **Edit modals** e as **Fichas** de Vampiro, Lobisomem (W20/W5), Mago (M20/M5) e Metamorfos renderizam atributos, habilidades, merits/flaws e backgrounds manualmente — código duplicado e divergente.
 
-### Arquivos a criar
-1. `src/lib/magoM5/diceUtils.ts` — motor `rollM5()` / `splitPool()` (cópia adaptada de `lobisomemW5/diceUtils.ts`, troca Rage→Paradox, Messy→Quiet, Brutal→Backlash).
-2. `src/lib/storyteller/adapters/magoM5Adapter.ts` — `edition: '5ed'`, trackers próprios (sem session_w5_*, usa colunas existentes `session_arete`, `session_quintessence`, `session_paradox`, `session_willpower_current`), `PlayerTrackersComponent = M5Trackers`, `PendingTestComponent = M5PendingTest`.
-3. `src/components/session/storyteller/M5Trackers.tsx` — Arête (1-5)/Quint (0-5)/Paradoxo (0-10)/Vontade (0-5)/Saúde.
-4. `src/components/session/storyteller/M5PendingTest.tsx` — split pool no lado do jogador, lê paradoxo atual; categorias: atributo+habilidade, atributo puro, vontade, **arête**, **quintessência**.
-5. `src/components/session/storyteller/M5NarratorRollModal.tsx` — narrador insere dados de Paradoxo manualmente.
+Vamos componentizar tudo e injetar **labels específicas por sistema** (ex.: 5ed → Compostura/Determinação, Mago 5ed → Essências renomeadas, etc.).
 
-### Arquivos a editar
-- `src/lib/gameSystems.ts` — registrar `mago_m5`.
-- `src/lib/storyteller/systemRegistry.ts` — registrar adapter; `getSessionEdition` já cobre via `edition` do adapter.
-- `src/components/StorytellerEditionSelector.tsx` — incluir mago_m5 quando família = mago.
-- `src/components/AllowedSystemsSelector.tsx` / `SessionFamilySelector.tsx` se necessário para listar.
-- `src/pages/CreateCharacter.tsx` — defaults M5 (arete=1, quintessence=0, paradox=0, willpower=3) ao selecionar sistema.
-- `src/components/character/mago/EditMagoCharacterModal.tsx` e `MagoCharacterSheet.tsx` — receber `game_system` e em M5 capar Arête/Quint/Vontade em 5, ocultar Rotinas opcional? **Manter Rotinas e Esferas idênticas** ao M20 para não criar wizards novos.
-- `src/components/character/mago/StepMagoSpheres.tsx` / `StepMagoBackgrounds.tsx` — apenas aceitam `gameSystem` opcional p/ defaults; sem mudança visual.
-- `src/pages/StorytellerSession.tsx` — branchear edition/sidebar/painel para mago_m5 (modelo W5).
-- `src/components/session/shared/StorytellerEventFeed.tsx` — rotear `mago_m5` para feed com renderização de Paradox dice (cor roxa, badges Quiet/Backlash). Vou reutilizar `WerewolfEventFeed` adicionando flag mode (já tem suporte a 'w5-split'); adapto para também aceitar `mode='m5-split'` com cores roxas — ou crio `MageEventFeed` thin wrapper.
-- `src/components/session/storyteller/StorytellerNarratorRollModal.tsx` / `StorytellerSession.tsx` — persistir campos M5 quando `mode='m5-split'`.
-- `src/components/session/mage/MagoNarratorSidebar.tsx` — aceitar M5 (badge "5ed", caps 0-5, Paradoxo 0-10).
-- `src/components/session/mage/MagoPlayerSidePanel.tsx` — card "Trackers 5ed".
+## Arquitetura
 
-### Não incluso (fica para depois)
-- Tradições/Convenções 5ed específicas, Hubris, Avatar mechanics aprofundadas.
-- i18n completo (só strings indispensáveis em PT).
-- Testes automatizados.
+### 1. Configuração por sistema (novo)
 
-### Resultado esperado
-Narrador cria sessão Storyteller marcando "Mago 5ed", jogador cria personagem mago_m5, entra na sala, narrador pede testes (incluindo Arête/Quint), sistema rola pool dividido com Paradox dice, Backlash incrementa Paradoxo automaticamente, feed mostra resultados.
+Criar `src/lib/storyteller/traitOverrides.ts`:
+
+```ts
+export interface TraitOverrides {
+  attributes?: Record<string, BilingualLabel>;  // key → label
+  abilities?: Record<string, BilingualLabel>;
+  // hooks pra outros blocos (backgrounds, virtues, etc.) virem depois
+}
+
+export function getTraitOverrides(system: GameSystem, edition?: '20th'|'5ed'): TraitOverrides
+```
+
+Mapas: W5/M5 → Compostura/Determinação; M5 → Essências (Dinâmica/Estática/Primordial/Questionadora); espaço para futuras divergências por sistema.
+
+### 2. Componentes compartilhados — ampliar
+
+- `AttributesEditor`: aceitar `overrides?: TraitOverrides['attributes']` (substitui o atual `edition` prop, que vira só um helper de conveniência).
+- `AbilitiesEditor`: idem com `overrides?: TraitOverrides['abilities']`.
+- Criar `BackgroundsEditor` (novo) — usado pelos 4 sistemas, com lista de backgrounds vindas do adapter.
+- Criar `TraitDisplay` (novo, read-only) — versão somente leitura dos blocos acima, usada nas **Fichas**.
+
+### 3. Edit modals — refatorar para usar os blocos
+
+Arquivos afetados:
+
+- `EditVampiroCharacterModal.tsx`
+- `EditLobisomemCharacterModal.tsx` (W20 + W5 — já compartilham)
+- `EditMagoCharacterModal.tsx` (M20 + M5 — já compartilham)
+- `EditMetamorfosCharacterModal.tsx`
+
+Cada um passa `overrides` derivadas de `getTraitOverrides(system, edition)`.
+
+### 4. Fichas (read-only) — refatorar
+
+- `VampiroCharacterSheet.tsx`
+- `LobisomemCharacterSheet.tsx`
+- `MagoCharacterSheet.tsx`
+- (Metamorfos reutiliza Lobisomem)
+
+Usar `TraitDisplay` para atributos/habilidades em vez de renderizar manualmente.
+
+### 5. Blocos sem mexer agora
+
+- Disciplinas (Vampiro), Dons (Lobisomem), Esferas/Rotinas (Mago), Formas (Metamorfos) — são intrínsecos do sistema, não vale forçar componentização. Ficam como estão.
+- Merits/Flaws já usam `MeritsFlawsSelector` compartilhado.
+
+## Ordem de execução
+
+1. Criar `traitOverrides.ts` + estender `AttributesEditor`/`AbilitiesEditor` com `overrides`.
+2. Criar `BackgroundsEditor` e `TraitDisplay` (read-only).
+3. Refatorar os 4 Edit modals (atributos + habilidades + backgrounds).
+4. Refatorar as 3 Fichas (Vampiro, Lobisomem, Mago).
+5. Verificar build + smoke visual via Playwright em uma ficha de cada sistema.
+
+## Pontos a confirmar
+
+- **Backgrounds**: cada sistema tem lista diferente (Vampiro: Aliados, Recursos…; Lobisomem: Ancestrais, Pureza Racial…; Mago: Avatar, Biblioteca…). Quer um `BackgroundsEditor` único alimentado por config do adapter, ou prefere manter cada um manual e só componentizar atributos/habilidades por enquanto? - **não vamos mexer nisso agora**
+- **Escopo de "demais itens"**: você quer que eu inclua **Virtudes** (Vampiro) e **Renome** (Lobisomem)  nessa unificação ou só Atributos + Habilidades nesta rodada? Sim. Vamos incluir somente isso (em Mago as Essencias são um seletor, igual algúrio para lobisomem, então não precisa ajustar).
