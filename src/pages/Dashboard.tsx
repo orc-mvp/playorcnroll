@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
-import { CharacterOptionsModal } from '@/components/dashboard/CharacterOptionsModal';
+
 import { SessionOptionsModal } from '@/components/dashboard/SessionOptionsModal';
 import { UserMenu } from '@/components/UserMenu';
 import UpgradeBanner from '@/components/UpgradeBanner';
@@ -23,7 +23,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
   const { t, language, setLanguage } = useI18n();
-  const [showCharacterModal, setShowCharacterModal] = useState(false);
+  
   const [showSessionModal, setShowSessionModal] = useState(false);
 
   useEffect(() => {
@@ -110,20 +110,19 @@ export default function Dashboard() {
           </Card>
 
           {/* Characters */}
-          <Card 
-            className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full"
-            onClick={() => setShowCharacterModal(true)}
-          >
-            <CardHeader className="p-4 md:p-6">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                <Scroll className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-              </div>
-              <CardTitle className="font-medieval text-base md:text-lg">{t.nav.characters}</CardTitle>
-              <CardDescription className="font-body text-xs md:text-sm">
-                {t.dashboard.charactersDesc}
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <Link to="/characters">
+            <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+              <CardHeader className="p-4 md:p-6">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                  <Scroll className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                </div>
+                <CardTitle className="font-medieval text-base md:text-lg">{t.nav.characters}</CardTitle>
+                <CardDescription className="font-body text-xs md:text-sm">
+                  {t.dashboard.charactersDesc}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
 
           {/* Customization (was Marks) */}
           <Link to="/customization">
@@ -182,11 +181,6 @@ export default function Dashboard() {
         onOpenChange={setShowSessionModal} 
       />
 
-      {/* Character Options Modal */}
-      <CharacterOptionsModal 
-        open={showCharacterModal} 
-        onOpenChange={setShowCharacterModal} 
-      />
     </div>
   );
 }
