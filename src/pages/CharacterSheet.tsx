@@ -282,6 +282,7 @@ export default function CharacterSheet() {
                 vampiro_data: character.vampiro_data as any,
                 notes: character.notes,
                 experience_points: character.experience_points,
+                game_system: character.game_system,
               }} 
             />
           ) : (character.game_system === 'lobisomem_w20' || character.game_system === 'metamorfos_w20' || character.game_system === 'lobisomem_w5') ? (
@@ -305,6 +306,7 @@ export default function CharacterSheet() {
                 vampiro_data: character.vampiro_data as any,
                 notes: character.notes,
                 experience_points: character.experience_points,
+                game_system: character.game_system,
               }}
             />
           ) : (
