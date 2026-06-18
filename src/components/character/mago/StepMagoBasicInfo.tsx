@@ -50,6 +50,7 @@ export interface MagoFormData {
 interface StepMagoBasicInfoProps {
   formData: MagoFormData;
   updateFormData: (updates: Partial<MagoFormData>) => void;
+  edition?: '20th' | '5ed';
 }
 
 const ARCHETYPES = [
@@ -61,8 +62,22 @@ const ARCHETYPES = [
   'Solitário', 'Tradicionalista', 'Visionário',
 ];
 
-export default function StepMagoBasicInfo({ formData, updateFormData }: StepMagoBasicInfoProps) {
+export default function StepMagoBasicInfo({ formData, updateFormData, edition = '20th' }: StepMagoBasicInfoProps) {
   const { t, language } = useI18n();
+  const is5ed = edition === '5ed';
+  const essenceLabels: Record<string, string> = is5ed
+    ? {
+        dynamic: 'Dinâmica',
+        pattern: 'Estática',
+        primordial: 'Primordial',
+        questing: 'Questionadora',
+      }
+    : {
+        dynamic: t.mago.essence_dynamic,
+        pattern: t.mago.essence_pattern,
+        primordial: t.mago.essence_primordial,
+        questing: t.mago.essence_questing,
+      };
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -107,10 +122,10 @@ export default function StepMagoBasicInfo({ formData, updateFormData }: StepMago
                   <SelectValue placeholder={t.mago.selectEssence} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dynamic">{t.mago.essence_dynamic}</SelectItem>
-                  <SelectItem value="pattern">{t.mago.essence_pattern}</SelectItem>
-                  <SelectItem value="primordial">{t.mago.essence_primordial}</SelectItem>
-                  <SelectItem value="questing">{t.mago.essence_questing}</SelectItem>
+                  <SelectItem value="dynamic">{essenceLabels.dynamic}</SelectItem>
+                  <SelectItem value="pattern">{essenceLabels.pattern}</SelectItem>
+                  <SelectItem value="primordial">{essenceLabels.primordial}</SelectItem>
+                  <SelectItem value="questing">{essenceLabels.questing}</SelectItem>
                 </SelectContent>
               </Select>
             </div>

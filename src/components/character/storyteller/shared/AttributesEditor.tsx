@@ -33,7 +33,14 @@ interface AttributesEditorProps {
   noCard?: boolean;
   /** Override card title. */
   title?: string;
+  /** WoD edition — '5ed' renames Appearance→Composure, Perception→Resolve. */
+  edition?: '20th' | '5ed';
 }
+
+const EDITION_5ED_LABELS: Record<string, { 'pt-BR': string; 'en-US': string }> = {
+  appearance: { 'pt-BR': 'Compostura', 'en-US': 'Composure' },
+  perception: { 'pt-BR': 'Determinação', 'en-US': 'Resolve' },
+};
 
 export default function AttributesEditor({
   value,
@@ -44,6 +51,7 @@ export default function AttributesEditor({
   totalOffset = 0,
   noCard = false,
   title,
+  edition = '20th',
 }: AttributesEditorProps) {
   const { language } = useI18n();
   const isMobile = useIsMobile();
@@ -76,10 +84,15 @@ export default function AttributesEditor({
 
     const content = (
       <div className="space-y-2">
-        {section.items.map((attr) => (
+        {section.items.map((attr) => {
+          const lang = language as 'pt-BR' | 'en-US';
+          const displayLabel = edition === '5ed' && EDITION_5ED_LABELS[attr.key]
+            ? EDITION_5ED_LABELS[attr.key][lang]
+            : attr.label[lang];
+          return (
           <div key={attr.key} className="flex items-center justify-between gap-2">
             <span className="text-sm font-body min-w-[100px]">
-              {attr.label[language as 'pt-BR' | 'en-US']}
+              {displayLabel}
             </span>
             <DotRating
               value={value[category]?.[attr.key] ?? minValue}
@@ -88,7 +101,8 @@ export default function AttributesEditor({
               maxValue={maxValue}
             />
           </div>
-        ))}
+          );
+        })}
       </div>
     );
 
