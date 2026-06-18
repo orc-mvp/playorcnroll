@@ -122,10 +122,10 @@ export default function StepMagoBasicInfo({ formData, updateFormData, edition = 
                   <SelectValue placeholder={t.mago.selectEssence} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="dynamic">{t.mago.essence_dynamic}</SelectItem>
-                  <SelectItem value="pattern">{t.mago.essence_pattern}</SelectItem>
-                  <SelectItem value="primordial">{t.mago.essence_primordial}</SelectItem>
-                  <SelectItem value="questing">{t.mago.essence_questing}</SelectItem>
+                  <SelectItem value="dynamic">{essenceLabels.dynamic}</SelectItem>
+                  <SelectItem value="pattern">{essenceLabels.pattern}</SelectItem>
+                  <SelectItem value="primordial">{essenceLabels.primordial}</SelectItem>
+                  <SelectItem value="questing">{essenceLabels.questing}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
