@@ -37,6 +37,7 @@ interface Character {
   name: string;
   concept: string | null;
   vampiro_data: MagoCharacterData | null;
+  game_system?: string;
 }
 
 interface EditMagoCharacterModalProps {

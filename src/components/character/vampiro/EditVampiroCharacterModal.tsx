@@ -71,6 +71,7 @@ interface Character {
   name: string;
   concept: string | null;
   vampiro_data: VampiroData | null;
+  game_system?: string;
 }
 
 interface EditVampiroCharacterModalProps {
