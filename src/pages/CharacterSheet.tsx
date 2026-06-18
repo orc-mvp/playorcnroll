@@ -758,6 +758,7 @@ export default function CharacterSheet() {
             name: character.name,
             concept: character.concept,
             vampiro_data: character.vampiro_data as any,
+            game_system: character.game_system,
           }}
           onSave={(updated) => {
             setCharacter((prev) =>
@@ -784,6 +785,7 @@ export default function CharacterSheet() {
             name: character.name,
             concept: character.concept,
             vampiro_data: character.vampiro_data as any,
+            game_system: character.game_system,
           }}
           onSave={(updated) => {
             setCharacter(prev => prev ? { 
