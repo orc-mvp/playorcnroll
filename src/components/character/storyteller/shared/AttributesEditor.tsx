@@ -51,6 +51,7 @@ export default function AttributesEditor({
   totalOffset = 0,
   noCard = false,
   title,
+  edition = '20th',
 }: AttributesEditorProps) {
   const { language } = useI18n();
   const isMobile = useIsMobile();
