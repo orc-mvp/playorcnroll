@@ -37,12 +37,10 @@ interface AttributesEditorProps {
   edition?: '20th' | '5ed';
 }
 
-const EDITION_5ED_LABELS: Record<string, BilingualLabel> = {
+const EDITION_5ED_LABELS: Record<string, { 'pt-BR': string; 'en-US': string }> = {
   appearance: { 'pt-BR': 'Compostura', 'en-US': 'Composure' },
   perception: { 'pt-BR': 'Determinação', 'en-US': 'Resolve' },
 };
-
-type BilingualLabel = { 'pt-BR': string; 'en-US': string };
 
 export default function AttributesEditor({
   value,
