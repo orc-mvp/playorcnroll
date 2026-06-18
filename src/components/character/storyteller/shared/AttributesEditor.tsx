@@ -84,10 +84,15 @@ export default function AttributesEditor({
 
     const content = (
       <div className="space-y-2">
-        {section.items.map((attr) => (
+        {section.items.map((attr) => {
+          const lang = language as 'pt-BR' | 'en-US';
+          const displayLabel = edition === '5ed' && EDITION_5ED_LABELS[attr.key]
+            ? EDITION_5ED_LABELS[attr.key][lang]
+            : attr.label[lang];
+          return (
           <div key={attr.key} className="flex items-center justify-between gap-2">
             <span className="text-sm font-body min-w-[100px]">
-              {attr.label[language as 'pt-BR' | 'en-US']}
+              {displayLabel}
             </span>
             <DotRating
               value={value[category]?.[attr.key] ?? minValue}
