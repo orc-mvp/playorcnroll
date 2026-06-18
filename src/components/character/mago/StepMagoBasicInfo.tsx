@@ -50,6 +50,7 @@ export interface MagoFormData {
 interface StepMagoBasicInfoProps {
   formData: MagoFormData;
   updateFormData: (updates: Partial<MagoFormData>) => void;
+  edition?: '20th' | '5ed';
 }
 
 const ARCHETYPES = [
