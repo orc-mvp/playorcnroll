@@ -33,7 +33,16 @@ interface AttributesEditorProps {
   noCard?: boolean;
   /** Override card title. */
   title?: string;
+  /** WoD edition — '5ed' renames Appearance→Composure, Perception→Resolve. */
+  edition?: '20th' | '5ed';
 }
+
+const EDITION_5ED_LABELS: Record<string, BilingualLabel> = {
+  appearance: { 'pt-BR': 'Compostura', 'en-US': 'Composure' },
+  perception: { 'pt-BR': 'Determinação', 'en-US': 'Resolve' },
+};
+
+type BilingualLabel = { 'pt-BR': string; 'en-US': string };
 
 export default function AttributesEditor({
   value,
