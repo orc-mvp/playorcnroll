@@ -62,8 +62,22 @@ const ARCHETYPES = [
   'Solitário', 'Tradicionalista', 'Visionário',
 ];
 
-export default function StepMagoBasicInfo({ formData, updateFormData }: StepMagoBasicInfoProps) {
+export default function StepMagoBasicInfo({ formData, updateFormData, edition = '20th' }: StepMagoBasicInfoProps) {
   const { t, language } = useI18n();
+  const is5ed = edition === '5ed';
+  const essenceLabels: Record<string, string> = is5ed
+    ? {
+        dynamic: 'Dinâmica',
+        pattern: 'Estática',
+        primordial: 'Primordial',
+        questing: 'Questionadora',
+      }
+    : {
+        dynamic: t.mago.essence_dynamic,
+        pattern: t.mago.essence_pattern,
+        primordial: t.mago.essence_primordial,
+        questing: t.mago.essence_questing,
+      };
 
   return (
     <div className="max-w-2xl mx-auto">
