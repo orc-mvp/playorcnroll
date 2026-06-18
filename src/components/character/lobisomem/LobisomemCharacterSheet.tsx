@@ -13,6 +13,10 @@ import {
 } from '@/components/ui/tooltip';
 import { Dog, User, Shield, Brain, Sparkles, Users, Flame, Star, Heart, Crown } from 'lucide-react';
 import { XpReducer } from '../storyteller/shared/XpReducer';
+import AttributesEditor from '../storyteller/shared/AttributesEditor';
+import AbilitiesEditor from '../storyteller/shared/AbilitiesEditor';
+import RenownBlock from '../storyteller/shared/RenownBlock';
+import { getTraitOverrides } from '@/lib/storyteller/traitOverrides';
 import { toTitleCase } from '@/lib/textUtils';
 import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 import { isShifterData, getShifterAuspiceLabel } from '@/lib/lobisomem/auspiceLabels';
@@ -346,32 +350,12 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.physical}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.strength} value={attributes.physical.strength} />
-                <AttributeRow name={t.vampiro.dexterity} value={attributes.physical.dexterity} />
-                <AttributeRow name={t.vampiro.stamina} value={attributes.physical.stamina} />
-              </div>
-            </div>
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.social}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.charisma} value={attributes.social.charisma} />
-                <AttributeRow name={t.vampiro.manipulation} value={attributes.social.manipulation} />
-                <AttributeRow name={t.vampiro.appearance} value={attributes.social.appearance} />
-              </div>
-            </div>
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.mental}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.perception} value={attributes.mental.perception} />
-                <AttributeRow name={t.vampiro.intelligence} value={attributes.mental.intelligence} />
-                <AttributeRow name={t.vampiro.wits} value={attributes.mental.wits} />
-              </div>
-            </div>
-          </div>
+          <AttributesEditor
+            value={attributes}
+            noCard
+            readOnly
+            overrides={getTraitOverrides(character.game_system).attributes}
+          />
         </CardContent>
       </Card>
 
@@ -384,41 +368,13 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
-                {t.vampiro.talents}{' '}
-                <span className="text-muted-foreground/60">({ABILITY_KEYS.talents.reduce((sum, k) => sum + (abilities.talents[k] || 0), 0)})</span>
-              </h4>
-              <div className="space-y-1">
-                {ABILITY_KEYS.talents.map((key) => (
-                  <AbilityRow key={key} name={t.vampiro[key]} value={abilities.talents[key] || 0} specialization={specializations[key]} />
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
-                {t.vampiro.skills}{' '}
-                <span className="text-muted-foreground/60">({ABILITY_KEYS.skills.reduce((sum, k) => sum + (abilities.skills[k] || 0), 0)})</span>
-              </h4>
-              <div className="space-y-1">
-                {ABILITY_KEYS.skills.map((key) => (
-                  <AbilityRow key={key} name={t.vampiro[key]} value={abilities.skills[key] || 0} specialization={specializations[key]} />
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
-                {t.vampiro.knowledges}{' '}
-                <span className="text-muted-foreground/60">({ABILITY_KEYS.knowledges.reduce((sum, k) => sum + (abilities.knowledges[k] || 0), 0)})</span>
-              </h4>
-              <div className="space-y-1">
-                {ABILITY_KEYS.knowledges.map((key) => (
-                  <AbilityRow key={key} name={t.vampiro[key]} value={abilities.knowledges[key] || 0} specialization={specializations[key]} />
-                ))}
-              </div>
-            </div>
-          </div>
+          <AbilitiesEditor
+            value={abilities}
+            specializations={specializations}
+            noCard
+            readOnly
+            overrides={getTraitOverrides(character.game_system).abilities}
+          />
         </CardContent>
       </Card>
 
@@ -736,30 +692,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-3">
-            {(() => {
-              const isBSD = data.tribe === 'Black Spiral Dancers';
-              const gloryLabel = isBSD ? t.lobisomem.bsd_glory : t.lobisomem.glory;
-              const honorLabel = isBSD ? t.lobisomem.bsd_honor : t.lobisomem.honor;
-              const wisdomLabel = isBSD ? t.lobisomem.bsd_wisdom : t.lobisomem.wisdom;
-              return (
-                <>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">{gloryLabel}</span>
-                    <DotDisplay value={renown.glory} maxValue={10} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">{honorLabel}</span>
-                    <DotDisplay value={renown.honor} maxValue={10} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-body text-sm">{wisdomLabel}</span>
-                    <DotDisplay value={renown.wisdom} maxValue={10} />
-                  </div>
-                </>
-              );
-            })()}
-          </div>
+          <RenownBlock value={renown} tribe={data.tribe} readOnly />
         </CardContent>
       </Card>
       )}
