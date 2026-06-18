@@ -13,6 +13,9 @@ import {
 } from '@/components/ui/tooltip';
 import { Star as StarIcon, User, Shield, Brain, Sparkles, Users, Heart, BookOpen, Zap } from 'lucide-react';
 import { XpReducer } from '../storyteller/shared/XpReducer';
+import AttributesEditor from '../storyteller/shared/AttributesEditor';
+import AbilitiesEditor from '../storyteller/shared/AbilitiesEditor';
+import { getTraitOverrides } from '@/lib/storyteller/traitOverrides';
 import { toTitleCase } from '@/lib/textUtils';
 import { MAGO_SPHERES, MAGO_BACKGROUNDS, type MagoCharacterData } from '@/lib/mago/spheres';
 import { CharacterNotes } from '../CharacterNotes';
@@ -36,6 +39,7 @@ interface MagoCharacterSheetProps {
     vampiro_data: MagoCharacterData | null;
     notes?: string | null;
     experience_points?: number;
+    game_system?: string;
   };
   sessionTrackers?: {
     quintessence?: number;
@@ -275,32 +279,12 @@ export default function MagoCharacterSheet({ character, sessionTrackers, readOnl
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.physical}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.strength} value={attributes.physical.strength} />
-                <AttributeRow name={t.vampiro.dexterity} value={attributes.physical.dexterity} />
-                <AttributeRow name={t.vampiro.stamina} value={attributes.physical.stamina} />
-              </div>
-            </div>
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.social}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.charisma} value={attributes.social.charisma} />
-                <AttributeRow name={t.vampiro.manipulation} value={attributes.social.manipulation} />
-                <AttributeRow name={t.vampiro.appearance} value={attributes.social.appearance} />
-              </div>
-            </div>
-            <div>
-              <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">{t.vampiro.mental}</h4>
-              <div className="space-y-1">
-                <AttributeRow name={t.vampiro.perception} value={attributes.mental.perception} />
-                <AttributeRow name={t.vampiro.intelligence} value={attributes.mental.intelligence} />
-                <AttributeRow name={t.vampiro.wits} value={attributes.mental.wits} />
-              </div>
-            </div>
-          </div>
+          <AttributesEditor
+            value={attributes}
+            noCard
+            readOnly
+            overrides={getTraitOverrides(character.game_system).attributes}
+          />
         </CardContent>
       </Card>
 
@@ -313,28 +297,13 @@ export default function MagoCharacterSheet({ character, sessionTrackers, readOnl
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {(['talents', 'skills', 'knowledges'] as const).map((cat) => (
-              <div key={cat}>
-                <h4 className="font-medieval text-sm text-muted-foreground mb-2 text-center">
-                  {t.vampiro[cat]}{' '}
-                  <span className="text-muted-foreground/60">
-                    ({ABILITY_KEYS[cat].reduce((sum, k) => sum + ((abilities[cat] as Record<string, number>)?.[k] || 0), 0)})
-                  </span>
-                </h4>
-                <div className="space-y-1">
-                  {ABILITY_KEYS[cat].map((key) => (
-                    <AbilityRow
-                      key={key}
-                      name={getTraitLabel(key, language === 'pt-BR' ? 'pt-BR' : 'en-US')}
-                      value={(abilities[cat] as Record<string, number>)?.[key] || 0}
-                      specialization={specializations[key]}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <AbilitiesEditor
+            value={abilities}
+            specializations={specializations}
+            noCard
+            readOnly
+            overrides={getTraitOverrides(character.game_system).abilities}
+          />
         </CardContent>
       </Card>
 
