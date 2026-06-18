@@ -29,6 +29,10 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { User, Shield, Brain, Heart, Moon, Star, BookOpen, Sparkles } from 'lucide-react';
 import DotRating from './DotRating';
 import MeritsFlawsSelector, { type SelectedMeritFlaw } from '@/components/character/storyteller/shared/MeritsFlawsSelector';
+import AttributesEditor, { type AttributeValues } from '@/components/character/storyteller/shared/AttributesEditor';
+import AbilitiesEditor, { type AbilityValues } from '@/components/character/storyteller/shared/AbilitiesEditor';
+import VirtuesBlock from '@/components/character/storyteller/shared/VirtuesBlock';
+import { getTraitOverrides } from '@/lib/storyteller/traitOverrides';
 
 // Types
 interface VampiroData {
