@@ -101,7 +101,8 @@ export default function AttributesEditor({
               maxValue={maxValue}
             />
           </div>
-        ))}
+          );
+        })}
       </div>
     );
 
