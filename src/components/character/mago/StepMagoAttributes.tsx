@@ -5,15 +5,17 @@ import AbilitiesEditor, { AbilityValues } from '@/components/character/storytell
 interface Props {
   formData: MagoFormData;
   updateFormData: (updates: Partial<MagoFormData>) => void;
+  edition?: '20th' | '5ed';
 }
 
-export default function StepMagoAttributes({ formData, updateFormData }: Props) {
+export default function StepMagoAttributes({ formData, updateFormData, edition = '20th' }: Props) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <AttributesEditor
         value={formData.attributes as AttributeValues}
         onChange={(next) => updateFormData({ attributes: next as MagoFormData['attributes'] })}
         minValue={1}
+        edition={edition}
       />
       <AbilitiesEditor
         value={formData.abilities as AbilityValues}

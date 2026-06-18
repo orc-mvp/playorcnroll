@@ -5,15 +5,17 @@ import AbilitiesEditor, { AbilityValues } from '@/components/character/storytell
 interface StepVampiroAttributesProps {
   formData: VampiroFormData;
   updateFormData: (updates: Partial<VampiroFormData>) => void;
+  edition?: '20th' | '5ed';
 }
 
-export default function StepVampiroAttributes({ formData, updateFormData }: StepVampiroAttributesProps) {
+export default function StepVampiroAttributes({ formData, updateFormData, edition = '20th' }: StepVampiroAttributesProps) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <AttributesEditor
         value={formData.attributes as AttributeValues}
         onChange={(next) => updateFormData({ attributes: next as VampiroFormData['attributes'] })}
         minValue={1}
+        edition={edition}
       />
       <AbilitiesEditor
         value={formData.abilities as AbilityValues}
