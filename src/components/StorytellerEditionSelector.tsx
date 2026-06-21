@@ -52,11 +52,11 @@ const EDITIONS: EditionOption[] = [
   {
     id: '5ed',
     name: { 'pt-BR': '5ª Edição', en: '5th Edition' },
-    shortName: 'W5',
+    shortName: 'W5 · M5',
     description: {
       'pt-BR':
-        'Lobisomem 5ª Edição. Pool dividido com dados de Fúria, dificuldade em sucessos, Messy Critical e Brutal Outcome. Não mistura com sistemas Clássicos.',
-      en: 'Werewolf 5th Edition. Split pool with Rage dice, success-based difficulty, Messy Critical and Brutal Outcome. Does not mix with Classic systems.',
+        'Mundo das Trevas 5ª Edição. Lobisomem W5 e Mago M5. Pool dividido com dados de Fúria/Paradoxo, dificuldade em sucessos, Messy/Quiet Critical e Brutal/Refluxo. Não mistura com sistemas Clássicos.',
+      en: '5th Edition World of Darkness. Werewolf W5 and Mage M5. Split pool with Rage/Paradox dice, success-based difficulty, Messy/Quiet Critical and Brutal/Backlash. Does not mix with Classic systems.',
     },
     badge: { 'pt-BR': 'Pool dividido', en: 'Split pool' },
     icon: <Moon className="w-8 h-8" />,
