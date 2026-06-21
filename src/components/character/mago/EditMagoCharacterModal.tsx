@@ -367,7 +367,7 @@ export function EditMagoCharacterModal({
                       <DotRating
                         value={magoData.arete || 1}
                         onChange={(val) => updateField('arete', val)}
-                        maxValue={10}
+                        maxValue={maxArete}
                         minValue={1}
                       />
                     </div>
@@ -376,7 +376,7 @@ export function EditMagoCharacterModal({
                       <DotRating
                         value={magoData.willpower || 1}
                         onChange={(val) => updateField('willpower', val)}
-                        maxValue={10}
+                        maxValue={maxWillpower}
                         minValue={1}
                       />
                     </div>
@@ -385,10 +385,10 @@ export function EditMagoCharacterModal({
                       <Input
                         type="number"
                         min={0}
-                        max={20}
+                        max={maxQuint}
                         value={magoData.quintessence ?? 0}
                         onChange={(e) =>
-                          updateField('quintessence', Math.max(0, Math.min(20, Number(e.target.value) || 0)))
+                          updateField('quintessence', Math.max(0, Math.min(maxQuint, Number(e.target.value) || 0)))
                         }
                         className="w-20 font-body text-center"
                       />
@@ -398,10 +398,10 @@ export function EditMagoCharacterModal({
                       <Input
                         type="number"
                         min={0}
-                        max={20}
+                        max={maxParadox}
                         value={magoData.paradox ?? 0}
                         onChange={(e) =>
-                          updateField('paradox', Math.max(0, Math.min(20, Number(e.target.value) || 0)))
+                          updateField('paradox', Math.max(0, Math.min(maxParadox, Number(e.target.value) || 0)))
                         }
                         className="w-20 font-body text-center"
                       />
