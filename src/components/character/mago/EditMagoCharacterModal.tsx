@@ -79,19 +79,26 @@ export function EditMagoCharacterModal({
     setMagoData((character.vampiro_data as MagoCharacterData) || ({} as MagoCharacterData));
   }, [character]);
 
+  const systemId = character.game_system || 'mago_m20';
+  const is5ed = systemId === 'mago_m5';
+  const maxArete = is5ed ? 5 : 10;
+  const maxWillpower = is5ed ? 5 : 10;
+  const maxQuint = is5ed ? 5 : 20;
+  const maxParadox = is5ed ? 10 : 20;
+
   useEffect(() => {
     const fetchMF = async () => {
       const { data } = await supabase
         .from('merits_flaws')
         .select('id, name, description, cost, category, prerequisites')
-        .contains('game_systems', ['mago_m20'])
+        .contains('game_systems', [systemId])
         .order('category')
         .order('cost', { ascending: false })
         .order('name');
       if (data) setAvailableMeritsFlaws(data);
     };
     if (open) fetchMF();
-  }, [open]);
+  }, [open, systemId]);
 
   const updateField = <K extends keyof MagoCharacterData>(key: K, value: MagoCharacterData[K]) => {
     setMagoData((prev) => ({ ...prev, [key]: value }));
