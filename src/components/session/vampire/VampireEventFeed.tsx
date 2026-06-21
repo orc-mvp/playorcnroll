@@ -228,6 +228,12 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
     const extraResults = (eventData.extra_results as number[]) || [];
     const difficulty = testConfig?.difficulty as number;
     const dicePool = eventData.dice_pool as number;
+    const mode = eventData.mode as string | undefined;
+    const isM5Split = mode === 'm5-split';
+    const normalDice = (eventData.normal_dice as number[]) || [];
+    const paradoxDice = (eventData.paradox_dice as number[]) || [];
+    const isQuietCritical = eventData.is_quiet_critical as boolean;
+    const isBacklash = eventData.is_backlash as boolean;
 
     return (
       <div className="space-y-2">
@@ -254,41 +260,87 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
 
         {/* Dice display */}
         <div className="flex flex-wrap gap-1">
-          {baseResults?.map((die, i) => (
-            <span
-              key={`base-${i}`}
-              className={cn(
-                "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
-                die >= difficulty
-                  ? 'bg-green-500/20 text-green-500'
-                  : die === 1
-                    ? 'bg-destructive/20 text-destructive'
-                    : 'bg-muted text-muted-foreground'
-              )}
-            >
-              {die}
-            </span>
-          ))}
-          {extraResults?.map((die, i) => (
-            <span
-              key={`extra-${i}`}
-              className={cn(
-                "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold border border-dashed",
-                die >= difficulty
-                  ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500'
-                  : die === 1
-                    ? 'bg-destructive/20 text-destructive border-destructive'
-                    : 'bg-muted text-muted-foreground border-muted-foreground'
-              )}
-            >
-              {die}
-            </span>
-          ))}
+          {isM5Split ? (
+            <>
+              {normalDice.map((die, i) => (
+                <span
+                  key={`n-${i}`}
+                  className={cn(
+                    "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+                    die >= difficulty
+                      ? 'bg-green-500/20 text-green-500'
+                      : die === 1
+                        ? 'bg-destructive/20 text-destructive'
+                        : 'bg-muted text-muted-foreground'
+                  )}
+                >
+                  {die}
+                </span>
+              ))}
+              {paradoxDice.map((die, i) => (
+                <span
+                  key={`p-${i}`}
+                  title="Paradoxo"
+                  className={cn(
+                    "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold border",
+                    die >= difficulty
+                      ? 'bg-purple-500/20 text-purple-300 border-purple-500'
+                      : die === 1
+                        ? 'bg-destructive/30 text-destructive border-destructive'
+                        : 'bg-purple-500/10 text-purple-300 border-purple-500/40'
+                  )}
+                >
+                  {die}
+                </span>
+              ))}
+            </>
+          ) : (
+            <>
+              {baseResults?.map((die, i) => (
+                <span
+                  key={`base-${i}`}
+                  className={cn(
+                    "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+                    die >= difficulty
+                      ? 'bg-green-500/20 text-green-500'
+                      : die === 1
+                        ? 'bg-destructive/20 text-destructive'
+                        : 'bg-muted text-muted-foreground'
+                  )}
+                >
+                  {die}
+                </span>
+              ))}
+              {extraResults?.map((die, i) => (
+                <span
+                  key={`extra-${i}`}
+                  className={cn(
+                    "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold border border-dashed",
+                    die >= difficulty
+                      ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500'
+                      : die === 1
+                        ? 'bg-destructive/20 text-destructive border-destructive'
+                        : 'bg-muted text-muted-foreground border-muted-foreground'
+                  )}
+                >
+                  {die}
+                </span>
+              ))}
+            </>
+          )}
         </div>
 
         {/* Result badge */}
-        <div className="flex items-center gap-2">
-          {isBotch ? (
+        <div className="flex items-center gap-2 flex-wrap">
+          {isM5Split && isQuietCritical ? (
+            <Badge className="bg-purple-600 text-xs">
+              {finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'} — Crítico Silencioso
+            </Badge>
+          ) : isM5Split && isBacklash ? (
+            <Badge variant="destructive" className="text-xs">
+              Refluxo (Paradoxo +1)
+            </Badge>
+          ) : isBotch ? (
             <Badge variant="destructive" className="text-xs">
               {t.vampiroTests?.botch || 'Falha Crítica'}
             </Badge>
@@ -306,7 +358,9 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
             </Badge>
           )}
           <span className="text-xs text-muted-foreground">
-            {t.vampiroTests?.poolLabel || 'Pool'}: {dicePool} | {t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}
+            {t.vampiroTests?.poolLabel || 'Pool'}: {dicePool}
+            {isM5Split && paradoxDice.length > 0 && ` (${paradoxDice.length} Paradoxo)`}
+            {' | '}{t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}
           </span>
         </div>
       </div>
@@ -469,16 +523,24 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
     const isBotch = eventData.is_botch as boolean;
     const isExceptional = eventData.is_exceptional as boolean;
     const context = eventData.context as string | undefined;
+    const mode = eventData.mode as string | undefined;
+    const isM5Split = mode === 'm5-split';
+    const normalDice = (eventData.normal_dice as number[]) || [];
+    const paradoxDice = (eventData.paradox_dice as number[]) || [];
+    const isQuietCritical = eventData.is_quiet_critical as boolean;
+    const isBacklash = eventData.is_backlash as boolean;
 
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2 flex-wrap">
-          <Dices className="w-4 h-4 text-destructive shrink-0" />
+          <Dices className={cn("w-4 h-4 shrink-0", isM5Split ? 'text-purple-500' : 'text-destructive')} />
           <span className="font-medieval text-sm">
             {t.vampiroTests?.narratorRolled || 'Narrador rolou'}
           </span>
           <Badge variant="outline" className="text-xs">
-            {diceCount}d10 | {t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}
+            {diceCount}d10
+            {isM5Split && paradoxDice.length > 0 && ` (${paradoxDice.length} Paradoxo)`}
+            {' | '}{t.vampiroTests?.difficultyLabel || 'Dif'}: {difficulty}
           </Badge>
         </div>
 
@@ -487,25 +549,69 @@ export function VampireEventFeed({ events, currentUserId, isNarrator = false }: 
         )}
 
         <div className="flex flex-wrap gap-1">
-          {results?.map((die, i) => (
-            <span
-              key={i}
-              className={cn(
-                "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
-                die >= difficulty
-                  ? 'bg-green-500/20 text-green-500'
-                  : die === 1
-                    ? 'bg-destructive/20 text-destructive'
-                    : 'bg-muted text-muted-foreground'
-              )}
-            >
-              {die}
-            </span>
-          ))}
+          {isM5Split ? (
+            <>
+              {normalDice.map((die, i) => (
+                <span
+                  key={`n-${i}`}
+                  className={cn(
+                    "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+                    die >= difficulty
+                      ? 'bg-green-500/20 text-green-500'
+                      : die === 1
+                        ? 'bg-destructive/20 text-destructive'
+                        : 'bg-muted text-muted-foreground'
+                  )}
+                >
+                  {die}
+                </span>
+              ))}
+              {paradoxDice.map((die, i) => (
+                <span
+                  key={`p-${i}`}
+                  title="Paradoxo"
+                  className={cn(
+                    "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold border",
+                    die >= difficulty
+                      ? 'bg-purple-500/20 text-purple-300 border-purple-500'
+                      : die === 1
+                        ? 'bg-destructive/30 text-destructive border-destructive'
+                        : 'bg-purple-500/10 text-purple-300 border-purple-500/40'
+                  )}
+                >
+                  {die}
+                </span>
+              ))}
+            </>
+          ) : (
+            results?.map((die, i) => (
+              <span
+                key={i}
+                className={cn(
+                  "inline-flex items-center justify-center w-6 h-6 rounded text-xs font-bold",
+                  die >= difficulty
+                    ? 'bg-green-500/20 text-green-500'
+                    : die === 1
+                      ? 'bg-destructive/20 text-destructive'
+                      : 'bg-muted text-muted-foreground'
+                )}
+              >
+                {die}
+              </span>
+            ))
+          )}
         </div>
 
-        <div className="flex items-center gap-2">
-          {isBotch ? (
+        <div className="flex items-center gap-2 flex-wrap">
+          {isM5Split && isQuietCritical ? (
+            <Badge className="bg-purple-600 text-xs">
+              {finalSuccesses} {t.vampiroTests?.successes || 'Sucessos'} — Crítico Silencioso
+            </Badge>
+          ) : isM5Split && isBacklash ? (
+            <Badge variant="destructive" className="text-xs">
+              Refluxo
+            </Badge>
+          ) : isBotch ? (
             <Badge variant="destructive" className="text-xs">
               {t.vampiroTests?.botch || 'Falha Crítica'}
             </Badge>

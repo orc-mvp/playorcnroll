@@ -211,6 +211,9 @@ export function MagoNarratorSidebar({
             <div className="space-y-3">
               {participants.map((p) => {
                 const data = p.character?.vampiro_data as MagoCharacterData | null;
+                const is5ed = p.character?.game_system === 'mago_m5';
+                const maxQuint = is5ed ? 5 : 20;
+                const maxParadox = is5ed ? 10 : 20;
                 const maxArete = data?.arete || 1;
                 const maxWillpower = data?.willpower || 1;
                 const currentQuintessence = p.session_quintessence ?? 0;
@@ -220,7 +223,7 @@ export function MagoNarratorSidebar({
                 const damagedLevels = healthDamage.filter(Boolean).length;
 
                 const isWillpowerCritical = currentWillpower === 0;
-                const isParadoxCritical = currentParadox >= 15;
+                const isParadoxCritical = is5ed ? currentParadox >= 8 : currentParadox >= 15;
                 const hasCriticalState = isWillpowerCritical || isParadoxCritical;
 
                 return (
@@ -265,7 +268,7 @@ export function MagoNarratorSidebar({
                         <button
                           type="button"
                           onClick={() =>
-                            openAdjustModal('blood' as TrackerType, currentQuintessence, p.id, p.character?.name || '', undefined, 20, 'quintessence')
+                            openAdjustModal('blood' as TrackerType, currentQuintessence, p.id, p.character?.name || '', undefined, maxQuint, 'quintessence')
                           }
                           className="flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 bg-purple-500/10 border-purple-500/20"
                         >
@@ -280,7 +283,7 @@ export function MagoNarratorSidebar({
                         <button
                           type="button"
                           onClick={() =>
-                            openAdjustModal('blood' as TrackerType, currentParadox, p.id, p.character?.name || '', undefined, 20, 'paradox')
+                            openAdjustModal('blood' as TrackerType, currentParadox, p.id, p.character?.name || '', undefined, maxParadox, 'paradox')
                           }
                           className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
                             isParadoxCritical

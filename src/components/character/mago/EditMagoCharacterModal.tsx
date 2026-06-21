@@ -79,19 +79,26 @@ export function EditMagoCharacterModal({
     setMagoData((character.vampiro_data as MagoCharacterData) || ({} as MagoCharacterData));
   }, [character]);
 
+  const systemId = character.game_system || 'mago_m20';
+  const is5ed = systemId === 'mago_m5';
+  const maxArete = is5ed ? 5 : 10;
+  const maxWillpower = is5ed ? 5 : 10;
+  const maxQuint = is5ed ? 5 : 20;
+  const maxParadox = is5ed ? 10 : 20;
+
   useEffect(() => {
     const fetchMF = async () => {
       const { data } = await supabase
         .from('merits_flaws')
         .select('id, name, description, cost, category, prerequisites')
-        .contains('game_systems', ['mago_m20'])
+        .contains('game_systems', [systemId])
         .order('category')
         .order('cost', { ascending: false })
         .order('name');
       if (data) setAvailableMeritsFlaws(data);
     };
     if (open) fetchMF();
-  }, [open]);
+  }, [open, systemId]);
 
   const updateField = <K extends keyof MagoCharacterData>(key: K, value: MagoCharacterData[K]) => {
     setMagoData((prev) => ({ ...prev, [key]: value }));
@@ -360,7 +367,7 @@ export function EditMagoCharacterModal({
                       <DotRating
                         value={magoData.arete || 1}
                         onChange={(val) => updateField('arete', val)}
-                        maxValue={10}
+                        maxValue={maxArete}
                         minValue={1}
                       />
                     </div>
@@ -369,7 +376,7 @@ export function EditMagoCharacterModal({
                       <DotRating
                         value={magoData.willpower || 1}
                         onChange={(val) => updateField('willpower', val)}
-                        maxValue={10}
+                        maxValue={maxWillpower}
                         minValue={1}
                       />
                     </div>
@@ -378,10 +385,10 @@ export function EditMagoCharacterModal({
                       <Input
                         type="number"
                         min={0}
-                        max={20}
+                        max={maxQuint}
                         value={magoData.quintessence ?? 0}
                         onChange={(e) =>
-                          updateField('quintessence', Math.max(0, Math.min(20, Number(e.target.value) || 0)))
+                          updateField('quintessence', Math.max(0, Math.min(maxQuint, Number(e.target.value) || 0)))
                         }
                         className="w-20 font-body text-center"
                       />
@@ -391,10 +398,10 @@ export function EditMagoCharacterModal({
                       <Input
                         type="number"
                         min={0}
-                        max={20}
+                        max={maxParadox}
                         value={magoData.paradox ?? 0}
                         onChange={(e) =>
-                          updateField('paradox', Math.max(0, Math.min(20, Number(e.target.value) || 0)))
+                          updateField('paradox', Math.max(0, Math.min(maxParadox, Number(e.target.value) || 0)))
                         }
                         className="w-20 font-body text-center"
                       />

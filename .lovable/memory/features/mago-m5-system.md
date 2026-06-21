@@ -38,15 +38,15 @@ type: feature
 - Reutiliza os mesmos `StepMagoBasicInfo`/`Attributes`/`Spheres`/`Rotes`/`Backgrounds`/`MeritsFlaws` do M20.
 - Em `CreateCharacter`, ao escolher `mago_m5` defaults são capados (arete=1, vontade=3, quint=0, paradox=0).
 - `MagoCharacterSheet` reaproveitada (não diferencia visualmente M20 vs M5; sem polish).
-- `EditMagoCharacterModal` ainda carrega merits/flaws filtrados por `mago_m20` (gap conhecido).
+- `EditMagoCharacterModal` filtra merits/flaws pelo `character.game_system` e aplica caps M5 nos pools (Arête/Vontade 5, Quint 5, Paradoxo 10).
 
 ## Sala Storyteller
 - `StorytellerSession`: branch `mago_m5` em `magoParticipants`, `buildTrackerProps`, `sidePanelProps`, `pendingTestSharedProps` (passa `currentParadox`).
 - `StorytellerNarratorRollModal` rota `m5-split` → `M5NarratorRollModal`.
-- `StorytellerEventFeed` rota `mago_m5` para `VampireEventFeed` (legados `base_results` cobrem a renderização clássica).
+- `StorytellerEventFeed` rota `mago_m5` para `VampireEventFeed`, que renderiza dados de Paradoxo em roxo + badges "Crítico Silencioso"/"Refluxo" quando `mode==='m5-split'`.
+- `MagoNarratorSidebar` aplica caps M5 (Quint 5, Paradoxo 10, paradox crítico ≥8) quando `character.game_system==='mago_m5'`.
 - Persistência: `narrator_roll` grava `mode: 'm5-split'`, `normal_dice`, `paradox_dice`, `is_quiet_critical`, `is_backlash`, `margin`.
 
 ## Gaps conhecidos (pós-MVP)
-- `MagoNarratorSidebar` ainda usa caps M20 (20/20) ao adjustar trackers M5.
-- Feed não renderiza Quiet/Backlash com badges próprios (só texto legado).
-- i18n pendente.
+- i18n pendente (strings novas em PT-BR fixo: "Crítico Silencioso", "Refluxo").
+
