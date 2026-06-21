@@ -246,22 +246,8 @@ export default function MyCharacters() {
 
   const getSystemInfo = (systemId: string) => {
     const system = getGameSystem(systemId as GameSystemId);
-    const Icon = systemIcons[systemId] || Sword;
-    const color =
-      systemId === 'vampiro_v3'
-        ? 'text-red-500'
-        : systemId === 'lobisomem_w20'
-          ? 'text-emerald-500'
-          : systemId === 'mago_m20'
-            ? 'text-purple-500'
-            : systemId === 'metamorfos_w20'
-              ? 'text-amber-500'
-              : systemId === 'lobisomem_w5'
-                ? 'text-red-600'
-                : systemId === 'mago_m5'
-                  ? 'text-purple-600'
-                  : 'text-primary';
-    return { system, Icon, color };
+    const style = systemStyles[systemId] || defaultSystemStyle;
+    return { system, style };
   };
 
   return (
