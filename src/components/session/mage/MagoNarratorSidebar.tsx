@@ -268,7 +268,7 @@ export function MagoNarratorSidebar({
                         <button
                           type="button"
                           onClick={() =>
-                            openAdjustModal('blood' as TrackerType, currentQuintessence, p.id, p.character?.name || '', undefined, 20, 'quintessence')
+                            openAdjustModal('blood' as TrackerType, currentQuintessence, p.id, p.character?.name || '', undefined, maxQuint, 'quintessence')
                           }
                           className="flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 bg-purple-500/10 border-purple-500/20"
                         >
