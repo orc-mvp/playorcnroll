@@ -289,7 +289,8 @@ export default function MyCharacters() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {paginatedCharacters.map((char) => {
                 const strongAttrs = getStrongAttributes(char);
-                const { system, Icon: SystemIcon, color } = getSystemInfo(char.game_system);
+                const { system, style } = getSystemInfo(char.game_system);
+                const SystemIcon = style.Icon;
 
                 return (
                   <Card
@@ -298,22 +299,30 @@ export default function MyCharacters() {
                   >
                     <CardContent className="p-4">
                       <div className="flex flex-col gap-3">
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-between gap-2">
                           <Link
                             to={`/character/${char.id}`}
-                            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 hover:bg-primary/20 transition-colors"
+                            className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${style.avatarClass}`}
                           >
-                            <User className="w-6 h-6 text-primary" />
+                            <User className={`w-6 h-6 ${style.avatarIconClass}`} />
                           </Link>
-                          
-                          <div className="flex items-center gap-1">
-                            <Badge 
-                              variant="outline" 
-                              className={`text-[10px] px-1.5 py-0.5 ${color} border-current/30`}
+
+                          <div className="flex items-center gap-1 flex-wrap justify-end">
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] px-1.5 py-0.5 ${style.badgeClass}`}
                             >
                               <SystemIcon className="w-3 h-3 mr-1" />
                               {system?.shortName || 'PBTA'}
                             </Badge>
+                            {style.edition && (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0.5 bg-muted/40 text-muted-foreground border-border"
+                              >
+                                {style.edition}
+                              </Badge>
+                            )}
                             <Button
                               variant="ghost"
                               size="icon"
