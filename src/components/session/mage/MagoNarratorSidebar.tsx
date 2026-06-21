@@ -283,7 +283,7 @@ export function MagoNarratorSidebar({
                         <button
                           type="button"
                           onClick={() =>
-                            openAdjustModal('blood' as TrackerType, currentParadox, p.id, p.character?.name || '', undefined, 20, 'paradox')
+                            openAdjustModal('blood' as TrackerType, currentParadox, p.id, p.character?.name || '', undefined, maxParadox, 'paradox')
                           }
                           className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
                             isParadoxCritical
