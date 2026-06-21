@@ -71,14 +71,72 @@ const attributeIcons: Record<string, React.ElementType> = {
   faith: Flame,
 };
 
-const systemIcons: Record<string, React.ElementType> = {
-  herois_marcados: Sword,
-  vampiro_v3: Moon,
-  lobisomem_w20: Dog,
-  mago_m20: Star,
-  metamorfos_w20: PawPrint,
-  lobisomem_w5: Moon,
-  mago_m5: Star,
+type SystemStyle = {
+  Icon: React.ElementType;
+  badgeClass: string;
+  avatarClass: string;
+  avatarIconClass: string;
+  edition: string | null;
+};
+
+const systemStyles: Record<string, SystemStyle> = {
+  herois_marcados: {
+    Icon: Sword,
+    badgeClass: 'bg-primary/10 text-primary border-primary/40',
+    avatarClass: 'bg-primary/10 hover:bg-primary/20',
+    avatarIconClass: 'text-primary',
+    edition: null,
+  },
+  vampiro_v3: {
+    Icon: Moon,
+    badgeClass: 'bg-red-500/10 text-red-500 border-red-500/40',
+    avatarClass: 'bg-red-500/10 hover:bg-red-500/20',
+    avatarIconClass: 'text-red-500',
+    edition: 'V3',
+  },
+  lobisomem_w20: {
+    Icon: Dog,
+    badgeClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/40',
+    avatarClass: 'bg-emerald-500/10 hover:bg-emerald-500/20',
+    avatarIconClass: 'text-emerald-500',
+    edition: '20ª Ed',
+  },
+  lobisomem_w5: {
+    Icon: Dog,
+    badgeClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/40',
+    avatarClass: 'bg-emerald-500/10 hover:bg-emerald-500/20',
+    avatarIconClass: 'text-emerald-500',
+    edition: '5ª Ed',
+  },
+  mago_m20: {
+    Icon: Star,
+    badgeClass: 'bg-purple-500/10 text-purple-400 border-purple-500/40',
+    avatarClass: 'bg-purple-500/10 hover:bg-purple-500/20',
+    avatarIconClass: 'text-purple-400',
+    edition: '20ª Ed',
+  },
+  mago_m5: {
+    Icon: Star,
+    badgeClass: 'bg-purple-500/10 text-purple-400 border-purple-500/40',
+    avatarClass: 'bg-purple-500/10 hover:bg-purple-500/20',
+    avatarIconClass: 'text-purple-400',
+    edition: '5ª Ed',
+  },
+  metamorfos_w20: {
+    Icon: PawPrint,
+    badgeClass: 'bg-amber-500/10 text-amber-500 border-amber-500/40',
+    avatarClass: 'bg-amber-500/10 hover:bg-amber-500/20',
+    avatarIconClass: 'text-amber-500',
+    edition: '20ª Ed',
+  },
+};
+
+const defaultSystemStyle: SystemStyle = {
+  Icon: Sword,
+  badgeClass: 'bg-primary/10 text-primary border-primary/40',
+  avatarClass: 'bg-primary/10 hover:bg-primary/20',
+  avatarIconClass: 'text-primary',
+  edition: null,
 };
 
 export default function MyCharacters() {
@@ -188,22 +246,8 @@ export default function MyCharacters() {
 
   const getSystemInfo = (systemId: string) => {
     const system = getGameSystem(systemId as GameSystemId);
-    const Icon = systemIcons[systemId] || Sword;
-    const color =
-      systemId === 'vampiro_v3'
-        ? 'text-red-500'
-        : systemId === 'lobisomem_w20'
-          ? 'text-emerald-500'
-          : systemId === 'mago_m20'
-            ? 'text-purple-500'
-            : systemId === 'metamorfos_w20'
-              ? 'text-amber-500'
-              : systemId === 'lobisomem_w5'
-                ? 'text-red-600'
-                : systemId === 'mago_m5'
-                  ? 'text-purple-600'
-                  : 'text-primary';
-    return { system, Icon, color };
+    const style = systemStyles[systemId] || defaultSystemStyle;
+    return { system, style };
   };
 
   return (
@@ -245,7 +289,8 @@ export default function MyCharacters() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {paginatedCharacters.map((char) => {
                 const strongAttrs = getStrongAttributes(char);
-                const { system, Icon: SystemIcon, color } = getSystemInfo(char.game_system);
+                const { system, style } = getSystemInfo(char.game_system);
+                const SystemIcon = style.Icon;
 
                 return (
                   <Card
@@ -254,22 +299,30 @@ export default function MyCharacters() {
                   >
                     <CardContent className="p-4">
                       <div className="flex flex-col gap-3">
-                        <div className="flex items-start justify-between">
+                        <div className="flex items-start justify-between gap-2">
                           <Link
                             to={`/character/${char.id}`}
-                            className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 hover:bg-primary/20 transition-colors"
+                            className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${style.avatarClass}`}
                           >
-                            <User className="w-6 h-6 text-primary" />
+                            <User className={`w-6 h-6 ${style.avatarIconClass}`} />
                           </Link>
-                          
-                          <div className="flex items-center gap-1">
-                            <Badge 
-                              variant="outline" 
-                              className={`text-[10px] px-1.5 py-0.5 ${color} border-current/30`}
+
+                          <div className="flex items-center gap-1 flex-wrap justify-end">
+                            <Badge
+                              variant="outline"
+                              className={`text-[10px] px-1.5 py-0.5 ${style.badgeClass}`}
                             >
                               <SystemIcon className="w-3 h-3 mr-1" />
                               {system?.shortName || 'PBTA'}
                             </Badge>
+                            {style.edition && (
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0.5 bg-muted/40 text-muted-foreground border-border"
+                              >
+                                {style.edition}
+                              </Badge>
+                            )}
                             <Button
                               variant="ghost"
                               size="icon"
