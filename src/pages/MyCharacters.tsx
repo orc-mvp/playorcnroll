@@ -71,14 +71,72 @@ const attributeIcons: Record<string, React.ElementType> = {
   faith: Flame,
 };
 
-const systemIcons: Record<string, React.ElementType> = {
-  herois_marcados: Sword,
-  vampiro_v3: Moon,
-  lobisomem_w20: Dog,
-  mago_m20: Star,
-  metamorfos_w20: PawPrint,
-  lobisomem_w5: Moon,
-  mago_m5: Star,
+type SystemStyle = {
+  Icon: React.ElementType;
+  badgeClass: string;
+  avatarClass: string;
+  avatarIconClass: string;
+  edition: string | null;
+};
+
+const systemStyles: Record<string, SystemStyle> = {
+  herois_marcados: {
+    Icon: Sword,
+    badgeClass: 'bg-primary/10 text-primary border-primary/40',
+    avatarClass: 'bg-primary/10 hover:bg-primary/20',
+    avatarIconClass: 'text-primary',
+    edition: null,
+  },
+  vampiro_v3: {
+    Icon: Moon,
+    badgeClass: 'bg-red-500/10 text-red-500 border-red-500/40',
+    avatarClass: 'bg-red-500/10 hover:bg-red-500/20',
+    avatarIconClass: 'text-red-500',
+    edition: 'V3',
+  },
+  lobisomem_w20: {
+    Icon: Dog,
+    badgeClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/40',
+    avatarClass: 'bg-emerald-500/10 hover:bg-emerald-500/20',
+    avatarIconClass: 'text-emerald-500',
+    edition: '20ª Ed',
+  },
+  lobisomem_w5: {
+    Icon: Dog,
+    badgeClass: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/40',
+    avatarClass: 'bg-emerald-500/10 hover:bg-emerald-500/20',
+    avatarIconClass: 'text-emerald-500',
+    edition: '5ª Ed',
+  },
+  mago_m20: {
+    Icon: Star,
+    badgeClass: 'bg-purple-500/10 text-purple-400 border-purple-500/40',
+    avatarClass: 'bg-purple-500/10 hover:bg-purple-500/20',
+    avatarIconClass: 'text-purple-400',
+    edition: '20ª Ed',
+  },
+  mago_m5: {
+    Icon: Star,
+    badgeClass: 'bg-purple-500/10 text-purple-400 border-purple-500/40',
+    avatarClass: 'bg-purple-500/10 hover:bg-purple-500/20',
+    avatarIconClass: 'text-purple-400',
+    edition: '5ª Ed',
+  },
+  metamorfos_w20: {
+    Icon: PawPrint,
+    badgeClass: 'bg-amber-500/10 text-amber-500 border-amber-500/40',
+    avatarClass: 'bg-amber-500/10 hover:bg-amber-500/20',
+    avatarIconClass: 'text-amber-500',
+    edition: '20ª Ed',
+  },
+};
+
+const defaultSystemStyle: SystemStyle = {
+  Icon: Sword,
+  badgeClass: 'bg-primary/10 text-primary border-primary/40',
+  avatarClass: 'bg-primary/10 hover:bg-primary/20',
+  avatarIconClass: 'text-primary',
+  edition: null,
 };
 
 export default function MyCharacters() {
