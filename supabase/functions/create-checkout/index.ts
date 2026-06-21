@@ -45,7 +45,13 @@ Deno.serve(async (req) => {
       customerId = c.id;
     }
 
-    const origin = req.headers.get("origin") || req.headers.get("referer") || "https://playorcnroll.lovable.app";
+    const ALLOWED_ORIGINS = [
+      "https://playorcnroll.lovable.app",
+      "https://play.orcnroll.com",
+      "http://localhost:8080",
+    ];
+    const rawOrigin = req.headers.get("origin") || "";
+    const origin = ALLOWED_ORIGINS.includes(rawOrigin) ? rawOrigin : "https://playorcnroll.lovable.app";
     const successUrl = `${origin}/upgrade?status=success`;
     const cancelUrl = `${origin}/upgrade?status=cancel`;
 
@@ -74,7 +80,7 @@ Deno.serve(async (req) => {
     });
   } catch (e) {
     console.error("create-checkout error", e);
-    return new Response(JSON.stringify({ error: (e as Error).message }), {
+    return new Response(JSON.stringify({ error: "An unexpected error occurred. Please try again." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
