@@ -136,16 +136,12 @@ export default function MySessions() {
 
   const handleSessionClick = (session: SessionWithRole) => {
     if (session.status === 'active') {
-      const route = session.game_system === 'vampiro_v3' 
-        ? `/session/vampire/${session.id}` 
-        : session.game_system === 'lobisomem_w20'
-        ? `/session/werewolf/${session.id}`
-        : `/session/${session.id}`;
-      navigate(route);
+      navigate(getSessionRoute(session.id, session.game_system));
     } else {
       navigate(`/session/${session.id}/lobby`);
     }
   };
+
 
   const handleDeleteSession = async () => {
     if (!deleteSession) return;
