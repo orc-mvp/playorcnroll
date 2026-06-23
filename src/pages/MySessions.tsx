@@ -19,7 +19,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import UpgradeBanner from '@/components/UpgradeBanner';
-import { Sword, Moon, Dog, Trash2, Crown, Users as UsersIcon } from 'lucide-react';
+import { Sword, Moon, Dog, Trash2, Crown, Users as UsersIcon, Sparkles, PawPrint, Drama } from 'lucide-react';
+import { getSystemAdapter, isStorytellerSystem } from '@/lib/storyteller/systemRegistry';
+import { getSessionRoute } from '@/lib/sessionRoutes';
+import type { StorytellerSystemId } from '@/lib/storyteller/types';
 import { 
   ArrowLeft, 
   Plus, 
@@ -40,12 +43,22 @@ interface SessionWithRole {
   invite_code: string;
   status: string;
   game_system: string;
+  allowed_systems?: string[] | null;
   created_at: string;
   updated_at: string;
   narrator_id: string;
   participant_count?: number;
   contextRole: 'narrator' | 'player';
 }
+
+const SYSTEM_BADGE_META: Record<string, { label: string; icon: React.ElementType; className: string }> = {
+  vampiro_v3: { label: 'Vampiro V3', icon: Moon, className: 'border-destructive/40 text-destructive' },
+  lobisomem_w20: { label: 'Lobisomem W20', icon: Dog, className: 'border-emerald-500/40 text-emerald-500' },
+  mago_m20: { label: 'Mago M20', icon: Sparkles, className: 'border-purple-500/40 text-purple-400' },
+  metamorfos_w20: { label: 'Metamorfos W20', icon: PawPrint, className: 'border-amber-500/40 text-amber-500' },
+  lobisomem_w5: { label: 'Lobisomem W5', icon: Dog, className: 'border-red-500/40 text-red-500' },
+  mago_m5: { label: 'Mago M5', icon: Sparkles, className: 'border-purple-500/40 text-purple-400' },
+};
 
 export default function MySessions() {
   const navigate = useNavigate();
@@ -124,16 +137,12 @@ export default function MySessions() {
 
   const handleSessionClick = (session: SessionWithRole) => {
     if (session.status === 'active') {
-      const route = session.game_system === 'vampiro_v3' 
-        ? `/session/vampire/${session.id}` 
-        : session.game_system === 'lobisomem_w20'
-        ? `/session/werewolf/${session.id}`
-        : `/session/${session.id}`;
-      navigate(route);
+      navigate(getSessionRoute(session.id, session.game_system));
     } else {
       navigate(`/session/${session.id}/lobby`);
     }
   };
+
 
   const handleDeleteSession = async () => {
     if (!deleteSession) return;
@@ -260,33 +269,67 @@ export default function MySessions() {
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {session.game_system === 'vampiro_v3' ? (
-                            <Moon className="w-4 h-4 text-destructive shrink-0" />
-                          ) : session.game_system === 'lobisomem_w20' ? (
-                            <Dog className="w-4 h-4 text-emerald-500 shrink-0" />
-                          ) : (
-                            <Sword className="w-4 h-4 text-primary shrink-0" />
-                          )}
-                          <span className="text-xs text-muted-foreground font-body">
-                            {session.game_system === 'vampiro_v3' ? 'Vampiro 3ª Ed.' : session.game_system === 'lobisomem_w20' ? 'Lobisomem' : 'Heróis Marcados'}
-                          </span>
-                          <Badge variant="outline" className="text-xs">
-                            {isNarrator ? (
-                              <><Crown className="w-3 h-3 mr-1" />{t.roles.narrator}</>
-                            ) : (
-                              <><UsersIcon className="w-3 h-3 mr-1" />{t.roles.player}</>
-                            )}
-                          </Badge>
-                        </div>
+                        {(() => {
+                          const isStoryteller = isStorytellerSystem(session.game_system);
+                          const HeaderIcon = isStoryteller
+                            ? Drama
+                            : session.game_system === 'vampiro_v3'
+                            ? Moon
+                            : session.game_system === 'lobisomem_w20'
+                            ? Dog
+                            : Sword;
+                          const headerColor = isStoryteller
+                            ? 'text-destructive'
+                            : session.game_system === 'vampiro_v3'
+                            ? 'text-destructive'
+                            : session.game_system === 'lobisomem_w20'
+                            ? 'text-emerald-500'
+                            : 'text-primary';
+                          const headerLabel = isStoryteller
+                            ? 'Storyteller'
+                            : session.game_system === 'vampiro_v3'
+                            ? 'Vampiro 3ª Ed.'
+                            : session.game_system === 'lobisomem_w20'
+                            ? 'Lobisomem'
+                            : 'Heróis Marcados';
+                          return (
+                            <div className="flex items-center gap-2 mb-1">
+                              <HeaderIcon className={`w-4 h-4 ${headerColor} shrink-0`} />
+                              <span className="text-xs text-muted-foreground font-body">{headerLabel}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {isNarrator ? (
+                                  <><Crown className="w-3 h-3 mr-1" />{t.roles.narrator}</>
+                                ) : (
+                                  <><UsersIcon className="w-3 h-3 mr-1" />{t.roles.player}</>
+                                )}
+                              </Badge>
+                            </div>
+                          );
+                        })()}
                         <CardTitle className="font-medieval text-lg truncate">
                           {session.name}
                         </CardTitle>
+                        {isStorytellerSystem(session.game_system) && session.allowed_systems && session.allowed_systems.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {session.allowed_systems.map((sid) => {
+                              const meta = SYSTEM_BADGE_META[sid];
+                              if (!meta) return null;
+                              const Icon = meta.icon;
+                              return (
+                                <Badge key={sid} variant="outline" className={`text-[10px] ${meta.className}`}>
+                                  <Icon className="w-3 h-3 mr-1" />
+                                  {meta.label}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        )}
                         {session.description && (
                           <CardDescription className="font-body mt-1 line-clamp-2">
                             {DOMPurify.sanitize(session.description, { ALLOWED_TAGS: [] })}
                           </CardDescription>
                         )}
+
                       </div>
                       <Badge variant={status.variant} className={`shrink-0 ${status.className || ''}`}>
                         <StatusIcon className="w-3 h-3 mr-1" />
