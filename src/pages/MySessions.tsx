@@ -42,12 +42,22 @@ interface SessionWithRole {
   invite_code: string;
   status: string;
   game_system: string;
+  allowed_systems?: string[] | null;
   created_at: string;
   updated_at: string;
   narrator_id: string;
   participant_count?: number;
   contextRole: 'narrator' | 'player';
 }
+
+const SYSTEM_BADGE_META: Record<string, { label: string; icon: React.ElementType; className: string }> = {
+  vampiro_v3: { label: 'Vampiro V3', icon: Moon, className: 'border-destructive/40 text-destructive' },
+  lobisomem_w20: { label: 'Lobisomem W20', icon: Dog, className: 'border-emerald-500/40 text-emerald-500' },
+  mago_m20: { label: 'Mago M20', icon: Sparkles, className: 'border-purple-500/40 text-purple-400' },
+  metamorfos_w20: { label: 'Metamorfos W20', icon: PawPrint, className: 'border-amber-500/40 text-amber-500' },
+  lobisomem_w5: { label: 'Lobisomem W5', icon: Dog, className: 'border-red-500/40 text-red-500' },
+  mago_m5: { label: 'Mago M5', icon: Sparkles, className: 'border-purple-500/40 text-purple-400' },
+};
 
 export default function MySessions() {
   const navigate = useNavigate();
