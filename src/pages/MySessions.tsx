@@ -272,33 +272,67 @@ export default function MySessions() {
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          {session.game_system === 'vampiro_v3' ? (
-                            <Moon className="w-4 h-4 text-destructive shrink-0" />
-                          ) : session.game_system === 'lobisomem_w20' ? (
-                            <Dog className="w-4 h-4 text-emerald-500 shrink-0" />
-                          ) : (
-                            <Sword className="w-4 h-4 text-primary shrink-0" />
-                          )}
-                          <span className="text-xs text-muted-foreground font-body">
-                            {session.game_system === 'vampiro_v3' ? 'Vampiro 3ª Ed.' : session.game_system === 'lobisomem_w20' ? 'Lobisomem' : 'Heróis Marcados'}
-                          </span>
-                          <Badge variant="outline" className="text-xs">
-                            {isNarrator ? (
-                              <><Crown className="w-3 h-3 mr-1" />{t.roles.narrator}</>
-                            ) : (
-                              <><UsersIcon className="w-3 h-3 mr-1" />{t.roles.player}</>
-                            )}
-                          </Badge>
-                        </div>
+                        {(() => {
+                          const isStoryteller = isStorytellerSystem(session.game_system);
+                          const HeaderIcon = isStoryteller
+                            ? Drama
+                            : session.game_system === 'vampiro_v3'
+                            ? Moon
+                            : session.game_system === 'lobisomem_w20'
+                            ? Dog
+                            : Sword;
+                          const headerColor = isStoryteller
+                            ? 'text-destructive'
+                            : session.game_system === 'vampiro_v3'
+                            ? 'text-destructive'
+                            : session.game_system === 'lobisomem_w20'
+                            ? 'text-emerald-500'
+                            : 'text-primary';
+                          const headerLabel = isStoryteller
+                            ? 'Storyteller'
+                            : session.game_system === 'vampiro_v3'
+                            ? 'Vampiro 3ª Ed.'
+                            : session.game_system === 'lobisomem_w20'
+                            ? 'Lobisomem'
+                            : 'Heróis Marcados';
+                          return (
+                            <div className="flex items-center gap-2 mb-1">
+                              <HeaderIcon className={`w-4 h-4 ${headerColor} shrink-0`} />
+                              <span className="text-xs text-muted-foreground font-body">{headerLabel}</span>
+                              <Badge variant="outline" className="text-xs">
+                                {isNarrator ? (
+                                  <><Crown className="w-3 h-3 mr-1" />{t.roles.narrator}</>
+                                ) : (
+                                  <><UsersIcon className="w-3 h-3 mr-1" />{t.roles.player}</>
+                                )}
+                              </Badge>
+                            </div>
+                          );
+                        })()}
                         <CardTitle className="font-medieval text-lg truncate">
                           {session.name}
                         </CardTitle>
+                        {isStorytellerSystem(session.game_system) && session.allowed_systems && session.allowed_systems.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {session.allowed_systems.map((sid) => {
+                              const meta = SYSTEM_BADGE_META[sid];
+                              if (!meta) return null;
+                              const Icon = meta.icon;
+                              return (
+                                <Badge key={sid} variant="outline" className={`text-[10px] ${meta.className}`}>
+                                  <Icon className="w-3 h-3 mr-1" />
+                                  {meta.label}
+                                </Badge>
+                              );
+                            })}
+                          </div>
+                        )}
                         {session.description && (
                           <CardDescription className="font-body mt-1 line-clamp-2">
                             {DOMPurify.sanitize(session.description, { ALLOWED_TAGS: [] })}
                           </CardDescription>
                         )}
+
                       </div>
                       <Badge variant={status.variant} className={`shrink-0 ${status.className || ''}`}>
                         <StatusIcon className="w-3 h-3 mr-1" />
