@@ -263,18 +263,20 @@ export function MagoNarratorSidebar({
                     </div>
 
                     {p.character && (
-                      <div className="grid grid-cols-5 gap-1.5 text-xs">
+                      <div className="grid grid-cols-3 gap-1.5 text-xs">
                         {/* Quintessência */}
                         <button
                           type="button"
                           onClick={() =>
                             openAdjustModal('blood' as TrackerType, currentQuintessence, p.id, p.character?.name || '', undefined, maxQuint, 'quintessence')
                           }
-                          className="flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 bg-purple-500/10 border-purple-500/20"
+                          className="flex flex-col items-center justify-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 bg-purple-500/10 border-purple-500/20 min-w-0"
                         >
                           <Sparkles className="w-3 h-3 text-purple-500 mb-0.5" />
-                          <span className="font-medium text-purple-500">{currentQuintessence}</span>
-                          <span className="text-muted-foreground text-[9px]">
+                          <span className="font-medium text-purple-500 leading-none">
+                            {currentQuintessence}/{maxQuint}
+                          </span>
+                          <span className="text-muted-foreground text-[9px] truncate w-full text-center mt-0.5">
                             {t.mago?.quintessence || 'Quint.'}
                           </span>
                         </button>
@@ -285,24 +287,26 @@ export function MagoNarratorSidebar({
                           onClick={() =>
                             openAdjustModal('blood' as TrackerType, currentParadox, p.id, p.character?.name || '', undefined, maxParadox, 'paradox')
                           }
-                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                          className={`flex flex-col items-center justify-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 min-w-0 ${
                             isParadoxCritical
                               ? 'bg-destructive/30 border-destructive animate-pulse'
                               : 'bg-destructive/10 border-destructive/20'
                           }`}
                         >
                           <Zap className="w-3 h-3 text-destructive mb-0.5" />
-                          <span className="font-medium text-destructive">{currentParadox}</span>
-                          <span className="text-muted-foreground text-[9px]">
+                          <span className="font-medium text-destructive leading-none">
+                            {currentParadox}/{maxParadox}
+                          </span>
+                          <span className="text-muted-foreground text-[9px] truncate w-full text-center mt-0.5">
                             {t.mago?.paradox || 'Paradoxo'}
                           </span>
                         </button>
 
                         {/* Arête (fixo, não-clicável) */}
-                        <div className="flex flex-col items-center p-1.5 rounded border bg-purple-500/5 border-purple-500/20">
+                        <div className="flex flex-col items-center justify-center p-1.5 rounded border bg-purple-500/5 border-purple-500/20 min-w-0">
                           <Star className="w-3 h-3 text-purple-500 mb-0.5" />
-                          <span className="font-medium text-purple-500">{maxArete}</span>
-                          <span className="text-muted-foreground text-[9px]">
+                          <span className="font-medium text-purple-500 leading-none">{maxArete}</span>
+                          <span className="text-muted-foreground text-[9px] truncate w-full text-center mt-0.5">
                             {t.mago?.arete || 'Arête'}
                           </span>
                         </div>
@@ -313,7 +317,7 @@ export function MagoNarratorSidebar({
                           onClick={() =>
                             openAdjustModal('willpower', currentWillpower, p.id, p.character?.name || '', undefined, maxWillpower, 'willpower')
                           }
-                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                          className={`flex flex-col items-center justify-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 min-w-0 col-span-1 ${
                             isWillpowerCritical ? 'bg-amber-500/30 border-amber-500' : 'bg-muted/50 border-border'
                           }`}
                         >
@@ -322,11 +326,11 @@ export function MagoNarratorSidebar({
                           ) : (
                             <Sparkles className="w-3 h-3 text-foreground mb-0.5" />
                           )}
-                          <span className={`font-medium ${isWillpowerCritical ? 'text-amber-500' : ''}`}>
+                          <span className={`font-medium leading-none ${isWillpowerCritical ? 'text-amber-500' : ''}`}>
                             {currentWillpower}/{maxWillpower}
                           </span>
-                          <span className="text-muted-foreground text-[9px]">
-                            {t.mago?.willpowerLabel || t.vampiro?.willpowerCurrent || 'Vontade'}
+                          <span className="text-muted-foreground text-[9px] truncate w-full text-center mt-0.5">
+                            {language === 'pt-BR' ? 'Vontade' : 'Willpower'}
                           </span>
                         </button>
 
@@ -336,7 +340,7 @@ export function MagoNarratorSidebar({
                           onClick={() =>
                             openAdjustModal('health', damagedLevels, p.id, p.character?.name || '', undefined, 7, 'health')
                           }
-                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                          className={`flex flex-col items-center justify-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 min-w-0 col-span-2 ${
                             damagedLevels >= 5
                               ? 'bg-destructive/20 border-destructive/40'
                               : damagedLevels >= 3
@@ -354,7 +358,7 @@ export function MagoNarratorSidebar({
                             }`}
                           />
                           <span
-                            className={`font-medium ${
+                            className={`font-medium leading-none ${
                               damagedLevels >= 5
                                 ? 'text-destructive'
                                 : damagedLevels >= 3
@@ -364,8 +368,8 @@ export function MagoNarratorSidebar({
                           >
                             {7 - damagedLevels}/7
                           </span>
-                          <span className="text-muted-foreground text-[9px]">
-                            {t.mago?.vitality || t.vampiro?.healthLevels || 'Vit.'}
+                          <span className="text-muted-foreground text-[9px] truncate w-full text-center mt-0.5">
+                            {language === 'pt-BR' ? 'Vitalidade' : 'Health'}
                           </span>
                         </button>
                       </div>

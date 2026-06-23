@@ -68,14 +68,27 @@ export const magoM5Adapter: SystemAdapter = {
   initializeTrackers: (p) => {
     const data = p.character?.vampiro_data;
     if (!data) return null;
-    if (((p as any).session_arete ?? 0) > 0 || (p.session_willpower_current ?? 0) !== 0) return null;
-    return {
-      session_quintessence: Math.min(5, data.quintessence ?? 0),
-      session_paradox: Math.min(10, data.paradox ?? 0),
-      session_arete: Math.min(5, data.arete || 1),
-      session_willpower_current: Math.min(5, data.willpower || 3),
-      session_health_damage: [false, false, false, false, false, false, false],
-    } as any;
+    const arete = (p as any).session_arete ?? 0;
+    const isInitialized = arete > 0 || (p.session_willpower_current ?? 0) !== 0;
+    if (!isInitialized) {
+      return {
+        session_quintessence: Math.min(5, data.quintessence ?? 0),
+        session_paradox: Math.min(10, data.paradox ?? 0),
+        session_arete: Math.min(5, data.arete || 1),
+        session_willpower_current: Math.min(5, data.willpower || 3),
+        session_health_damage: [false, false, false, false, false, false, false],
+      } as any;
+    }
+    // Catch-up sync: paradox/quintessence editados na ficha após init devem
+    // refletir na sessão. Só sobe (narrador pode reduzir manualmente).
+    const sheetParadox = Math.min(10, data.paradox ?? 0);
+    const sheetQuint = Math.min(5, data.quintessence ?? 0);
+    const curParadox = (p as any).session_paradox ?? 0;
+    const curQuint = (p as any).session_quintessence ?? 0;
+    const patch: Record<string, number> = {};
+    if (sheetParadox > curParadox) patch.session_paradox = sheetParadox;
+    if (sheetQuint > curQuint) patch.session_quintessence = sheetQuint;
+    return Object.keys(patch).length ? (patch as any) : null;
   },
 
   CharacterSheet: MagoCharacterSheet as any,
