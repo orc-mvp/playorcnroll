@@ -19,7 +19,9 @@ import {
 } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 import UpgradeBanner from '@/components/UpgradeBanner';
-import { Sword, Moon, Dog, Trash2, Crown, Users as UsersIcon } from 'lucide-react';
+import { Sword, Moon, Dog, Trash2, Crown, Users as UsersIcon, Sparkles, PawPrint, Drama } from 'lucide-react';
+import { getSystemAdapter, isStorytellerSystem } from '@/lib/storyteller/systemRegistry';
+import type { StorytellerSystemId } from '@/lib/storyteller/types';
 import { 
   ArrowLeft, 
   Plus, 
