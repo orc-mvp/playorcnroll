@@ -161,6 +161,10 @@ export default function Profile() {
                 className="mt-1"
               />
             </div>
+            <div>
+              <Label className="font-body">Email</Label>
+              <p className="font-body text-sm text-muted-foreground mt-1">{user?.email}</p>
+            </div>
             <Button onClick={handleUpdateName} disabled={savingName || !displayName.trim()}>
               {savingName ? t.profile.updating : t.common.save}
             </Button>
