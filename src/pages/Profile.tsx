@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { usePremium } from '@/hooks/usePremium';
+
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -8,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, User, KeyRound } from 'lucide-react';
+import { ArrowLeft, User, KeyRound, Crown } from 'lucide-react';
 import { UserMenu } from '@/components/UserMenu';
 import UpgradeBanner from '@/components/UpgradeBanner';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
@@ -16,6 +18,8 @@ import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 export default function Profile() {
   const navigate = useNavigate();
   const { user, profile, loading, updateProfile } = useAuth();
+  const { isPremium, planName, status, currentPeriodEnd, loading: premiumLoading } = usePremium();
+
   const { t, language, setLanguage } = useI18n();
   const { toast } = useToast();
 
@@ -171,7 +175,52 @@ export default function Profile() {
           </CardContent>
         </Card>
 
+        {/* Subscription Status */}
+        <Card className="medieval-card mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="font-medieval text-lg flex items-center gap-2">
+              <Crown className="w-5 h-5 text-amber-500" />
+              Assinatura
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {premiumLoading ? (
+              <p className="text-sm text-muted-foreground">Carregando...</p>
+            ) : (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="font-body text-sm">Status</span>
+                  <span className={`font-body text-sm font-semibold ${isPremium ? 'text-emerald-500' : 'text-muted-foreground'}`}>
+                    {isPremium ? 'Premium' : 'Free'}
+                  </span>
+                </div>
+                {planName && (
+                  <div className="flex items-center justify-between">
+                    <span className="font-body text-sm">Plano</span>
+                    <span className="font-body text-sm font-semibold">{planName}</span>
+                  </div>
+                )}
+                {!isPremium && status && status !== 'active' && (
+                  <div className="flex items-center justify-between">
+                    <span className="font-body text-sm">Situação</span>
+                    <span className="font-body text-sm text-muted-foreground capitalize">{status}</span>
+                  </div>
+                )}
+                {isPremium && currentPeriodEnd && (
+                  <div className="flex items-center justify-between">
+                    <span className="font-body text-sm">Válido até</span>
+                    <span className="font-body text-sm text-muted-foreground">
+                      {new Date(currentPeriodEnd).toLocaleDateString('pt-BR')}
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Change Password */}
+
         <Card className="medieval-card">
           <CardHeader className="pb-3">
             <CardTitle className="font-medieval text-lg flex items-center gap-2">

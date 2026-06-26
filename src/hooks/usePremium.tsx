@@ -10,8 +10,10 @@ interface PremiumState {
   currentPeriodEnd: string | null;
   daysUntilExpiry: number | null;
   isSuperadmin: boolean;
+  planName: string | null;
   refresh: () => Promise<void>;
 }
+
 
 export function usePremium(): PremiumState {
   const { user } = useAuth();
@@ -20,7 +22,9 @@ export function usePremium(): PremiumState {
   const [status, setStatus] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
   const [currentPeriodEnd, setCurrentPeriodEnd] = useState<string | null>(null);
+  const [planName, setPlanName] = useState<string | null>(null);
   const [isSuperadmin, setIsSuperadmin] = useState(false);
+
 
   const fetchAll = useCallback(async () => {
     if (!user) {
@@ -36,7 +40,7 @@ export function usePremium(): PremiumState {
       if (import.meta.env.DEV) console.warn('sync-subscription failed', e);
     }
     const [{ data: sub }, { data: roles }] = await Promise.all([
-      supabase.from('subscriptions').select('status, payment_method, current_period_end').eq('user_id', user.id).maybeSingle(),
+      supabase.from('subscriptions').select('status, payment_method, current_period_end, plan_name').eq('user_id', user.id).maybeSingle(),
       supabase.from('user_roles').select('role').eq('user_id', user.id),
     ]);
     const superadmin = !!roles?.some((r: any) => r.role === 'superadmin');
@@ -47,7 +51,9 @@ export function usePremium(): PremiumState {
     setStatus(sub?.status ?? null);
     setPaymentMethod(sub?.payment_method ?? null);
     setCurrentPeriodEnd(sub?.current_period_end ?? null);
+    setPlanName(sub?.plan_name ?? null);
     setLoading(false);
+
   }, [user]);
 
 
@@ -70,5 +76,6 @@ export function usePremium(): PremiumState {
     ? Math.ceil((new Date(currentPeriodEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
     : null;
 
-  return { isPremium, loading, status, paymentMethod, currentPeriodEnd, daysUntilExpiry, isSuperadmin, refresh: fetchAll };
+  return { isPremium, loading, status, paymentMethod, currentPeriodEnd, daysUntilExpiry, isSuperadmin, planName, refresh: fetchAll };
+
 }
