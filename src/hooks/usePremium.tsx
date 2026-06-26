@@ -29,6 +29,12 @@ export function usePremium(): PremiumState {
       return;
     }
     setLoading(true);
+    // Reconcile with Stripe first so a missed webhook doesn't keep the user locked out.
+    try {
+      await supabase.functions.invoke('sync-subscription');
+    } catch (e) {
+      if (import.meta.env.DEV) console.warn('sync-subscription failed', e);
+    }
     const [{ data: sub }, { data: roles }] = await Promise.all([
       supabase.from('subscriptions').select('status, payment_method, current_period_end').eq('user_id', user.id).maybeSingle(),
       supabase.from('user_roles').select('role').eq('user_id', user.id),
@@ -43,6 +49,7 @@ export function usePremium(): PremiumState {
     setCurrentPeriodEnd(sub?.current_period_end ?? null);
     setLoading(false);
   }, [user]);
+
 
   useEffect(() => {
     fetchAll();
