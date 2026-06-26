@@ -118,6 +118,22 @@ Deno.serve(async (req) => {
 
     const periodEnd = new Date(active.current_period_end * 1000).toISOString();
 
+    // Resolve plan name from the subscription's first price product.
+    let planName: string | null = null;
+    try {
+      const firstItem = active.items.data[0];
+      const price = firstItem?.price;
+      if (price) {
+        const productId = typeof price.product === "string" ? price.product : price.product?.id;
+        if (productId) {
+          const product = await stripe.products.retrieve(productId);
+          planName = product.name ?? null;
+        }
+      }
+    } catch (e) {
+      log("plan name resolution failed", String(e));
+    }
+
     // 3) If a row exists with this stripe_customer_id but a different user_id (legacy duplicate),
     //    detach it so the current user takes ownership cleanly. PK is user_id, so we can't have
     //    two rows for the same user; but two rows for the same customer would be ambiguous.
@@ -143,16 +159,18 @@ Deno.serve(async (req) => {
       stripe_subscription_id: active.id,
       current_period_end: periodEnd,
       cancel_at_period_end: active.cancel_at_period_end,
+      plan_name: planName,
     });
     if (upsertErr) throw new Error(`Upsert failed: ${upsertErr.message}`);
 
-    log("synced", { user_id: user.id, status: normalized, periodEnd });
+    log("synced", { user_id: user.id, status: normalized, periodEnd, planName });
 
     return new Response(
       JSON.stringify({
         subscribed: normalized === "active",
         status: normalized,
         current_period_end: periodEnd,
+        plan_name: planName,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
     );
