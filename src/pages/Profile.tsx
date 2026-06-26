@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { usePremium } from '@/hooks/usePremium';
+
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -8,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, User, KeyRound } from 'lucide-react';
+import { ArrowLeft, User, KeyRound, Crown } from 'lucide-react';
 import { UserMenu } from '@/components/UserMenu';
 import UpgradeBanner from '@/components/UpgradeBanner';
 import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
@@ -16,6 +18,8 @@ import logoLateral from '@/assets/logo-orcnroll-lateral.webp';
 export default function Profile() {
   const navigate = useNavigate();
   const { user, profile, loading, updateProfile } = useAuth();
+  const { isPremium, planName, status, currentPeriodEnd, loading: premiumLoading } = usePremium();
+
   const { t, language, setLanguage } = useI18n();
   const { toast } = useToast();
 
