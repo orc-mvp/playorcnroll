@@ -32,31 +32,75 @@ Deno.serve(async (req) => {
     if (userErr) throw new Error(`Auth error: ${userErr.message}`);
     const user = userData.user;
     if (!user?.email) throw new Error("User has no email");
-    log("user", { id: user.id, email: user.email });
+    const email = user.email.trim().toLowerCase();
+    log("user", { id: user.id, email });
 
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    if (customers.data.length === 0) {
+    // 1) Look up Stripe customer by metadata.user_id first (most reliable),
+    //    then fall back to email search (Stripe email match is case-insensitive but normalize anyway).
+    let customer: Stripe.Customer | null = null;
+
+    const byMeta = await stripe.customers.search({
+      query: `metadata['user_id']:'${user.id}'`,
+      limit: 1,
+    }).catch(() => null);
+    if (byMeta && byMeta.data.length > 0) {
+      customer = byMeta.data[0];
+      log("customer via metadata", { id: customer.id });
+    } else {
+      const byEmail = await stripe.customers.list({ email, limit: 10 });
+      // Pick the customer that has a subscription (active preferred) if multiple share the email.
+      if (byEmail.data.length > 0) {
+        let best: Stripe.Customer | null = null;
+        let bestScore = -1;
+        for (const c of byEmail.data) {
+          const subs = await stripe.subscriptions.list({ customer: c.id, status: "all", limit: 5 });
+          const score = subs.data.reduce((acc, s) => {
+            if (s.status === "active" || s.status === "trialing") return Math.max(acc, 3);
+            if (s.status === "past_due") return Math.max(acc, 2);
+            return Math.max(acc, 1);
+          }, 0);
+          if (score > bestScore) {
+            bestScore = score;
+            best = c;
+          }
+        }
+        customer = best ?? byEmail.data[0];
+        log("customer via email", { id: customer.id, picked_from: byEmail.data.length });
+      }
+    }
+
+    if (!customer) {
       log("no stripe customer");
-      // Clear any stale active row tied to this user (defensive — keeps history minimal).
       return new Response(
         JSON.stringify({ subscribed: false, reason: "no_customer" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
       );
     }
-    const customer = customers.data[0];
+
+    // 2) Stamp metadata.user_id on the Stripe customer so future webhooks resolve the right user_id.
+    if (customer.metadata?.user_id !== user.id) {
+      try {
+        await stripe.customers.update(customer.id, {
+          metadata: { ...(customer.metadata ?? {}), user_id: user.id },
+        });
+        log("customer metadata updated with user_id");
+      } catch (e) {
+        log("customer metadata update failed", String(e));
+      }
+    }
+
     const subs = await stripe.subscriptions.list({
       customer: customer.id,
       status: "all",
       limit: 5,
     });
 
-    // Pick the most relevant: active/trialing first, then most-recent.
     const active = subs.data.find((s) =>
       ["active", "trialing", "past_due"].includes(s.status)
     ) ?? subs.data.sort((a, b) => b.created - a.created)[0];
 
     if (!active) {
-      log("no subscriptions");
+      log("no subscriptions for customer");
       return new Response(
         JSON.stringify({ subscribed: false, reason: "no_subscription" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 },
@@ -74,6 +118,23 @@ Deno.serve(async (req) => {
 
     const periodEnd = new Date(active.current_period_end * 1000).toISOString();
 
+    // 3) If a row exists with this stripe_customer_id but a different user_id (legacy duplicate),
+    //    detach it so the current user takes ownership cleanly. PK is user_id, so we can't have
+    //    two rows for the same user; but two rows for the same customer would be ambiguous.
+    const { data: orphan } = await admin
+      .from("subscriptions")
+      .select("user_id")
+      .eq("stripe_customer_id", customer.id)
+      .neq("user_id", user.id)
+      .maybeSingle();
+    if (orphan) {
+      log("detaching orphan row", { previous_user_id: orphan.user_id });
+      await admin
+        .from("subscriptions")
+        .update({ stripe_customer_id: null, stripe_subscription_id: null, status: "canceled" })
+        .eq("user_id", orphan.user_id);
+    }
+
     const { error: upsertErr } = await admin.from("subscriptions").upsert({
       user_id: user.id,
       status: normalized,
@@ -85,7 +146,7 @@ Deno.serve(async (req) => {
     });
     if (upsertErr) throw new Error(`Upsert failed: ${upsertErr.message}`);
 
-    log("synced", { status: normalized, periodEnd });
+    log("synced", { user_id: user.id, status: normalized, periodEnd });
 
     return new Response(
       JSON.stringify({
