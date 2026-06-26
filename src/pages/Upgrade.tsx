@@ -111,6 +111,19 @@ export default function Upgrade() {
           </Card>
         )}
 
+        {!isPremium && (
+          <Card>
+            <CardContent className="py-4 flex items-center justify-between gap-2 flex-wrap">
+              <p className="text-sm text-muted-foreground">Já pagou e ainda aparece como gratuito? Atualize o status:</p>
+              <Button variant="outline" onClick={syncStatus} disabled={busy === 'sync'}>
+                {busy === 'sync' ? '...' : 'Atualizar status da assinatura'}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+
+
 
         <Card>
           <CardHeader>
