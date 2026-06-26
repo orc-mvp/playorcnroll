@@ -492,6 +492,7 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           payment_method: string | null
+          plan_name: string | null
           status: string
           stripe_customer_id: string | null
           stripe_subscription_id: string | null
@@ -503,6 +504,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           payment_method?: string | null
+          plan_name?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null
@@ -514,6 +516,7 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           payment_method?: string | null
+          plan_name?: string | null
           status?: string
           stripe_customer_id?: string | null
           stripe_subscription_id?: string | null

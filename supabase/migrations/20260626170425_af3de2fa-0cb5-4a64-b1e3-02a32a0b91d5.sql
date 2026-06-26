@@ -1,0 +1,1 @@
+ALTER TABLE public.subscriptions ADD COLUMN plan_name text;
