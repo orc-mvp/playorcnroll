@@ -121,11 +121,15 @@ export function EditLobisomemCharacterModal({
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
 
+  // Reinicializa o formulário apenas quando o modal abre ou troca de personagem.
+  // Evita perda de edições quando o objeto `character` é recriado pelo parent
+  // (ex.: refetch/realtime) enquanto o usuário ainda está editando.
   useEffect(() => {
+    if (!open) return;
     setName(character.name);
     setConcept(character.concept || '');
     setLobData(character.vampiro_data || {});
-  }, [character]);
+  }, [open, character.id]);
 
   const updateField = <K extends keyof LobisomemCharacterData>(key: K, value: LobisomemCharacterData[K]) => {
     setLobData(prev => ({ ...prev, [key]: value }));
