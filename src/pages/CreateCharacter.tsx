@@ -140,7 +140,7 @@ export default function CreateCharacter() {
   const [lobisomemFormData, setLobisomemFormData] = useState<LobisomemFormData>(initialLobisomemFormData);
   const [magoFormData, setMagoFormData] = useState<MagoFormData>(initialMagoFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { isPremium } = usePremium();
+  const { isPremium, loading: premiumLoading } = usePremium();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   // Apply W5 defaults (caps 0-5 for Rage/Will, Harmony 7) once the system is W5.
@@ -167,7 +167,7 @@ export default function CreateCharacter() {
 
   // Block creation if user already has 3+ characters and is not premium
   useEffect(() => {
-    if (!user || isPremium) return;
+    if (!user || premiumLoading || isPremium) return;
     (async () => {
       const { count } = await supabase
         .from('characters')
@@ -175,7 +175,7 @@ export default function CreateCharacter() {
         .eq('user_id', user.id);
       if ((count ?? 0) >= 3) setUpgradeOpen(true);
     })();
-  }, [user, isPremium]);
+  }, [user, isPremium, premiumLoading]);
 
   const totalSteps =
     gameSystem === 'vampiro_v3' ? 6 :
