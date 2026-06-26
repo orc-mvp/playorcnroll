@@ -14,10 +14,23 @@ import UpgradeBanner from '@/components/UpgradeBanner';
 export default function Upgrade() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { isPremium, status, paymentMethod, currentPeriodEnd, daysUntilExpiry, isSuperadmin } = usePremium();
+  const { isPremium, status, paymentMethod, currentPeriodEnd, daysUntilExpiry, isSuperadmin, refresh } = usePremium();
   const { t } = useI18n();
   const { toast } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
+
+  const syncStatus = async () => {
+    setBusy('sync');
+    try {
+      await refresh();
+      toast({ title: 'Status atualizado' });
+    } catch (e) {
+      toast({ title: 'Erro', description: (e as Error).message, variant: 'destructive' });
+    } finally {
+      setBusy(null);
+    }
+  };
+
 
   if (!authLoading && !user) {
     navigate('/login?returnTo=/upgrade');
@@ -79,14 +92,25 @@ export default function Upgrade() {
               </CardDescription>
             </CardHeader>
             {paymentMethod === 'card' && (
-              <CardContent>
+              <CardContent className="flex flex-wrap gap-2">
                 <Button onClick={portal} disabled={busy === 'portal'}>
                   {t.upgrade?.managePortal}
+                </Button>
+                <Button variant="outline" onClick={syncStatus} disabled={busy === 'sync'}>
+                  {busy === 'sync' ? '...' : 'Atualizar status da assinatura'}
+                </Button>
+              </CardContent>
+            )}
+            {!paymentMethod && (
+              <CardContent>
+                <Button variant="outline" onClick={syncStatus} disabled={busy === 'sync'}>
+                  {busy === 'sync' ? '...' : 'Atualizar status da assinatura'}
                 </Button>
               </CardContent>
             )}
           </Card>
         )}
+
 
         <Card>
           <CardHeader>
