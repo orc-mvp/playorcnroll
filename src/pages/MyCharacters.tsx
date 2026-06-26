@@ -150,9 +150,10 @@ export default function MyCharacters() {
   const [deleteTarget, setDeleteTarget] = useState<Character | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const { isPremium } = usePremium();
+  const { isPremium, loading: premiumLoading } = usePremium();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
-  const canCreate = isPremium || characters.length < 3;
+  const canCreate = premiumLoading || isPremium || characters.length < 3;
+
 
   useEffect(() => {
     if (!user) return;
