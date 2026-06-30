@@ -631,9 +631,9 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
               <div>
                 <h4 className="font-medieval text-sm text-muted-foreground mb-2">{t.lobisomem.willpowerLabel}</h4>
                 <div className="flex justify-center">
-                  <DotDisplay value={Math.min(willpower, isW5 ? 5 : 10)} maxValue={isW5 ? 5 : 10} />
+                  <DotDisplay value={Math.min(willpower, 10)} maxValue={10} />
                 </div>
-                <p className="text-center text-xs text-muted-foreground mt-1">{Math.min(willpower, isW5 ? 5 : 10)}/{isW5 ? 5 : 10}</p>
+                <p className="text-center text-xs text-muted-foreground mt-1">{Math.min(willpower, 10)}/10</p>
               </div>
               {isW5 && (
                 <div>
