@@ -217,13 +217,22 @@ export default function MySessions() {
             </h1>
           </div>
 
-          <Button asChild className="shrink-0">
-            <Link to="/session/create">
-              <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden sm:inline">{t.session.create}</span>
-              <span className="sm:hidden">{t.session.newFemale}</span>
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Button asChild variant="outline" className="shrink-0">
+              <Link to="/join">
+                <Users className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">{t.session.join}</span>
+                <span className="sm:hidden">{t.session.join.split(' ')[0]}</span>
+              </Link>
+            </Button>
+            <Button asChild className="shrink-0">
+              <Link to="/session/create">
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">{t.session.create}</span>
+                <span className="sm:hidden">{t.session.newFemale}</span>
+              </Link>
+            </Button>
+          </div>
         </div>
       </header>
       <UpgradeBanner />
