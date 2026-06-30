@@ -171,12 +171,6 @@ export default function Dashboard() {
         <RecentActivity userId={user.id} />
       </main>
 
-      {/* Session Options Modal */}
-      <SessionOptionsModal 
-        open={showSessionModal} 
-        onOpenChange={setShowSessionModal} 
-      />
-
     </div>
   );
 }
