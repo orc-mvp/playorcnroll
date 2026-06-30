@@ -1,6 +1,5 @@
-import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate, Link } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useI18n } from '@/lib/i18n';
 import { Button } from '@/components/ui/button';
@@ -10,15 +9,23 @@ import { GAME_SYSTEMS } from '@/lib/gameSystems';
 import logoLarge from '@/assets/logo-orcnroll-large.webp';
 
 export default function Index() {
-  const navigate = useNavigate();
   const { user, loading } = useAuth();
   const { t, language, setLanguage } = useI18n();
 
-  useEffect(() => {
-    if (user && !loading) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [user, loading, navigate]);
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-pulse text-primary font-medieval text-2xl">
+          {t.common.loading}
+        </div>
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
 
   const systemIcons = {
     herois_marcados: <Sword className="w-10 h-10" />,
