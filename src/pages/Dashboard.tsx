@@ -91,20 +91,19 @@ export default function Dashboard() {
         {/* Quick Actions - 5 cards */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 mb-8">
           {/* Sessions */}
-          <Card 
-            className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full"
-            onClick={() => setShowSessionModal(true)}
-          >
-            <CardHeader className="p-4 md:p-6">
-              <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
-                <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-primary" />
-              </div>
-              <CardTitle className="font-medieval text-base md:text-lg">{t.nav.sessions}</CardTitle>
-              <CardDescription className="font-body text-xs md:text-sm">
-                {t.dashboard.sessionsDesc}
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          <Link to="/sessions">
+            <Card className="medieval-card hover:border-primary/50 transition-colors cursor-pointer group h-full">
+              <CardHeader className="p-4 md:p-6">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-2 group-hover:bg-primary/20 transition-colors">
+                  <BookOpen className="w-5 h-5 md:w-6 md:h-6 text-primary" />
+                </div>
+                <CardTitle className="font-medieval text-base md:text-lg">{t.nav.sessions}</CardTitle>
+                <CardDescription className="font-body text-xs md:text-sm">
+                  {t.dashboard.sessionsDesc}
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </Link>
 
           {/* Characters */}
           <Link to="/characters">
