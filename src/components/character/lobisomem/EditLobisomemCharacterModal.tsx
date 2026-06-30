@@ -401,9 +401,9 @@ export function EditLobisomemCharacterModal({
                     <div className="flex items-center justify-between">
                       <span className="font-body text-sm">{t.lobisomem.willpowerLabel}</span>
                       <DotRating
-                        value={Math.min(lobData.willpower || 1, isW5 ? 5 : 10)}
+                        value={Math.min(lobData.willpower || 1, 10)}
                         onChange={(val) => updateField('willpower', val)}
-                        maxValue={isW5 ? 5 : 10}
+                        maxValue={10}
                         minValue={isW5 ? 0 : 1}
                       />
                     </div>
