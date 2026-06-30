@@ -84,9 +84,9 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData, gam
               {t.lobisomem.willpowerLabel}
             </span>
             <DotRating
-              value={Math.min(formData.willpower, isW5 ? 5 : 10)}
+              value={Math.min(formData.willpower, 10)}
               onChange={(value) => updateFormData({ willpower: value })}
-              maxValue={isW5 ? 5 : 10}
+              maxValue={10}
               minValue={isW5 ? 0 : 1}
             />
           </div>
