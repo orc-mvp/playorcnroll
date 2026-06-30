@@ -7,7 +7,6 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { Badge } from '@/components/ui/badge';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 
-import { SessionOptionsModal } from '@/components/dashboard/SessionOptionsModal';
 import { UserMenu } from '@/components/UserMenu';
 import UpgradeBanner from '@/components/UpgradeBanner';
 import { 
@@ -23,8 +22,6 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { user, profile, loading } = useAuth();
   const { t, language, setLanguage } = useI18n();
-  
-  const [showSessionModal, setShowSessionModal] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
