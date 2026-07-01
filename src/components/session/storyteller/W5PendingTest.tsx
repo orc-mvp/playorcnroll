@@ -118,9 +118,6 @@ export function W5PendingTest({
       case 'rage':
         pool = Math.min(5, currentRage);
         break;
-      case 'harmony':
-        pool = Math.min(10, (vampiroData as any).harmony ?? 7);
-        break;
       default:
         pool = 1;
     }
@@ -128,11 +125,11 @@ export function W5PendingTest({
   };
 
   const dicePool = calculatePool();
-  // 'rage' o pool já É de Fúria; 'willpower' e 'harmony' não misturam Fúria.
+  // 'rage' o pool já É de Fúria; 'willpower' não mistura Fúria.
   const effectiveRage =
     config.testType === 'rage'
       ? Math.min(currentRage, dicePool)
-      : config.testType === 'willpower' || config.testType === 'harmony'
+      : config.testType === 'willpower'
         ? 0
         : Math.min(currentRage, dicePool);
 
