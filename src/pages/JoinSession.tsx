@@ -278,8 +278,13 @@ export default function JoinSession() {
         return;
       }
 
-      // New player
-      if (sessionData.join_locked) {
+      // New player — re-validate lock state against server to avoid stale
+      // toast when narrator toggled the flag after the initial validation.
+      const { data: freshLockRow } = await supabase.functions.invoke('validate-invite-code', {
+        body: { invite_code: inviteCode.trim().toUpperCase() },
+      });
+      const freshLocked = freshLockRow?.session?.join_locked ?? sessionData.join_locked;
+      if (freshLocked) {
         toast({
           title: t.managePlayers.joinLockedByNarrator,
           variant: 'destructive',
@@ -287,6 +292,7 @@ export default function JoinSession() {
         setIsJoining(false);
         return;
       }
+
 
       const { data: characterData } = await supabase
         .from('characters')
