@@ -84,7 +84,18 @@ export default function JoinSession() {
   const [joinedSessions, setJoinedSessions] = useState<JoinedSession[]>([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [validatedSession, setValidatedSession] = useState<ValidatedSession | null>(null);
+  const [validatedInviteCode, setValidatedInviteCode] = useState('');
   const [isValidating, setIsValidating] = useState(false);
+
+  useEffect(() => {
+    const routeCode = code?.trim().toUpperCase() || '';
+    if (!routeCode) return;
+
+    setInviteCode(routeCode);
+    setValidatedSession(null);
+    setValidatedInviteCode('');
+    setSelectedCharacterId('');
+  }, [code]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -184,6 +195,7 @@ export default function JoinSession() {
       }
 
       setValidatedSession(validateData.session);
+      setValidatedInviteCode(codeToUse);
       setSelectedCharacterId('');
 
       toast({
@@ -213,6 +225,17 @@ export default function JoinSession() {
       return;
     }
 
+    const codeToUse = inviteCode.trim().toUpperCase();
+
+    if (validatedInviteCode !== codeToUse) {
+      toast({
+        title: t.session.validateFirst,
+        description: t.session.clickVerify,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (!selectedCharacterId) {
       toast({
         title: t.session.selectCharacter,
@@ -223,6 +246,22 @@ export default function JoinSession() {
     }
 
     if (!user) return;
+
+    const selectedCharacter = characters.find((char) => char.id === selectedCharacterId);
+    const compatibleCharacters = filterCompatibleCharacters(
+      selectedCharacter ? [selectedCharacter] : [],
+      validatedSession.game_system,
+      validatedSession.allowed_systems,
+    );
+
+    if (compatibleCharacters.length === 0) {
+      toast({
+        title: t.session.selectCharacter,
+        description: 'Esta ficha não é compatível com a edição/sistema da sala.',
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setIsJoining(true);
 
@@ -281,7 +320,7 @@ export default function JoinSession() {
       // New player — re-validate lock state against server to avoid stale
       // toast when narrator toggled the flag after the initial validation.
       const { data: freshLockRow } = await supabase.functions.invoke('validate-invite-code', {
-        body: { invite_code: inviteCode.trim().toUpperCase() },
+        body: { invite_code: codeToUse },
       });
       const freshLocked = freshLockRow?.session?.join_locked ?? sessionData.join_locked;
       if (freshLocked) {
@@ -306,7 +345,7 @@ export default function JoinSession() {
       );
 
       const { error: joinError } = await supabase.rpc('join_session_with_code', {
-        p_invite_code: inviteCode.trim().toUpperCase(),
+        p_invite_code: codeToUse,
         p_character_id: selectedCharacterId,
         p_patch: patch as any,
       });
@@ -501,6 +540,7 @@ export default function JoinSession() {
                         onChange={(e) => {
                           setInviteCode(e.target.value.toUpperCase());
                           setValidatedSession(null);
+                          setValidatedInviteCode('');
                           setSelectedCharacterId('');
                         }}
                         placeholder={t.session.inviteCodePlaceholder}
