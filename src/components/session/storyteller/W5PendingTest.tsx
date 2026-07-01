@@ -180,22 +180,22 @@ export function W5PendingTest({
         },
       ]);
 
-      // Brutal Outcome → -1 Harmonia (clamped a 0). Lê o valor atual e grava.
+      // Brutal Outcome → +1 Harano (clamped a 5).
       if (r.isBrutalOutcome) {
         try {
           const { data: row } = await supabase
             .from('session_participants')
-            .select('id, session_w5_harmony')
+            .select('id, session_w5_harano')
             .eq('session_id', sessionId)
             .eq('character_id', characterId)
             .maybeSingle();
           if (row) {
-            const current = (row as any).session_w5_harmony ?? 7;
-            const next = Math.max(0, current - 1);
+            const current = (row as any).session_w5_harano ?? 0;
+            const next = Math.min(5, current + 1);
             if (next !== current) {
               await supabase
                 .from('session_participants')
-                .update({ session_w5_harmony: next } as any)
+                .update({ session_w5_harano: next } as any)
                 .eq('id', (row as any).id);
               await supabase.from('session_events').insert([
                 {
@@ -206,7 +206,7 @@ export function W5PendingTest({
                     JSON.stringify({
                       character_id: characterId,
                       character_name: characterName,
-                      tracker: 'harmony',
+                      tracker: 'harano',
                       previous: current,
                       next,
                       reason: 'brutal_outcome',
@@ -217,7 +217,7 @@ export function W5PendingTest({
             }
           }
         } catch (e) {
-          if (import.meta.env.DEV) console.error('W5 harmony decrement error', e);
+          if (import.meta.env.DEV) console.error('W5 harano increment error', e);
         }
       }
 
