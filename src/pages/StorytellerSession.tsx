@@ -573,7 +573,8 @@ export default function StorytellerSession() {
         character: myCharacter,
         initialRage: anyP.session_w5_rage ?? 0,
         initialWillpower: anyP.session_w5_willpower_current ?? 0,
-        initialHarmony: anyP.session_w5_harmony ?? 7,
+        initialHarano: anyP.session_w5_harano ?? 0,
+        initialHauglosk: anyP.session_w5_hauglosk ?? 0,
         initialHealthDamage:
           (myParticipant.session_health_damage as boolean[]) ||
           [false, false, false, false, false, false, false],
