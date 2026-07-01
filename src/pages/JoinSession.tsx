@@ -247,6 +247,22 @@ export default function JoinSession() {
 
     if (!user) return;
 
+    const selectedCharacter = characters.find((char) => char.id === selectedCharacterId);
+    const compatibleCharacters = filterCompatibleCharacters(
+      selectedCharacter ? [selectedCharacter] : [],
+      validatedSession.game_system,
+      validatedSession.allowed_systems,
+    );
+
+    if (compatibleCharacters.length === 0) {
+      toast({
+        title: t.session.selectCharacter,
+        description: 'Esta ficha não é compatível com a edição/sistema da sala.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsJoining(true);
 
     try {
