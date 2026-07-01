@@ -375,7 +375,7 @@ export function W5Trackers({
       {pending && (
         <TrackerChangeConfirmModal
           open={!!pending}
-          trackerType={(pending.type === 'harmony' ? 'willpower' : pending.type) as TrackerType}
+          trackerType={((pending.type === 'harano' || pending.type === 'hauglosk') ? 'willpower' : pending.type) as TrackerType}
           currentValue={pending.currentValue}
           newValue={pending.newValue}
           isNarrator={false}
