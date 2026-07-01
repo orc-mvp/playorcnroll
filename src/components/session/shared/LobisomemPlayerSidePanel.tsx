@@ -42,7 +42,8 @@ export function LobisomemPlayerSidePanel({
   const isW5 = (character as any)?.game_system === 'lobisomem_w5';
   const w5Rage = (sessionTrackers as any)?.rage ?? 0;
   const w5Willpower = (sessionTrackers as any)?.willpower ?? 0;
-  const w5Harmony = (sessionTrackers as any)?.harmony ?? 7;
+  const w5Harano = (sessionTrackers as any)?.harano ?? 0;
+  const w5Hauglosk = (sessionTrackers as any)?.hauglosk ?? 0;
 
   if (!character) {
     return (
