@@ -104,7 +104,8 @@ interface LobisomemCharacterSheetProps {
     gnosis?: number;
     rage?: number;
     willpower?: number;
-    harmony?: number;
+    harano?: number;
+    hauglosk?: number;
     healthDamage?: boolean[];
     form?: string;
   };
@@ -223,7 +224,8 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
   const gnosis = data.gnosis || (isW5 ? 0 : 1);
   const rage = data.rage || 1;
   const willpower = data.willpower || 1;
-  const harmony = sessionTrackers?.harmony ?? (data as any).harmony ?? 7;
+  const harano = sessionTrackers?.harano ?? (data as any).harano ?? 0;
+  const hauglosk = sessionTrackers?.hauglosk ?? (data as any).hauglosk ?? 0;
   const gifts = data.gifts || {};
   const renown = data.renown || { glory: 0, honor: 0, wisdom: 0 };
 
@@ -636,15 +638,22 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
                 <p className="text-center text-xs text-muted-foreground mt-1">{Math.min(willpower, 10)}/10</p>
               </div>
               {isW5 && (
-                <div>
-                  <h4 className="font-medieval text-sm text-muted-foreground mb-2">
-                    {language === 'pt-BR' ? 'Harmonia' : 'Harmony'}
-                  </h4>
-                  <div className="flex justify-center">
-                    <DotDisplay value={harmony} maxValue={10} />
+                <>
+                  <div>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-2">Harano</h4>
+                    <div className="flex justify-center">
+                      <DotDisplay value={Math.min(harano, 5)} maxValue={5} />
+                    </div>
+                    <p className="text-center text-xs text-muted-foreground mt-1">{Math.min(harano, 5)}/5</p>
                   </div>
-                  <p className="text-center text-xs text-muted-foreground mt-1">{harmony}/10</p>
-                </div>
+                  <div>
+                    <h4 className="font-medieval text-sm text-muted-foreground mb-2">Hauglosk</h4>
+                    <div className="flex justify-center">
+                      <DotDisplay value={Math.min(hauglosk, 5)} maxValue={5} />
+                    </div>
+                    <p className="text-center text-xs text-muted-foreground mt-1">{Math.min(hauglosk, 5)}/5</p>
+                  </div>
+                </>
               )}
             </div>
 
@@ -682,8 +691,7 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
         </CardContent>
       </Card>
 
-      {/* Renome — apenas W20/Metamorfos (W5 substitui por Harmonia, exibida acima) */}
-      {!isW5 && (
+      {/* Renome — W20/Metamorfos (max 10) e W5 (max 5) */}
       <Card className="medieval-card border-emerald-500/20">
         <CardHeader className="pb-3">
           <CardTitle className="font-medieval flex items-center gap-2 text-emerald-500">
@@ -692,10 +700,9 @@ export default function LobisomemCharacterSheet({ character, sessionTrackers, re
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <RenownBlock value={renown} tribe={data.tribe} readOnly />
+          <RenownBlock value={renown} tribe={data.tribe} readOnly maxValue={isW5 ? 5 : 10} />
         </CardContent>
       </Card>
-      )}
 
       {/* Notes */}
       <CharacterNotes

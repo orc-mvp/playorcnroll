@@ -42,7 +42,8 @@ export function LobisomemPlayerSidePanel({
   const isW5 = (character as any)?.game_system === 'lobisomem_w5';
   const w5Rage = (sessionTrackers as any)?.rage ?? 0;
   const w5Willpower = (sessionTrackers as any)?.willpower ?? 0;
-  const w5Harmony = (sessionTrackers as any)?.harmony ?? 7;
+  const w5Harano = (sessionTrackers as any)?.harano ?? 0;
+  const w5Hauglosk = (sessionTrackers as any)?.hauglosk ?? 0;
 
   if (!character) {
     return (
@@ -179,13 +180,26 @@ export function LobisomemPlayerSidePanel({
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-emerald-500">Harmonia</span>
+                  <span className="text-red-500">Harano</span>
                   <div className="flex gap-0.5">
-                    {Array.from({ length: 10 }, (_, i) => (
+                    {Array.from({ length: 5 }, (_, i) => (
                       <div
                         key={i}
-                        className={`w-2 h-2 rounded-full ${
-                          i < w5Harmony ? 'bg-emerald-500' : 'bg-muted-foreground/20'
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          i < w5Harano ? 'bg-red-500' : 'bg-muted-foreground/20'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-blue-400">Hauglosk</span>
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <div
+                        key={i}
+                        className={`w-2.5 h-2.5 rounded-full ${
+                          i < w5Hauglosk ? 'bg-blue-400' : 'bg-muted-foreground/20'
                         }`}
                       />
                     ))}

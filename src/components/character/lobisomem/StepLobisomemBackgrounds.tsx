@@ -45,14 +45,14 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData, gam
         <CardHeader className="text-center pb-4">
           <CardTitle className="font-medieval text-2xl">
             {isW5
-              ? (language === 'pt-BR' ? 'Fúria, Vontade e Harmonia' : 'Rage, Willpower and Harmony')
+              ? (language === 'pt-BR' ? 'Fúria, Vontade, Harano e Hauglosk' : 'Rage, Willpower, Harano and Hauglosk')
               : t.lobisomem.gnosisRage}
           </CardTitle>
           <CardDescription className="font-body">
             {isW5
               ? (language === 'pt-BR'
-                  ? 'Escalas 5ª Edição — Fúria e Vontade 0–5, Harmonia 0–10 (sugestão inicial: 7)'
-                  : 'W5 scales — Rage and Willpower 0–5, Harmony 0–10 (suggested start: 7)')
+                  ? 'Escalas 5ª Edição — todos 0–5'
+                  : 'W5 scales — all 0–5')
               : (language === 'pt-BR'
                   ? 'Defina os valores iniciais de Gnose, Fúria e Força de Vontade'
                   : 'Set initial values for Gnosis, Rage and Willpower')}
@@ -91,23 +91,31 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData, gam
             />
           </div>
           {isW5 && (
-            <div className="flex items-center justify-between gap-4">
-              <span className="font-body text-sm min-w-[140px]">
-                {language === 'pt-BR' ? 'Harmonia' : 'Harmony'}
-              </span>
-              <DotRating
-                value={formData.harmony ?? 7}
-                onChange={(value) => updateFormData({ harmony: value })}
-                maxValue={10}
-                minValue={0}
-              />
-            </div>
+            <>
+              <div className="flex items-center justify-between gap-4">
+                <span className="font-body text-sm min-w-[140px]">Harano</span>
+                <DotRating
+                  value={formData.harano ?? 0}
+                  onChange={(value) => updateFormData({ harano: value })}
+                  maxValue={5}
+                  minValue={0}
+                />
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="font-body text-sm min-w-[140px]">Hauglosk</span>
+                <DotRating
+                  value={formData.hauglosk ?? 0}
+                  onChange={(value) => updateFormData({ hauglosk: value })}
+                  maxValue={5}
+                  minValue={0}
+                />
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
 
-      {/* Renown — apenas W20/Metamorfos (W5 substitui por Harmonia) */}
-      {!isW5 && (
+      {/* Renome — W20/Metamorfos (max 10) e W5 (max 5) */}
       <Card className="medieval-card">
         <CardHeader className="text-center pb-4">
           <CardTitle className="font-medieval text-2xl">
@@ -123,32 +131,33 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData, gam
             const gloryLabel = isBSD ? t.lobisomem.bsd_glory : t.lobisomem.glory;
             const honorLabel = isBSD ? t.lobisomem.bsd_honor : t.lobisomem.honor;
             const wisdomLabel = isBSD ? t.lobisomem.bsd_wisdom : t.lobisomem.wisdom;
+            const maxRenown = isW5 ? 5 : 10;
             return (
               <>
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-body text-sm min-w-[140px]">{gloryLabel}</span>
                   <DotRating
-                    value={formData.renown?.glory || 0}
+                    value={Math.min(formData.renown?.glory || 0, maxRenown)}
                     onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), glory: value } })}
-                    maxValue={10}
+                    maxValue={maxRenown}
                     minValue={0}
                   />
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-body text-sm min-w-[140px]">{honorLabel}</span>
                   <DotRating
-                    value={formData.renown?.honor || 0}
+                    value={Math.min(formData.renown?.honor || 0, maxRenown)}
                     onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), honor: value } })}
-                    maxValue={10}
+                    maxValue={maxRenown}
                     minValue={0}
                   />
                 </div>
                 <div className="flex items-center justify-between gap-4">
                   <span className="font-body text-sm min-w-[140px]">{wisdomLabel}</span>
                   <DotRating
-                    value={formData.renown?.wisdom || 0}
+                    value={Math.min(formData.renown?.wisdom || 0, maxRenown)}
                     onChange={(value) => updateFormData({ renown: { ...(formData.renown || { glory: 0, honor: 0, wisdom: 0 }), wisdom: value } })}
-                    maxValue={10}
+                    maxValue={maxRenown}
                     minValue={0}
                   />
                 </div>
@@ -157,7 +166,6 @@ export default function StepLobisomemBackgrounds({ formData, updateFormData, gam
           })()}
         </CardContent>
       </Card>
-      )}
 
       {/* Backgrounds */}
       <Card className="medieval-card">

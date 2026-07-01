@@ -159,7 +159,7 @@ export default function StorytellerSession() {
           id, user_id, character_id,
           session_blood_pool, session_willpower_current, session_health_damage,
           session_gnosis, session_rage, session_form,
-          session_w5_rage, session_w5_willpower_current, session_w5_harmony,
+          session_w5_rage, session_w5_willpower_current, session_w5_harano, session_w5_hauglosk,
           session_quintessence, session_paradox, session_arete,
           sheet_locked,
           characters:character_id (id, name, concept, game_system, experience_points, vampiro_data)
@@ -573,7 +573,8 @@ export default function StorytellerSession() {
         character: myCharacter,
         initialRage: anyP.session_w5_rage ?? 0,
         initialWillpower: anyP.session_w5_willpower_current ?? 0,
-        initialHarmony: anyP.session_w5_harmony ?? 7,
+        initialHarano: anyP.session_w5_harano ?? 0,
+        initialHauglosk: anyP.session_w5_hauglosk ?? 0,
         initialHealthDamage:
           (myParticipant.session_health_damage as boolean[]) ||
           [false, false, false, false, false, false, false],
@@ -620,7 +621,8 @@ export default function StorytellerSession() {
         ? {
             rage: (myParticipant as any)?.session_w5_rage ?? 0,
             willpower: (myParticipant as any)?.session_w5_willpower_current ?? 0,
-            harmony: (myParticipant as any)?.session_w5_harmony ?? 7,
+            harano: (myParticipant as any)?.session_w5_harano ?? 0,
+            hauglosk: (myParticipant as any)?.session_w5_hauglosk ?? 0,
             healthDamage:
               (myParticipant?.session_health_damage as boolean[]) ||
               Array(7).fill(false),

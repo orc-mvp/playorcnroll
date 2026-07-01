@@ -369,7 +369,9 @@ export type Database = {
           session_paradox: number | null
           session_quintessence: number | null
           session_rage: number | null
+          session_w5_harano: number
           session_w5_harmony: number
+          session_w5_hauglosk: number
           session_w5_rage: number
           session_w5_willpower_current: number
           session_willpower_current: number | null
@@ -389,7 +391,9 @@ export type Database = {
           session_paradox?: number | null
           session_quintessence?: number | null
           session_rage?: number | null
+          session_w5_harano?: number
           session_w5_harmony?: number
+          session_w5_hauglosk?: number
           session_w5_rage?: number
           session_w5_willpower_current?: number
           session_willpower_current?: number | null
@@ -409,7 +413,9 @@ export type Database = {
           session_paradox?: number | null
           session_quintessence?: number | null
           session_rage?: number | null
+          session_w5_harano?: number
           session_w5_harmony?: number
+          session_w5_hauglosk?: number
           session_w5_rage?: number
           session_w5_willpower_current?: number
           session_willpower_current?: number | null

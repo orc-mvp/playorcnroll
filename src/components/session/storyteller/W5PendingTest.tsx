@@ -118,9 +118,6 @@ export function W5PendingTest({
       case 'rage':
         pool = Math.min(5, currentRage);
         break;
-      case 'harmony':
-        pool = Math.min(10, (vampiroData as any).harmony ?? 7);
-        break;
       default:
         pool = 1;
     }
@@ -128,11 +125,11 @@ export function W5PendingTest({
   };
 
   const dicePool = calculatePool();
-  // 'rage' o pool já É de Fúria; 'willpower' e 'harmony' não misturam Fúria.
+  // 'rage' o pool já É de Fúria; 'willpower' não mistura Fúria.
   const effectiveRage =
     config.testType === 'rage'
       ? Math.min(currentRage, dicePool)
-      : config.testType === 'willpower' || config.testType === 'harmony'
+      : config.testType === 'willpower'
         ? 0
         : Math.min(currentRage, dicePool);
 
@@ -183,22 +180,22 @@ export function W5PendingTest({
         },
       ]);
 
-      // Brutal Outcome → -1 Harmonia (clamped a 0). Lê o valor atual e grava.
+      // Brutal Outcome → +1 Harano (clamped a 5).
       if (r.isBrutalOutcome) {
         try {
           const { data: row } = await supabase
             .from('session_participants')
-            .select('id, session_w5_harmony')
+            .select('id, session_w5_harano')
             .eq('session_id', sessionId)
             .eq('character_id', characterId)
             .maybeSingle();
           if (row) {
-            const current = (row as any).session_w5_harmony ?? 7;
-            const next = Math.max(0, current - 1);
+            const current = (row as any).session_w5_harano ?? 0;
+            const next = Math.min(5, current + 1);
             if (next !== current) {
               await supabase
                 .from('session_participants')
-                .update({ session_w5_harmony: next } as any)
+                .update({ session_w5_harano: next } as any)
                 .eq('id', (row as any).id);
               await supabase.from('session_events').insert([
                 {
@@ -209,7 +206,7 @@ export function W5PendingTest({
                     JSON.stringify({
                       character_id: characterId,
                       character_name: characterName,
-                      tracker: 'harmony',
+                      tracker: 'harano',
                       previous: current,
                       next,
                       reason: 'brutal_outcome',
@@ -220,7 +217,7 @@ export function W5PendingTest({
             }
           }
         } catch (e) {
-          if (import.meta.env.DEV) console.error('W5 harmony decrement error', e);
+          if (import.meta.env.DEV) console.error('W5 harano increment error', e);
         }
       }
 
@@ -232,7 +229,7 @@ export function W5PendingTest({
             : r.passed
               ? t.vampiroTests.success
               : t.vampiroTests.failure,
-        description: r.isBrutalOutcome ? 'Harmonia -1' : undefined,
+        description: r.isBrutalOutcome ? 'Harano +1' : undefined,
       });
     } catch (e) {
       if (import.meta.env.DEV) console.error('W5 test save error', e);
@@ -374,7 +371,7 @@ export function W5PendingTest({
     if (config.testType === 'attribute_only') return config.attribute ?? '';
     if (config.testType === 'willpower') return 'Vontade';
     if (config.testType === 'rage') return 'Frenesi (Fúria)';
-    if (config.testType === 'harmony') return 'Harmonia';
+    
     if (config.testType === 'raw_dice')
       return `${config.diceCount ?? 1} dados`;
     return config.testType;
