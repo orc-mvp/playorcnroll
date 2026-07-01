@@ -229,7 +229,7 @@ export function W5PendingTest({
             : r.passed
               ? t.vampiroTests.success
               : t.vampiroTests.failure,
-        description: r.isBrutalOutcome ? 'Harmonia -1' : undefined,
+        description: r.isBrutalOutcome ? 'Harano +1' : undefined,
       });
     } catch (e) {
       if (import.meta.env.DEV) console.error('W5 test save error', e);
