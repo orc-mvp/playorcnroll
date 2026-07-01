@@ -408,31 +408,39 @@ export function EditLobisomemCharacterModal({
                       />
                     </div>
                     {isW5 && (
-                      <div className="flex items-center justify-between">
-                        <span className="font-body text-sm">
-                          {language === 'pt-BR' ? 'Harmonia' : 'Harmony'}
-                        </span>
-                        <DotRating
-                          value={(lobData as any).harmony ?? 7}
-                          onChange={(val) => updateField('harmony' as any, val as any)}
-                          maxValue={10}
-                          minValue={0}
-                        />
-                      </div>
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="font-body text-sm">Harano</span>
+                          <DotRating
+                            value={Math.min((lobData as any).harano ?? 0, 5)}
+                            onChange={(val) => updateField('harano' as any, val as any)}
+                            maxValue={5}
+                            minValue={0}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-body text-sm">Hauglosk</span>
+                          <DotRating
+                            value={Math.min((lobData as any).hauglosk ?? 0, 5)}
+                            onChange={(val) => updateField('hauglosk' as any, val as any)}
+                            maxValue={5}
+                            minValue={0}
+                          />
+                        </div>
+                      </>
                     )}
                   </div>
 
-                  {/* Renown — apenas W20 (W5 usa Harmonia acima) */}
-                  {!isW5 && (
-                    <div className="space-y-2 pt-2 border-t border-border">
-                      <h4 className="font-medieval text-sm text-muted-foreground">{t.lobisomem.renown}</h4>
-                      <RenownBlock
-                        value={lobData.renown || { glory: 0, honor: 0, wisdom: 0 }}
-                        onChange={(next) => updateField('renown', next)}
-                        tribe={lobData.tribe}
-                      />
-                    </div>
-                  )}
+                  {/* Renome — W20/Metamorfos (max 10) e W5 (max 5) */}
+                  <div className="space-y-2 pt-2 border-t border-border">
+                    <h4 className="font-medieval text-sm text-muted-foreground">{t.lobisomem.renown}</h4>
+                    <RenownBlock
+                      value={lobData.renown || { glory: 0, honor: 0, wisdom: 0 }}
+                      onChange={(next) => updateField('renown', next)}
+                      tribe={lobData.tribe}
+                      maxValue={isW5 ? 5 : 10}
+                    />
+                  </div>
                 </div>
               </TabsContent>
 

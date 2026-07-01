@@ -23,9 +23,10 @@ import type { LobisomemCharacterData } from '@/lib/lobisomem/diceUtils';
 const HEALTH_LEVELS = ['bruised', 'hurt', 'injured', 'wounded', 'mauled', 'crippled', 'incapacitated'] as const;
 const RAGE_MAX = 5;
 const WILLPOWER_MAX = 5;
-const HARMONY_MAX = 10;
+const HARANO_MAX = 5;
+const HAUGLOSK_MAX = 5;
 
-type W5TrackerKind = 'rage' | 'willpower' | 'harmony' | 'health';
+type W5TrackerKind = 'rage' | 'willpower' | 'harano' | 'hauglosk' | 'health';
 
 interface PendingChange {
   type: W5TrackerKind;
@@ -45,7 +46,8 @@ interface Props {
   } | null;
   initialRage?: number;
   initialWillpower?: number;
-  initialHarmony?: number;
+  initialHarano?: number;
+  initialHauglosk?: number;
   initialHealthDamage?: boolean[];
   initialForm?: string;
 }
@@ -57,13 +59,15 @@ export function W5Trackers({
   character,
   initialRage = 0,
   initialWillpower = 0,
-  initialHarmony = 7,
+  initialHarano = 0,
+  initialHauglosk = 0,
   initialHealthDamage = [false, false, false, false, false, false, false],
   initialForm = 'hominid',
 }: Props) {
   const [rage, setRage] = useState(initialRage);
   const [willpower, setWillpower] = useState(initialWillpower);
-  const [harmony, setHarmony] = useState(initialHarmony);
+  const [harano, setHarano] = useState(initialHarano);
+  const [hauglosk, setHauglosk] = useState(initialHauglosk);
   const [health, setHealth] = useState<boolean[]>(initialHealthDamage);
   const [form, setForm] = useState(initialForm);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -72,7 +76,8 @@ export function W5Trackers({
 
   const initialized = useRef(false);
   const prevWill = useRef(initialWillpower);
-  const prevHarmony = useRef(initialHarmony);
+  const prevHarano = useRef(initialHarano);
+  const prevHauglosk = useRef(initialHauglosk);
 
   const emit = useCallback(
     async (eventType: string, data: Record<string, unknown>) => {
@@ -101,18 +106,28 @@ export function W5Trackers({
 
   useEffect(() => {
     if (!initialized.current) return;
-    if (prevHarmony.current > 1 && harmony <= 1) {
-      emit('critical_state', { type: 'harmony_critical' });
-      sonnerToast.error('Harmonia em colapso — a Fera se aproxima!');
+    if (prevHarano.current < HARANO_MAX && harano >= HARANO_MAX) {
+      emit('critical_state', { type: 'harano_max' });
+      sonnerToast.error('Harano no limite — a apatia domina!');
     }
-    prevHarmony.current = harmony;
-  }, [harmony, emit]);
+    prevHarano.current = harano;
+  }, [harano, emit]);
+
+  useEffect(() => {
+    if (!initialized.current) return;
+    if (prevHauglosk.current < HAUGLOSK_MAX && hauglosk >= HAUGLOSK_MAX) {
+      emit('critical_state', { type: 'hauglosk_max' });
+      sonnerToast.error('Hauglosk no limite — a fúria explode!');
+    }
+    prevHauglosk.current = hauglosk;
+  }, [hauglosk, emit]);
 
   const save = useCallback(
     async (patch: {
       session_w5_rage?: number;
       session_w5_willpower_current?: number;
-      session_w5_harmony?: number;
+      session_w5_harano?: number;
+      session_w5_hauglosk?: number;
       session_health_damage?: boolean[];
       session_form?: string;
     }) => {
@@ -143,7 +158,7 @@ export function W5Trackers({
     if (!pending) return;
     const { type, currentValue, newValue } = pending;
     await emit('tracker_change', {
-      tracker_type: type === 'harmony' ? 'harmony' : type,
+      tracker_type: type,
       old_value: currentValue,
       new_value: newValue,
       is_narrator_change: false,
@@ -154,9 +169,12 @@ export function W5Trackers({
     } else if (type === 'willpower') {
       setWillpower(newValue);
       save({ session_w5_willpower_current: newValue });
-    } else if (type === 'harmony') {
-      setHarmony(newValue);
-      save({ session_w5_harmony: newValue });
+    } else if (type === 'harano') {
+      setHarano(newValue);
+      save({ session_w5_harano: newValue });
+    } else if (type === 'hauglosk') {
+      setHauglosk(newValue);
+      save({ session_w5_hauglosk: newValue });
     } else if (type === 'health') {
       const next = Array(7).fill(false);
       for (let i = 0; i < newValue; i++) next[i] = true;
@@ -237,28 +255,53 @@ export function W5Trackers({
         </CardContent>
       </Card>
 
-      {/* HARMONY */}
-      <Card className={`medieval-card ${harmony <= 1 ? 'border-destructive' : 'border-red-600/20'}`}>
+      {/* HARANO */}
+      <Card className={`medieval-card ${harano >= HARANO_MAX ? 'border-destructive' : 'border-red-600/20'}`}>
         <CardHeader className="pb-2">
-          <CardTitle className="font-medieval text-sm flex items-center gap-2 text-emerald-500">
+          <CardTitle className="font-medieval text-sm flex items-center gap-2 text-red-500">
             <Scale className="w-4 h-4" />
-            Harmonia
+            Harano
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex flex-wrap gap-1.5 md:gap-1 justify-center">
-            {Array.from({ length: HARMONY_MAX }, (_, i) => (
+            {Array.from({ length: HARANO_MAX }, (_, i) => (
               <button
                 key={i}
                 type="button"
-                onClick={() => requestChange('harmony', i, harmony)}
-                className={`w-5 h-5 md:w-4 md:h-4 rounded-full border-2 transition-colors cursor-pointer hover:border-emerald-500 ${
-                  i < harmony ? 'bg-emerald-500 border-emerald-500' : 'border-muted-foreground/40 bg-transparent'
+                onClick={() => requestChange('harano', i, harano)}
+                className={`w-5 h-5 md:w-4 md:h-4 rounded-full border-2 transition-colors cursor-pointer hover:border-red-500 ${
+                  i < harano ? 'bg-red-500 border-red-500' : 'border-muted-foreground/40 bg-transparent'
                 }`}
               />
             ))}
           </div>
-          <p className="text-xs text-muted-foreground text-center">{harmony}/{HARMONY_MAX}</p>
+          <p className="text-xs text-muted-foreground text-center">{harano}/{HARANO_MAX}</p>
+        </CardContent>
+      </Card>
+
+      {/* HAUGLOSK */}
+      <Card className={`medieval-card ${hauglosk >= HAUGLOSK_MAX ? 'border-destructive' : 'border-red-600/20'}`}>
+        <CardHeader className="pb-2">
+          <CardTitle className="font-medieval text-sm flex items-center gap-2 text-blue-400">
+            <Scale className="w-4 h-4" />
+            Hauglosk
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex flex-wrap gap-1.5 md:gap-1 justify-center">
+            {Array.from({ length: HAUGLOSK_MAX }, (_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => requestChange('hauglosk', i, hauglosk)}
+                className={`w-5 h-5 md:w-4 md:h-4 rounded-full border-2 transition-colors cursor-pointer hover:border-blue-400 ${
+                  i < hauglosk ? 'bg-blue-400 border-blue-400' : 'border-muted-foreground/40 bg-transparent'
+                }`}
+              />
+            ))}
+          </div>
+          <p className="text-xs text-muted-foreground text-center">{hauglosk}/{HAUGLOSK_MAX}</p>
         </CardContent>
       </Card>
 

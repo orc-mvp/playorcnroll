@@ -42,7 +42,8 @@ interface Participant {
   session_form?: string;
   session_w5_rage?: number;
   session_w5_willpower_current?: number;
-  session_w5_harmony?: number;
+  session_w5_harano?: number;
+  session_w5_hauglosk?: number;
   experience_points?: number;
   sheet_locked?: boolean;
   character?: {
@@ -173,8 +174,11 @@ export function WerewolfNarratorSidebar({
         case 'w5_willpower':
           updateData.session_w5_willpower_current = pendingChange.newValue;
           break;
-        case 'w5_harmony':
-          updateData.session_w5_harmony = pendingChange.newValue;
+        case 'w5_harano':
+          updateData.session_w5_harano = pendingChange.newValue;
+          break;
+        case 'w5_hauglosk':
+          updateData.session_w5_hauglosk = pendingChange.newValue;
           break;
         case 'health':
           const newHealth = Array(7).fill(false);
@@ -256,7 +260,8 @@ export function WerewolfNarratorSidebar({
 
                 const currentRageW5 = p.session_w5_rage || 0;
                 const currentWpW5 = p.session_w5_willpower_current || 0;
-                const currentHarmony = p.session_w5_harmony ?? 7;
+                const currentHarano = p.session_w5_harano ?? 0;
+                const currentHauglosk = p.session_w5_hauglosk ?? 0;
 
                 const currentRage = isW5 ? currentRageW5 : currentRageW20;
                 const currentWillpower = isW5 ? currentWpW5 : currentWpW20;
@@ -267,7 +272,7 @@ export function WerewolfNarratorSidebar({
                 const damagedLevels = healthDamage.filter(Boolean).length;
                 const currentForm = p.session_form || 'hominid';
 
-                const isFirstCritical = isW5 ? currentHarmony === 0 : currentGnosis === 0;
+                const isFirstCritical = isW5 ? (currentHarano >= 5 || currentHauglosk >= 5) : currentGnosis === 0;
                 const isWillpowerCritical = currentWillpower === 0;
                 const hasCriticalState = isFirstCritical || isWillpowerCritical;
 
@@ -338,21 +343,9 @@ export function WerewolfNarratorSidebar({
 
                     {/* Interactive Trackers Row */}
                     {p.character && (
-                      <div className="grid grid-cols-4 gap-1.5 text-xs">
-                        {/* First slot: Gnose (W20) ou Harmonia (W5) */}
-                        {isW5 ? (
-                          <button
-                            type="button"
-                            onClick={() => openAdjustModal('blood' as TrackerType, currentHarmony, p.id, p.character?.name || '', undefined, 10, false, 'w5_harmony')}
-                            className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
-                              currentHarmony === 0 ? 'bg-amber-500/30 border-amber-500' : 'bg-emerald-500/10 border-emerald-500/20'
-                            }`}
-                          >
-                            <Scale className={`w-3 h-3 mb-0.5 ${currentHarmony === 0 ? 'text-amber-500' : 'text-emerald-500'}`} />
-                            <span className={`font-medium ${currentHarmony === 0 ? 'text-amber-500' : 'text-emerald-500'}`}>{currentHarmony}/10</span>
-                            <span className="text-muted-foreground text-[9px]">Harmonia</span>
-                          </button>
-                        ) : (
+                      <div className={`grid ${isW5 ? 'grid-cols-3' : 'grid-cols-4'} gap-1.5 text-xs`}>
+                        {/* First slot: Gnose (W20) — omitido em W5 */}
+                        {!isW5 && (
                           <button
                             type="button"
                             onClick={() => openAdjustModal('blood' as TrackerType, currentGnosis, p.id, p.character?.name || '', undefined, maxGnosis, false, 'gnosis')}
@@ -411,6 +404,34 @@ export function WerewolfNarratorSidebar({
                       </div>
                     )}
 
+                    {/* Harano & Hauglosk (W5 only) — extra row */}
+                    {p.character && isW5 && (
+                      <div className="grid grid-cols-2 gap-1.5 text-xs">
+                        <button
+                          type="button"
+                          onClick={() => openAdjustModal('blood' as TrackerType, currentHarano, p.id, p.character?.name || '', undefined, 5, false, 'w5_harano')}
+                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                            currentHarano >= 5 ? 'bg-amber-500/30 border-amber-500' : 'bg-red-600/10 border-red-600/20'
+                          }`}
+                        >
+                          <Scale className={`w-3 h-3 mb-0.5 ${currentHarano >= 5 ? 'text-amber-500' : 'text-red-500'}`} />
+                          <span className={`font-medium ${currentHarano >= 5 ? 'text-amber-500' : 'text-red-500'}`}>{currentHarano}/5</span>
+                          <span className="text-muted-foreground text-[9px]">Harano</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openAdjustModal('blood' as TrackerType, currentHauglosk, p.id, p.character?.name || '', undefined, 5, false, 'w5_hauglosk')}
+                          className={`flex flex-col items-center p-1.5 rounded border cursor-pointer transition-colors hover:bg-muted/50 ${
+                            currentHauglosk >= 5 ? 'bg-amber-500/30 border-amber-500' : 'bg-blue-600/10 border-blue-600/20'
+                          }`}
+                        >
+                          <Scale className={`w-3 h-3 mb-0.5 ${currentHauglosk >= 5 ? 'text-amber-500' : 'text-blue-400'}`} />
+                          <span className={`font-medium ${currentHauglosk >= 5 ? 'text-amber-500' : 'text-blue-400'}`}>{currentHauglosk}/5</span>
+                          <span className="text-muted-foreground text-[9px]">Hauglosk</span>
+                        </button>
+                      </div>
+                    )}
+
                     {/* View Character Sheet Button */}
                     {p.character && (
                       <Button
@@ -458,7 +479,8 @@ export function WerewolfNarratorSidebar({
                       ? {
                           rage: selectedParticipant?.session_w5_rage ?? 0,
                           willpower: selectedParticipant?.session_w5_willpower_current ?? 0,
-                          harmony: selectedParticipant?.session_w5_harmony ?? 7,
+                          harano: selectedParticipant?.session_w5_harano ?? 0,
+                          hauglosk: selectedParticipant?.session_w5_hauglosk ?? 0,
                           healthDamage: selectedParticipant?.session_health_damage ?? Array(7).fill(false),
                           form: selectedParticipant?.session_form || 'hominid',
                         }

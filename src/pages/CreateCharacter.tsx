@@ -143,7 +143,7 @@ export default function CreateCharacter() {
   const { isPremium, loading: premiumLoading } = usePremium();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
 
-  // Apply W5 defaults (caps 0-5 for Rage/Will, Harmony 7) once the system is W5.
+  // Apply W5 defaults (caps 0-5 for Rage/Will, Harano/Hauglosk 0) once the system is W5.
   useEffect(() => {
     if (gameSystem === 'lobisomem_w5') {
       setLobisomemFormData(prev => ({
@@ -151,7 +151,8 @@ export default function CreateCharacter() {
         rage: Math.min(prev.rage || 1, 5),
         willpower: Math.min(prev.willpower || 3, 5),
         gnosis: 0,
-        harmony: prev.harmony ?? 7,
+        harano: prev.harano ?? 0,
+        hauglosk: prev.hauglosk ?? 0,
       }));
     }
     if (gameSystem === 'mago_m5') {
@@ -342,10 +343,11 @@ export default function CreateCharacter() {
             willpower,
             gifts: lobisomemFormData.gifts,
             backgrounds: lobisomemFormData.backgrounds,
-            // W5 não usa Renome — substitui por Harmonia.
+            // W5 adiciona Harano/Hauglosk; Renome existe em ambas edições.
+            renown: lobisomemFormData.renown,
             ...(isW5
-              ? { harmony: lobisomemFormData.harmony ?? 7 }
-              : { renown: lobisomemFormData.renown }),
+              ? { harano: lobisomemFormData.harano ?? 0, hauglosk: lobisomemFormData.hauglosk ?? 0 }
+              : {}),
             merits_flaws: lobisomemFormData.merits_flaws || [],
             // Metamorfos começa com lista vazia de formas — configurar na edição.
             ...(gameSystem === 'metamorfos_w20' ? { metamorph_forms: [], metamorph_species: '' } : {}),

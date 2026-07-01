@@ -42,8 +42,10 @@ export interface LobisomemFormData {
   rage: number;
   willpower: number;
   renown: { glory: number; honor: number; wisdom: number };
-  /** W5 only — substitui Renome. 0-10, default 7. */
-  harmony?: number;
+  /** W5 only — 0-5 (corrupção/influência da Fera). */
+  harano?: number;
+  /** W5 only — 0-5 (excesso de controle humano). */
+  hauglosk?: number;
 
   // Step 5 - Merits & Flaws
   merits_flaws: { id: string; name: string; cost: number; category: string }[];

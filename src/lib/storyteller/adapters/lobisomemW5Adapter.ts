@@ -38,7 +38,8 @@ export const lobisomemW5Adapter: SystemAdapter = {
   participantSelectFields: [
     'session_w5_rage',
     'session_w5_willpower_current',
-    'session_w5_harmony',
+    'session_w5_harano',
+    'session_w5_hauglosk',
     'session_health_damage',
     'session_form',
   ],
@@ -61,12 +62,20 @@ export const lobisomemW5Adapter: SystemAdapter = {
       getCurrent: (p) => (p as any).session_w5_willpower_current ?? 0,
     },
     {
-      key: 'harmony',
-      label: 'Harmonia',
+      key: 'harano',
+      label: 'Harano',
       icon: Scale,
-      color: 'text-emerald-500',
-      getMax: () => 10,
-      getCurrent: (p) => (p as any).session_w5_harmony ?? 7,
+      color: 'text-red-500',
+      getMax: () => 5,
+      getCurrent: (p) => (p as any).session_w5_harano ?? 0,
+    },
+    {
+      key: 'hauglosk',
+      label: 'Hauglosk',
+      icon: Scale,
+      color: 'text-blue-400',
+      getMax: () => 5,
+      getCurrent: (p) => (p as any).session_w5_hauglosk ?? 0,
     },
     {
       key: 'health',
@@ -82,7 +91,6 @@ export const lobisomemW5Adapter: SystemAdapter = {
   ],
 
   initializeTrackers: (p) => {
-    // Inicializa apenas se ainda for default — Harmony default no DB é 7.
     const anyP = p as any;
     if ((anyP.session_w5_rage ?? 0) !== 0 || (anyP.session_w5_willpower_current ?? 0) !== 0) {
       return null;
@@ -90,7 +98,8 @@ export const lobisomemW5Adapter: SystemAdapter = {
     return {
       session_w5_rage: 1,
       session_w5_willpower_current: 3,
-      session_w5_harmony: anyP.session_w5_harmony ?? 7,
+      session_w5_harano: anyP.session_w5_harano ?? 0,
+      session_w5_hauglosk: anyP.session_w5_hauglosk ?? 0,
       session_health_damage: [false, false, false, false, false, false, false],
       session_form: 'hominid',
     } as any;
@@ -123,12 +132,6 @@ export const lobisomemW5Adapter: SystemAdapter = {
       label: 'Teste de Frenesi (Fúria)',
       crossSystem: false,
       testType: 'rage',
-    },
-    {
-      id: 'harmony',
-      label: 'Teste de Harmonia',
-      crossSystem: false,
-      testType: 'harmony',
     },
     {
       id: 'raw_dice',
