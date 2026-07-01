@@ -621,7 +621,8 @@ export default function StorytellerSession() {
         ? {
             rage: (myParticipant as any)?.session_w5_rage ?? 0,
             willpower: (myParticipant as any)?.session_w5_willpower_current ?? 0,
-            harmony: (myParticipant as any)?.session_w5_harmony ?? 7,
+            harano: (myParticipant as any)?.session_w5_harano ?? 0,
+            hauglosk: (myParticipant as any)?.session_w5_hauglosk ?? 0,
             healthDamage:
               (myParticipant?.session_health_damage as boolean[]) ||
               Array(7).fill(false),
